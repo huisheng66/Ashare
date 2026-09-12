@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: oklch(1 0 0);
+  --surface: oklch(0.97 0.008 120);
+  --ink: oklch(0.22 0.028 120);
+  --muted: oklch(0.42 0.022 120);
+  --line: oklch(0.9 0.012 120);
+  --primary: oklch(0.34 0.078 120);
+  --primary-hover: oklch(0.28 0.072 120);
+  --on-primary: oklch(0.99 0.005 120);
+  --accent: oklch(0.46 0.145 28);
+  --on-accent: oklch(0.99 0 0);
+  --official: oklch(0.32 0.03 250);
+  --focus: oklch(0.34 0.078 120);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-toast: 50;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-official: var(--official);
+  --font-sans: var(--font-noto), "Noto Sans SC", "PingFang SC", "Microsoft YaHei",
+    sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg);
+  color: var(--ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+::selection {
+  background: oklch(0.34 0.078 120 / 0.18);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
