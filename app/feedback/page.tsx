@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function FeedbackPage() {
   return (
-    <div className="mx-auto w-full max-w-[980px] px-5 py-8 sm:px-8">
+    <div className="w-full px-5 py-8 sm:px-8">
       <h1 className="text-[36px] font-bold tracking-tight">反馈</h1>
       <p className="mt-2 max-w-[55ch] text-[15px] text-muted-foreground">
         发现链接失效、介绍不对，或页面本身有问题，都可以在这里说。反馈只有管理员能看到。

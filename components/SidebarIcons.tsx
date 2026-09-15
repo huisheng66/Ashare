@@ -33,6 +33,48 @@ const paths: Record<string, React.ReactNode> = {
       <path d="M5.4 11a5.4 5.4 0 0 0 5.2 0" />
     </>
   ),
+  tools: (
+    <>
+      <path d="M2.6 5.4h10.8M2.6 10.6h10.8" />
+      <circle cx="5.6" cy="5.4" r="1.5" />
+      <circle cx="10.4" cy="10.6" r="1.5" />
+    </>
+  ),
+  photo: (
+    <>
+      <path d="M2.2 5.2h2.3l.9-1.6h5.2l.9 1.6h2.3v7.2H2.2z" />
+      <circle cx="8" cy="8.6" r="2.4" />
+    </>
+  ),
+  games: (
+    <>
+      <rect x="1.8" y="4.8" width="12.4" height="6.4" rx="3.2" />
+      <path d="M5.2 8h2M6.2 7v2" />
+      <circle cx="10.4" cy="7.8" r="0.5" />
+      <circle cx="11.6" cy="9" r="0.5" />
+    </>
+  ),
+  education: (
+    <>
+      <path d="M8 2.8L1.8 5.8 8 8.8l6.2-3-6.2-3z" />
+      <path d="M4.4 7.2v3.2c0 1.1 1.6 1.9 3.6 1.9s3.6-.8 3.6-1.9V7.2" />
+    </>
+  ),
+  music: (
+    <>
+      <path d="M6.2 11V3.8l6-1.4v7.1" />
+      <circle cx="4.6" cy="11.4" r="1.7" />
+      <circle cx="10.6" cy="10.2" r="1.7" />
+    </>
+  ),
+  social: (
+    <>
+      <path d="M2.6 3.2h10.8v7H8.2l-3 2.6v-2.6H2.6z" />
+      <circle cx="6" cy="6.7" r="0.6" />
+      <circle cx="8" cy="6.7" r="0.6" />
+      <circle cx="10" cy="6.7" r="0.6" />
+    </>
+  ),
   about: (
     <>
       <path d="M8 1.6l5.2 2v4.1c0 3.4-2.4 5.4-5.2 6.5-2.8-1.1-5.2-3.1-5.2-6.5V3.6l5.2-2z" />

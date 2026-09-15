@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { FilterPanel } from "@/components/FilterPanel";
 import { MagnifierIcon } from "@/components/MagnifierIcon";
 import { NavIcon } from "@/components/SidebarIcons";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { scenes } from "@/data/scenes";
-import type { CatalogCounts } from "@/data/types";
 
 const sceneIconColors: Record<string, string> = {
   code: "#0A84FF",
@@ -17,9 +15,15 @@ const sceneIconColors: Record<string, string> = {
   data: "#34C759",
   office: "#A2845E",
   engineering: "#FF9500",
+  tools: "#8E8E93",
+  photo: "#FF375F",
+  games: "#5856D6",
+  education: "#30B0C7",
+  music: "#FF2D55",
+  social: "#32ADE6",
 };
 
-export function Sidebar({ counts }: { counts: CatalogCounts }) {
+export function Sidebar() {
   const pathname = usePathname();
 
   const row = (href: string, label: string, icon: React.ReactNode) => {
@@ -65,14 +69,17 @@ export function Sidebar({ counts }: { counts: CatalogCounts }) {
         </div>
       </form>
 
-      {pathname === "/" ? (
-        <div className="mb-3 border-t border-border pt-3">
-          <FilterPanel counts={counts} />
-        </div>
-      ) : null}
-
-      <nav aria-label="主导航" className="flex flex-col gap-0.5">
+      <p className="mb-1 mt-2 px-2.5 text-[11px] font-semibold text-muted-foreground">
+        浏览
+      </p>
+      <nav aria-label="浏览" className="flex flex-col gap-0.5">
         {row("/", "探索", <NavIcon id="explore" color="#007AFF" className="size-4" />)}
+      </nav>
+
+      <p className="mb-1 mt-4 px-2.5 text-[11px] font-semibold text-muted-foreground">
+        类别
+      </p>
+      <nav aria-label="类别" className="flex flex-col gap-0.5">
         {scenes.map((scene) =>
           row(
             `/scenes/${scene.id}`,

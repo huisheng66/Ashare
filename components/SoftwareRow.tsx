@@ -1,14 +1,13 @@
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { PlatformList } from "@/components/PlatformList";
 import { SoftwareIcon } from "@/components/SoftwareIcon";
 import { SourceBadge } from "@/components/SourceBadge";
 import { Card } from "@/components/ui/card";
 import type { Software } from "@/data/types";
-import { primaryLink } from "@/lib/items";
 
 export function SoftwareRow({ item }: { item: Software }) {
-  const primary = primaryLink(item);
   return (
     <Card className="flex-row items-center gap-4 px-4 py-3 transition-shadow duration-200 hover:shadow-card-hover">
       <Link
@@ -35,13 +34,9 @@ export function SoftwareRow({ item }: { item: Software }) {
           <PlatformList platforms={item.platforms} />
         </div>
       </div>
-      {primary.url ? (
-        <Button asChild size="sm" className="shrink-0">
-          <a href={primary.url} target="_blank" rel="noopener noreferrer">
-            前往
-          </a>
-        </Button>
-      ) : null}
+      <Button asChild size="sm" variant="secondary" className="shrink-0">
+        <Link href={`/software/${item.slug}`}>查看</Link>
+      </Button>
     </Card>
   );
 }

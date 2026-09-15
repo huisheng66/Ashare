@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Noto_Sans_SC } from "next/font/google";
-import { Suspense } from "react";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { catalogCounts } from "@/lib/catalog";
 import "./globals.css";
 
 const noto = Noto_Sans_SC({
@@ -25,7 +23,6 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const counts = await catalogCounts();
   return (
     <html
       lang="zh-CN"
@@ -46,13 +43,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             跳到主要内容
           </a>
           <div className="flex w-full flex-1">
-            <Suspense
-              fallback={
-                <div className="hidden w-[240px] shrink-0 bg-muted lg:block" />
-              }
-            >
-              <Sidebar counts={counts} />
-            </Suspense>
+            <Sidebar />
             <div className="flex min-w-0 flex-1 flex-col">
               <Header />
               <main id="main" className="flex-1">

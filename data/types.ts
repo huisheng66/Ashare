@@ -4,7 +4,13 @@ export type SceneId =
   | "design"
   | "data"
   | "office"
-  | "engineering";
+  | "engineering"
+  | "tools"
+  | "photo"
+  | "games"
+  | "education"
+  | "music"
+  | "social";
 
 export type Platform = "windows" | "macos" | "linux";
 

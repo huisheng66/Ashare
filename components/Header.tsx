@@ -24,6 +24,12 @@ const sceneIconColors: Record<string, string> = {
   data: "#34C759",
   office: "#A2845E",
   engineering: "#FF9500",
+  tools: "#8E8E93",
+  photo: "#FF375F",
+  games: "#5856D6",
+  education: "#30B0C7",
+  music: "#FF2D55",
+  social: "#32ADE6",
 };
 
 const iconColor = (id: string) =>

@@ -28,7 +28,7 @@ export default async function ScenePage({ params }: Props) {
   const items = await byScene(scene.id);
 
   return (
-    <div className="mx-auto w-full max-w-[980px] px-5 py-8 sm:px-8">
+    <div className="w-full px-5 py-8 sm:px-8">
       <p>
         <Link href="/" className="text-[13px] font-medium text-primary">
           <span aria-hidden>‹ </span>探索

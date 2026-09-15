@@ -1,8 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { LayoutGrid, List } from "lucide-react";
+
+import { SoftwareCard } from "@/components/SoftwareCard";
 import { SoftwareRow } from "@/components/SoftwareRow";
-import type { Platform, Software, SourceKind } from "@/data/types";
+import { Button } from "@/components/ui/button";
+import type { Platform, Software } from "@/data/types";
 import { filterSoftware } from "@/lib/items";
 
 const platforms: { id: Platform | "all"; label: string }[] = [
@@ -12,44 +16,65 @@ const platforms: { id: Platform | "all"; label: string }[] = [
   { id: "linux", label: "Linux" },
 ];
 
-const sources: { id: SourceKind | "all"; label: string }[] = [
-  { id: "all", label: "全部来源" },
-  { id: "opensource", label: "开源" },
-  { id: "official", label: "官方" },
-  { id: "discount", label: "优惠" },
-];
-
 export function SceneBrowser({ items }: { items: Software[] }) {
   const [platform, setPlatform] = useState<Platform | "all">("all");
-  const [source, setSource] = useState<SourceKind | "all">("all");
+  const [view, setView] = useState<"grid" | "row">("row");
   const visible = useMemo(
-    () => filterSoftware(items, { platform, source }),
-    [items, platform, source],
+    () => filterSoftware(items, { platform }),
+    [items, platform],
   );
 
   return (
     <div className="mt-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-1">
+          <Button
+            type="button"
+            variant={view === "grid" ? "default" : "outline"}
+            size="icon-sm"
+            aria-label="九宫格"
+            aria-pressed={view === "grid"}
+            onClick={() => setView("grid")}
+          >
+            <LayoutGrid className="size-4" />
+          </Button>
+          <Button
+            type="button"
+            variant={view === "row" ? "default" : "outline"}
+            size="icon-sm"
+            aria-label="行排列"
+            aria-pressed={view === "row"}
+            onClick={() => setView("row")}
+          >
+            <List className="size-4" />
+          </Button>
+        </div>
         <FilterGroup
           legend="系统"
           value={platform}
           options={platforms}
           onChange={setPlatform}
         />
-        <FilterGroup
-          legend="来源"
-          value={source}
-          options={sources}
-          onChange={setSource}
-        />
       </div>
-      <p className="mt-4 text-[12px] text-muted-foreground">{visible.length} 个软件</p>
+
+      <p className="mt-4 text-[12px] text-muted-foreground">
+        {visible.length} 个软件
+      </p>
+
       {visible.length ? (
-        <div className="mt-1 space-y-2">
-          {visible.map((item) => (
-            <SoftwareRow key={item.slug} item={item} />
-          ))}
-        </div>
+        view === "grid" ? (
+          <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-5">
+            {visible.map((item) => (
+              <SoftwareCard key={item.slug} item={item} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-1 space-y-2">
+            {visible.map((item) => (
+              <SoftwareRow key={item.slug} item={item} />
+            ))}
+          </div>
+        )
       ) : (
         <p className="mt-6 text-[15px] text-muted-foreground">
           这个组合下没有条目。试试放宽系统和来源。

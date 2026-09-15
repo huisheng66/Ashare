@@ -34,6 +34,12 @@ export async function catalogCounts(): Promise<CatalogCounts> {
     "data",
     "office",
     "engineering",
+    "tools",
+    "photo",
+    "games",
+    "education",
+    "music",
+    "social",
   ];
   const platformIds: Platform[] = ["windows", "macos", "linux"];
   return {

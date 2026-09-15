@@ -50,7 +50,7 @@ export default async function HomePage({ searchParams }: Props) {
   const featured = all.filter((item) => item.featured);
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-5 py-8 sm:px-8">
+    <div className="w-full px-5 py-8 sm:px-8">
       <h1 className="sr-only">探索</h1>
       <HotSearchBar />
       {featured.length ? (

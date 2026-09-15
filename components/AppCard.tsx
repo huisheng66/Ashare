@@ -1,13 +1,13 @@
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlatformList } from "@/components/PlatformList";
 import { SoftwareIcon } from "@/components/SoftwareIcon";
 import { SourceBadge } from "@/components/SourceBadge";
 import type { Software } from "@/data/types";
-import { primaryLink } from "@/lib/items";
 
 export function AppCard({ item }: { item: Software }) {
-  const primary = primaryLink(item);
   return (
     <Card className="w-[240px] shrink-0 transition-shadow duration-200 hover:shadow-card-hover">
       <CardContent className="flex h-full flex-col">
@@ -27,13 +27,9 @@ export function AppCard({ item }: { item: Software }) {
           <div className="min-w-0 truncate">
             <PlatformList platforms={item.platforms} />
           </div>
-          {primary.url ? (
-            <Button asChild size="sm">
-              <a href={primary.url} target="_blank" rel="noopener noreferrer">
-                前往
-              </a>
-            </Button>
-          ) : null}
+          <Button asChild size="sm" variant="secondary">
+            <Link href={`/software/${item.slug}`}>查看</Link>
+          </Button>
         </div>
       </CardContent>
     </Card>
