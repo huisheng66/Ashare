@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ashare runtime data
+# data/icons/ 是提交进仓库的本地图标，不忽略
+data/store/
+public/media/

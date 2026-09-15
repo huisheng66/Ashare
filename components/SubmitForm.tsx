@@ -1,176 +1,92 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { scenes } from "@/data/scenes";
+import { CircleCheck } from "lucide-react";
+import { useActionState } from "react";
 
-const STORAGE_KEY = "ashare-submissions";
+import { submitSubmission, SubmissionState } from "@/app/submit/actions";
+import { Field } from "@/components/form-field";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
-type Draft = {
-  name: string;
-  url: string;
-  scene: string;
-  need: string;
-};
+const initial: SubmissionState = { ok: false };
 
-const empty: Draft = { name: "", url: "", scene: "code", need: "" };
+const kindOptions = [
+  { value: "app", label: "应用（厂商正式版 / 免费档 / 优惠入口）" },
+  { value: "script", label: "脚本 / 命令行小工具" },
+  { value: "opensource", label: "开源项目" },
+];
 
 export function SubmitForm() {
-  const [draft, setDraft] = useState<Draft>(empty);
-  const [error, setError] = useState("");
-  const [done, setDone] = useState(false);
-
-  const sceneName = useMemo(
-    () => scenes.find((s) => s.id === draft.scene)?.name ?? "",
-    [draft.scene],
+  const [state, formAction, pending] = useActionState(
+    submitSubmission,
+    initial,
   );
 
-  function onSubmit(event: FormEvent) {
-    event.preventDefault();
-    setError("");
-    const name = draft.name.trim();
-    const url = draft.url.trim();
-    const need = draft.need.trim();
-    if (!name) {
-      setError("请填写软件名。");
-      return;
-    }
-    if (!isOfficialUrl(url)) {
-      setError("请填写以 http:// 或 https:// 开头的官方页面地址。");
-      return;
-    }
-    if (need.length < 8) {
-      setError("请用一句话说明它解决什么需求，至少 8 个字。");
-      return;
-    }
-
-    const entry = {
-      ...draft,
-      name,
-      url,
-      need,
-      at: new Date().toISOString(),
-    };
-    const prev = readStore();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([entry, ...prev]));
-    setDone(true);
-  }
-
-  if (done) {
+  if (state.ok) {
     return (
-      <div className="rounded-xl bg-surface px-5 py-8">
-        <h2 className="text-xl font-extrabold tracking-tight">已经记下</h2>
-        <p className="mt-2 max-w-[50ch] text-muted">
-          {draft.name}（{sceneName}）会进入审核。通过后才会出现在目录里。这一版先存在你这台浏览器里，方便演示流程。
+      <Card className="items-center gap-3 py-10 text-center">
+        <CircleCheck className="size-10 text-opensource" />
+        <h2 className="text-lg font-semibold">已提交</h2>
+        <p className="max-w-[50ch] text-sm text-muted-foreground">
+          会进入站内审核队列，通过后才会出现在目录里。感谢推荐。
         </p>
-        <button
-          type="button"
-          className="mt-6 h-11 rounded-lg bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover"
-          onClick={() => {
-            setDraft(empty);
-            setDone(false);
-          }}
-        >
+        <Button variant="secondary" onClick={() => location.reload()}>
           再提交一个
-        </button>
-      </div>
+        </Button>
+      </Card>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="max-w-xl space-y-5" noValidate>
-      <Field label="软件名" htmlFor="name">
-        <input
-          id="name"
-          value={draft.name}
-          onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-          className={inputClass}
-          placeholder="例如 JASP"
-        />
+    <form action={formAction} className="space-y-5">
+      <Field label="类型" htmlFor="kind">
+        <Select name="kind" defaultValue="app">
+          <SelectTrigger id="kind" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {kindOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </Field>
-      <Field label="官方页面" htmlFor="url">
-        <input
-          id="url"
-          type="url"
-          value={draft.url}
-          onChange={(e) => setDraft({ ...draft, url: e.target.value })}
-          className={inputClass}
-          placeholder="https://"
-        />
+      <Field label="名称" htmlFor="name">
+        <Input id="name" name="name" required placeholder="例如 JASP" />
       </Field>
-      <Field label="场景" htmlFor="scene">
-        <select
-          id="scene"
-          value={draft.scene}
-          onChange={(e) => setDraft({ ...draft, scene: e.target.value })}
-          className={inputClass}
-        >
-          {scenes.map((scene) => (
-            <option key={scene.id} value={scene.id}>
-              {scene.name}
-            </option>
-          ))}
-        </select>
+      <Field label="主链接（官网 / GitHub）" htmlFor="url">
+        <Input id="url" name="url" type="url" required placeholder="https://" />
       </Field>
       <Field label="它解决什么需求" htmlFor="need">
-        <textarea
+        <Textarea
           id="need"
-          value={draft.need}
-          onChange={(e) => setDraft({ ...draft, need: e.target.value })}
-          className={`${inputClass} h-auto min-h-28 py-3`}
+          name="need"
+          required
+          minLength={8}
+          maxLength={1000}
+          rows={5}
           placeholder="例如：需要点选做 t 检验，不想先学 R"
         />
       </Field>
-      {error ? (
-        <p role="alert" className="text-[0.875rem] font-medium text-accent">
-          {error}
+      {state.message ? (
+        <p role="alert" className="text-[13px] font-medium text-destructive">
+          {state.message}
         </p>
       ) : null}
-      <button
-        type="submit"
-        className="h-11 rounded-lg bg-primary px-4 font-semibold text-on-primary hover:bg-primary-hover"
-      >
-        提交审核
-      </button>
+      <Button type="submit" size="lg" disabled={pending}>
+        {pending ? "提交中…" : "提交审核"}
+      </Button>
     </form>
   );
-}
-
-const inputClass =
-  "h-11 w-full rounded-lg border border-line bg-bg px-3.5 text-ink placeholder:text-muted";
-
-function Field({
-  label,
-  htmlFor,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label htmlFor={htmlFor} className="mb-1.5 block text-[0.875rem] font-semibold">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function isOfficialUrl(value: string) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-function readStore() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as unknown[]) : [];
-  } catch {
-    return [];
-  }
 }

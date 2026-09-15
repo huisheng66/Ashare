@@ -1,6 +1,7 @@
-import type { Software } from "./types";
+import type { SeedSoftware } from "./types";
 
-export const software: Software[] = [
+/** 静态种子：首次启动灌入 data/store/catalog.json 后即以 store 为准 */
+export const software: SeedSoftware[] = [
   {
     slug: "vscode",
     name: "Visual Studio Code",
@@ -134,6 +135,7 @@ export const software: Software[] = [
     scenes: ["docs", "office"],
     platforms: ["windows", "macos", "linux"],
     source: "official",
+    price: "个人免费",
     officialUrl: "https://obsidian.md/download",
     officialLabel: "obsidian.md",
     whoFor: "要用本地文件做长期笔记，并能接受 Markdown。",
@@ -214,6 +216,7 @@ export const software: Software[] = [
     scenes: ["design"],
     platforms: ["windows", "macos"],
     source: "discount",
+    price: "个人档免费",
     officialUrl: "https://www.figma.com/downloads/",
     officialLabel: "figma.com",
     discountNote:
@@ -440,6 +443,7 @@ export const software: Software[] = [
     scenes: ["office", "docs"],
     platforms: ["windows", "macos", "linux"],
     source: "official",
+    price: "基础免费",
     officialUrl: "https://www.wps.cn/",
     officialLabel: "wps.cn",
     whoFor: "主要在国内环境交 .docx / .xlsx，需要高兼容。",

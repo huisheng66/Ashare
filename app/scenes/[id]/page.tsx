@@ -25,21 +25,17 @@ export default async function ScenePage({ params }: Props) {
   const { id } = await params;
   const scene = sceneById[id as SceneId];
   if (!scene) notFound();
-  const items = byScene(scene.id);
+  const items = await byScene(scene.id);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-      <p className="text-[0.8125rem] text-muted">
-        <Link href="/" className="hover:text-ink">
-          首页
+    <div className="mx-auto w-full max-w-[980px] px-5 py-8 sm:px-8">
+      <p>
+        <Link href="/" className="text-[13px] font-medium text-primary">
+          <span aria-hidden>‹ </span>探索
         </Link>
-        <span aria-hidden> / </span>
-        {scene.name}
       </p>
-      <h1 className="mt-3 text-[1.75rem] font-extrabold tracking-tight">
-        {scene.name}
-      </h1>
-      <p className="mt-2 max-w-[60ch] text-muted">{scene.description}</p>
+      <h1 className="mt-4 text-[36px] font-bold tracking-tight">{scene.name}</h1>
+      <p className="mt-2 max-w-[60ch] text-[15px] text-muted-foreground">{scene.description}</p>
       <SceneBrowser items={items} />
     </div>
   );

@@ -1,0 +1,63 @@
+import type { Software } from "./types";
+
+/** 新数据形态样例：脚本与开源项目（随首次灌入一起进 store） */
+export const samples: Software[] = [
+  {
+    slug: "yt-dlp",
+    name: "yt-dlp",
+    aliases: ["ytdlp", "视频下载", "命令行下载"],
+    kind: "script",
+    status: "published",
+    tags: ["CLI", "视频", "开源"],
+    summary: "命令行视频下载脚本，支持大量站点，可只下音频或指定清晰度。",
+    body: "yt-dlp 是一个持续维护的命令行下载脚本，用来把网页视频存成本地文件。它不做界面，所有能力都通过参数表达：只取音频、限最高清晰度、批量按列表下载都可以一条命令完成。\n适合愿意开终端、想要可重复命令的人；偶尔下一次视频、只想点按钮的话，它不是最顺手的选择。\n项目开源且更新频繁，建议从 GitHub Releases 获取最新版，旧版常因站点改版失效。",
+    scenes: ["code", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    links: {
+      official: "https://yt-dlp.org",
+      github: "https://github.com/yt-dlp/yt-dlp",
+    },
+    tutorial: [
+      "从 GitHub Releases 下载对应系统的可执行文件，放到 PATH 目录里。",
+      "终端运行 yt-dlp --version 确认可用。",
+      "基本用法：yt-dlp「视频链接」；只要音频加 -x。",
+      "清晰度限制用 -f「bv*[height<=1080]+ba」这类格式表达式，避免下到 8K。",
+    ],
+    whoFor: "愿意用终端、需要批量或可重复下载的人。",
+    whoNot: "只想点一下按钮偶尔存个视频，命令行会觉得麻烦。",
+    alternatives: [],
+    featured: true,
+    previews: [],
+    icon: { letter: "Y", color: "#7A57D1" },
+  },
+  {
+    slug: "syncthing",
+    name: "Syncthing",
+    aliases: ["sync", "文件同步"],
+    kind: "opensource",
+    status: "published",
+    tags: ["同步", "P2P", "自托管"],
+    summary: "开源的设备间文件同步工具，点对点直传，不经第三方服务器。",
+    body: "Syncthing 在你自己的设备之间建立点对点同步：文件夹在 A 电脑改动，B 电脑和手机自动跟上，数据只在设备之间流动，不经过厂商服务器。\n适合在意数据位置、有固定几台常用设备的人；需要「把链接发给同事即可访问」的多人协作盘，它不是同类替代。\n第一次配置要互相交换设备 ID，之后基本免维护。国内访问官方发布较慢时，可用项目方列出的已核验镜像。",
+    scenes: ["office"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    links: {
+      official: "https://syncthing.net",
+      github: "https://github.com/syncthing/syncthing",
+    },
+    tutorial: [
+      "官网下载安装包，启动后浏览器打开本地管理页 127.0.0.1:8384。",
+      "两台设备分别添加对方的设备 ID，完成信任。",
+      "添加要同步的文件夹，勾选共享给对方设备。",
+      "手机端用官方 App，扫码即可加入。",
+    ],
+    whoFor: "有几台常设备、想自己掌握数据位置的人。",
+    whoNot: "要和多人共享链接协作，或不想管任何配置的人。",
+    alternatives: ["localsend"],
+    featured: false,
+    previews: [],
+    icon: { letter: "S", color: "#0891B1", simpleIcon: "syncthing" },
+  },
+];

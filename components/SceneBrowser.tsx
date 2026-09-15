@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { SoftwareRow } from "@/components/SoftwareRow";
 import type { Platform, Software, SourceKind } from "@/data/types";
-import { filterSoftware } from "@/lib/catalog";
+import { filterSoftware } from "@/lib/items";
 
 const platforms: { id: Platform | "all"; label: string }[] = [
   { id: "all", label: "全部系统" },
@@ -43,15 +43,17 @@ export function SceneBrowser({ items }: { items: Software[] }) {
           onChange={setSource}
         />
       </div>
-      <p className="mt-4 text-[0.8125rem] text-muted">{visible.length} 个软件</p>
+      <p className="mt-4 text-[12px] text-muted-foreground">{visible.length} 个软件</p>
       {visible.length ? (
-        <div className="mt-1">
+        <div className="mt-1 space-y-2">
           {visible.map((item) => (
             <SoftwareRow key={item.slug} item={item} />
           ))}
         </div>
       ) : (
-        <p className="mt-6 text-muted">这个组合下没有条目。试试放宽系统和来源。</p>
+        <p className="mt-6 text-[15px] text-muted-foreground">
+          这个组合下没有条目。试试放宽系统和来源。
+        </p>
       )}
     </div>
   );
@@ -71,7 +73,7 @@ function FilterGroup<T extends string>({
   return (
     <fieldset className="min-w-0">
       <legend className="sr-only">{legend}</legend>
-      <div className="flex flex-wrap gap-1">
+      <div className="inline-flex rounded-full bg-muted p-1">
         {options.map((option) => {
           const active = option.id === value;
           return (
@@ -79,10 +81,10 @@ function FilterGroup<T extends string>({
               key={option.id}
               type="button"
               onClick={() => onChange(option.id)}
-              className={`h-9 rounded-full px-3 text-[0.8125rem] font-medium transition-colors ${
+              className={`h-7 rounded-full px-3.5 text-[13px] font-medium transition-colors ${
                 active
-                  ? "bg-primary text-on-primary"
-                  : "bg-surface text-ink hover:bg-[oklch(0.94_0.012_120)]"
+                  ? "bg-background text-foreground shadow-card"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {option.label}

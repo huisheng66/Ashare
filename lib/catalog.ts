@@ -1,65 +1,61 @@
-import { software } from "@/data/software";
-import type { Platform, SceneId, Software, SourceKind } from "@/data/types";
+import "server-only";
 
-export function getSoftware(slug: string): Software | undefined {
-  return software.find((item) => item.slug === slug);
+import { getCatalogAll } from "./store";
+import { kindLabel } from "./items";
+import type { CatalogCounts, ItemKind, Platform, SceneId, Software } from "@/data/types";
+
+/** 服务端数据访问：公开页只读 published 条目 */
+
+export async function allPublished(): Promise<Software[]> {
+  return (await getCatalogAll()).filter((item) => item.status === "published");
 }
 
-export function byScene(id: SceneId): Software[] {
-  return software.filter((item) => item.scenes.includes(id));
+export async function getSoftware(slug: string): Promise<Software | undefined> {
+  return (await allPublished()).find((item) => item.slug === slug);
 }
 
-export function featuredSoftware(): Software[] {
-  return software.filter((item) => item.featured);
+export async function byScene(id: SceneId): Promise<Software[]> {
+  return (await allPublished()).filter((item) => item.scenes.includes(id));
 }
 
-export function alternativesOf(item: Software): Software[] {
+export async function alternativesOf(item: Software): Promise<Software[]> {
+  const published = await allPublished();
   return item.alternatives
-    .map((slug) => getSoftware(slug))
+    .map((slug) => published.find((i) => i.slug === slug))
     .filter((value): value is Software => Boolean(value));
 }
 
-export function searchSoftware(query: string, items: Software[] = software): Software[] {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return items;
-  return items.filter((item) => {
-    const hay = [
-      item.name,
-      item.nameZh ?? "",
-      item.summary,
-      item.whoFor,
-      ...item.aliases,
-      ...item.scenes,
-    ]
-      .join(" ")
-      .toLowerCase();
-    return hay.includes(needle);
-  });
+export async function catalogCounts(): Promise<CatalogCounts> {
+  const items = await allPublished();
+  const sceneIds: SceneId[] = [
+    "code",
+    "docs",
+    "design",
+    "data",
+    "office",
+    "engineering",
+  ];
+  const platformIds: Platform[] = ["windows", "macos", "linux"];
+  return {
+    total: items.length,
+    discount: items.filter((item) => item.source === "discount").length,
+    kinds: Object.fromEntries(
+      (Object.keys(kindLabel) as ItemKind[]).map((id) => [
+        id,
+        items.filter((item) => item.kind === id).length,
+      ]),
+    ) as CatalogCounts["kinds"],
+    scenes: Object.fromEntries(
+      sceneIds.map((id) => [
+        id,
+        items.filter((item) => item.scenes.includes(id)).length,
+      ]),
+    ) as CatalogCounts["scenes"],
+    platforms: Object.fromEntries(
+      platformIds.map((id) => [
+        id,
+        items.filter((item) => item.platforms.includes(id)).length,
+      ]),
+    ) as CatalogCounts["platforms"],
+  };
 }
-
-export function filterSoftware(
-  items: Software[],
-  opts: { platform?: Platform | "all"; source?: SourceKind | "all" },
-): Software[] {
-  return items.filter((item) => {
-    const platformOk =
-      !opts.platform || opts.platform === "all"
-        ? true
-        : item.platforms.includes(opts.platform);
-    const sourceOk =
-      !opts.source || opts.source === "all" ? true : item.source === opts.source;
-    return platformOk && sourceOk;
-  });
-}
-
-export const platformLabel: Record<Platform, string> = {
-  windows: "Windows",
-  macos: "macOS",
-  linux: "Linux",
-};
-
-export const sourceLabel: Record<SourceKind, string> = {
-  official: "官方",
-  opensource: "开源",
-  discount: "优惠",
-};

@@ -1,33 +1,65 @@
-import { HomeCatalog } from "@/components/HomeCatalog";
-import { scenes } from "@/data/scenes";
-import { software } from "@/data/software";
-import { featuredSoftware } from "@/lib/catalog";
+import { AppCardRow } from "@/components/AppCard";
+import { CatalogBrowser } from "@/components/CatalogBrowser";
+import { HotSearchBar } from "@/components/HotSearchBar";
+import type { Platform, SceneId } from "@/data/types";
+import { allPublished, catalogCounts } from "@/lib/catalog";
 
-export default function HomePage() {
+export const metadata = {
+  title: "探索",
+};
+
+type Props = {
+  searchParams: Promise<{
+    scene?: string;
+    platform?: string;
+    kind?: string;
+    discount?: string;
+    sort?: string;
+  }>;
+};
+
+function parseList(value?: string): string[] {
+  return value ? value.split(",").filter(Boolean) : [];
+}
+
+export default async function HomePage({ searchParams }: Props) {
+  const sp = await searchParams;
+  const scenePicked = new Set(parseList(sp.scene)) as Set<SceneId>;
+  const platformPicked = new Set(parseList(sp.platform)) as Set<Platform>;
+  const kindPicked = new Set(parseList(sp.kind));
+  const discountOnly = sp.discount === "1";
+
+  const all = await allPublished();
+  let shown = all.filter(
+    (item) =>
+      (scenePicked.size === 0 ||
+        item.scenes.some((s) => scenePicked.has(s))) &&
+      (platformPicked.size === 0 ||
+        item.platforms.some((p) => platformPicked.has(p))) &&
+      (kindPicked.size === 0 || kindPicked.has(item.kind)) &&
+      (!discountOnly || item.source === "discount"),
+  );
+  if (sp.sort === "updated") {
+    shown = [...shown].sort((a, b) =>
+      (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""),
+    );
+  } else if (sp.sort === "name") {
+    shown = [...shown].sort((a, b) => a.name.localeCompare(b.name));
+  }
+  const counts = await catalogCounts();
+  const featured = all.filter((item) => item.featured);
+
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-      <header className="max-w-2xl">
-        <h1 className="text-balance text-[1.75rem] font-extrabold leading-tight tracking-tight sm:text-4xl">
-          按你要做的事找软件
-        </h1>
-        <p className="mt-3 max-w-[58ch] text-[1.05rem] text-muted">
-          目录按场景排。每条都告诉你适不适合、去哪个官网、有没有平替。不提供安装包，也不做破解。
-        </p>
-      </header>
-
-      <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[0.875rem] text-ink">
-        <li>只连官方与开源</li>
-        <li>安装要点写在详情里</li>
-        <li>商业软件旁给出免费路径</li>
-      </ul>
-
-      <div className="mt-8">
-        <HomeCatalog
-          scenes={scenes}
-          catalog={software}
-          featured={featuredSoftware()}
-        />
-      </div>
+    <div className="mx-auto w-full max-w-[1200px] px-5 py-8 sm:px-8">
+      <h1 className="sr-only">探索</h1>
+      <HotSearchBar />
+      {featured.length ? (
+        <section className="mt-8">
+          <h2 className="text-xl font-bold tracking-tight">编辑精选</h2>
+          <AppCardRow className="mt-4" items={featured} />
+        </section>
+      ) : null}
+      <CatalogBrowser items={shown} total={counts.total} counts={counts} />
     </div>
   );
 }

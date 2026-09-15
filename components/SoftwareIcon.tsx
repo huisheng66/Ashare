@@ -4,20 +4,27 @@ import { useState } from "react";
 import type { Software } from "@/data/types";
 
 type Props = {
-  item: Pick<Software, "name" | "icon">;
+  item: Pick<Software, "name" | "icon" | "iconImage">;
   size?: number;
   className?: string;
 };
 
 export function SoftwareIcon({ item, size = 48, className = "" }: Props) {
-  const [failed, setFailed] = useState(!item.icon.simpleIcon);
-  const src = item.icon.simpleIcon
-    ? `https://cdn.simpleicons.org/${item.icon.simpleIcon}`
-    : "";
+  // 优先级：本地图标图 → Simple Icons → 字母
+  const [stage, setStage] = useState(
+    item.iconImage ? 0 : item.icon.simpleIcon ? 1 : 2,
+  );
+  const advance = () => setStage((s) => s + 1);
+  const src =
+    stage === 0 && item.iconImage
+      ? item.iconImage
+      : stage <= 1 && item.icon.simpleIcon
+        ? `/icons/${item.icon.simpleIcon}`
+        : "";
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-[10px] ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-[22.37%] ${className}`}
       style={{
         width: size,
         height: size,
@@ -25,7 +32,7 @@ export function SoftwareIcon({ item, size = 48, className = "" }: Props) {
       }}
       aria-hidden
     >
-      {!failed && src ? (
+      {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
@@ -33,11 +40,11 @@ export function SoftwareIcon({ item, size = 48, className = "" }: Props) {
           width={Math.round(size * 0.56)}
           height={Math.round(size * 0.56)}
           className="object-contain"
-          onError={() => setFailed(true)}
+          onError={advance}
         />
       ) : (
         <span
-          className="font-extrabold leading-none"
+          className="font-bold leading-none"
           style={{
             color: item.icon.color,
             fontSize: size * 0.42,
