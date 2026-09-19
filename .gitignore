@@ -45,3 +45,8 @@ next-env.d.ts
 # data/icons/ 是提交进仓库的本地图标，不忽略
 data/store/
 public/media/
+
+# agent tool state
+.mimosa/
+.v2c/
+.zcode/

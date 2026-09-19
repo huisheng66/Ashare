@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 
 import { MagnifierIcon } from "@/components/MagnifierIcon";
 import { NavIcon } from "@/components/SidebarIcons";
+import { SiteFooter } from "@/components/SiteFooter";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { navigationGroups } from "@/lib/navigation";
 
@@ -58,6 +59,7 @@ export function Sidebar() {
       <div className="mt-auto px-2.5 pt-6 text-xs leading-relaxed text-muted-foreground">
         <p>只连可核验的官方、开源与作者授权渠道。</p>
         <p>本站不托管安装包，不收录破解。</p>
+        <SiteFooter compact />
       </div>
     </aside>
   );

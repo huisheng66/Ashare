@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { getSiteUrl } from "@/lib/site";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
+import { SiteFooter } from "@/components/SiteFooter";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -47,10 +48,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               <main id="main" tabIndex={-1} className="min-w-0 flex-1">
                 {children}
               </main>
-              <div className="border-t border-border px-5 py-6 text-[11px] leading-relaxed text-muted-foreground lg:hidden">
-                <p>只连可核验的官方、开源与作者授权渠道，不托管安装包。</p>
-                <p className="mt-1">不收录破解、修改版与盗版分发。</p>
-              </div>
+              <SiteFooter />
             </div>
           </div>
           <Toaster position="top-center" richColors />

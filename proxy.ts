@@ -31,7 +31,10 @@ export function proxy(request: NextRequest) {
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    ...(isProd ? ["upgrade-insecure-requests"] : []),
+    // 仅 https 站点才强制升级请求，避免内网 HTTP 部署被浏览器改写后无法访问
+    ...(isProd && (process.env.NEXT_PUBLIC_SITE_URL ?? "").startsWith("https://")
+      ? ["upgrade-insecure-requests"]
+      : []),
   ].join("; ");
 
   const requestHeaders = new Headers(request.headers);

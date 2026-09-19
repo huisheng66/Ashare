@@ -13,6 +13,16 @@
 本文件记录对 Ashare 的功能、界面与安全改动。格式按日期倒序，条目写明动机与涉及文件。
 规划类文档见 [next.md](./next.md)，产品与视觉规范见 [PRODUCT.md](./PRODUCT.md) / [DESIGN.md](./DESIGN.md)。
 
+## 2026-09-17 · 页脚备案
+
+- 全站页脚与侧栏底部增加备案号：鲁公网安备37011602000384号、鲁ICP备2026008648号-1，分别链到公安部与工信部查询页。
+
+## 2026-09-15 · 收录 Mineradio
+
+- 新增条目 [Mineradio](https://github.com/XxHuberrr/Mineradio)（GPL-3.0，Windows/macOS 沉浸式音乐播放器），归入新「音乐」类别（首个条目）。
+- 写入 `data/samples.ts`（种子）与 `data/store/catalog.json`（运行库，SHA-256 同步）。
+- 注意：该播放器接入网易云/QQ音乐第三方接口，登录态与音源可用性随平台变化。
+
 ## 2026-09-15 · 类别页调整
 
 - 类别页 `SceneBrowser` 去掉「来源」筛选（全部来源/开源/官方/优惠），只保留「系统」；相关 state 与常量清理。

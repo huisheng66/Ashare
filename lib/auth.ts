@@ -2,13 +2,15 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { createSessionToken, SESSION_MS, verifyPasswordHash, verifySignedSessionToken } from "./auth-crypto";
+import { getSiteUrl } from "./site";
 
 export { hashPassword } from "./auth-crypto";
 
 const COOKIE = "ashare_admin";
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  // 未配置 https 站点时（如内网 HTTP 部署）不能下发 secure cookie，否则登录后立刻失效
+  secure: process.env.NODE_ENV === "production" && getSiteUrl()?.protocol === "https:",
   sameSite: "strict" as const,
   path: "/admin",
 };
