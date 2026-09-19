@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import type { Software } from "@/data/types";
 
@@ -10,48 +11,17 @@ type Props = {
 };
 
 export function SoftwareIcon({ item, size = 48, className = "" }: Props) {
-  // 优先级：本地图标图 → Simple Icons → 字母
-  const [stage, setStage] = useState(
-    item.iconImage ? 0 : item.icon.simpleIcon ? 1 : 2,
-  );
-  const advance = () => setStage((s) => s + 1);
-  const src =
-    stage === 0 && item.iconImage
-      ? item.iconImage
-      : stage <= 1 && item.icon.simpleIcon
-        ? `/icons/${item.icon.simpleIcon}`
-        : "";
+  const [failedSources, setFailedSources] = useState<string[]>([]);
+  const sources = [item.iconImage, item.icon.simpleIcon ? `/icons/${item.icon.simpleIcon}` : undefined];
+  const src = sources.find((source): source is string => Boolean(source) && !failedSources.includes(source!));
+  const imageSize = Math.round(size * 0.62);
 
   return (
-    <span
-      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-[22.37%] ${className}`}
-      style={{
-        width: size,
-        height: size,
-        background: `${item.icon.color}14`,
-      }}
-      aria-hidden
-    >
+    <span className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-[22.37%] ${className}`} style={{ width: size, height: size, background: `${item.icon.color}14` }} aria-hidden="true">
       {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={src}
-          alt=""
-          width={Math.round(size * 0.56)}
-          height={Math.round(size * 0.56)}
-          className="object-contain"
-          onError={advance}
-        />
+        <Image src={src} alt="" width={imageSize} height={imageSize} sizes={`${imageSize}px`} unoptimized={src.startsWith("/icons/")} className="object-contain" onError={() => setFailedSources((failed) => failed.includes(src) ? failed : [...failed, src])} />
       ) : (
-        <span
-          className="font-bold leading-none"
-          style={{
-            color: item.icon.color,
-            fontSize: size * 0.42,
-          }}
-        >
-          {item.icon.letter}
-        </span>
+        <span className="font-bold leading-none" style={{ color: item.icon.color, fontSize: size * 0.42 }}>{item.icon.letter}</span>
       )}
     </span>
   );

@@ -1,10 +1,16 @@
 import type { MetadataRoute } from "next";
 
+import { absoluteSiteUrl } from "@/lib/site";
+
+export const dynamic = "force-dynamic";
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      disallow: ["/admin"],
+      allow: "/",
+      disallow: ["/admin", "/search"],
     },
+    sitemap: absoluteSiteUrl("/sitemap.xml"),
   };
 }

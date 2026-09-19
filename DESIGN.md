@@ -22,7 +22,7 @@
 | `--popover` / `--popover-foreground` | 白 / 近黑 | 浮层、下拉 |
 | `--primary` / `--primary-foreground` | `oklch(0.53 0.235 277)` 紫 / 白 | 主行动色、链接、选中态 |
 | `--secondary` / `--accent` | `oklch(0.97 0 0)` | 次要按钮、hover 底 |
-| `--muted` / `--muted-foreground` | `oklch(0.97 0 0)` / `oklch(0.552 0 0)` | 灰底 / 说明文字 |
+| `--muted` / `--muted-foreground` | `oklch(0.97 0 0)` / `oklch(0.49 0 0)` | 灰底 / 说明文字 |
 | `--destructive` | `oklch(0.577 0.245 27.325)` | 错误、删除 |
 | `--border` / `--input` / `--ring` | `oklch(0.922 0 0)` / 同 / `--primary` | 描边、输入框、焦点环 |
 | `--radius` | `0.75rem` | 圆角基准（`rounded-lg` = 1×，`xl` = 1.4×） |
@@ -33,14 +33,14 @@
 
 **阴影**：`--shadow-card`（常态）、`--shadow-card-hover`（悬停抬升）。
 
-**字体**：`--font-sans` = `Noto Sans SC`（中文主）+ PingFang / 微软雅黑回退；`letter-spacing: -0.011em`。
+**字体**：`--font-sans` = 系统字体（Segoe UI / PingFang / 微软雅黑 / Noto Sans CJK SC），无外部字体下载；`letter-spacing: -0.011em`。
 
 ## 布局
 
 - 桌面：左侧栏 `240px` sticky，`bg-sidebar`、右描边；内容列铺满剩余宽度（`w-full`），卡片网格自适应列数。
 - 移动：顶部 `nav-blur` 半透明栏（`h-14`），导航收进右侧 `Sheet` 抽屉。
 - 侧边栏只做导航（探索 / 类别 / 更多），不放大块筛选面板；筛选统一从内容工具栏的「筛选」按钮打开左侧 `Sheet`，桌面与移动一致。
-- 首页自上而下：热门搜索 → 编辑精选（`AppCardRow` 横滑）→ 工具栏（筛选 / 视图切换 / 排序）→ 卡片网格。
+- 首页自上而下：标题与主搜索框 → 热门搜索 → 编辑精选（`AppCardRow` 横滑）→ 工具栏（筛选 / 视图切换 / 排序）→ 卡片网格。
 - 卡片网格：`repeat(auto-fill, minmax(260px,1fr))`，`gap-5`，舒展。
 
 ## 组件
@@ -63,7 +63,7 @@
 
 ## 动效
 
-- 时长 150–300ms，ease-out；hover 颜色/阴影过渡；卡片 `hover:shadow-card-hover`，缩略图 `group-hover:scale-[1.03]`。
+- 时长 150–300ms，ease-out；hover 颜色/阴影过渡；卡片 `hover:ring-primary/30`，缩略图 `group-hover:scale-[1.02]`。
 - 按钮 `active:scale-[0.97]`。
 - 横向行 `scroll-row`：scroll-snap，隐藏滚动条。
 - `prefers-reduced-motion: reduce` → 全部瞬时。

@@ -2,13 +2,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * 安全响应头 + CSP（nonce 交给 Next 注入自身脚本）。
+ * 页面 CSP（nonce 交给 Next 注入自身脚本，根布局须动态渲染）。
+ * 图片与静态资源的基础安全头由 next.config.ts 统一提供。
  * 限速与 IP 封禁在 lib/guard.ts（Node 运行时）执行，这里不依赖共享内存状态。
  */
 export function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/admin")) {
+  const pathname = request.nextUrl.pathname;
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     if (!["GET", "HEAD", "POST"].includes(request.method)) {
-      return new NextResponse(null, { status: 405 });
+      return new NextResponse(null, {
+        status: 405,
+        headers: { Allow: "GET, HEAD, POST" },
+      });
     }
   }
 
@@ -20,9 +25,12 @@ export function proxy(request: NextRequest) {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isProd ? "" : " 'unsafe-eval'"}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data:",
+    "font-src 'self'",
+    `connect-src 'self'${isProd ? "" : " ws: wss:"}`,
     "object-src 'none'",
     "frame-ancestors 'none'",
     "base-uri 'self'",
+    "form-action 'self'",
     ...(isProd ? ["upgrade-insecure-requests"] : []),
   ].join("; ");
 
@@ -32,16 +40,11 @@ export function proxy(request: NextRequest) {
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  response.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=()",
-  );
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|media).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon\\.ico$|icon$|media/|icons/|robots\\.txt$|sitemap\\.xml$).*)",
+  ],
 };

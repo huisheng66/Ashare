@@ -1,19 +1,14 @@
 import type { Metadata } from "next";
-import { Noto_Sans_SC } from "next/font/google";
+import { headers } from "next/headers";
+import { getSiteUrl } from "@/lib/site";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const noto = Noto_Sans_SC({
-  variable: "--font-noto",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
+  metadataBase: getSiteUrl(),
   title: {
     default: "Ashare · 按需找软件",
     template: "%s · Ashare",
@@ -23,14 +18,17 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html
       lang="zh-CN"
       suppressHydrationWarning
-      className={`${noto.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <ThemeProvider
+          nonce={nonce}
           attribute="class"
           defaultTheme="system"
           enableSystem
@@ -46,7 +44,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             <Sidebar />
             <div className="flex min-w-0 flex-1 flex-col">
               <Header />
-              <main id="main" className="flex-1">
+              <main id="main" tabIndex={-1} className="min-w-0 flex-1">
                 {children}
               </main>
               <div className="border-t border-border px-5 py-6 text-[11px] leading-relaxed text-muted-foreground lg:hidden">

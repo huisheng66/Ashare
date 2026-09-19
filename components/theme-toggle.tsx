@@ -11,7 +11,8 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      aria-label="切换深色模式"
+      className="size-11 lg:size-9"
+      aria-label="切换浅色或深色主题"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
       <Sun className="size-4 dark:hidden" />

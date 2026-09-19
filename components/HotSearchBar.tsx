@@ -24,7 +24,7 @@ export function HotSearchBar() {
         <Link key={term} href={`/search?q=${encodeURIComponent(term)}`}>
           <Badge
             variant="secondary"
-            className="h-7 rounded-full px-3 text-[13px] transition-colors hover:bg-primary hover:text-primary-foreground"
+            className="h-9 rounded-full px-3 text-[13px] transition-colors hover:bg-primary hover:text-primary-foreground"
           >
             {term}
           </Badge>

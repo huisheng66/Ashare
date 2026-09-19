@@ -1,17 +1,21 @@
 import "server-only";
 
+import { cache } from "react";
 import { getCatalogAll } from "./store";
-import { kindLabel } from "./items";
-import type { CatalogCounts, ItemKind, Platform, SceneId, Software } from "@/data/types";
+import { kindIds, platformIds, sceneIds } from "./catalog-query";
+import type { CatalogCounts, SceneId, Software } from "@/data/types";
 
-/** 服务端数据访问：公开页只读 published 条目 */
+/** 同一次服务端渲染共享目录快照；新请求仍读取最新发布数据。 */
+export const allPublished = cache(async (): Promise<Software[]> =>
+  (await getCatalogAll()).filter((item) => item.status === "published"),
+);
 
-export async function allPublished(): Promise<Software[]> {
-  return (await getCatalogAll()).filter((item) => item.status === "published");
-}
+const publishedBySlug = cache(async () =>
+  new Map((await allPublished()).map((item) => [item.slug, item])),
+);
 
 export async function getSoftware(slug: string): Promise<Software | undefined> {
-  return (await allPublished()).find((item) => item.slug === slug);
+  return (await publishedBySlug()).get(slug);
 }
 
 export async function byScene(id: SceneId): Promise<Software[]> {
@@ -19,49 +23,30 @@ export async function byScene(id: SceneId): Promise<Software[]> {
 }
 
 export async function alternativesOf(item: Software): Promise<Software[]> {
-  const published = await allPublished();
+  const published = await publishedBySlug();
   return item.alternatives
-    .map((slug) => published.find((i) => i.slug === slug))
+    .map((slug) => published.get(slug))
     .filter((value): value is Software => Boolean(value));
 }
 
-export async function catalogCounts(): Promise<CatalogCounts> {
+export const catalogCounts = cache(async (): Promise<CatalogCounts> => {
   const items = await allPublished();
-  const sceneIds: SceneId[] = [
-    "code",
-    "docs",
-    "design",
-    "data",
-    "office",
-    "engineering",
-    "tools",
-    "photo",
-    "games",
-    "education",
-    "music",
-    "social",
-  ];
-  const platformIds: Platform[] = ["windows", "macos", "linux"];
-  return {
+  const counts: CatalogCounts = {
     total: items.length,
-    discount: items.filter((item) => item.source === "discount").length,
-    kinds: Object.fromEntries(
-      (Object.keys(kindLabel) as ItemKind[]).map((id) => [
-        id,
-        items.filter((item) => item.kind === id).length,
-      ]),
-    ) as CatalogCounts["kinds"],
-    scenes: Object.fromEntries(
-      sceneIds.map((id) => [
-        id,
-        items.filter((item) => item.scenes.includes(id)).length,
-      ]),
-    ) as CatalogCounts["scenes"],
-    platforms: Object.fromEntries(
-      platformIds.map((id) => [
-        id,
-        items.filter((item) => item.platforms.includes(id)).length,
-      ]),
-    ) as CatalogCounts["platforms"],
+    discount: 0,
+    kinds: Object.fromEntries(kindIds.map((id) => [id, 0])) as CatalogCounts["kinds"],
+    scenes: Object.fromEntries(sceneIds.map((id) => [id, 0])) as CatalogCounts["scenes"],
+    platforms: Object.fromEntries(platformIds.map((id) => [id, 0])) as CatalogCounts["platforms"],
   };
-}
+  for (const item of items) {
+    if (item.source === "discount") counts.discount += 1;
+    if (Object.hasOwn(counts.kinds, item.kind)) counts.kinds[item.kind] += 1;
+    for (const id of new Set(item.scenes)) {
+      if (Object.hasOwn(counts.scenes, id)) counts.scenes[id] += 1;
+    }
+    for (const id of new Set(item.platforms)) {
+      if (Object.hasOwn(counts.platforms, id)) counts.platforms[id] += 1;
+    }
+  }
+  return counts;
+});

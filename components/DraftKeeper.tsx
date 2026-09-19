@@ -21,15 +21,15 @@ export function DraftKeeper({
     const key = `ashare-draft:${storageKey}`;
 
     const collect = (): Record<string, DraftValue> => {
-      const data: Record<string, DraftValue> = {};
+      const data: Record<string, DraftValue> = Object.create(null);
       for (const el of form.elements) {
         const name = (el as HTMLInputElement).name;
-        if (!name || el.id === "f-previews" || el.id === "f-iconImage") continue;
+        if (!name || (el instanceof HTMLInputElement && ["file", "password", "hidden", "submit"].includes(el.type))) continue;
         if (el instanceof HTMLInputElement && el.type === "checkbox") {
           if (el.type === "checkbox" && form.elements.namedItem(name) instanceof RadioNodeList) {
             // 同名多选（场景/平台）
             const group = form.querySelectorAll<HTMLInputElement>(
-              `input[name="${name}"]:checked`,
+              `input[name="${CSS.escape(name)}"]:checked`,
             );
             data[name] = [...group].map((c) => c.value);
           } else {
@@ -48,7 +48,9 @@ export function DraftKeeper({
 
     const restore = (data: Record<string, DraftValue>) => {
       for (const [name, value] of Object.entries(data)) {
+        if (!name || ["__proto__", "constructor", "prototype"].includes(name)) continue;
         const first = form.elements.namedItem(name);
+        if (first instanceof HTMLInputElement && ["file", "password", "hidden", "submit"].includes(first.type)) continue;
         if (first instanceof RadioNodeList || form.querySelectorAll(`input[name="${name}"]`).length > 1) {
           const values = Array.isArray(value) ? value : [];
           form.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`).forEach((c) => {
@@ -78,7 +80,11 @@ export function DraftKeeper({
         // 草稿损坏则忽略
       }
     } else {
-      localStorage.removeItem(key);
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // 浏览器禁用站点存储时，表单仍可正常填写。
+      }
     }
 
     const save = () => {

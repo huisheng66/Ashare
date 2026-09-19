@@ -6,7 +6,7 @@ import { LayoutGrid, List } from "lucide-react";
 import { SoftwareCard } from "@/components/SoftwareCard";
 import { SoftwareRow } from "@/components/SoftwareRow";
 import { Button } from "@/components/ui/button";
-import type { Platform, Software } from "@/data/types";
+import type { CatalogItem, Platform } from "@/data/types";
 import { filterSoftware } from "@/lib/items";
 
 const platforms: { id: Platform | "all"; label: string }[] = [
@@ -16,7 +16,7 @@ const platforms: { id: Platform | "all"; label: string }[] = [
   { id: "linux", label: "Linux" },
 ];
 
-export function SceneBrowser({ items }: { items: Software[] }) {
+export function SceneBrowser({ items }: { items: CatalogItem[] }) {
   const [platform, setPlatform] = useState<Platform | "all">("all");
   const [view, setView] = useState<"grid" | "row">("row");
   const visible = useMemo(
@@ -31,8 +31,9 @@ export function SceneBrowser({ items }: { items: Software[] }) {
           <Button
             type="button"
             variant={view === "grid" ? "default" : "outline"}
-            size="icon-sm"
-            aria-label="九宫格"
+            size="icon"
+            className="size-11"
+            aria-label="网格视图"
             aria-pressed={view === "grid"}
             onClick={() => setView("grid")}
           >
@@ -41,8 +42,9 @@ export function SceneBrowser({ items }: { items: Software[] }) {
           <Button
             type="button"
             variant={view === "row" ? "default" : "outline"}
-            size="icon-sm"
-            aria-label="行排列"
+            size="icon"
+            className="size-11"
+            aria-label="列表视图"
             aria-pressed={view === "row"}
             onClick={() => setView("row")}
           >
@@ -57,13 +59,13 @@ export function SceneBrowser({ items }: { items: Software[] }) {
         />
       </div>
 
-      <p className="mt-4 text-[12px] text-muted-foreground">
-        {visible.length} 个软件
+      <p className="mt-4 text-sm text-muted-foreground" role="status">
+        {visible.length} 个工具
       </p>
 
       {visible.length ? (
         view === "grid" ? (
-          <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-5">
+          <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-5">
             {visible.map((item) => (
               <SoftwareCard key={item.slug} item={item} />
             ))}
@@ -76,9 +78,16 @@ export function SceneBrowser({ items }: { items: Software[] }) {
           </div>
         )
       ) : (
-        <p className="mt-6 text-[15px] text-muted-foreground">
-          这个组合下没有条目。试试放宽系统和来源。
-        </p>
+        <div className="mt-6 rounded-xl bg-muted p-6">
+          <p className="text-sm text-muted-foreground">
+            {platform === "all" ? "这个场景还没有收录工具。" : "这个场景暂时没有支持该系统的工具。"}
+          </p>
+          {platform !== "all" ? (
+            <Button variant="outline" onClick={() => setPlatform("all")} className="mt-4 min-h-11">
+              查看全部系统
+            </Button>
+          ) : null}
+        </div>
       )}
     </div>
   );
@@ -98,7 +107,7 @@ function FilterGroup<T extends string>({
   return (
     <fieldset className="min-w-0">
       <legend className="sr-only">{legend}</legend>
-      <div className="inline-flex rounded-full bg-muted p-1">
+      <div className="inline-flex flex-wrap gap-1 rounded-xl bg-muted p-1">
         {options.map((option) => {
           const active = option.id === value;
           return (
@@ -106,7 +115,8 @@ function FilterGroup<T extends string>({
               key={option.id}
               type="button"
               onClick={() => onChange(option.id)}
-              className={`h-7 rounded-full px-3.5 text-[13px] font-medium transition-colors ${
+              aria-pressed={active}
+              className={`min-h-11 rounded-lg px-3.5 text-[13px] font-medium transition-colors ${
                 active
                   ? "bg-background text-foreground shadow-card"
                   : "text-muted-foreground hover:text-foreground"

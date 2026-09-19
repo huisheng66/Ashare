@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { ChevronLeft, ExternalLink } from "lucide-react";
 
@@ -15,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { scenes } from "@/data/scenes";
 import { alternativesOf, getSoftware } from "@/lib/catalog";
 import { kindLabel, platformLabel, primaryLink, sourceLabel } from "@/lib/items";
+import { absoluteSiteUrl } from "@/lib/site";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -23,22 +26,30 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const item = await getSoftware(slug);
-  if (!item) return { title: "条目" };
-  const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(
-    /\/$/,
-    "",
-  );
+  if (!item) notFound();
+  const url = absoluteSiteUrl(`/software/${encodeURIComponent(item.slug)}`);
+  const preview = item.previews[0]
+    ? absoluteSiteUrl(item.previews[0])
+    : undefined;
   return {
     title: item.name,
     description: item.summary,
+    alternates: url ? { canonical: url } : undefined,
     openGraph: {
       title: `${item.name} · Ashare`,
       description: item.summary,
       type: "article",
-      url: `${base}/software/${item.slug}`,
-      images: item.previews[0]
-        ? [{ url: `${base}${item.previews[0]}` }]
-        : undefined,
+      siteName: "Ashare",
+      locale: "zh_CN",
+      url,
+      modifiedTime: item.updatedAt,
+      images: preview ? [{ url: preview, alt: `${item.name} 预览` }] : [],
+    },
+    twitter: {
+      card: preview ? "summary_large_image" : "summary",
+      title: `${item.name} · Ashare`,
+      description: item.summary,
+      images: preview ? [{ url: preview, alt: `${item.name} 预览` }] : [],
     },
   };
 }
@@ -47,7 +58,8 @@ export default async function SoftwarePage({ params }: Props) {
   const { slug } = await params;
   const item = await getSoftware(slug);
   if (!item) notFound();
-  const alts = await alternativesOf(item);
+  const [alts, requestHeaders] = await Promise.all([alternativesOf(item), headers()]);
+  const nonce = requestHeaders.get("x-nonce") ?? undefined;
   const primary = primaryLink(item);
   let primaryHost = primary.url;
   try {
@@ -75,6 +87,7 @@ export default async function SoftwarePage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: item.name,
+    url: absoluteSiteUrl(`/software/${encodeURIComponent(item.slug)}`),
     description: item.summary,
     operatingSystem: item.platforms.map((p) => platformLabel[p]).join(", "),
     applicationCategory: kindLabel[item.kind],
@@ -88,6 +101,7 @@ export default async function SoftwarePage({ params }: Props) {
     <div className="w-full px-5 py-8 sm:px-8">
       <script
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{ __html: jsonLd }}
       />
 
@@ -100,7 +114,11 @@ export default async function SoftwarePage({ params }: Props) {
       </Link>
 
       <header className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start">
-        <SoftwareIcon item={item} size={112} className="shadow-card" />
+        <SoftwareIcon
+          item={{ name: item.name, icon: item.icon, iconImage: item.iconImage }}
+          size={112}
+          className="shadow-card"
+        />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -153,13 +171,18 @@ export default async function SoftwarePage({ params }: Props) {
 
       {item.previews.length ? (
         <div className="scroll-row mt-8 gap-4">
-          {item.previews.map((src) => (
+          {item.previews.map((src, index) => (
             <div
               key={src}
-              className="w-[85%] shrink-0 overflow-hidden rounded-xl border border-border bg-muted sm:w-[70%]"
+              className="relative aspect-[16/10] w-[85%] shrink-0 overflow-hidden rounded-xl border border-border bg-muted sm:w-[70%]"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`${item.name} 预览`} className="w-full" />
+              <Image
+                src={src}
+                alt={`${item.name} 预览 ${index + 1}`}
+                fill
+                sizes="(max-width: 640px) 85vw, (max-width: 1024px) 70vw, 60vw"
+                className="object-contain"
+              />
             </div>
           ))}
         </div>
@@ -180,8 +203,8 @@ export default async function SoftwarePage({ params }: Props) {
         <section className="mt-10">
           <h2 className="text-xl font-bold tracking-tight">详细介绍</h2>
           <div className="mt-3 max-w-[68ch] space-y-3">
-            {paragraphs.map((text) => (
-              <p key={text.slice(0, 24)} className="text-[15px] leading-relaxed">
+            {paragraphs.map((text, index) => (
+              <p key={index} className="text-[15px] leading-relaxed">
                 {text}
               </p>
             ))}

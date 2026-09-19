@@ -5,17 +5,18 @@ import { PlatformList } from "@/components/PlatformList";
 import { SoftwareIcon } from "@/components/SoftwareIcon";
 import { SourceBadge } from "@/components/SourceBadge";
 import { Card } from "@/components/ui/card";
-import type { Software } from "@/data/types";
+import type { CatalogItem } from "@/data/types";
 
-export function SoftwareRow({ item }: { item: Software }) {
+export function SoftwareRow({ item }: { item: CatalogItem }) {
   return (
-    <Card className="flex-row items-center gap-4 px-4 py-3 transition-shadow duration-200 hover:shadow-card-hover">
+    <Card className="flex-row items-center gap-4 px-4 py-3 transition-colors duration-200 hover:ring-primary/30">
       <Link
         href={`/software/${item.slug}`}
         className="shrink-0"
-        aria-label={item.name}
+        aria-label={`查看详情：${item.name}`}
+        tabIndex={-1}
       >
-        <SoftwareIcon item={item} size={56} />
+        <SoftwareIcon item={{ name: item.name, icon: item.icon, iconImage: item.iconImage }} size={56} />
       </Link>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -35,7 +36,7 @@ export function SoftwareRow({ item }: { item: Software }) {
         </div>
       </div>
       <Button asChild size="sm" variant="secondary" className="shrink-0">
-        <Link href={`/software/${item.slug}`}>查看</Link>
+        <Link href={`/software/${item.slug}`} aria-label={`查看详情：${item.name}`}>详情</Link>
       </Button>
     </Card>
   );

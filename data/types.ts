@@ -67,6 +67,13 @@ export type Software = {
   };
 };
 
+/** 列表跨服务端/客户端边界时只发送卡片所需字段。 */
+export type CatalogItem = Pick<Software,
+  | "slug" | "name" | "nameZh" | "kind" | "tags" | "summary"
+  | "scenes" | "platforms" | "source" | "price" | "featured"
+  | "previews" | "iconImage" | "icon"
+>;
+
 export type Submission = {
   id: string;
   at: string;

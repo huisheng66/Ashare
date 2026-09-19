@@ -6,50 +6,13 @@ import path from "node:path";
 
 import { samples } from "@/data/samples";
 import { software as seed } from "@/data/software";
-import type {
-  FeedbackEntry,
-  SeedSoftware,
-  Software,
-  Submission,
-} from "@/data/types";
+import type { FeedbackEntry, SeedSoftware, Software, Submission } from "@/data/types";
+import { JsonStore } from "./json-store";
 
 const DIR = path.join(process.cwd(), "data", "store");
-
-// 单进程内存缓存 + 每文件串行写队列；原子写（tmp + rename），权限 0600
-const memory = new Map<string, unknown>();
-const queues = new Map<string, Promise<void>>();
-
-async function readJSON<T>(name: string): Promise<T | null> {
-  if (memory.has(name)) return memory.get(name) as T;
-  try {
-    const raw = await fs.readFile(path.join(DIR, `${name}.json`), "utf8");
-    memory.set(name, JSON.parse(raw) as T);
-  } catch {
-    memory.set(name, null);
-  }
-  return memory.get(name) as T | null;
-}
-
-async function writeJSON(name: string, value: unknown): Promise<void> {
-  memory.set(name, value);
-  const run = (queues.get(name) ?? Promise.resolve()).then(async () => {
-    await fs.mkdir(DIR, { recursive: true });
-    const file = path.join(DIR, `${name}.json`);
-    // 目录数据的写前备份：上一版存为 .bak，误操作可回滚
-    if (name === "catalog") {
-      await fs.copyFile(file, path.join(DIR, "catalog.bak.json")).catch(
-        () => {},
-      );
-    }
-    const tmp = path.join(DIR, `${name}.tmp`);
-    await fs.writeFile(tmp, JSON.stringify(value, null, 2), { mode: 0o600 });
-    await fs.rename(tmp, file);
-  });
-  queues.set(name, run);
-  return run;
-}
-
-const serialize = (items: Software[]) => JSON.stringify(items, null, 2);
+// One Node process owns this local store. Each mutation includes its read in the queue.
+const store = new JsonStore(DIR);
+let checkedCatalogIntegrity = false;
 
 function seedToItem(s: SeedSoftware): Software {
   const { installTips, officialUrl, ...rest } = s;
@@ -68,16 +31,17 @@ function seedToItem(s: SeedSoftware): Software {
   };
 }
 
-async function seedCatalog(): Promise<Software[]> {
-  const items = [...seed.map(seedToItem), ...samples];
-  await saveCatalog(items);
-  return items;
+const seedCatalog = (): Software[] => [...seed.map(seedToItem), ...structuredClone(samples)];
+
+function requireArray<T>(value: T[], name: string): T[] {
+  if (!Array.isArray(value)) throw new Error(`[store] ${name}.json must contain an array`);
+  return value;
 }
 
-/** 旧数据兼容：单张 preview 迁移为 previews 数组；缺失的时间戳用目录文件 mtime 补齐 */
+/** Legacy single previews and missing timestamps remain readable without rewriting data. */
 function normalize(items: Software[], fallbackTime?: Date): Software[] {
   const fallback = (fallbackTime ?? new Date()).toISOString();
-  return items.map((item) => {
+  return requireArray(items, "catalog").map((item) => {
     const next = { ...item };
     if (!next.previews) {
       const legacy = (item as unknown as { preview?: string }).preview;
@@ -89,64 +53,88 @@ function normalize(items: Software[], fallbackTime?: Date): Software[] {
   });
 }
 
-export async function getCatalogAll(): Promise<Software[]> {
-  const items = await readJSON<Software[]>("catalog");
-  if (!items) return seedCatalog();
-  let mtime: Date | undefined;
+async function catalogTime(): Promise<Date | undefined> {
   try {
-    mtime = (await fs.stat(path.join(DIR, "catalog.json"))).mtime;
-  } catch {
-    // 文件不存在时不会走到这里
+    return (await fs.stat(path.join(DIR, "catalog.json"))).mtime;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    return undefined;
   }
-  const normalized = normalize(items, mtime);
-  const recorded = await readJSON<string>("catalog.sha256");
-  if (recorded) {
-    const actual = createHash("sha256")
-      .update(JSON.stringify(items, null, 2))
-      .digest("hex");
-    if (actual !== recorded) {
-      console.warn(
-        "[store] catalog.json 与发布时的 SHA-256 不一致，文件可能被改动",
-      );
+}
+
+export async function getCatalogAll(): Promise<Software[]> {
+  const items = await store.readOrCreate("catalog", seedCatalog, async (current) => {
+    if (checkedCatalogIntegrity) return;
+    const recorded = await store.read<string>("catalog.sha256").catch((error: unknown) => {
+      console.error("[store] Could not read catalog checksum", error);
+      return null;
+    });
+    if (recorded && recorded !== createHash("sha256").update(JSON.stringify(current, null, 2)).digest("hex")) {
+      console.warn("[store] catalog.json 与发布时的 SHA-256 不一致，文件可能被改动");
     }
-  }
-  return normalized;
+    checkedCatalogIntegrity = true;
+  });
+  return normalize(items, await catalogTime());
+}
+
+export async function updateCatalog(
+  change: (items: Software[]) => Software[] | Promise<Software[]>,
+): Promise<void> {
+  await store.update("catalog", seedCatalog, async (items) => {
+    return requireArray(await change(normalize(items, await catalogTime())), "catalog");
+  }, {
+    backup: true,
+    afterWrite: async (items) => {
+      // The checksum is advisory. A sidecar failure must not report a committed save as failed.
+      const digest = createHash("sha256").update(JSON.stringify(items, null, 2)).digest("hex");
+      await store.update("catalog.sha256", () => "", () => digest).catch((error: unknown) => {
+        console.error("[store] Could not update catalog checksum", error);
+      });
+    },
+  });
 }
 
 export async function saveCatalog(items: Software[]): Promise<void> {
-  await writeJSON("catalog", items);
-  await writeJSON(
-    "catalog.sha256",
-    createHash("sha256").update(serialize(items)).digest("hex"),
-  );
+  await updateCatalog(() => items);
 }
 
 export async function getFeedback(): Promise<FeedbackEntry[]> {
-  return (await readJSON<FeedbackEntry[]>("feedback")) ?? [];
+  return requireArray((await store.read<FeedbackEntry[]>("feedback")) ?? [], "feedback");
 }
 
-export async function saveFeedback(entries: FeedbackEntry[]): Promise<void> {
-  await writeJSON("feedback", entries);
+export async function updateFeedback(change: (entries: FeedbackEntry[]) => FeedbackEntry[]): Promise<void> {
+  await store.update<FeedbackEntry[]>("feedback", () => [], (entries) => change(requireArray(entries, "feedback")));
+}
+
+export async function addFeedback(entry: FeedbackEntry): Promise<void> {
+  await updateFeedback((entries) => [entry, ...entries]);
 }
 
 export async function getSubmissions(): Promise<Submission[]> {
-  return (await readJSON<Submission[]>("submissions")) ?? [];
+  return requireArray((await store.read<Submission[]>("submissions")) ?? [], "submissions");
 }
 
-export async function saveSubmissions(entries: Submission[]): Promise<void> {
-  await writeJSON("submissions", entries);
+export async function updateSubmissions(change: (entries: Submission[]) => Submission[]): Promise<void> {
+  await store.update<Submission[]>("submissions", () => [], (entries) => change(requireArray(entries, "submissions")));
 }
 
 export async function addSubmission(entry: Submission): Promise<void> {
-  await saveSubmissions([entry, ...(await getSubmissions())]);
+  await updateSubmissions((entries) => [entry, ...entries]);
 }
 
-export type Blocks = Record<string, number>; // ip -> 封禁截止 epoch ms
+export type Blocks = Record<string, number>;
+
+function requireBlocks(value: Blocks): Blocks {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("[store] blocks.json must contain an object");
+  }
+  return value;
+}
 
 export async function getBlocks(): Promise<Blocks> {
-  return (await readJSON<Blocks>("blocks")) ?? {};
+  return requireBlocks((await store.read<Blocks>("blocks")) ?? {});
 }
 
-export async function saveBlocks(blocks: Blocks): Promise<void> {
-  await writeJSON("blocks", blocks);
+export async function updateBlocks(change: (blocks: Blocks) => Blocks): Promise<void> {
+  await store.update<Blocks>("blocks", () => ({}), (blocks) => change(requireBlocks(blocks)));
 }

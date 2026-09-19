@@ -6,43 +6,23 @@ import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import {
-  endSession,
-  hasValidSession,
-  startSession,
-  verifyPassword,
-} from "@/lib/auth";
+import { endSession, hasValidSession, startSession, verifyPassword } from "@/lib/auth";
 import { getClientIp, guardLogin, isBlocked, recordLoginFailure } from "@/lib/guard";
-import {
-  getBlocks,
-  getCatalogAll,
-  getFeedback,
-  getSubmissions,
-  saveBlocks,
-  saveCatalog,
-  saveFeedback,
-  saveSubmissions,
-} from "@/lib/store";
-import type {
-  ItemKind,
-  PublishStatus,
-  Software,
-  SourceKind,
-  Submission,
-} from "@/data/types";
+import { getSubmissions, updateBlocks, updateCatalog, updateFeedback, updateSubmissions } from "@/lib/store";
+import { imageExtension, isHttpUrl, ITEM_KINDS, MAX_UPLOAD, mediaParts, PLATFORMS, PUBLISH_STATUSES, SLUG_PATTERN, SOURCE_KINDS } from "@/lib/input-validation";
+import { scenes } from "@/data/scenes";
+import type { ItemKind, Platform, PublishStatus, SceneId, Software, SourceKind } from "@/data/types";
 
-/** 每一个 Action 与后台页面都先过这道闸 */
 export async function requireAdmin(): Promise<void> {
   if (!(await hasValidSession())) redirect("/admin/login");
-  const ip = await getClientIp();
-  if (await isBlocked(ip)) redirect("/admin/login?e=blocked");
+  if (await isBlocked(await getClientIp())) redirect("/admin/login?e=blocked");
 }
 
 export async function login(formData: FormData): Promise<void> {
   const ip = await getClientIp();
   if (!(await guardLogin(ip))) redirect("/admin/login?e=rate");
-  const password = String(formData.get("password") ?? "");
-  if (!verifyPassword(password)) {
+  const password = text(formData, "password");
+  if (!(await verifyPassword(password))) {
     await recordLoginFailure(ip);
     redirect("/admin/login?e=wrong");
   }
@@ -55,198 +35,162 @@ export async function logout(): Promise<void> {
   redirect("/admin/login");
 }
 
-const CRACK_WORDS = [
-  "破解", "序列号", "绿色版", "激活码", "注册机", "盗版",
-  "crack", "keygen", "nulled",
-];
-const GIT_HOSTS = new Set([
-  "github.com", "www.github.com", "gitlab.com", "gitee.com", "codeberg.org",
-]);
-const IMAGE_TYPES: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-  "image/gif": "gif",
-};
-const MAX_UPLOAD = 5 * 1024 * 1024;
+const CRACK_WORDS = ["破解", "序列号", "绿色版", "激活码", "注册机", "盗版", "crack", "keygen", "nulled"];
+const GIT_HOSTS = new Set(["github.com", "www.github.com", "gitlab.com", "gitee.com", "codeberg.org"]);
+const SCENES = new Set<string>(scenes.map((scene) => scene.id));
 
-/** 校验失败时回跳的表单（new 或原 slug），由 saveItem 设置 */
-let errorBack = "new";
-
-function bad(message: string): never {
-  redirect(`/admin/items/${errorBack}?e=${encodeURIComponent(message)}`);
+function text(fd: FormData, key: string): string {
+  const value = fd.get(key);
+  return typeof value === "string" ? value : "";
 }
 
 function str(fd: FormData, key: string): string {
-  return String(fd.get(key) ?? "").trim();
+  return text(fd, key).trim();
 }
 
-function checkUrl(url: string, opts: { git?: boolean } = {}): string | undefined {
-  if (!url) return undefined;
-  let parsed: URL;
+async function removeMedia(mediaPath: string): Promise<void> {
+  const parts = mediaParts(mediaPath);
+  if (!parts) return;
   try {
-    parsed = new URL(url);
-  } catch {
-    bad("链接格式不正确");
+    await fs.rm(path.join(process.cwd(), "public", "media", ...parts), { force: true });
+  } catch (error) {
+    console.error("[media] Could not remove unused image", error);
   }
-  if (
-    parsed.protocol !== "https:" &&
-    !(parsed.protocol === "http:" && process.env.NODE_ENV !== "production")
-  ) {
-    bad("链接只允许 https");
-  }
-  if (opts.git && !GIT_HOSTS.has(parsed.host)) {
-    bad("Git 链接只允许 github.com / gitlab.com / gitee.com / codeberg.org");
-  }
-  return url;
-}
-
-function rejectCrack(item: Software): void {
-  const haystack = [
-    item.name, item.summary, item.body, item.whoFor, item.whoNot,
-    ...item.tags, ...item.tutorial,
-    item.links.diskNote ?? "",
-  ]
-    .join(" ")
-    .toLowerCase();
-  if (CRACK_WORDS.some((word) => haystack.includes(word))) {
-    bad("内容包含破解相关词，拒绝保存");
-  }
-}
-
-async function saveUploadFile(file: File, slug: string): Promise<string> {
-  if (file.size > MAX_UPLOAD) bad("单张图片超过 5MB 上限");
-  const ext = IMAGE_TYPES[file.type];
-  if (!ext) bad("图片只支持 JPEG / PNG / WebP / GIF");
-  const name = `${randomBytes(8).toString("hex")}.${ext}`;
-  const dir = path.join(process.cwd(), "public", "media", slug);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(
-    path.join(dir, name),
-    Buffer.from(await file.arrayBuffer()),
-    { mode: 0o600 },
-  );
-  return `/media/${slug}/${name}`;
-}
-
-async function removeMedia(slug: string, mediaPath: string): Promise<void> {
-  if (!mediaPath.startsWith(`/media/${slug}/`)) return;
-  await fs
-    .rm(path.join(process.cwd(), "public", mediaPath), { force: true })
-    .catch(() => {});
 }
 
 export async function saveItem(fd: FormData): Promise<void> {
   await requireAdmin();
-
   const original = str(fd, "originalSlug");
-  errorBack = original || "new";
-
+  const errorBack = SLUG_PATTERN.test(original) ? original : "new";
+  // Each request owns its validation target; concurrent actions cannot overwrite it.
+  const bad: (message: string) => never = (message) => redirect(`/admin/items/${errorBack}?e=${encodeURIComponent(message)}`);
   const slug = str(fd, "slug").toLowerCase();
-  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) bad("slug 只允许小写字母、数字和中划线");
-
-  const all = await getCatalogAll();
-  const existing = original ? all.find((i) => i.slug === original) : undefined;
-  if (!existing && all.some((i) => i.slug === slug)) bad("slug 已存在");
+  if (!SLUG_PATTERN.test(slug) || (original && !SLUG_PATTERN.test(original))) bad("slug 需为 1–100 个小写字母、数字或中划线，且以字母或数字开头");
 
   const kind = (str(fd, "kind") || "app") as ItemKind;
   const status = (str(fd, "status") || "draft") as PublishStatus;
   const source = (str(fd, "source") || "official") as SourceKind;
+  const selectedScenes = [...new Set(fd.getAll("scenes").map(String))] as SceneId[];
+  const platforms = [...new Set(fd.getAll("platforms").map(String))] as Platform[];
+  if (!ITEM_KINDS.includes(kind) || !PUBLISH_STATUSES.includes(status) || !SOURCE_KINDS.includes(source)) bad("条目类型、状态或来源无效");
+  if (selectedScenes.some((scene) => !SCENES.has(scene)) || platforms.some((platform) => !PLATFORMS.includes(platform))) bad("场景或平台无效");
 
+  const checked = (key: string, max: number): string => {
+    const value = str(fd, key);
+    if (value.length > max) bad(`${key} 内容过长（最多 ${max} 字）`);
+    return value;
+  };
+  const list = (key: string): string[] => [...new Set(checked(key, 2000).split(/[,，]/).map((value) => value.trim()).filter(Boolean))];
+  const checkUrl = (key: string, git = false): string | undefined => {
+    const url = str(fd, key);
+    if (!url) return undefined;
+    if (!isHttpUrl(url, process.env.NODE_ENV !== "production")) bad("链接格式不正确，请使用不含账户密码的 HTTPS 地址");
+    if (git && !GIT_HOSTS.has(new URL(url).host)) bad("Git 链接只允许 github.com / gitlab.com / gitee.com / codeberg.org");
+    return url;
+  };
   const links = {
-    official: checkUrl(str(fd, "official")),
-    homepage: checkUrl(str(fd, "homepage")),
-    github: checkUrl(str(fd, "github"), { git: true }),
-    disk: checkUrl(str(fd, "disk")),
-    diskNote: str(fd, "diskNote") || undefined,
+    official: checkUrl("official"),
+    homepage: checkUrl("homepage"),
+    github: checkUrl("github", true),
+    disk: checkUrl("disk"),
+    diskNote: checked("diskNote", 1000) || undefined,
   };
   if (links.disk && !links.diskNote) bad("镜像链接必须填写镜像说明");
-  if (links.disk && !links.official && !links.github) {
-    bad("镜像只能作为补充，必须先填官网或 GitHub");
-  }
-
+  if (links.disk && !links.official && !links.github) bad("镜像只能作为补充，必须先填官网或 GitHub");
+  const simpleIcon = checked("simpleIcon", 100);
+  if (simpleIcon && !SLUG_PATTERN.test(simpleIcon)) bad("Simple Icon 名称格式不正确");
   const now = new Date().toISOString();
   const draft: Software = {
     slug,
-    name: str(fd, "name"),
-    nameZh: str(fd, "nameZh") || undefined,
-    aliases: str(fd, "aliases")
-      .split(/[,，]/)
-      .map((s) => s.trim())
-      .filter(Boolean),
-    kind,
-    status,
-    tags: str(fd, "tags")
-      .split(/[,，]/)
-      .map((s) => s.trim())
-      .filter(Boolean),
-    summary: str(fd, "summary"),
-    body: str(fd, "body"),
-    scenes: fd.getAll("scenes").map(String) as Software["scenes"],
-    platforms: fd.getAll("platforms").map(String) as Software["platforms"],
-    source,
-    price: str(fd, "price") || undefined,
+    name: checked("name", 100),
+    nameZh: checked("nameZh", 100) || undefined,
+    aliases: list("aliases"),
+    kind, status, source,
+    tags: list("tags"),
+    summary: checked("summary", 500),
+    body: checked("body", 50_000),
+    scenes: selectedScenes,
+    platforms,
+    price: checked("price", 100) || undefined,
     links,
-    tutorial: str(fd, "tutorial")
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean),
-    whoFor: str(fd, "whoFor"),
-    whoNot: str(fd, "whoNot"),
-    discountNote: str(fd, "discountNote") || undefined,
-    alternatives: str(fd, "alternatives")
-      .split(/[,，]/)
-      .map((s) => s.trim())
-      .filter(Boolean),
+    tutorial: checked("tutorial", 10_000).split("\n").map((value) => value.trim()).filter(Boolean),
+    whoFor: checked("whoFor", 2000),
+    whoNot: checked("whoNot", 2000),
+    discountNote: checked("discountNote", 1000) || undefined,
+    alternatives: list("alternatives"),
     featured: fd.get("featured") === "on",
     previews: [],
-    iconImage: undefined,
-    createdAt: existing?.createdAt ?? now,
+    createdAt: now,
     updatedAt: now,
     icon: {
-      letter: (str(fd, "letter") || slug[0]?.toUpperCase() || "?").slice(0, 2),
-      color: /^#[0-9a-fA-F]{6}$/.test(str(fd, "color"))
-        ? str(fd, "color")
-        : "#0071e3",
-      simpleIcon: str(fd, "simpleIcon") || undefined,
+      letter: (str(fd, "letter") || slug[0].toUpperCase()).slice(0, 2),
+      color: /^#[0-9a-fA-F]{6}$/.test(str(fd, "color")) ? str(fd, "color") : "#0071e3",
+      simpleIcon: simpleIcon || undefined,
     },
   };
-
-  // 预览图：保留未勾选移除的旧图，追加新上传，上限 6 张
-  const removeIdx = new Set(fd.getAll("removePreview").map(String));
-  const keptPreviews = (existing?.previews ?? []).filter(
-    (_, idx) => !removeIdx.has(String(idx)),
-  );
-  for (let idx = 0; idx < (existing?.previews.length ?? 0); idx++) {
-    if (removeIdx.has(String(idx))) {
-      await removeMedia(slug, existing!.previews[idx]);
-    }
-  }
-  const uploads: string[] = [];
-  for (const entry of fd.getAll("previews")) {
-    if (entry instanceof File && entry.size > 0) {
-      uploads.push(await saveUploadFile(entry, slug));
-    }
-  }
-  draft.previews = [...keptPreviews, ...uploads];
-  if (draft.previews.length > 6) bad("预览图最多 6 张");
-
-  // 图标图：单张，新传则替换旧文件
-  const iconFile = fd.get("iconImage");
-  if (iconFile instanceof File && iconFile.size > 0) {
-    draft.iconImage = await saveUploadFile(iconFile, slug);
-    if (existing?.iconImage) await removeMedia(slug, existing.iconImage);
-  } else if (slug === original) {
-    draft.iconImage = existing?.iconImage;
-  }
-
   if (!draft.name || !draft.summary) bad("名称与简介必填");
-  rejectCrack(draft);
+  const haystack = [draft.name, draft.summary, draft.body, draft.whoFor, draft.whoNot, ...draft.tags, ...draft.tutorial, links.diskNote ?? ""].join(" ").toLowerCase();
+  if (CRACK_WORDS.some((word) => haystack.includes(word))) bad("内容包含破解相关词，拒绝保存");
 
-  const next = existing
-    ? all.map((i) => (i.slug === original ? draft : i))
-    : [draft, ...all];
-  await saveCatalog(next);
+  const previews = fd.getAll("previews").filter((entry): entry is File => entry instanceof File && entry.size > 0);
+  const icon = fd.get("iconImage");
+  const iconFile = icon instanceof File && icon.size > 0 ? icon : undefined;
+  if (previews.length > 6) bad("预览图最多 6 张");
+  const validatedFiles = new Map<File, { data: Buffer; extension: string }>();
+  for (const file of [...previews, ...(iconFile ? [iconFile] : [])]) {
+    if (file.size > MAX_UPLOAD) bad("单张图片超过 5MB 上限");
+    const data = Buffer.from(await file.arrayBuffer());
+    const extension = imageExtension(file.type, data);
+    if (!extension) bad("图片内容与格式不符，只支持 JPEG / PNG / WebP / GIF");
+    validatedFiles.set(file, { data, extension });
+  }
+
+  const uploaded: string[] = [];
+  const obsolete: string[] = [];
+  const upload = async (file: File): Promise<string> => {
+    const { data, extension } = validatedFiles.get(file)!;
+    const name = `${randomBytes(8).toString("hex")}.${extension}`;
+    const dir = path.join(process.cwd(), "public", "media", slug);
+    await fs.mkdir(dir, { recursive: true });
+    const mediaPath = `/media/${slug}/${name}`;
+    const handle = await fs.open(path.join(dir, name), "wx", 0o600);
+    uploaded.push(mediaPath);
+    try {
+      await handle.writeFile(data);
+      await handle.sync();
+    } finally {
+      await handle.close();
+    }
+    return mediaPath;
+  };
+  try {
+    await updateCatalog(async (all) => {
+      const existing = original ? all.find((item) => item.slug === original) : undefined;
+      if (original && !existing) bad("条目已被删除，请刷新后重试");
+      if (all.some((item) => item.slug === slug && item.slug !== original)) bad("slug 已存在");
+      const remove = new Set(fd.getAll("removePreview").map(String));
+      const kept = (existing?.previews ?? []).filter((image, index) => {
+        if (!remove.has(String(index))) return true;
+        obsolete.push(image);
+        return false;
+      });
+      if (kept.length + previews.length > 6) bad("预览图最多 6 张");
+      draft.previews = [...kept];
+      for (const file of previews) draft.previews.push(await upload(file));
+      draft.iconImage = existing?.iconImage;
+      if (iconFile) {
+        draft.iconImage = await upload(iconFile);
+        if (existing?.iconImage) obsolete.push(existing.iconImage);
+      }
+      draft.createdAt = existing?.createdAt ?? now;
+      return existing ? all.map((item) => item.slug === original ? draft : item) : [draft, ...all];
+    });
+  } catch (error) {
+    await Promise.all(uploaded.map(removeMedia));
+    throw error;
+  }
+  // Only remove the replaced files once the new catalog has been committed.
+  await Promise.all(obsolete.filter((image) => !draft.previews.includes(image) && draft.iconImage !== image).map(removeMedia));
   revalidatePath("/", "layout");
   redirect("/admin?saved=1");
 }
@@ -255,12 +199,8 @@ export async function setItemStatus(fd: FormData): Promise<void> {
   await requireAdmin();
   const slug = str(fd, "slug");
   const status = str(fd, "status") as PublishStatus;
-  const all = await getCatalogAll();
-  await saveCatalog(
-    all.map((i) =>
-      i.slug === slug ? { ...i, status, updatedAt: new Date().toISOString() } : i,
-    ),
-  );
+  if (!SLUG_PATTERN.test(slug) || !PUBLISH_STATUSES.includes(status)) redirect("/admin?e=invalid");
+  await updateCatalog((all) => all.map((item) => item.slug === slug ? { ...item, status, updatedAt: new Date().toISOString() } : item));
   revalidatePath("/", "layout");
   redirect("/admin?saved=1");
 }
@@ -268,7 +208,7 @@ export async function setItemStatus(fd: FormData): Promise<void> {
 export async function deleteItem(fd: FormData): Promise<void> {
   await requireAdmin();
   const slug = str(fd, "slug");
-  await saveCatalog((await getCatalogAll()).filter((i) => i.slug !== slug));
+  await updateCatalog((all) => all.filter((item) => item.slug !== slug));
   revalidatePath("/", "layout");
   redirect("/admin");
 }
@@ -276,49 +216,37 @@ export async function deleteItem(fd: FormData): Promise<void> {
 export async function markFeedbackRead(fd: FormData): Promise<void> {
   await requireAdmin();
   const id = str(fd, "id");
-  await saveFeedback(
-    (await getFeedback()).map((f) => (f.id === id ? { ...f, read: true } : f)),
-  );
+  await updateFeedback((entries) => entries.map((entry) => entry.id === id ? { ...entry, read: true } : entry));
   redirect("/admin/inbox");
 }
 
 export async function deleteFeedback(fd: FormData): Promise<void> {
   await requireAdmin();
   const id = str(fd, "id");
-  await saveFeedback((await getFeedback()).filter((f) => f.id !== id));
+  await updateFeedback((entries) => entries.filter((entry) => entry.id !== id));
   redirect("/admin/inbox");
 }
 
 export async function deleteSubmission(fd: FormData): Promise<void> {
   await requireAdmin();
   const id = str(fd, "id");
-  await saveSubmissions((await getSubmissions()).filter((s) => s.id !== id));
+  await updateSubmissions((entries) => entries.filter((entry) => entry.id !== id));
   redirect("/admin/inbox");
 }
 
 export async function unblockIp(fd: FormData): Promise<void> {
   await requireAdmin();
   const ip = str(fd, "ip");
-  const blocks = await getBlocks();
-  delete blocks[ip];
-  await saveBlocks(blocks);
+  await updateBlocks((blocks) => { delete blocks[ip]; return blocks; });
   redirect("/admin/inbox");
 }
 
-/** 投稿一键转条目：删除投稿并带着预填参数跳到新建表单 */
+/** Prefill the editor while preserving the submission if editing is abandoned. */
 export async function convertSubmission(fd: FormData): Promise<void> {
   await requireAdmin();
   const id = str(fd, "id");
-  const list = await getSubmissions();
-  const submission: Submission | undefined = list.find((s) => s.id === id);
+  const submission = (await getSubmissions()).find((entry) => entry.id === id);
   if (!submission) redirect("/admin/inbox");
-  await saveSubmissions(list.filter((s) => s.id !== id));
-
-  const params = new URLSearchParams({
-    name: submission.name,
-    kind: submission.kind,
-    url: submission.url,
-    note: submission.need,
-  });
+  const params = new URLSearchParams({ name: submission.name, kind: submission.kind, url: submission.url, note: submission.need });
   redirect(`/admin/items/new?${params}`);
 }

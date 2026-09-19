@@ -1,34 +1,32 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import Form from "next/form";
 import { MagnifierIcon } from "@/components/MagnifierIcon";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MAX_SEARCH_LENGTH } from "@/lib/catalog-query";
 
-export function SearchPanel() {
-  const router = useRouter();
-  const [value, setValue] = useState("");
-
-  function onSubmit(event: FormEvent) {
-    event.preventDefault();
-    const q = value.trim();
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
-  }
-
+export function SearchPanel({ initialQuery = "" }: { initialQuery?: string }) {
   return (
-    <form onSubmit={onSubmit} role="search" className="mt-6">
-      <label htmlFor="search-page" className="sr-only">
-        搜索软件
-      </label>
-      <div className="relative max-w-xl">
-        <MagnifierIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <input
-          id="search-page"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="名称、别名或用途"
-          className="h-10 w-full rounded-[9px] border border-black/10 bg-muted pl-9 pr-4 text-[15px] text-foreground transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background"
-        />
+    <Form action="/search" role="search" className="mt-6 max-w-xl">
+      <Label htmlFor="search-page" className="mb-2 block text-sm">
+        搜索工具
+      </Label>
+      <div className="flex items-center gap-2">
+        <div className="relative min-w-0 flex-1">
+          <MagnifierIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            key={initialQuery}
+            id="search-page"
+            name="q"
+            type="search"
+            defaultValue={initialQuery}
+            maxLength={MAX_SEARCH_LENGTH}
+            placeholder="名称、别名或用途"
+            className="h-11 bg-muted pl-9 text-base"
+          />
+        </div>
+        <Button type="submit" className="h-11 px-4">搜索</Button>
       </div>
-    </form>
+    </Form>
   );
 }
