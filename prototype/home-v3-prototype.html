@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="NqRcPIuEvoVduMIENYyChg"><head data-page-node-id="QCAlNEOdbLavhCTZeyKB8t">
+<meta charset="UTF-8" data-page-node-id="uC466VCFyc65EjlBaDgObs">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="1dhKB4ErkfyIpW8HyR5nzP">
+<title>Ashare 新首页 · 高保真原型</title>
+<style>
+  :root {
+    --background: #ffffff;
+    --foreground: oklch(0.145 0 0);
+    --card: #ffffff;
+    --card-foreground: oklch(0.145 0 0);
+    --muted: #f4f4f5;
+    --muted-foreground: oklch(0.49 0 0);
+    --border: #e4e4e7;
+    --input: #e4e4e7;
+    --primary: oklch(0.53 0.235 277);
+    --primary-foreground: #ffffff;
+    --accent: #f4f4f5;
+    --ring: oklch(0.53 0.235 277);
+    --official: #007AFF;
+    --opensource: #34A853;
+    --discount: #FF6B35;
+    --radius: 0.75rem;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-card-hover: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lift: 0 12px 32px -8px rgba(0,0,0,0.12);
+  }
+  .dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --border: oklch(1 0 0 / 12%);
+    --input: oklch(1 0 0 / 15%);
+    --primary: oklch(0.72 0.17 277);
+    --primary-foreground: oklch(0.145 0 0);
+    --accent: oklch(0.269 0 0);
+    --official: #4DA3FF;
+    --opensource: #5DD47E;
+    --discount: #FF8A5B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    letter-spacing: -0.011em;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ===== 顶部导航栏 ===== */
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--background) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    max-width: 1200px; margin: 0 auto;
+    height: 60px; padding: 0 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.03em;
+    flex: 1 1 0; min-width: 0;
+  }
+  .brand-mark {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: var(--primary); color: var(--primary-foreground);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .nav-tabs {
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+    overflow-x: auto; flex: 0 1 auto; min-width: 0;
+  }
+  .nav-tab {
+    padding: 8px 14px; border-radius: 8px;
+    font-size: 14px; font-weight: 500; color: var(--muted-foreground);
+    white-space: nowrap; transition: all .18s ease;
+  }
+  .nav-tab:hover { background: var(--accent); color: var(--foreground); }
+  .nav-tab[aria-current="page"] { background: color-mix(in srgb, var(--primary) 10%, transparent); color: var(--primary); }
+  .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 1 1 0; min-width: 0; }
+  .mini-search {
+    display: flex; align-items: center; gap: 7px;
+    height: 36px; padding: 0 12px; min-width: 180px;
+    border: 1px solid var(--input); border-radius: 10px;
+    background: var(--background); color: var(--muted-foreground);
+    font-size: 13px; transition: all .18s ease;
+  }
+  .mini-search:hover { border-color: var(--ring); }
+  .mini-search kbd {
+    margin-left: auto; font-size: 11px; font-family: inherit;
+    padding: 2px 5px; border-radius: 5px; background: var(--muted);
+  }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted-foreground); transition: all .18s ease;
+  }
+  .icon-btn:hover { background: var(--accent); color: var(--foreground); }
+
+  /* ===== 容器 ===== */
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .section { margin-top: 40px; }
+
+  /* ===== Hero：大搜索框 ===== */
+  .hero {
+    position: relative; text-align: center;
+    padding: 56px 0 8px;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: -60px 0 auto 0; height: 320px;
+    background:
+      radial-gradient(40rem 18rem at 50% -30%, color-mix(in srgb, var(--primary) 11%, transparent), transparent 70%);
+    pointer-events: none; z-index: -1;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary); font-size: 13px; font-weight: 500;
+  }
+  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+  .hero h1 {
+    margin-top: 16px; font-size: clamp(30px, 4.2vw, 46px);
+    font-weight: 700; letter-spacing: -0.03em; line-height: 1.15;
+  }
+  .hero h1 em { font-style: normal; color: var(--primary); }
+  .hero-sub {
+    margin-top: 14px; font-size: 15px; color: var(--muted-foreground);
+    max-width: 560px; margin-left: auto; margin-right: auto; line-height: 1.7;
+  }
+
+  /* 搜索框 */
+  .search-shell { max-width: 720px; margin: 28px auto 0; }
+  .search-box {
+    display: flex; align-items: center; gap: 6px;
+    height: 60px; padding: 6px 6px 6px 18px;
+    border: 1px solid var(--input); border-radius: 18px;
+    background: var(--card); box-shadow: var(--shadow-card);
+    transition: all .2s ease;
+  }
+  .search-box:focus-within {
+    border-color: color-mix(in srgb, var(--ring) 60%, transparent);
+    box-shadow: var(--shadow-lift);
+  }
+  .search-box .search-ico { flex-shrink: 0; color: var(--muted-foreground); }
+  .search-box input {
+    flex: 1; min-width: 0; height: 100%; border: none; background: none;
+    font-size: 16px; color: var(--foreground); outline: none;
+  }
+  .search-box input::placeholder { color: var(--muted-foreground); }
+  .btn-search {
+    flex-shrink: 0; height: 48px; padding: 0 22px; border-radius: 13px;
+    display: inline-flex; align-items: center;
+    background: var(--primary); color: var(--primary-foreground);
+    font-size: 15px; font-weight: 600; transition: all .18s ease;
+  }
+  .btn-search:hover { opacity: .92; }
+  .btn-search:active { transform: scale(0.97); }
+
+  .hot-row {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    align-items: center; gap: 8px; margin-top: 18px;
+  }
+  .hot-label { font-size: 13px; color: var(--muted-foreground); }
+  .hot-chip {
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--muted); color: var(--foreground);
+    font-size: 13px; font-weight: 500; transition: all .18s ease;
+  }
+  .hot-chip:hover { background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
+
+  /* AI 结果横幅 */
+  .ai-note {
+    display: none; max-width: 720px; margin: 16px auto 0;
+    padding: 14px 18px; border-radius: 14px;
+    background: color-mix(in srgb, var(--primary) 7%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+    text-align: left; font-size: 13.5px; line-height: 1.65;
+  }
+  .ai-note.on { display: block; }
+  .ai-note .ai-head {
+    display: flex; align-items: center; gap: 7px;
+    font-weight: 600; color: var(--primary); font-size: 13px; margin-bottom: 7px;
+  }
+  .ai-note .intent-tag {
+    display: inline-block; padding: 2px 8px; margin: 0 2px; border-radius: 6px;
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+    color: var(--primary); font-weight: 500;
+  }
+
+  /* ===== 横幅轮播 ===== */
+  .banner-wrap { position: relative; margin-top: 44px; }
+  .banner-track { position: relative; height: 260px; border-radius: 18px; overflow: hidden; }
+  .banner {
+    position: absolute; inset: 0; opacity: 0; visibility: hidden;
+    transition: opacity .5s ease; display: flex; align-items: center;
+    padding: 0 56px; gap: 40px;
+  }
+  .banner.active { opacity: 1; visibility: visible; }
+  .banner[data-tone="purple"] { background: linear-gradient(120deg, #EEF0FF 0%, #E4E7FF 55%, #F3E9FF 100%); }
+  .banner[data-tone="teal"]   { background: linear-gradient(120deg, #E6F7F1 0%, #DCF3EA 55%, #E9F7EE 100%); }
+  .banner[data-tone="amber"]  { background: linear-gradient(120deg, #FFF6E6 0%, #FFEFD6 55%, #FFF3E2 100%); }
+  .dark .banner[data-tone="purple"] { background: linear-gradient(120deg, #241F3D 0%, #2A2450 100%); }
+  .dark .banner[data-tone="teal"]   { background: linear-gradient(120deg, #16302A 0%, #12352C 100%); }
+  .dark .banner[data-tone="amber"]  { background: linear-gradient(120deg, #362915 0%, #3D2E14 100%); }
+  .banner-copy { flex: 1; min-width: 0; }
+  .banner-tag {
+    display: inline-block; padding: 4px 11px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; margin-bottom: 14px;
+  }
+  .banner[data-tone="purple"] .banner-tag { background: #534AB7; color: #fff; }
+  .banner[data-tone="teal"] .banner-tag   { background: #0F6E56; color: #fff; }
+  .banner[data-tone="amber"] .banner-tag  { background: #854F0B; color: #fff; }
+  .banner h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 10px; }
+  .banner p { font-size: 14px; color: #5F5E5A; max-width: 420px; line-height: 1.65; }
+  .dark .banner p { color: #B4B2A9; }
+  .banner-cta {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 18px;
+    padding: 10px 20px; border-radius: 11px; background: var(--foreground);
+    color: var(--background); font-size: 14px; font-weight: 600;
+  }
+  .banner-art {
+    flex-shrink: 0; width: 220px; height: 180px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 68px; font-weight: 700;
+    background: rgba(255,255,255,.55);
+  }
+  .dark .banner-art { background: rgba(255,255,255,.08); }
+  .banner[data-tone="purple"] .banner-art { color: #534AB7; }
+  .banner[data-tone="teal"] .banner-art   { color: #0F6E56; }
+  .banner[data-tone="amber"] .banner-art  { color: #854F0B; }
+  .banner-ctrl {
+    position: absolute; bottom: 18px; left: 56px;
+    display: flex; gap: 7px; z-index: 2;
+  }
+  .banner-dot {
+    width: 22px; height: 4px; border-radius: 999px;
+    background: rgba(0,0,0,.18); transition: all .25s ease;
+  }
+  .dark .banner-dot { background: rgba(255,255,255,.22); }
+  .banner-dot.active { background: var(--foreground); width: 34px; }
+  .banner-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,.85); color: #2C2C2A;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-card); z-index: 2; transition: all .18s ease;
+  }
+  .dark .banner-arrow { background: rgba(0,0,0,.5); color: #fff; }
+  .banner-arrow:hover { transform: translateY(-50%) scale(1.08); }
+  .banner-arrow.prev { left: 14px; }
+  .banner-arrow.next { right: 14px; }
+
+  /* ===== 领域区块 ===== */
+  .field-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+  }
+  .field-ico {
+    width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700;
+  }
+  .field-head h2 { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
+  .field-desc { font-size: 13.5px; color: var(--muted-foreground); margin: 6px 0 16px 40px; }
+  .field-more {
+    margin-left: auto; font-size: 13px; font-weight: 500; color: var(--primary);
+    display: inline-flex; align-items: center;
+  }
+  .field-more:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .scroll-row {
+    display: flex; gap: 16px; overflow-x: auto; padding-bottom: 6px;
+    scroll-snap-type: x mandatory; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
+  }
+  .scroll-row::-webkit-scrollbar { display: none; }
+
+  .card {
+    flex-shrink: 0; width: 236px; scroll-snap-align: start;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); border-color: color-mix(in srgb, var(--primary) 30%, var(--border)); }
+  .card-thumb {
+    aspect-ratio: 16/10; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; font-weight: 700;
+  }
+  .card-badge {
+    position: absolute; top: 10px; left: 10px;
+    padding: 3px 9px; border-radius: 999px;
+    background: var(--primary); color: var(--primary-foreground);
+    font-size: 11px; font-weight: 600;
+  }
+  .card-body { padding: 13px 14px 15px; }
+  .card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .chip-scene {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 999px; background: var(--muted);
+    font-size: 11px; font-weight: 500; color: var(--muted-foreground);
+  }
+  .src-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .src-official { background: color-mix(in srgb, var(--official) 12%, transparent); color: var(--official); }
+  .src-opensource { background: color-mix(in srgb, var(--opensource) 12%, transparent); color: var(--opensource); }
+  .src-discount { background: color-mix(in srgb, var(--discount) 12%, transparent); color: var(--discount); }
+  .card-body h3 { font-size: 15px; font-weight: 600; line-height: 1.35; margin-bottom: 5px; }
+  .card-body .sum {
+    font-size: 12.5px; color: var(--muted-foreground); line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    min-height: 38px;
+  }
+  .card-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--border);
+  }
+  .price { font-size: 14px; font-weight: 700; }
+  .plat { display: flex; gap: 5px; }
+  .plat span {
+    font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 5px;
+    background: var(--muted); color: var(--muted-foreground);
+  }
+
+  /* ===== 搜索结果面板 ===== */
+  .result-panel { display: none; margin-top: 34px; }
+  .result-panel.on { display: block; }
+  .result-head {
+    display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .result-head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+  .result-head .count { font-size: 13.5px; color: var(--muted-foreground); }
+  .result-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: 16px;
+  }
+  .result-grid .card { width: auto; }
+  .empty {
+    padding: 48px 24px; text-align: center; border-radius: 16px; background: var(--muted);
+  }
+  .empty h3 { font-size: 16px; font-weight: 600; }
+  .empty p { font-size: 13.5px; color: var(--muted-foreground); margin-top: 8px; line-height: 1.65; }
+  .empty .link { color: var(--primary); font-weight: 500; }
+
+  /* ===== 页脚 ===== */
+  .site-footer {
+    margin-top: 64px; border-top: 1px solid var(--border);
+    padding: 32px 0 40px; font-size: 13px; color: var(--muted-foreground);
+  }
+  .footer-grid { display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; }
+  .footer-col h4 { font-size: 13px; font-weight: 600; color: var(--foreground); margin-bottom: 10px; }
+  .footer-col a { display: block; padding: 3px 0; transition: color .15s ease; }
+  .footer-col a:hover { color: var(--primary); }
+  .footer-note { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12.5px; line-height: 1.7; }
+
+  @media (max-width: 768px) {
+    .header-inner { gap: 10px; padding: 0 16px; height: 54px; }
+    .brand { flex: 0 0 auto; font-size: 16px; }
+    .brand-mark { width: 24px; height: 24px; font-size: 13px; }
+    .nav-tabs { flex: 1 1 auto; justify-content: flex-start; scrollbar-width: none; }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+    .nav-tab { padding: 7px 11px; font-size: 13px; }
+    .header-actions { flex: 0 0 auto; }
+    .mini-search { min-width: 0; width: 36px; padding: 0; justify-content: center; }
+    .mini-search span, .mini-search kbd { display: none; }
+    .wrap { padding: 0 16px; }
+    .hero { padding: 34px 0 4px; }
+    .search-box { height: 54px; padding-left: 14px; }
+    .btn-search { padding: 0 16px; font-size: 14px; }
+    .banner-track { height: 300px; }
+    .banner { flex-direction: column; align-items: flex-start; justify-content: center; padding: 0 24px; gap: 18px; }
+    .banner-art { width: 100%; height: 90px; font-size: 42px; }
+    .banner h2 { font-size: 22px; }
+    .banner-ctrl { left: 24px; }
+    .banner-arrow { display: none; }
+    .field-more { font-size: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body style="position: relative;" data-page-node-id="1iwtNqhckhMaSgtyyOwvKS">
+
+<header class="site-header" data-page-node-id="7V2pvBdSauesApkyzPFkKm">
+  <div class="header-inner" data-page-node-id="fRR5mpCdLFRbDGnRaKllPq">
+    <a href="#" class="brand" aria-label="Ashare 首页" data-page-node-id="diNMC2L6fOlDL2QXbYROtN">
+      Ashare
+    </a>
+    <nav class="nav-tabs" id="navTabs" aria-label="资源大类导航" data-page-node-id="zYnjvSH3Zz4HlhCLx7lKyF"></nav>
+    <div class="header-actions" data-page-node-id="KHuR0dl5ZAxxUDXgbMNae9">
+      
+      <button class="icon-btn" id="themeBtn" aria-label="切换主题" data-page-node-id="qVztjYhnzJZvpHlEQLagKJ"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="9agpKhOCEPmZwp5pHZKl4d"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" data-page-node-id="DQLYfJZgKbDvXCQqxKz40B"></path></svg></button>
+    </div>
+  </div>
+</header>
+
+<main data-page-node-id="5nDh1GKWy4t6KgGyTA6C7v">
+  <section class="hero wrap" data-page-node-id="DJwQGXC3w4DLGyCf3TtA6q">
+    <span class="hero-badge" data-page-node-id="8NGnuEF4NjXyCLPrsbBWbp"><span class="dot" data-page-node-id="jtgAetATfT8lXVvJq6a1Dc"></span>已收录 <b id="totalCount" data-page-node-id="rTBbL4PGRTc4uHW4Re5EXp">30</b> 款工具</span>
+    <h1 data-page-node-id="RlnnqiH2tL8qE0NCPBfPSu">说出你的<em data-page-node-id="GMa88W44Y4RfczfgfI99wp">需求</em>，找到趁手的工具</h1>
+    <p class="hero-sub" data-page-node-id="uvBHIV21mACCNoJqoHdyyy">输入工具名、用途，或者直接描述你想完成的事——比如「把视频剪短」「处理一堆表格」。我们帮你从官方、开源与作者授权渠道里挑。</p>
+
+    <form class="search-shell" id="searchForm" onsubmit="return doSearch(event)" data-page-node-id="Dqrau01PSKhsHy8dEWbPwI">
+      <div class="search-box" data-page-node-id="Clum8YuZpENqIeC5KaJfwh">
+        <svg class="search-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="CPB12LNw4mPNo7Yxs60R6V"><circle cx="11" cy="11" r="7" data-page-node-id="v3nHh8inFoz2YTNFdXFGqB"></circle><path d="m20 20-3.5-3.5" data-page-node-id="kDYw7ZbffVY9MGycFoqTB7"></path></svg>
+        <input id="searchInput" type="search" placeholder="试试：想剪视频 / 记笔记 / 画电路图" autocomplete="off" aria-label="搜索工具" data-page-node-id="BvxFUszf7EmHKK01FubpFX">
+        <button type="submit" class="btn-search" data-page-node-id="LcOTbEWDxdWxWZjHeBCSp8">AI 帮找</button>
+      </div>
+    </form>
+
+    <div class="hot-row" id="hotRow" data-page-node-id="GOSSTjpqZJmuBAJWe0bWp5"><span class="hot-label" data-page-node-id="wiXA4hzzTdFKgcZfhDdLqo">热门搜索</span><button class="hot-chip" onclick="quickSearch('视频剪辑')" data-page-node-id="iiCIAYPiibm1t9jYHP3o1I">视频剪辑</button><button class="hot-chip" onclick="quickSearch('记笔记')" data-page-node-id="01unAB4vNmrfqknWQDDqLo">记笔记</button><button class="hot-chip" onclick="quickSearch('画电路图')" data-page-node-id="ExYznPU964CYtzGcajK8kC">画电路图</button><button class="hot-chip" onclick="quickSearch('3D 建模')" data-page-node-id="HEyJ5jZ9fYyDIuMiSkOqd2">3D 建模</button><button class="hot-chip" onclick="quickSearch('传文件')" data-page-node-id="4RIzk2MaxSzqpfNGuPFFHJ">传文件</button><button class="hot-chip" onclick="quickSearch('统计分析')" data-page-node-id="9dkImOa0OLHoT5BUOWubr9">统计分析</button><button class="hot-chip" onclick="quickSearch('修图')" data-page-node-id="aBYWEPwJwldcEKSFgh8GCB">修图</button><button class="hot-chip" onclick="quickSearch('写代码')" data-page-node-id="4qaIlCyP0HAgbFCgeB1PbL">写代码</button></div>
+    <div class="ai-note" id="aiNote" data-page-node-id="rikdeMO1LZ2hdzIo9BK7LN"></div>
+  </section>
+
+  <div class="wrap" data-page-node-id="TknszOe99w7EHGZOVOgMLS">
+    <section class="banner-wrap" aria-label="置顶推荐" id="bannerWrap" data-page-node-id="6XWblGsXAbLA3i0SUxj3yw">
+      <div class="banner-track" id="bannerTrack" data-page-node-id="jPQLNShPRzwOFf8Xx2Uaqk"><div class="banner" data-tone="purple" data-page-node-id="fUO8Py5BspCDoVxOT2X9Cl">
+      <div class="banner-copy" data-page-node-id="UXDa6D7odGoJFHKIqnMT0F">
+        <span class="banner-tag" data-page-node-id="18yyahRpvXeedamRlrgFuF">编辑精选</span>
+        <h2 data-page-node-id="Hb8b5c9hutfQeU6t5Yg3fr">这周新收录的三款工具</h2>
+        <p data-page-node-id="ker7HGYPs8SvRAsftyzB7O">从开发到音频，都是官方或开源渠道，能直接下载。</p>
+        <a href="#" class="banner-cta" data-page-node-id="sJHEoRZBK7dGdfAosVRhpN">看看收录了什么
+        </a>
+      </div>
+      <div class="banner-art" data-page-node-id="8kcu1Vt33vLdtK0CBBcItZ">A</div>
+    </div><div class="banner" data-tone="teal" data-page-node-id="aH7z9IdMqw4xiHqCU5ldlc">
+      <div class="banner-copy" data-page-node-id="7sRzC8Vc4bmDFKQlDkRJwo">
+        <span class="banner-tag" data-page-node-id="9LexD8PELgebxsbMXynwYf">推广位</span>
+        <h2 data-page-node-id="srIzmthFQhTg5iKjrO9lJw">这里可以放你的产品</h2>
+        <p data-page-node-id="fS3ORKuEhre8u73g8OlNAG">横幅支持编辑精选与推广位两种来源，左右切换、自动轮播。</p>
+        <a href="#" class="banner-cta" data-page-node-id="aPPeUvWPsfC9tOGFFKHBC1">了解投放
+        </a>
+      </div>
+      <div class="banner-art" data-page-node-id="vyAczH0Dcf0MoXDskDs18K">B</div>
+    </div><div class="banner active" data-tone="amber" data-page-node-id="I8yBT4fo1u2l7UF2d2d8rk">
+      <div class="banner-copy" data-page-node-id="jQyI0tDkr3L6F793jiz6HM">
+        <span class="banner-tag" data-page-node-id="Ze6Prc6zKEyVGwgPS1YnKP">专题</span>
+        <h2 data-page-node-id="d79DMEyYFP0o00HWog3tE9">工程制图：开源的能顶多少</h2>
+        <p data-page-node-id="y2rWZswVS0sUy3bMF3lZNw">KiCad、FreeCAD、LibreCAD 各自的适用边界。</p>
+        <a href="#" class="banner-cta" data-page-node-id="cUuFpOrGY3pr9rtIwhQ124">读这个专题
+        </a>
+      </div>
+      <div class="banner-art" data-page-node-id="rWAyALBdNUu7xfXEjE1fhG">C</div>
+    </div></div>
+      <button class="banner-arrow prev" onclick="moveBanner(-1)" aria-label="上一张" data-page-node-id="cBe4nrz4irx9PEqdlVEDtr">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="fASXxpSBW2RHSQLsMjfMuy"><path d="m15 18-6-6 6-6" data-page-node-id="otwcmWhAd9Ef2er2Obn5CE"></path></svg>
+      </button>
+      <button class="banner-arrow next" onclick="moveBanner(1)" aria-label="下一张" data-page-node-id="ELZi5SNEdD4lTeLcy3wEAo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="QdWDVAGgBvNqQQyiFfX7A8"><path d="m9 18 6-6-6-6" data-page-node-id="un9cEUR6qZMARpDsK49JbW"></path></svg>
+      </button>
+      <div class="banner-ctrl" id="bannerCtrl" data-page-node-id="2PVx3wjwI42ADwxy2rTafo"><button class="banner-dot" onclick="goBanner(0)" aria-label="第 1 张" data-page-node-id="visbnlCa6s33UK1Crz7AIf"></button><button class="banner-dot" onclick="goBanner(1)" aria-label="第 2 张" data-page-node-id="e7MwiDElPeSh85MmfC1Zub"></button><button class="banner-dot active" onclick="goBanner(2)" aria-label="第 3 张" data-page-node-id="4DsvDkkzv0O5sGRpiD9ENG"></button></div>
+    </section>
+  </div>
+
+  <div class="wrap result-panel" id="resultPanel" data-page-node-id="5nOpgY9kFPSX7f0ci44GiL">
+    <div class="result-head" data-page-node-id="IxCfWNGwe2My1DRGWWIC4e">
+      <h2 id="resultTitle" data-page-node-id="8dMltjUEnUoBzqmw54biMr">搜索结果</h2>
+      <span class="count" id="resultCount" data-page-node-id="qttMjOUgUzDS512TuaMjCq"></span>
+    </div>
+    <div class="result-grid" id="resultGrid" data-page-node-id="8VUYdYYMCxAefyAta8m6BC"></div>
+  </div>
+
+  <div class="wrap" id="fieldsWrap" data-page-node-id="TBnTLvNGpbvjS7wcn7RVCG"><section class="section" data-page-node-id="jFPU2ovOKDVFDJRlPgENd6">
+      <div class="field-head" data-page-node-id="PYOlup7mHH9COxqTV6a8Gz">
+        <span class="field-ico" style="background:rgba(0,122,255,0.14);color:#007AFF" data-page-node-id="d4Gx0q6FHbckuvmfrupoqr">开</span>
+        <h2 data-page-node-id="6KiLLM6HEEN9ZORHMJbNCU">开发工具</h2>
+        <a href="#" class="field-more" data-page-node-id="WhnP2EaxiHR42df7CwhSbU">查看全部
+        </a>
+      </div>
+      <p class="field-desc" data-page-node-id="cuC6nvHAIVZvZQGDzF5gtT">编辑器、版本控制与语言运行时，按项目需要逐步配齐。</p>
+      <div class="scroll-row" data-page-node-id="cOJinikuFW9tlaXCSeyIgf"><article class="card" data-page-node-id="QnSTALFFFLAk4208pCfTVh">
+    <span class="card-badge" data-page-node-id="ASXztGRtFY4M3u1rMdhjIP">精选</span>
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 Visual Studio Code 详情" data-page-node-id="lW4xIyDAC5MWUwAkUMj3c8">V</a>
+    <div class="card-body" data-page-node-id="aJgDMQasH1lk5lpqCEmFy6">
+      <div class="card-meta" data-page-node-id="aNzgkwlXQfKN7BlsofmXhY">
+        <span class="chip-scene" data-page-node-id="FnM0K4JzE0KFVrMf2N29vQ">开发</span>
+        <span class="src-badge src-official" data-page-node-id="Ge4w3YSUEDFrMpKokmUyRZ">官方</span>
+      </div>
+      <h3 data-page-node-id="MqI8cbffnhL8xDYnmVdcsu">Visual Studio Code</h3>
+      <p class="sum" data-page-node-id="Q9cvaq0glErcEgiPpHJ9yt">微软出品的代码编辑器，插件生态最大，免费跨平台。</p>
+      <div class="card-foot" data-page-node-id="6XEZVC7pkgKx1AjmMu5Wfa">
+        <span class="price" data-page-node-id="fkeYKkmfLmeIl22lEP5OCk">免费</span>
+        <span class="plat" data-page-node-id="yl2CIJqJfToqvHZUZVUKgH"><span data-page-node-id="zNdKHg42ywrcsJuyeekn0W">Windows</span><span data-page-node-id="5F39m96JV2aCGVngVOwuzi">macOS</span><span data-page-node-id="N7OriEnAqqJ3EDpsLWRGZV">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="5z0tU2ADW8brOqtQ5DAH9e">
+    <span class="card-badge" data-page-node-id="sN9LVnbMMJpRQjGj8DaXXu">精选</span>
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 Git 详情" data-page-node-id="BvjB0UyieBG4Hv5ZLuE3mF">G</a>
+    <div class="card-body" data-page-node-id="lpD7BtB4nwOSPw8bLeZPQ4">
+      <div class="card-meta" data-page-node-id="AkaTKlVjSMjYPrsTEU4zQJ">
+        <span class="chip-scene" data-page-node-id="PZAetRcEwJPBpHCXSuBdTu">开发</span>
+        <span class="src-badge src-opensource" data-page-node-id="ivelb7AeYol7YRshrra9fj">开源</span>
+      </div>
+      <h3 data-page-node-id="vZRYhgWmRc98BujYEf89n7">Git</h3>
+      <p class="sum" data-page-node-id="6wHCdrT4anPyinFflLXsD6">分布式版本控制标准工具，命令行为主，图形前端丰富。</p>
+      <div class="card-foot" data-page-node-id="BoxzQXIcJbBH6qcOxBN0Sz">
+        <span class="price" data-page-node-id="hYjopasWUQ39mB7AF3uGd7">免费</span>
+        <span class="plat" data-page-node-id="U31H2AAnauONZFWn8n3Acg"><span data-page-node-id="fbsjQFnySMcM5isaapVVGm">Windows</span><span data-page-node-id="2aiW3bS63RHgTj4FA6SMbC">macOS</span><span data-page-node-id="xzlfqQNacVVj8fGFCrlnMV">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="FoBPZU7w42MTEqc5h79gsC">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 Python 详情" data-page-node-id="F7CgSXE5J1jDeHONsucMls">P</a>
+    <div class="card-body" data-page-node-id="uX1X4FuUAdHegiBJ0qWIDc">
+      <div class="card-meta" data-page-node-id="JXe5FRzNMSkbrqgtUalWcz">
+        <span class="chip-scene" data-page-node-id="BYpuinouR3uEZAUK0PmztY">开发</span>
+        <span class="src-badge src-opensource" data-page-node-id="qF7cC5UjflpaprIOt39tIk">开源</span>
+      </div>
+      <h3 data-page-node-id="XydcS5pgxJG9JYIJFQIniA">Python</h3>
+      <p class="sum" data-page-node-id="kkBUnk1I6K1fdCTy2Lo28Y">通用编程语言运行环境，数据与脚本场景覆盖面最广。</p>
+      <div class="card-foot" data-page-node-id="mqKnX79me8DjRrqo3QY3nR">
+        <span class="price" data-page-node-id="TaZRIVYaL9ppvDHu5oXoIH">免费</span>
+        <span class="plat" data-page-node-id="ODUbWh1B5qEKcRmowXxpMG"><span data-page-node-id="K1o1CJOmZiHz8STmQViPH8">Windows</span><span data-page-node-id="Uve9gH5350YjoeNKHncbDl">macOS</span><span data-page-node-id="ksBIGI06miB9AhMcI1MLAV">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="vdl1UpS6MDFS7HfmmwDw6c">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 Node.js 详情" data-page-node-id="WjbIj87nQsI0sbGRjWsilx">N</a>
+    <div class="card-body" data-page-node-id="XbHyXXkH4fjGZ6qKahEiwo">
+      <div class="card-meta" data-page-node-id="OtWh6MCXlFPaZ5B9FX6zXZ">
+        <span class="chip-scene" data-page-node-id="D4OyqwECZUDcsBVnsZN9WE">开发</span>
+        <span class="src-badge src-opensource" data-page-node-id="EcLk3EBY0BjCfClDh3Phu8">开源</span>
+      </div>
+      <h3 data-page-node-id="Dkiciburm0kYfXxu6BCi1s">Node.js</h3>
+      <p class="sum" data-page-node-id="79NjSGuv6e7D8xMHDDVuHk">JavaScript 服务端运行时，前端工具链与后端服务都用它。</p>
+      <div class="card-foot" data-page-node-id="peRQzEvClrUn7SYM8vVa4x">
+        <span class="price" data-page-node-id="z6XUIksrmxTmTOgi8qQe5g">免费</span>
+        <span class="plat" data-page-node-id="NXRVzVhfEjXvCgLmhTRe1n"><span data-page-node-id="3u2X8IWhuzfwVwECxJW9NQ">Windows</span><span data-page-node-id="3lWm2dQsGpRD7HPT5KGaQs">macOS</span><span data-page-node-id="bjzHDFfnNqBuErDihHh0iW">Linux</span></span>
+      </div>
+    </div>
+  </article></div>
+    </section><section class="section" data-page-node-id="xt5g1uBWgq6pGq6vUdEIHL">
+      <div class="field-head" data-page-node-id="6aT3eMnQOONoiszbGjtGcC">
+        <span class="field-ico" style="background:rgba(175,82,222,0.14);color:#AF52DE" data-page-node-id="013sFqX898W35zxG9WcGTV">设</span>
+        <h2 data-page-node-id="3voL1BrW3loJ34Bte9Fggu">设计与创作</h2>
+        <a href="#" class="field-more" data-page-node-id="4XxeGk5lyxA3BHkzTkQYKC">查看全部
+        </a>
+      </div>
+      <p class="field-desc" data-page-node-id="eL2RcmJ5PHzT14hM4WJjkm">修图、矢量、三维与绘画，商业套件之外都有能长期用的开源选项。</p>
+      <div class="scroll-row" data-page-node-id="oA0x0TPJHLKjdgmQjorJI9"><article class="card" data-page-node-id="bXo3k5zNcWG5aUsiMaqowj">
+    <span class="card-badge" data-page-node-id="jHi7VCm7VvJzBuqEXJn0NW">精选</span>
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 Blender 详情" data-page-node-id="IlcX4Zz0cQv1EqBnZDRL0n">B</a>
+    <div class="card-body" data-page-node-id="rXPJGUIVwCFWt9acrCQp4n">
+      <div class="card-meta" data-page-node-id="YZY0KXVeCFoBeMFQK4s8Da">
+        <span class="chip-scene" data-page-node-id="bc9dtkUcGVeJAANie3aF3h">设计</span>
+        <span class="src-badge src-opensource" data-page-node-id="4HJO8jqdQDgzVH1NCzBPkJ">开源</span>
+      </div>
+      <h3 data-page-node-id="G7PAxyU0x4YKX3mOQlyCGn">Blender</h3>
+      <p class="sum" data-page-node-id="u5F0fQ1C7uLRvF1K2RiG5K">开源三维创作套件，建模、动画、渲染到合成全流程。</p>
+      <div class="card-foot" data-page-node-id="C9YmEcuUt8kmTKS8QfQltK">
+        <span class="price" data-page-node-id="Hhn6vJkVINvhsEXuTAQxN6">免费</span>
+        <span class="plat" data-page-node-id="oVmit2BK7k3WuvS5vFhZfP"><span data-page-node-id="lVSAbYkXnoEhcN2iIHW4bR">Windows</span><span data-page-node-id="BECGOm9tGhNqOLWwzjRQny">macOS</span><span data-page-node-id="oLfT9iQm0A6DIttnC8lX3U">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="9fTtH3MsuhBAQfVpcK2Cgk">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 GIMP 详情" data-page-node-id="yj44mgRu9lniVMChmhepx9">G</a>
+    <div class="card-body" data-page-node-id="ne8WIDg6EcYQyqid4Pg5oW">
+      <div class="card-meta" data-page-node-id="BSWW0lOqYnHcPaF7E79J5H">
+        <span class="chip-scene" data-page-node-id="gNJdWUCRdsSAqUgXq8uByB">设计</span>
+        <span class="src-badge src-opensource" data-page-node-id="XSylcPTvowzBTGTAO7ZQI2">开源</span>
+      </div>
+      <h3 data-page-node-id="NFKcHsnFjeN3HWjDHEBirY">GIMP</h3>
+      <p class="sum" data-page-node-id="dks4bH5vOviBUcw7rDgpkz">开源位图编辑软件，照片修饰与图像合成，GPLv3。</p>
+      <div class="card-foot" data-page-node-id="lH6xNw3gILuAn18P8h16lT">
+        <span class="price" data-page-node-id="DReuHhZdpmPXEheLYXyCDs">免费</span>
+        <span class="plat" data-page-node-id="HIiyuF9nDLzy1fdeXdoi6F"><span data-page-node-id="xljujhyGnrRjE3HUGysv66">Windows</span><span data-page-node-id="ACxW6DFK4TWe3ohD2ZKHAL">macOS</span><span data-page-node-id="8k0LQAyNspKCDYIeKt1mft">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="Oc6zs8W24aVNGkML1E09E6">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 Inkscape 详情" data-page-node-id="MxAMaRNXkn4BZW3x19bNU5">I</a>
+    <div class="card-body" data-page-node-id="P2SxxLPp30L5uWpr8K764Z">
+      <div class="card-meta" data-page-node-id="y3SaMTh2kayo8GGtxWefwR">
+        <span class="chip-scene" data-page-node-id="SLs8gFed4oWOHHCVSqe5pK">设计</span>
+        <span class="src-badge src-opensource" data-page-node-id="Cr8bvTFyMqPfJPpSemdXLW">开源</span>
+      </div>
+      <h3 data-page-node-id="nA1kA7ihxZzsUA3IgCC6bV">Inkscape</h3>
+      <p class="sum" data-page-node-id="AP1uSyo9H2NkIFC4yfgXhm">开源矢量绘图工具，适合图标、插画与 SVG 编辑。</p>
+      <div class="card-foot" data-page-node-id="Cn1TT4UKtejwE9dcB0ltIO">
+        <span class="price" data-page-node-id="bCUMhl88bJA0OyeFMwA2e2">免费</span>
+        <span class="plat" data-page-node-id="iRM1Dxn8q4ATL1Zn2BUWqe"><span data-page-node-id="2HCXUHCqhad2DVAb9e1QUW">Windows</span><span data-page-node-id="wDEFgUQGZeVCWFzI3kD5fy">macOS</span><span data-page-node-id="FKFjhvR3Omg4HYbHoC6hqM">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="AiVtGdcWhkdydu2kdRY0sH">
+    
+    <a href="#" class="card-thumb" style="background:rgba(216,90,48,0.14);color:#D85A30" aria-label="查看 Krita 详情" data-page-node-id="8cyxxgeHoggDCAUimROkUI">K</a>
+    <div class="card-body" data-page-node-id="90dSFrgoDy7GdHycoMgbbQ">
+      <div class="card-meta" data-page-node-id="tWvUBTWsaJEIidpDeppZ1z">
+        <span class="chip-scene" data-page-node-id="UT6tKiQ5bGGldPdrSukTd4">设计</span>
+        <span class="src-badge src-opensource" data-page-node-id="yblXPIlw2HBVvO8DjQI21w">开源</span>
+      </div>
+      <h3 data-page-node-id="GwDFOV3bN6VVgCNvxTTDEk">Krita</h3>
+      <p class="sum" data-page-node-id="WTnAiuNVgtzi4CzlfR13yH">面向数字绘画的开源软件，笔刷系统与绘画体验成熟。</p>
+      <div class="card-foot" data-page-node-id="L6eZAZbhn4TX9OcVJlGpfV">
+        <span class="price" data-page-node-id="qeE1Ki1424vV4WfkXbo4Xg">免费</span>
+        <span class="plat" data-page-node-id="SUGkV84F3MFEDPWZPgFLbn"><span data-page-node-id="fXfAVzc8dkFey8BrTIwrvm">Windows</span><span data-page-node-id="HtNsHB6dBEtvyPveC7n0XC">macOS</span><span data-page-node-id="3QmigG6UEFS5ogtxh7dGwZ">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="HRdS13zIWwCMhsP49oMRBj">
+    <span class="card-badge" data-page-node-id="NfwN1ZPx75mnPpZ8zFK8gd">精选</span>
+    <a href="#" class="card-thumb" style="background:rgba(29,158,117,0.14);color:#1D9E75" aria-label="查看 Figma 详情" data-page-node-id="vKwN43ZMCd7BxBWWCtSDjW">F</a>
+    <div class="card-body" data-page-node-id="7Kz0HmjVC4BJOVX8XjMfpn">
+      <div class="card-meta" data-page-node-id="ouGwFnBdzieJ5REFza1d9k">
+        <span class="chip-scene" data-page-node-id="7ZK9zZuFupMZwzRb6AvyQb">设计</span>
+        <span class="src-badge src-official" data-page-node-id="AiesX52qXoVBJRTKyHMsvv">官方</span>
+      </div>
+      <h3 data-page-node-id="r2wCA4Po4ko6wTG4bVn0Uw">Figma</h3>
+      <p class="sum" data-page-node-id="ES6M5pkJbWiHbvjhIomAFs">浏览器端界面设计协作工具，多人实时编辑，免费档可用。</p>
+      <div class="card-foot" data-page-node-id="Tb0CmPZBSmS2igDRtzfSWn">
+        <span class="price" data-page-node-id="MXUkcyeolS34W2akhzfvg8">免费档</span>
+        <span class="plat" data-page-node-id="7JsnfPKbfp8jN9oU2Hvpw4"><span data-page-node-id="uNPhY7eMMMxoAyz9Vm0fJq">Windows</span><span data-page-node-id="WbtDgwkGqtXddfWGoDvhGH">macOS</span></span>
+      </div>
+    </div>
+  </article></div>
+    </section><section class="section" data-page-node-id="76FusKqt9COn5sjGETlau0">
+      <div class="field-head" data-page-node-id="iE0XTAh6kForNDHTQuFmew">
+        <span class="field-ico" style="background:rgba(52,168,83,0.14);color:#34A853" data-page-node-id="urGarFREkRD9anIpCInpGB">文</span>
+        <h2 data-page-node-id="5kLlQTLgwdoDgDLpTg9mTa">文档与笔记</h2>
+        <a href="#" class="field-more" data-page-node-id="W7ffz2DdAQ58ZKXSguQ8E9">查看全部
+        </a>
+      </div>
+      <p class="field-desc" data-page-node-id="j2TUQZR2ckHYKn5N2nsV1D">写作、文献管理、格式转换与本地知识库。</p>
+      <div class="scroll-row" data-page-node-id="jZO37MP6xBVzmoHRy1JmcU"><article class="card" data-page-node-id="myZo370LY0gxvqbV5rpa5e">
+    <span class="card-badge" data-page-node-id="3Cgd7faOjEGBMZb3I64YiX">精选</span>
+    <a href="#" class="card-thumb" style="background:rgba(186,117,23,0.14);color:#BA7517" aria-label="查看 Obsidian 详情" data-page-node-id="gRpuGlWsTct1zr9Y99pCgW">O</a>
+    <div class="card-body" data-page-node-id="GvBh2Ly8xHas9gKCZfbXAX">
+      <div class="card-meta" data-page-node-id="expaNZIOix4h5cpD4ObFlH">
+        <span class="chip-scene" data-page-node-id="78y4MfUUsJWFIXDeO0olHy">文档</span>
+        <span class="src-badge src-official" data-page-node-id="RqqkLwEQwMLjKvf9fjHjH0">官方</span>
+      </div>
+      <h3 data-page-node-id="mwgTlElYN9jJMfnY4QaEDQ">Obsidian</h3>
+      <p class="sum" data-page-node-id="F5EfxkTExBQjChmgWwgEjR">本地优先的知识库笔记工具，Markdown 存储，插件生态开源。</p>
+      <div class="card-foot" data-page-node-id="V9oFnPlL3DalMIhJV23EKK">
+        <span class="price" data-page-node-id="fAC9pWFI6q6nehAqDhdUI6">个人免费</span>
+        <span class="plat" data-page-node-id="JVnrJehqS6GKHQUhKOyHU6"><span data-page-node-id="tTi2BMlpbG0D6OKTmTlOEX">Windows</span><span data-page-node-id="0XfF3JfqIbLfP38QoElo6h">macOS</span><span data-page-node-id="EBFEohFAGefR79EaACUvKK">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="7DWmZUD8PGl4eiGdQQruQe">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 Pandoc 详情" data-page-node-id="11MhdssSlEl15FSGmzvdHr">P</a>
+    <div class="card-body" data-page-node-id="JvxDet4GjEV7iQfyyQVgJp">
+      <div class="card-meta" data-page-node-id="LN3cAGYauEF9ETZlhLRndS">
+        <span class="chip-scene" data-page-node-id="GQjeeP1Nzv4F9Merll3czi">文档</span>
+        <span class="src-badge src-opensource" data-page-node-id="NN3kokzxmhp93iNEEPHIy6">开源</span>
+      </div>
+      <h3 data-page-node-id="ORRR4LZ9JoNq7KF8zriPIj">Pandoc</h3>
+      <p class="sum" data-page-node-id="fGqFYxsL7sRHUshKeNJvnb">文档格式转换命令行工具，支持几十种标记语言互转。</p>
+      <div class="card-foot" data-page-node-id="HKIHA3IYWAN9g2YCosLHZr">
+        <span class="price" data-page-node-id="mkTleI41eREbTRA7hv5PnV">免费</span>
+        <span class="plat" data-page-node-id="NJ30dA2nAYUXKRy757EhTX"><span data-page-node-id="lRzXOdBB07FbKHd09HQ0uI">Windows</span><span data-page-node-id="HY3m69LzoQRGPVlhY2g1eB">macOS</span><span data-page-node-id="iYV5JsrzwyBNw4e1REupDg">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="096ygTfUIDgK7lAVQdIw13">
+    <span class="card-badge" data-page-node-id="HDBVGPXmWifOktr2FGNjGh">精选</span>
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 Zotero 详情" data-page-node-id="i2dLKv8zWUSZ9SVQtjDH9L">Z</a>
+    <div class="card-body" data-page-node-id="P45aDNjOjs2eDUsCBc4EeR">
+      <div class="card-meta" data-page-node-id="HVmnZzihwzyrswtBd20CxE">
+        <span class="chip-scene" data-page-node-id="cNrHIY2vrGVEviyjci6oBt">文档</span>
+        <span class="src-badge src-opensource" data-page-node-id="saCZGYP5lB34dMNDt9vPlr">开源</span>
+      </div>
+      <h3 data-page-node-id="1Js4u1JXfJ4ez2hbGDzwrg">Zotero</h3>
+      <p class="sum" data-page-node-id="SwRaNuyiMvHQdpqPBoOuQ2">文献管理工具，抓取网页、生成引用，学术写作常用。</p>
+      <div class="card-foot" data-page-node-id="EEyxXujKecP6LGVkM2CTLm">
+        <span class="price" data-page-node-id="cuPs2Wqk5wRaqCZQDFjzJc">免费</span>
+        <span class="plat" data-page-node-id="gyIqfBgtnWuA6QSqrqYsXa"><span data-page-node-id="vSqI3SVL3MwjVO84a4d00r">Windows</span><span data-page-node-id="RbahbCLvnpiG1Ex076g9Ga">macOS</span><span data-page-node-id="2P9ywdrufhDkMS6wUxQyQc">Linux</span></span>
+      </div>
+    </div>
+  </article></div>
+    </section><section class="section" data-page-node-id="gAOIx0cNTSjSv6ly9WlBBU">
+      <div class="field-head" data-page-node-id="UPzG90tf2o24fqOMauvESg">
+        <span class="field-ico" style="background:rgba(0,163,163,0.14);color:#00A3A3" data-page-node-id="MuV1czJE7eFeymv4lXUfTO">工</span>
+        <h2 data-page-node-id="xEIzMPOuCSbnunOUQRd9QQ">工程制图</h2>
+        <a href="#" class="field-more" data-page-node-id="XQr0NC3pjLAVztzOF8oUMd">查看全部
+        </a>
+      </div>
+      <p class="field-desc" data-page-node-id="qKqor6ReQHqeOnaSTV2GhC">电路设计、机械建模与地理信息，专业软件的开源替代。</p>
+      <div class="scroll-row" data-page-node-id="RxXjkavuXc45mpQGiUtdXL"><article class="card" data-page-node-id="JkZcMVDZ8IhN1GF8K9LDX5">
+    <span class="card-badge" data-page-node-id="xQQbLEgrNPasQ4cT6qEdtm">精选</span>
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 KiCad 详情" data-page-node-id="UP4bC8adXE3jrAo5VEg6jJ">K</a>
+    <div class="card-body" data-page-node-id="dUxpJGCUNnxgqu7hHcj2Rq">
+      <div class="card-meta" data-page-node-id="bhGOG55UsAxn1BvCyTlC8C">
+        <span class="chip-scene" data-page-node-id="aDkcOGH67Z8GZOerj30KCZ">制图</span>
+        <span class="src-badge src-opensource" data-page-node-id="aosrgTCo1gars0smJKkoMb">开源</span>
+      </div>
+      <h3 data-page-node-id="WqT4aBMFoFO7QqeYs77H9k">KiCad</h3>
+      <p class="sum" data-page-node-id="vRNVTNP5GZHZRwa059jz3g">开源电子设计自动化套件，原理图到 PCB 全流程，GPL-3.0。</p>
+      <div class="card-foot" data-page-node-id="GGMCBZgAe7HLbadp95VgkN">
+        <span class="price" data-page-node-id="ZdRq77zhh3p2CcRvuGtPYw">免费</span>
+        <span class="plat" data-page-node-id="T5EQLI4CV1syptLNgB6nJF"><span data-page-node-id="JBQvn3aNNL4TbwEkm4ki7E">Windows</span><span data-page-node-id="8wivYZVVNR3xEAhpmXQRr2">macOS</span><span data-page-node-id="U6WGhpXFzsubBnOloQbj6S">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="6rGT4NSFUKV6AbTZ0jT8fD">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 LibreCAD 详情" data-page-node-id="j8AUdFZewxuk7Phd3oIAAV">L</a>
+    <div class="card-body" data-page-node-id="DE3yBrdrRBZ4wVScDRuMqb">
+      <div class="card-meta" data-page-node-id="A9oJAapmUsBKHAVVLvSDwh">
+        <span class="chip-scene" data-page-node-id="ESQOqtIATOljFAf4oqP8sT">制图</span>
+        <span class="src-badge src-opensource" data-page-node-id="6uKjOZFR0GjietmFLyFlzO">开源</span>
+      </div>
+      <h3 data-page-node-id="2F0RvpvYg4cekOLOZp5HRk">LibreCAD</h3>
+      <p class="sum" data-page-node-id="qlVfEWj3UOFdFipvH2Bb53">开源二维 CAD，轻量上手快，适合平面图纸。</p>
+      <div class="card-foot" data-page-node-id="a2RjFHGYp1rOZATnQrIL3j">
+        <span class="price" data-page-node-id="ZcadACCdoLQjdsHSzFlnlQ">免费</span>
+        <span class="plat" data-page-node-id="F1HTonH1fLAJO0VE6MBZur"><span data-page-node-id="DPIB2oSPgFdGPZldaYFNan">Windows</span><span data-page-node-id="X1t9xzhtnhUOGZh0gieoEn">macOS</span><span data-page-node-id="RwxXLSria3umDmCOFsOzVI">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="hQ8JPY90gkvwZXlKCyHV1w">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 OpenSCAD 详情" data-page-node-id="xlLt2HkC02MqWpAgEEFnjC">O</a>
+    <div class="card-body" data-page-node-id="y8d8osuOlK3BHVABTDOoFx">
+      <div class="card-meta" data-page-node-id="hkF0ksLADQPOKnKPLuAyb1">
+        <span class="chip-scene" data-page-node-id="2ZaTeL3TCHRrtSIRBkFjft">制图</span>
+        <span class="src-badge src-opensource" data-page-node-id="EZO3oUxuYQ6UYX0Hofl7WP">开源</span>
+      </div>
+      <h3 data-page-node-id="f1BEBLQuPBPBbGDaSH15y0">OpenSCAD</h3>
+      <p class="sum" data-page-node-id="HWGmLkCMT4hlzT1XjluVuc">用代码建模的三维 CAD，参数化设计可复现。</p>
+      <div class="card-foot" data-page-node-id="fctpmugD4WnRonqJNuhgFv">
+        <span class="price" data-page-node-id="NzS7CTrE0cAznUnVZuMk2h">免费</span>
+        <span class="plat" data-page-node-id="e9KnUonKbRolSg4Ksp0qmw"><span data-page-node-id="JKAY7al7p4ASuFtPTXopVG">Windows</span><span data-page-node-id="Ly17bqVI7zvuYpgUqg0H0L">macOS</span><span data-page-node-id="CsfPA4be5xvenhDPUBz6Iv">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="f16iTUPfL9hfeUHQz7GHCq">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 FreeCAD 详情" data-page-node-id="i1TMLokCPMGK2SBLP6Ti6k">F</a>
+    <div class="card-body" data-page-node-id="o16EvO0SGGgyzHiTTggueu">
+      <div class="card-meta" data-page-node-id="ILrbTvDyxWXx6GFwRedRV9">
+        <span class="chip-scene" data-page-node-id="oGtcHVL1CMrkM7GFzHN4GT">制图</span>
+        <span class="src-badge src-opensource" data-page-node-id="QAKmG9CMXeOlrv6ItIkjvC">开源</span>
+      </div>
+      <h3 data-page-node-id="DDKWrrrVXygQ2CGN08Tfzm">FreeCAD</h3>
+      <p class="sum" data-page-node-id="pfsWA2YNSu4CWnROBMlIk7">开源参数化三维建模软件，机械与建筑场景都能用。</p>
+      <div class="card-foot" data-page-node-id="vxn3A7ThbJEprTuAqkI25d">
+        <span class="price" data-page-node-id="C342HnHVlGVUahoBVW5OVs">免费</span>
+        <span class="plat" data-page-node-id="jHJd9yVKMLsDDamgqY0JNi"><span data-page-node-id="EM64R1AbGDetAZ8tiJpIzO">Windows</span><span data-page-node-id="DOEvcoPG4BU5XZa3nbIxWb">macOS</span><span data-page-node-id="ZDrBB32wsLAPlOksd9D6E0">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="DSQ7RLyfAH0idNJXH8ZUUn">
+    
+    <a href="#" class="card-thumb" style="background:rgba(55,138,221,0.14);color:#378ADD" aria-label="查看 QGIS 详情" data-page-node-id="JdhRwslgqRnqBoEAF6HvG8">Q</a>
+    <div class="card-body" data-page-node-id="oZGlUYBifVpGB9V9wCxBrZ">
+      <div class="card-meta" data-page-node-id="BAC2cUmgBLaePKYNkVY5cP">
+        <span class="chip-scene" data-page-node-id="3SVuv2Znn2Hhqxc9mziO6D">制图</span>
+        <span class="src-badge src-opensource" data-page-node-id="yZOKcLTHDy1BuCd6OjABG4">开源</span>
+      </div>
+      <h3 data-page-node-id="CD8bsC9GxPiheukSw1i7O9">QGIS</h3>
+      <p class="sum" data-page-node-id="bIrVxJXi1U0ayGQGhO2GuC">开源地理信息系统，地图制作与空间数据分析。</p>
+      <div class="card-foot" data-page-node-id="wvlpS4WrPfKxmTSDgO4LfF">
+        <span class="price" data-page-node-id="DnalGfueKg3jIxt1GUbdhh">免费</span>
+        <span class="plat" data-page-node-id="NiGmB3FkNzo68tEakN5Okg"><span data-page-node-id="GwD5AwX7G9sE5baBgf2EUI">Windows</span><span data-page-node-id="KsPxxjOSEnrwiOg1UN1V7Z">macOS</span><span data-page-node-id="2YbzhXpNRvvQCKRk9ExlOz">Linux</span></span>
+      </div>
+    </div>
+  </article></div>
+    </section><section class="section" data-page-node-id="S6OXAjLDEWKPuCjudCadTE">
+      <div class="field-head" data-page-node-id="V3SmzCXSuG3nsCqitK1HSZ">
+        <span class="field-ico" style="background:rgba(88,86,214,0.14);color:#5856D6" data-page-node-id="6TxZbhBDRJf2JTBvjj11nr">数</span>
+        <h2 data-page-node-id="g4OkRKELZE6XzkyWXzDuqd">数据与分析</h2>
+        <a href="#" class="field-more" data-page-node-id="TIwBpsOACTzgXhV9cS1JrQ">查看全部
+        </a>
+      </div>
+      <p class="field-desc" data-page-node-id="L0OpESXDmxtRIItEnXIft7">统计、数值计算与数据库工具，从点选到写代码都有。</p>
+      <div class="scroll-row" data-page-node-id="pHwMMu5rImQfFVFS1jKXlU"><article class="card" data-page-node-id="QKCMzlm4yUUe2JRYJsCvLe">
+    
+    <a href="#" class="card-thumb" style="background:rgba(29,158,117,0.14);color:#1D9E75" aria-label="查看 JASP 详情" data-page-node-id="VtSGLTPVEcBsR12wYVGFkg">J</a>
+    <div class="card-body" data-page-node-id="1gMGanvlwbSAGtjazrqINj">
+      <div class="card-meta" data-page-node-id="Bb0qHgMhY6nV8lFe9LXYZM">
+        <span class="chip-scene" data-page-node-id="dTYqVzpU43ewODs44wJyvc">数据</span>
+        <span class="src-badge src-opensource" data-page-node-id="KYbZOcxCBSFHCwAFMH2YvU">开源</span>
+      </div>
+      <h3 data-page-node-id="hnziByBjhPrWwXa9biAq8C">JASP</h3>
+      <p class="sum" data-page-node-id="0R31OWQ0Lg6Bp4jpFu6EYT">点选式统计分析软件，菜单操作输出贝叶斯与频率结果。</p>
+      <div class="card-foot" data-page-node-id="1Pkrw9VsJQF7vHfrs4Hgm9">
+        <span class="price" data-page-node-id="s8nMcJLMmK5d4fNjkbDUI6">免费</span>
+        <span class="plat" data-page-node-id="QNbuoKdNwsA5Ni6z6TA0oF"><span data-page-node-id="eVGgF4BgNEbQb8DSpJMsBW">Windows</span><span data-page-node-id="Waq35y1FjJNigojanRMtYQ">macOS</span><span data-page-node-id="wOApRx1NkQHUiWQKRmIs5a">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="taQTG37lC9ACuc1vtKAEDw">
+    <span class="card-badge" data-page-node-id="0NLClje4Ex6lFBk9E8gMGC">精选</span>
+    <a href="#" class="card-thumb" style="background:rgba(29,158,117,0.14);color:#1D9E75" aria-label="查看 Jupyter 详情" data-page-node-id="qpjt7xdgUESnvVpN4smuV2">J</a>
+    <div class="card-body" data-page-node-id="eby4TVcmwGf4zj1CWHZgIi">
+      <div class="card-meta" data-page-node-id="LOpTGFZsBaMA8vmGHz7fPu">
+        <span class="chip-scene" data-page-node-id="RXzVMWbFXQlFrE1Ab9vtlZ">数据</span>
+        <span class="src-badge src-opensource" data-page-node-id="iWie2rItzsGalvJiGoP8to">开源</span>
+      </div>
+      <h3 data-page-node-id="HJveg2CjANxXUUKVNHdYwO">Jupyter</h3>
+      <p class="sum" data-page-node-id="XHYhStNCem9EedB6EYRUzm">交互式笔记本环境，边写代码边出图表，数据探索常用。</p>
+      <div class="card-foot" data-page-node-id="c7XGbN7p5LAF2qlWTxhgxK">
+        <span class="price" data-page-node-id="EwBPWkSRkJNc5eW8PRHPji">免费</span>
+        <span class="plat" data-page-node-id="lIObnJPao0OEdSNcTPEwnD"><span data-page-node-id="CSKAD9nueLDgiUu7GSOc21">Windows</span><span data-page-node-id="5lkj8juHgDSihlUAfj9Ojd">macOS</span><span data-page-node-id="zgYhVXuAVUuQaqtWySQ4hC">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="LnhD1PUiMzoIgbNxnPIiCS">
+    
+    <a href="#" class="card-thumb" style="background:rgba(29,158,117,0.14);color:#1D9E75" aria-label="查看 RStudio 详情" data-page-node-id="lPchk7vcYj2AxANEGGJKeZ">R</a>
+    <div class="card-body" data-page-node-id="TQ0H2wQtKx1HgRIqlswNXP">
+      <div class="card-meta" data-page-node-id="RtVWKu3MaT2Jnj94EXHuC1">
+        <span class="chip-scene" data-page-node-id="eBXmaPGz9t1EIstH3iF7eo">数据</span>
+        <span class="src-badge src-official" data-page-node-id="RELeyb9PV3Lxjb4VADl8GU">官方</span>
+      </div>
+      <h3 data-page-node-id="oQLL1uPDmYe6kJ4HWHIG23">RStudio</h3>
+      <p class="sum" data-page-node-id="ACFJKD3OvoEGGRzGGIkeOr">R 语言集成开发环境，统计建模与可视化的主力工具。</p>
+      <div class="card-foot" data-page-node-id="bP5LE9JTgF2OaePHyWvqFB">
+        <span class="price" data-page-node-id="gHeVgiiCZk8W8bQlhUqxVe">免费</span>
+        <span class="plat" data-page-node-id="8rpsVMv3nc4mrQHGkZCFTH"><span data-page-node-id="8bFfXRlli4oHfTWht7P1dh">Windows</span><span data-page-node-id="GzTf9Af0Y6ACmjRnrARzgH">macOS</span><span data-page-node-id="LZmvGL71QtCNoiXI0PQESS">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="zEvm1sREbZ5iwjSbTLKnS0">
+    
+    <a href="#" class="card-thumb" style="background:rgba(29,158,117,0.14);color:#1D9E75" aria-label="查看 DBeaver 详情" data-page-node-id="71VCH8knPzetDt5DQFR5uC">D</a>
+    <div class="card-body" data-page-node-id="dvpoYOxui42vGZvbO4uIWQ">
+      <div class="card-meta" data-page-node-id="UO4EdXmIdnLqa9xBa0Ef31">
+        <span class="chip-scene" data-page-node-id="Z3vvsh004Gk9eFGYaZD6bv">数据</span>
+        <span class="src-badge src-opensource" data-page-node-id="bspgMhTvcdClD37f00Iz2b">开源</span>
+      </div>
+      <h3 data-page-node-id="xXYJDR7f1hkZeQoUuPC4MA">DBeaver</h3>
+      <p class="sum" data-page-node-id="Bo9gXIUZ4VN31Fat22InYK">通用数据库客户端，支持几十种数据库，社区版免费。</p>
+      <div class="card-foot" data-page-node-id="Eb7yP2iMxIBZmOL3GmPO5C">
+        <span class="price" data-page-node-id="2rDlTIHeioYwsHyKcD3Bjw">免费</span>
+        <span class="plat" data-page-node-id="WujN1BUaPLIENo1meTHHAR"><span data-page-node-id="w8Zanxo3cekNVOkyQJkx4Q">Windows</span><span data-page-node-id="X0aIgPZwVjgaE8ZRVSTZk0">macOS</span><span data-page-node-id="8Q8OHGWdsQC3ypFf91MiUQ">Linux</span></span>
+      </div>
+    </div>
+  </article><article class="card" data-page-node-id="9KFSWnm6k7AFdw8BreNb49">
+    
+    <a href="#" class="card-thumb" style="background:rgba(29,158,117,0.14);color:#1D9E75" aria-label="查看 GNU Octave 详情" data-page-node-id="Vo2aDPFyNsswcV9cx3jpG4">G</a>
+    <div class="card-body" data-page-node-id="AsAvMZ5bxhMCTUCtoXqedH">
+      <div class="card-meta" data-page-node-id="CUaTDyUbdR03DGEpneD2Nd">
+        <span class="chip-scene" data-page-node-id="jOrdZHT9TVZw8NTwDwLDF9">数据</span>
+        <span class="src-badge src-opensource" data-page-node-id="AYBr1ATJkVGVNA7LQTsu0G">开源</span>
+      </div>
+      <h3 data-page-node-id="nHfFuykznC8wQb9ORrNZF7">GNU Octave</h3>
+      <p class="sum" data-page-node-id="PJ3OA8OyjzS957XWFvpUFc">开源数值计算环境，语法兼容 MATLAB，科学计算常用。</p>
+      <div class="card-foot" data-page-node-id="hAPDESaOnAh1WoOPviD7k3">
+        <span class="price" data-page-node-id="OwWV8UErNFBUkCB4Qjurzj">免费</span>
+        <span class="plat" data-page-node-id="yCNAaey0Lz6w1Xe0NJzUQF"><span data-page-node-id="m9LLrdV9LD7aXtIj5XHuoq">Windows</span><span data-page-node-id="S8WsgY25SZUyFbnCK5RfvR">macOS</span><span data-page-node-id="uUE63RfKvsJVnKQVwqcJgF">Linux</span></span>
+      </div>
+    </div>
+  </article></div>
+    </section></div>
+
+  <footer class="site-footer" data-page-node-id="gciofuz8ht70BQ2zhV0hhX">
+    <div class="wrap" data-page-node-id="VJVt0kbVNEYDw1GcEYZK2E">
+      <div class="footer-grid" data-page-node-id="MPGdB3c3opivuOI2MxMRWS">
+        <div class="footer-col" style="max-width:300px" data-page-node-id="Vz8Pqw970ZTcCXIK1kehtx">
+          <div class="brand" style="margin-bottom:10px" data-page-node-id="m3k7oTq1LdyKz9ZAp01EUi"><span class="brand-mark" data-page-node-id="4pM62zh7Iab0oeS8PKnVLY">A</span>Ashare</div>
+          <p style="line-height:1.7" data-page-node-id="fETCPfXObffWA8rH8wUxPR">只连可核验的官方、开源与作者授权渠道。不托管安装包，不收录破解。</p>
+        </div>
+        <div class="footer-col" data-page-node-id="LqKS5O1MU7UGKuRERqgCxQ">
+          <h4 data-page-node-id="HkGHgsI1xnOXojXX7Lh9Ew">资源大类</h4>
+          <a href="#" data-page-node-id="SHEZkkkPipnegh4kAiXkyr">AI 工具</a><a href="#" data-page-node-id="gam1k8WTY7UmEER84deu7v">软件资源</a><a href="#" data-page-node-id="s9Ec4utCFbpCQvyCgTJgMt">影音资源</a>
+          <a href="#" data-page-node-id="NZkp24BN8RICnyJ4CRQgCw">实用工具</a><a href="#" data-page-node-id="zAyiBZDNibvmDs6QBBoanQ">开源项目</a>
+        </div>
+        <div class="footer-col" data-page-node-id="SDvp1MFJ89bBHIzSjwDrFD">
+          <h4 data-page-node-id="MeVs8FoVdBbMntKfpCiigT">关于</h4>
+          <a href="#" data-page-node-id="XGyy4soAnj1R4BlxW6OLMM">收录标准</a><a href="#" data-page-node-id="Apqg0DUM9xqh83dnBZYORQ">提交推荐</a><a href="#" data-page-node-id="vcjA0LoTSYDxuTd9EWFw4w">反馈问题</a><a href="#" data-page-node-id="1kXPuxx5gEEpOTTcnfV1Dg">关于本站</a>
+        </div>
+      </div>
+      <p class="footer-note" data-page-node-id="o4vMCazxgExPfAlVtnI10Q">本站收录三类合法来源：厂商正式版、可复现脚本、开源官方发行。网盘仅作补充镜像。© 2026 Ashare · 高保真原型（非生产代码）</p>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* ============ 数据 ============ */
+const CATEGORIES = [
+  { id: "ai",         name: "AI 工具",   color: "#534AB7" },
+  { id: "software",   name: "软件资源",  color: "#1D9E75" },
+  { id: "media",      name: "影音资源",  color: "#D85A30" },
+  { id: "tools",      name: "实用工具",  color: "#BA7517" },
+  { id: "opensource", name: "开源项目",  color: "#378ADD" },
+];
+
+/* 工具条目：图标色用首位字母 + 色相 */
+const TOOLS = [
+  { slug:"vscode", name:"Visual Studio Code", scene:"code", sceneName:"开发", summary:"微软出品的代码编辑器，插件生态最大，免费跨平台。", price:"免费", source:"official", platforms:["win","mac","linux"], tags:["编辑器","编程","IDE"], cat:"opensource", hot:true },
+  { slug:"git", name:"Git", scene:"code", sceneName:"开发", summary:"分布式版本控制标准工具，命令行为主，图形前端丰富。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["版本控制","命令行"], cat:"opensource", hot:true },
+  { slug:"python", name:"Python", scene:"code", sceneName:"开发", summary:"通用编程语言运行环境，数据与脚本场景覆盖面最广。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["编程语言","脚本"], cat:"opensource" },
+  { slug:"obsidian", name:"Obsidian", scene:"docs", sceneName:"文档", summary:"本地优先的知识库笔记工具，Markdown 存储，插件生态开源。", price:"个人免费", source:"official", platforms:["win","mac","linux"], tags:["笔记","知识库","Markdown"], cat:"tools", hot:true },
+  { slug:"pandoc", name:"Pandoc", scene:"docs", sceneName:"文档", summary:"文档格式转换命令行工具，支持几十种标记语言互转。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["格式转换","命令行"], cat:"opensource" },
+  { slug:"zotero", name:"Zotero", scene:"docs", sceneName:"文档", summary:"文献管理工具，抓取网页、生成引用，学术写作常用。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["文献管理","引用"], cat:"opensource", hot:true },
+  { slug:"blender", name:"Blender", scene:"design", sceneName:"设计", summary:"开源三维创作套件，建模、动画、渲染到合成全流程。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["3D","建模","动画"], cat:"opensource", hot:true },
+  { slug:"gimp", name:"GIMP", scene:"design", sceneName:"设计", summary:"开源位图编辑软件，照片修饰与图像合成，GPLv3。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["修图","位图"], cat:"opensource" },
+  { slug:"inkscape", name:"Inkscape", scene:"design", sceneName:"设计", summary:"开源矢量绘图工具，适合图标、插画与 SVG 编辑。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["矢量","SVG"], cat:"opensource" },
+  { slug:"krita", name:"Krita", scene:"design", sceneName:"设计", summary:"面向数字绘画的开源软件，笔刷系统与绘画体验成熟。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["绘画","插画"], cat:"media" },
+  { slug:"mineradio", name:"Mineradio", scene:"music", sceneName:"音乐", summary:"轻量电台式音乐播放器，界面简洁、资源占用低。", price:"免费", source:"official", platforms:["win"], tags:["音乐","播放器"], cat:"media", hot:true },
+  { slug:"audacity", name:"Audacity", scene:"music", sceneName:"音乐", summary:"开源音频编辑与录音工具，剪辑、降噪、批量处理。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["音频编辑","录音"], cat:"media" },
+  { slug:"picard", name:"MusicBrainz Picard", scene:"music", sceneName:"音乐", summary:"音乐标签自动整理工具，基于开源音乐数据库匹配。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["标签整理","音乐库"], cat:"media" },
+  { slug:"kicad", name:"KiCad", scene:"engineering", sceneName:"制图", summary:"开源电子设计自动化套件，原理图到 PCB 全流程，GPL-3.0。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["EDA","电路","PCB"], cat:"opensource", hot:true },
+  { slug:"librecad", name:"LibreCAD", scene:"engineering", sceneName:"制图", summary:"开源二维 CAD，轻量上手快，适合平面图纸。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["CAD","2D"], cat:"opensource" },
+  { slug:"openscad", name:"OpenSCAD", scene:"engineering", sceneName:"制图", summary:"用代码建模的三维 CAD，参数化设计可复现。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["CAD","参数化","3D"], cat:"opensource" },
+  { slug:"freecad", name:"FreeCAD", scene:"engineering", sceneName:"制图", summary:"开源参数化三维建模软件，机械与建筑场景都能用。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["CAD","建模"], cat:"opensource" },
+  { slug:"qgis", name:"QGIS", scene:"engineering", sceneName:"制图", summary:"开源地理信息系统，地图制作与空间数据分析。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["GIS","地图"], cat:"opensource" },
+  { slug:"localsend", name:"LocalSend", scene:"office", sceneName:"办公", summary:"跨平台局域网文件互传，无需账号与云端，Apache-2.0。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["传输","局域网"], cat:"tools", hot:true },
+  { slug:"joplin", name:"Joplin", scene:"office", sceneName:"办公", summary:"开源笔记应用，端到端加密同步，支持 Markdown。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["笔记","同步"], cat:"tools" },
+  { slug:"thunderbird", name:"Thunderbird", scene:"office", sceneName:"办公", summary:"Mozilla 出品的开源邮件客户端，多账户与日历整合。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["邮件","日历"], cat:"tools" },
+  { slug:"libreoffice", name:"LibreOffice", scene:"office", sceneName:"办公", summary:"开源办公套件，文档表格演示齐全，兼容主流格式。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["办公套件","文档"], cat:"tools" },
+  { slug:"jasp", name:"JASP", scene:"data", sceneName:"数据", summary:"点选式统计分析软件，菜单操作输出贝叶斯与频率结果。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["统计","数据分析"], cat:"software" },
+  { slug:"jupyter", name:"Jupyter", scene:"data", sceneName:"数据", summary:"交互式笔记本环境，边写代码边出图表，数据探索常用。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["笔记本","Python"], cat:"software", hot:true },
+  { slug:"rstudio", name:"RStudio", scene:"data", sceneName:"数据", summary:"R 语言集成开发环境，统计建模与可视化的主力工具。", price:"免费", source:"official", platforms:["win","mac","linux"], tags:["R","统计"], cat:"software" },
+  { slug:"dbeaver", name:"DBeaver", scene:"data", sceneName:"数据", summary:"通用数据库客户端，支持几十种数据库，社区版免费。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["数据库","SQL"], cat:"software" },
+  { slug:"geogebra", name:"GeoGebra", scene:"education", sceneName:"教育", summary:"动态数学软件，几何代数与微积分可视化，非商业免费。", price:"非商业免费", source:"official", platforms:["win","mac","linux"], tags:["数学","几何"], cat:"software" },
+  { slug:"octave", name:"GNU Octave", scene:"data", sceneName:"数据", summary:"开源数值计算环境，语法兼容 MATLAB，科学计算常用。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["数值计算","科学"], cat:"software" },
+  { slug:"figma", name:"Figma", scene:"design", sceneName:"设计", summary:"浏览器端界面设计协作工具，多人实时编辑，免费档可用。", price:"免费档", source:"official", platforms:["win","mac"], tags:["界面设计","协作"], cat:"software", hot:true },
+  { slug:"nodejs", name:"Node.js", scene:"code", sceneName:"开发", summary:"JavaScript 服务端运行时，前端工具链与后端服务都用它。", price:"免费", source:"opensource", platforms:["win","mac","linux"], tags:["运行时","JavaScript"], cat:"opensource" },
+];
+
+/* 领域区块：每块展示某场景的代表工具 */
+const FIELDS = [
+  { id:"code",   name:"开发工具",  desc:"编辑器、版本控制与语言运行时，按项目需要逐步配齐。", color:"#007AFF", cat:"software" },
+  { id:"design", name:"设计与创作", desc:"修图、矢量、三维与绘画，商业套件之外都有能长期用的开源选项。", color:"#AF52DE", cat:"software" },
+  { id:"media",  name:"影音与音频", desc:"播放、剪辑、音频处理与音乐库整理。", color:"#FF6B35", cat:"media" },
+  { id:"docs",   name:"文档与笔记", desc:"写作、文献管理、格式转换与本地知识库。", color:"#34A853", cat:"tools" },
+  { id:"engineering", name:"工程制图", desc:"电路设计、机械建模与地理信息，专业软件的开源替代。", color:"#00A3A3", cat:"opensource" },
+  { id:"data",   name:"数据与分析", desc:"统计、数值计算与数据库工具，从点选到写代码都有。", color:"#5856D6", cat:"software" },
+];
+
+/* 意图映射：把自然语言说法映射到关键词 */
+const INTENTS = [
+  { words:["剪视频","剪辑视频","剪片子","做视频","编辑视频"], map:"视频 剪辑", label:"视频剪辑" },
+  { words:["p图","修图","改图","处理图片","抠图","修照片"], map:"修图 图片", label:"图片处理" },
+  { words:["画图","画画","绘图","插画","手绘"], map:"绘图 插画 矢量", label:"绘图绘画" },
+  { words:["记笔记","做笔记","整理知识","知识库"], map:"笔记 知识库", label:"笔记知识库" },
+  { words:["写代码","编程","敲代码","开发","写程序"], map:"编辑器 编程 代码", label:"编程开发" },
+  { words:["画电路","电路图","pcb","画板子"], map:"电路 PCB EDA", label:"电路设计" },
+  { words:["三维","3d","建模","渲染"], map:"3D 建模 渲染", label:"三维建模" },
+  { words:["处理表格","做表格","excel","表格"], map:"表格 办公套件", label:"表格处理" },
+  { words:["算数","算数据","统计","数据分析"], map:"统计 数据分析", label:"统计分析" },
+  { words:["听歌","音乐","播放器","放音乐"], map:"音乐 播放器", label:"音乐播放" },
+  { words:["传文件","发文件","互传","局域网传"], map:"传输 局域网 文件", label:"文件传输" },
+  { words:["写文档","写论文","排版","文献"], map:"文档 文献 排版", label:"文档写作" },
+  { words:["看pdf","读pdf","pdf"], map:"PDF 阅读", label:"PDF 阅读" },
+  { words:["数学","几何","函数图","画函数"], map:"数学 几何", label:"数学工具" },
+];
+
+const HOT_WORDS = ["视频剪辑","记笔记","画电路图","3D 建模","传文件","统计分析","修图","写代码"];
+
+/* ============ 状态 ============ */
+/* 搜索即 AI 帮找：关键词打分 + 意图理解，始终开启，无独立开关。 */
+const AI_ENABLED = true;
+let currentCat = "all";
+
+/* ============ 搜索逻辑 ============ */
+function parseIntent(q) {
+  const lower = q.toLowerCase().trim();
+  const hits = INTENTS.filter(it => it.words.some(w => lower.includes(w)));
+  if (!hits.length) return null;
+  return { terms: hits.flatMap(h => h.map.split(" ")), labels: hits.map(h => h.label) };
+}
+
+/* 与项目 lib/items.ts 的打分思路一致：字段加权 + 多词 AND */
+function scoreItem(item, terms, phrase) {
+  const names = [item.name, item.slug].map(s => s.toLowerCase());
+  const aliases = [item.sceneName, item.scene].map(s => s.toLowerCase());
+  const tags = item.tags.map(s => s.toLowerCase());
+  const summary = item.summary.toLowerCase();
+  const scoreTerm = t => {
+    if (names.some(n => n === t)) return 200;
+    if (names.some(n => n.includes(t))) return 110;
+    if (aliases.some(a => a === t)) return 90;
+    if (aliases.some(a => a.includes(t))) return 80;
+    if (tags.some(x => x.includes(t))) return 50;
+    if (summary.includes(t)) return 30;
+    return 0;
+  };
+  const scores = terms.map(scoreTerm);
+  if (scores.some(s => s === 0)) return 0;
+  const bonus = terms.length > 1 ? scoreTerm(phrase) : 0;
+  return scores.reduce((a, b) => a + b, bonus);
+}
+
+function search(rawQuery) {
+  const q = rawQuery.trim();
+  if (!q) return { items: [], intent: null };
+  let terms = [...new Set(q.toLowerCase().split(/\s+/))];
+  let intent = null;
+  if (AI_ENABLED) {
+    intent = parseIntent(q);
+    if (intent) terms = [...new Set([...terms, ...intent.terms])];
+  }
+  const scored = TOOLS.map(item => ({ item, s: scoreItem(item, terms, q.toLowerCase()) }))
+    .filter(x => x.s > 0)
+    .sort((a, b) => b.s - a.s);
+  return { items: scored.map(x => x.item), intent };
+}
+
+/* ============ 渲染 ============ */
+function renderNav() {
+  const nav = document.getElementById("navTabs");
+  const items = [{ id:"all", name:"探索" }, ...CATEGORIES];
+  nav.innerHTML = items.map(c =>
+    `<button class="nav-tab" data-cat="${c.id}" aria-current="${c.id === currentCat ? 'page' : 'false'}" onclick="pickCat('${c.id}')">${c.name}</button>`
+  ).join("");
+}
+
+function pickCat(id) {
+  currentCat = id;
+  renderNav();
+  if (id === "all") { document.getElementById("resultPanel").classList.remove("on"); document.getElementById("aiNote").classList.remove("on"); showSections(true); return; }
+  const cat = CATEGORIES.find(c => c.id === id);
+  const items = TOOLS.filter(t => t.cat === id);
+  showSections(false);
+  renderResult(`${cat.name} · 共 ${items.length} 款`, items, null);
+}
+
+function showSections(on) {
+  document.getElementById("bannerWrap").style.display = on ? "" : "none";
+  document.getElementById("fieldsWrap").style.display = on ? "" : "none";
+}
+
+function renderHot() {
+  document.getElementById("hotRow").innerHTML =
+    '<span class="hot-label">热门搜索</span>' +
+    HOT_WORDS.map(w => `<button class="hot-chip" onclick="quickSearch('${w}')">${w}</button>`).join("");
+}
+
+function quickSearch(w) {
+  document.getElementById("searchInput").value = w;
+  doSearch();
+}
+
+function focusSearch() {
+  document.getElementById("searchInput").focus();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function doSearch(ev) {
+  if (ev) ev.preventDefault();
+  const q = document.getElementById("searchInput").value;
+  const { items, intent } = search(q);
+  showSections(false);
+  const noteEl = document.getElementById("aiNote");
+
+  if (AI_ENABLED && intent) {
+    noteEl.classList.add("on");
+    noteEl.innerHTML = `<div class="ai-head">AI 理解到的意图</div>
+      你说的「${q}」属于 ${intent.labels.map(l => `<span class="intent-tag">${l}</span>`).join("")}，
+      已按相关标签扩展检索。下方结果按匹配度排序。`;
+  } else {
+    noteEl.classList.remove("on");
+  }
+
+  const title = q.trim() ? `「${q.trim()}」的结果` : "搜索结果";
+  renderResult(title, items, AI_ENABLED && intent);
+  document.getElementById("resultPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+  return false;
+}
+
+function renderResult(title, items, intent) {
+  const panel = document.getElementById("resultPanel");
+  panel.classList.add("on");
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultCount").textContent = items.length ? `找到 ${items.length} 款工具` : "";
+  const grid = document.getElementById("resultGrid");
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <h3>暂时没找到匹配的工具</h3>
+      <p>试试更短的名称或常见别名，或者直接描述你想完成的事——比如「想剪个视频」「处理一堆表格」。<br>
+      也可以 <a href="#" class="link">提交你想要的工具</a>，我们会优先收录。</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = items.map(cardHTML).join("");
+}
+
+function cardHTML(t) {
+  const srcName = { official:"官方", opensource:"开源", discount:"优惠" }[t.source];
+  const plat = t.platforms.map(p => `<span>${p === 'win' ? 'Windows' : p === 'mac' ? 'macOS' : 'Linux'}</span>`).join("");
+  const cat = CATEGORIES.find(c => c.id === t.cat);
+  return `<article class="card">
+    ${t.hot ? '<span class="card-badge">精选</span>' : ''}
+    <a href="#" class="card-thumb" style="background:${hexA(cat ? cat.color : '#888780', 0.14)};color:${cat ? cat.color : '#888780'}" aria-label="查看 ${t.name} 详情">${t.name.slice(0,1).toUpperCase()}</a>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="chip-scene">${t.sceneName}</span>
+        <span class="src-badge src-${t.source}">${srcName}</span>
+      </div>
+      <h3>${t.name}</h3>
+      <p class="sum">${t.summary}</p>
+      <div class="card-foot">
+        <span class="price">${t.price}</span>
+        <span class="plat">${plat}</span>
+      </div>
+    </div>
+  </article>`;
+}
+
+function hexA(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* 只展示卡片（横幅用） */
+const BANNERS = [
+  { tone:"purple", tag:"编辑精选", title:"这周新收录的三款工具", desc:"从开发到音频，都是官方或开源渠道，能直接下载。", cta:"看看收录了什么", art:"A" },
+  { tone:"teal",   tag:"推广位",   title:"这里可以放你的产品", desc:"横幅支持编辑精选与推广位两种来源，左右切换、自动轮播。", cta:"了解投放", art:"B" },
+  { tone:"amber",  tag:"专题",     title:"工程制图：开源的能顶多少", desc:"KiCad、FreeCAD、LibreCAD 各自的适用边界。", cta:"读这个专题", art:"C" },
+];
+let bannerIdx = 0, bannerTimer = null;
+
+function renderBanner() {
+  document.getElementById("bannerTrack").innerHTML = BANNERS.map((b, i) =>
+    `<div class="banner ${i === 0 ? 'active' : ''}" data-tone="${b.tone}">
+      <div class="banner-copy">
+        <span class="banner-tag">${b.tag}</span>
+        <h2>${b.title}</h2>
+        <p>${b.desc}</p>
+        <a href="#" class="banner-cta">${b.cta}
+        </a>
+      </div>
+      <div class="banner-art">${b.art}</div>
+    </div>`
+  ).join("");
+  document.getElementById("bannerCtrl").innerHTML = BANNERS.map((_, i) =>
+    `<button class="banner-dot ${i === 0 ? 'active' : ''}" onclick="goBanner(${i})" aria-label="第 ${i+1} 张"></button>`
+  ).join("");
+}
+
+function goBanner(i) {
+  bannerIdx = (i + BANNERS.length) % BANNERS.length;
+  document.querySelectorAll(".banner").forEach((el, k) => el.classList.toggle("active", k === bannerIdx));
+  document.querySelectorAll(".banner-dot").forEach((el, k) => el.classList.toggle("active", k === bannerIdx));
+}
+function moveBanner(d) { goBanner(bannerIdx + d); resetBannerTimer(); }
+function resetBannerTimer() {
+  clearInterval(bannerTimer);
+  bannerTimer = setInterval(() => goBanner(bannerIdx + 1), 5200);
+}
+
+function renderFields() {
+  document.getElementById("fieldsWrap").innerHTML = FIELDS.map(f => {
+    const items = TOOLS.filter(t => t.scene === f.id).slice(0, 7);
+    if (!items.length) return "";
+    return `<section class="section">
+      <div class="field-head">
+        <span class="field-ico" style="background:${hexA(f.color,0.14)};color:${f.color}">${f.name.slice(0,1)}</span>
+        <h2>${f.name}</h2>
+        <a href="#" class="field-more">查看全部
+        </a>
+      </div>
+      <p class="field-desc">${f.desc}</p>
+      <div class="scroll-row">${items.map(cardHTML).join("")}</div>
+    </section>`;
+  }).join("");
+}
+
+/* ============ 主题 ============ */
+function applyTheme(dark) {
+  document.documentElement.classList.toggle("dark", dark);
+  document.getElementById("themeBtn").innerHTML = dark
+    ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+    : '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  try { localStorage.setItem("proto-theme", dark ? "dark" : "light"); } catch(e) {}
+}
+
+/* ============ 初始化 ============ */
+function init() {
+  const saved = (() => { try { return localStorage.getItem("proto-theme"); } catch(e) { return null; } })();
+  const dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyTheme(dark);
+  document.getElementById("themeBtn").onclick = () => applyTheme(!document.documentElement.classList.contains("dark"));
+
+  renderNav();
+  renderHot();
+  renderBanner();
+  renderFields();
+  document.getElementById("totalCount").textContent = TOOLS.length;
+  resetBannerTimer();
+
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); focusSearch(); }
+  });
+}
+init();
+</script>
+
+
+</body></html>

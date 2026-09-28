@@ -148,12 +148,12 @@ async function validate(item, index, { allowHttp, knownSlugs, strict }) {
   if (item.icon?.simpleIcon) {
     if (!SLUG_PATTERN.test(item.icon.simpleIcon)) fail("icon.simpleIcon 名称格式不正确");
     else if (!await fs.stat(path.join(ROOT, "data", "icons", `${item.icon.simpleIcon}.svg`)).then(() => true, () => false)) {
-      warn(`data/icons/${item.icon.simpleIcon}.svg 不存在，前端会回退字母图标`);
+      soft(`data/icons/${item.icon.simpleIcon}.svg 不存在，前端会回退字母图标`);
     }
   }
 
   for (const slug of item.alternatives ?? []) {
-    if (!knownSlugs.has(slug)) warn(`alternatives 里的 ${slug} 不在目录中，详情页不会显示`);
+    if (!knownSlugs.has(slug)) soft(`alternatives 里的 ${slug} 不在目录中，详情页不会显示`);
   }
   // ---- 内容质量：SKILL.md 的「完成标准」在此落地 ----
   const body = item.body?.trim() ?? "";
