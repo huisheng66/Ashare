@@ -9,7 +9,7 @@ import type { CatalogItem } from "@/data/types";
 
 export function AppCard({ item }: { item: CatalogItem }) {
   return (
-    <Card className="w-[240px] shrink-0 transition-colors duration-200 hover:ring-primary/30">
+    <Card className="w-[240px] shrink-0 transition-[box-shadow,translate,colors] duration-200 hover:-translate-y-0.5 hover:shadow-card-hover hover:ring-primary/30">
       <CardContent className="flex h-full flex-col">
         <div className="flex items-center gap-3">
           <SoftwareIcon item={{ name: item.name, icon: item.icon, iconImage: item.iconImage }} size={44} />

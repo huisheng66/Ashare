@@ -63,9 +63,10 @@
 
 ## 动效
 
-- 时长 150–300ms，ease-out；hover 颜色/阴影过渡；卡片 `hover:ring-primary/30`，缩略图 `group-hover:scale-[1.02]`。
+- 时长 150–300ms，ease-out；hover 颜色/阴影过渡；卡片 `hover:ring-primary/30` 叠加 `hover:-translate-y-0.5 hover:shadow-card-hover` 抬升，缩略图 `group-hover:scale-[1.02]`。
 - 按钮 `active:scale-[0.97]`。
-- 横向行 `scroll-row`：scroll-snap，隐藏滚动条。
+- 横向行 `scroll-row`：scroll-snap，隐藏滚动条；`scroll-row-fade` 右缘渐隐提示还有更多。
+- 首页 hero 用 `.hero-glow`：主色低透明径向渐变，浅/深各一套，克制不喧宾。
 - `prefers-reduced-motion: reduce` → 全部瞬时。
 
 ## 无障碍

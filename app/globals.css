@@ -193,6 +193,24 @@
   backdrop-filter: saturate(180%) blur(20px);
 }
 
+/* 首页 hero：克制的主色径向渐变氛围 */
+.hero-glow {
+  background:
+    radial-gradient(40rem 20rem at 12% 0%, color-mix(in oklab, var(--primary) 11%, transparent), transparent 70%),
+    radial-gradient(32rem 16rem at 88% 8%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 70%);
+}
+.dark .hero-glow {
+  background:
+    radial-gradient(40rem 20rem at 12% 0%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 70%),
+    radial-gradient(32rem 16rem at 88% 8%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 70%);
+}
+
+/* 横滑卡片行：右缘渐隐，提示后面还有内容 */
+.scroll-row-fade {
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 3rem), transparent);
+  mask-image: linear-gradient(to right, black calc(100% - 3rem), transparent);
+}
+
 /* Touch controls keep the compact desktop layout without shrinking tap targets. */
 @media (pointer: coarse) {
   [data-slot="button"], [data-slot="input"], [data-slot="select-trigger"] {

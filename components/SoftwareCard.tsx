@@ -15,7 +15,7 @@ import { kindLabel } from "@/lib/items";
 /** 网格卡片：首页与类别页共用 */
 export function SoftwareCard({ item }: { item: CatalogItem }) {
   return (
-    <Card className="group relative gap-0 overflow-hidden py-0 transition-colors duration-200 hover:ring-primary/30">
+    <Card className="group relative gap-0 overflow-hidden py-0 transition-[box-shadow,translate,colors] duration-200 hover:-translate-y-0.5 hover:shadow-card-hover hover:ring-primary/30">
       <Link
         href={`/software/${item.slug}`}
         aria-label={`查看详情：${item.name}`}
