@@ -125,4 +125,12 @@ export type SeedSoftware = {
     color: string;
     simpleIcon?: string;
   };
+  /** 可选：种子里直接写正文，缺省为空串（历史行为）。写了才能让全新部署也有内容。 */
+  body?: string;
+  /** 可选：种子里直接写标签，缺省为空数组。 */
+  tags?: string[];
+  /** 可选：缺省由 source 推导；source 标 opensource 但实际闭源时（如 GeoGebra）必须显式写。 */
+  kind?: ItemKind;
+  /** 可选：缺省为 `{ official: officialUrl }`。需要额外给 github / mirror 时填写。 */
+  links?: ItemLinks;
 };

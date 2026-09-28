@@ -1,5 +1,162 @@
 # 变更记录
 
+## 2026-09-28 · 精简与安全加固
+
+这一轮不录新条目，把前七轮长出来的流程和代码收敛一遍。
+
+**安全：探活脚本补上 SSRF 防护**
+
+- 上一轮给 `check-links` 加的 `--url` 可以传入任意地址，却没有限制目标。候选地址若来自网页或用户投稿，脚本就会替你去打 `169.254.169.254`（云元数据服务）、内网管理口，或 `file://` 本地文件——这是典型的 SSRF，而这类脚本正是由 AI 自动执行的。
+- 抓取统一走 `scripts/_shared.mjs` 的 `safeFetch`：只放行 http/https；预解析 DNS，拒绝私有 / 保留 / 环回 / 组播网段（IPv4 按 CIDR 表位运算，IPv6 覆盖 `fc00::/7`、`fe80::/10`、`::1`、文档段）；`redirect: "manual"` 手动跟随并**逐跳**校验——只给 `redirect: "follow"` 的话，一个 302 就能绕过所有检查。
+- 测本机 dev 服务才加 `--allow-private`，且它**只放行第 0 跳**。否则「测一下 localhost」会被服务端的一个 302 带进内网。
+- 已验证拦截：元数据地址、`127.0.0.1`、`192.168.x`、`10.x`、`[::1]`、`file://`，以及「公网 → 302 → 169.254.169.254」的绕过路径。
+
+**安全：备份删除加确认**
+
+- `--keep` 会 `fs.rm -r`。此前只按目录名匹配 `ashare-backup-*` 就删，若 `--out` 指向的目录里本来就有同名文件夹会被误删。现在目录必须有带 `createdAt` 的 `manifest.json`、归档须经 `tar -tzf` 确认含 manifest，否则跳过并提示。已用「名字合规但无 manifest」的假目录验证会保留。
+- 快照若含用户投稿 / 反馈文件（`feedback.json`、`blocks.json`、`inbox.json`）会在清单里标出并提示「对外分享前先剔除」——恢复需要完整数据，但分享不需要。
+
+**精简：抽出 `scripts/_shared.mjs`**
+
+- 五个脚本各自实现了一遍参数解析、运行库读取、并发限流。`parseFlags` / `readCatalog` / `mapLimit` / `safeFetch` 收进公共模块后：`check-links` 217 → 152 行、`content-audit` 189 → 174、`ingest-item` 294 → 288，`backup` 因新增删除保护 214 → 231。公共模块 167 行，其中约 60 行是 SSRF 防护这一新增能力。
+- 净账：脚本 +14 行、主流程文档 −65 行。代码量没有真的下降，换来的是消除 5 处重复实现 + 两个安全缺口被堵上。
+
+**精简：SKILL.md 197 → 132 行**
+
+- 核验要点、批量节奏、`--patch` 细节与 references 大量重复。现在 SKILL.md 只留流程骨架、硬红线、闸门和「指向哪个 reference」，细则下沉到按需加载的 references——核验的 8 条陷阱搬进 `sources-and-redlines.md`，没有丢信息。
+
+**流程：给已知误报打标记**
+
+- 全量探活每轮都报同样 4 个异常，且全是误报：inkscape.org / jasp-stats.org 的 403 是 Cloudflare 拦自动化，texstudio.org / gimp.org 的超时是本机代理隧道。脚本现在对这几个域名附一句带日期的「已人工确认」提示，省掉每轮重复复核。提示不改变判定结果，过期需重验。
+
+**验证**：`npm run check` 46 测试全过 · 51 个链接探活 48 可达（4 个异常均为上述已知误报）· 全站 35 个详情页冒烟 0 异常 · `seed:drift` 0 不一致 · 备份 / `--keep` / `--list` 行为正常。
+
+## 2026-09-28 · 文档场景补齐 3 条与探活工具改进
+
+**补齐文档场景 3 条空壳**（`npm run content:audit`：正文/标签缺失 13 → 10）
+
+- Obsidian：主程序是**专有软件**（个人免费、商业使用需付费许可），`source: official` / `kind: app`，正文第四段明说「插件大多开源，但主程序不是」——它常被误当成开源项目，插件仓库也不是上游，因此只留官网链接。
+- Pandoc（GPL-2.0-or-later，Haskell 编写，分发单个可执行文件）、Sumatra PDF（GPL-3.0，已读上游 COPYING 原文确认为「GNU GENERAL PUBLIC LICENSE Version 3」）。三条各补 4 个标签、4–5 个别名与四段正文，运行库与种子两个落点都已写入，漂移 0 条。
+- 冒烟复核：本批 3 条与全站 35 个详情页均无异常，本批 5 个链接全部 200。
+
+**核验过程中澄清的两处疑点**
+
+- Pandoc 的 `COPYING` 在 main 分支取不到（404），许可证按 GitHub API 的 `license` 字段记录，正文写明来源。这条属于「核验受限但结论可靠」，未硬写范围。
+- `obsidian.md/download` 首次探活超时 10s，重跑 200；`curl --noproxy '*'` 直连又是 000 而脚本走代理是 200。同一地址三种结论，说明单次失败只能证明「这条路径不通」。站点本身正常，地址未改。
+
+**`check-links.mjs` 支持 `--url` 与自动重试**
+
+- 选题阶段要核验还没入库的候选地址，以前只能拿 curl 手测，还常与脚本结论不一致。现在可直接 `--url <地址>` 批量测，写入前先把候选地址过一遍。
+- 网络抖动会让活链偶发超时，默认失败后重试 1 次（`--retries 0` 退回只测一次）。顺带修掉 `attempt()` 返回 `result.url ?? result.finalUrl` 的取值不一致——`request()` 只产出 `finalUrl`，前者恒为 undefined。
+
+**又一次 `aliases` 漏同步**
+
+- 本批草稿改了 `aliases`/`tags`/`body`/`links` 四项，运行库写入后同步种子时漏了 `aliases`，`npm run seed:drift` 报出 3 条不一致。这是第二次栽在同一字段上（第二批是 blender/dbeaver/figma/freecad/geogebra）。已在 SKILL.md 第 6 步写成硬动作：草稿改了哪些字段，种子就照字段名逐项核对。
+
+**技能文档迭代**：坑位库新增 46–49 条（探活要交叉验证、`--url` 的由来、插件开源 ≠ 主程序开源、`--patch` 字段清单要原样同步）；SKILL.md 第 3 步加入 `--url` 用法与重试说明，第 6 步加入字段逐项核对动作。
+
+## 2026-09-28 · 开发场景补齐 3 条与漂移检查
+
+**补齐开发场景 3 条空壳**（`npm run content:audit`：正文/标签缺失 16 → 13）
+
+- Git（GPL-2.0-only，仓库 COPYING 明确只认第二版，不是 v2 或更高版本）、Node.js（MIT，仓库注明内含第三方组件各自另有许可）、Python（PSF License Version 2，条款与 MIT / GPL 不同）。三条各补 4 个标签、4 个别名与四段正文，运行库与种子两个落点都已写入，漂移 0 条。
+- 冒烟复核：全站 35 个详情页无异常。
+
+**修复第二批遗留的别名丢失**
+
+- 第二批给 blender / dbeaver / figma / freecad / geogebra 补 `aliases` 时只写了新别名，`--patch` 是整体替换，原有的「3d」「建模」「sql 客户端」等搜索词被覆盖，且漏同步种子。已按「原有 + 新增」合并回写两个落点，并顺带对齐 Blender 正文里一处空格差异。
+
+**新增 `scripts/seed-drift.mjs`（`npm run seed:drift`）**
+
+- 「两个落点」此前全靠人工保证，没有机器校验。脚本把种子经 `seedToItem()` 转换后与运行库逐字段比对（`summary` / `body` / `tags` / `aliases` / `links` / `kind` / `source` / `price` / `scenes` / `platforms`），并列出仅存在于一侧的条目；`--strict` 有差异时非零退出。
+- 首次运行即抓出 5 条不一致（4 条别名漏同步、1 条正文空格差异），修复后归零。已接进 `package.json`、README 与收录流程的第 6 步闸门。
+- 实现要点：Node 的类型擦除可以直接 `import "../data/software.ts"`，不需要正则解析 TS 源文件。
+
+**技能文档迭代**：坑位库新增 41–45 条（`--patch` 是替换不是追加、`aliases` 漂移最难发现、GPL-2.0 与 GPL-2.0-or-later 有别、许可证按原文写、脚本可直接导入种子 TS）；SKILL.md 第 6 步加入漂移检查闸门与别名替换警告。
+
+## 2026-09-28 · 办公场景补齐 3 条与批次归属规则
+
+**补齐办公场景 3 条空壳**（`npm run content:audit`：正文/标签缺失 19 → 16）
+
+- Joplin（AGPL-3.0-or-later，上游 LICENSE 为仓库默认许可、部分子目录另有声明）、LocalSend（Apache-2.0）、Thunderbird（MPL-2.0，源码在 hg.mozilla.org 不在 GitHub，只有官网链接）。三条各补 4 个标签、4–5 个别名与四段正文，运行库与种子两个落点都已写入。
+- Joplin 的 LICENSE 里另有商标与图标条款（Joplin® 为 JOPLIN SAS 注册商标，logo 需授权使用），已单独写进正文第四段——这类限制比许可证本身更容易被二次分发者踩到。
+- 冒烟复核：本批 3 条与全站 35 个详情页均无异常。
+
+**`content-audit` 补上批次归属能力**
+
+- 输出新增 `primary`（即 `scenes[0]`）：`--scene X` 会把主场景不是 X 的条目标成「（主场景 Y）」。跨场景条目（如 joplin 属 `office`+`docs`、obsidian 属 `docs`+`office`）此前归属不明，两边都以为对方会处理，最后谁也没做——现在按主场景归属，这类条目留给所属场景那一批。
+- 默认输出末尾新增「建议下一批」：挑主场景待补最多的场景并列出前 3 个 slug，直接支撑「一批一个场景」的节奏。当前指向开发场景（主场景待补 6 条）。
+
+**技能文档迭代**：坑位库新增 37–40 条（API 拿不到许可证时直读上游文件、许可证附加条款要照实写、跨场景条目按主场景归属、冒烟需 dev 常驻）；SKILL.md 批量节奏新增跨场景归属规则与「建议下一批」用法。
+
+## 2026-09-28 · 制图场景补齐 3 条与渲染冒烟
+
+**补齐制图场景 3 条空壳**（`npm run content:audit`：正文/标签缺失 22 → 19；制图场景待补 5 → 2）
+
+- KiCad（GPL-3.0，上游 LICENSE 明确为第三版）、LibreCAD（GPL-2.0，上游 LICENSE 明确为 GPLv2）、OpenSCAD（GPL-2.0，上游 COPYING 为第二版并附 CGAL 链接例外）。三条 API 返回的 `license` 均为 `NOASSERTION` 或空，全部改从上游许可证原文确认。
+- 三条各补 4 个标签、4–5 个别名与四段正文，运行库与种子两个落点都已写入；补上 Git 仓库链接（KiCad 上游在 gitlab.com，LibreCAD 与 OpenSCAD 在 GitHub）。
+
+**新增渲染冒烟脚本 `scripts/smoke-detail.mjs`（`npm run smoke:detail`）**
+
+- 此前几批只跑 `npm run check` 与 `content:audit`，两者都只碰数据，从没验证过页面。脚本在 dev 服务上逐条检查：正文每一段是否真的渲染（取每段前 12 字做探针）、官网与 Git 链接是否出现在页面、来源徽章是否与 `source` 一致、价格是否展示。
+- 首轮实测 35 个详情页全部通过。徽章按 CSS 类判断而非全文搜「开源」——页脚与「同类替代」都会带出该词，全文搜会误报（GeoGebra 首轮即被误报）。
+- 已接进 `package.json` 与 README，并写进收录流程的校验闸门。
+
+**`content-audit` 新增 `--scene <id>`**：按场景收窄统计与待补清单（场景库存仍按全量算），配合「一批一个场景」的节奏。
+
+**技能文档迭代**：坑位库新增 32–36 条（数据检查全绿不等于页面正确、徽章按 CSS 类判断、后台任务里 `&` 起的服务会被回收、本机访问 localhost 需绕过代理、`--scene` 只收窄统计）；SKILL.md 第 7 步从「打开页面看看」改成可执行的冒烟闸门，完成标准同步加入该项。
+
+## 2026-09-28 · 设计场景补齐 3 条与校验脚本硬化
+
+**补齐设计场景最后 3 条空壳**（`npm run content:audit`：正文/标签缺失 25 → 22，设计场景待补归零）
+
+- GIMP（GPL-3.0，上游 `COPYING` 明确为第三版）、Inkscape、Krita（GPL-3.0）。三条各补 4 个标签、4 个别名与四段正文，运行库与种子两个落点都已写入。
+- Inkscape 与 Krita 补上 Git 仓库链接（上游分别在 gitlab.com 与 github.com/KDE/krita）。GIMP 上游在 `gitlab.gnome.org`，不在 Git host 白名单内，只保留官网链接。
+
+**修复一条真死链**
+
+- Krita 官网下载页 `krita.org/download/` 已 404，正确地址为 `krita.org/en/download/`。运行库与种子同步修正，复检 200。
+- 全量探活 39 个链接，另外 3 个异常经人工复核均非死链：inkscape.org 与 jasp-stats.org 是 Cloudflare 拦自动化（换浏览器 UA 即 200），texstudio.org 的超时是本机代理隧道失败（站点正常，最新版 4.9.8）。
+
+**Inkscape 许可证如实标注**
+
+- 上游用 REUSE 规范管理，`LICENSES/` 同时含 GPL-2.0-or-later 与 GPL-3.0-or-later，GitLab API 的 `license` 字段为空，且 inkscape.org 对本机请求返回 403 无法在线确认。正文写明「GPL 系列，以官网声明为准」及核验受限，不写死版本。
+
+**校验脚本硬化**
+
+- `ingest-item.mjs` 新增 `--strict`：把 SKILL.md 的「完成标准」变成可执行检查——正文至少 2 段且 ≥200 字、标签至少 3 个、别名非空、已发布必须有来源链接、适合/不适合不出现身份词、正文不含 Markdown（标题/加粗/列表/链接语法）。默认只提示，`--strict` 下升级为错误。已用一份故意不达标的草稿验证会拦下 6 项。
+- `content-audit.mjs --json` 的输出补上 `scenes` 字段：按场景分批补内容时可直接筛出某一场景的待补条目，此前只能靠猜。
+
+**技能文档迭代**：坑位库新增 27–31 条（`--patch` 浅合并会整体替换 `links`、异常不等于死链、REUSE 多许可、GitHub 仓库可能是过期镜像、自托管 GitLab 不在白名单）；SKILL.md 核验步骤补充四条复核要点，预检步骤补充 `--strict` 与浅合并警告。
+
+## 2026-09-28 · 补齐空壳条目与种子透传修复
+
+**补齐 5 条历史空壳的正文与标签**（`npm run content:audit`：正文/标签缺失 30 → 25）
+
+- Blender（GPL，blender.org）、DBeaver（社区版免费，dbeaver.io）、Figma（个人档免费）、FreeCAD（LGPL，freecad.org）、GeoGebra。运行库与种子两个落点都已写入，链接探活 5/5 通过。
+- 新增 `ingest-item.mjs --patch` 模式：只覆盖草稿里写到的字段，slug 不存在则报错退出，避免手滑新建重复条目。
+
+**修正 GeoGebra 的分类错误**
+
+- 此前种子标 `source: "opensource"`，被 `seedToItem()` 推导成 `kind: "opensource"`，前台会显示「开源」徽章。但它的 GitHub 仓库 `license` 字段为 `null`——源码公开、许可闭源，实为非商业免费。已改为 `source: "official"` + `kind: "app"` + `price: "非商业免费"`，正文第三段写明商用需单独授权。
+
+**修复：补进运行库的正文，全新部署会全部丢失**
+
+- `seedToItem()` 把 `body` 硬编码成 `""`、`tags` 硬编码成 `[]`，而 `data/software.ts` 的种子类型里根本没有这两个字段。也就是说正文补得再多，只要 `catalog.json` 重建就退回 30 条空壳。
+- `SeedSoftware` 新增可选 `body` / `tags` / `kind` / `links`，`seedToItem()` 改为透传（缺省行为不变，已有种子不受影响）。映射逻辑抽到 `lib/seed.ts`（`lib/store.ts` 带 `server-only`，测试无法直接导入），新增 `tests/seed.test.mjs` 6 项守住透传与 `source`/`kind` 不打架。
+- 涉及文件：`data/types.ts`、`lib/seed.ts`、`lib/store.ts`、`data/software.ts`、`tests/seed.test.mjs`。
+
+**技能文档迭代**：坑位库新增 21–26 条（种子形态差异、`links` 是对象不是数组、开源判据是许可证而非源码可见、跨场景混批）；`SKILL.md` 主流程补充 `--patch` 模式与种子落点的正确写法，字段文档新增「`source` 与 `kind` 的判定」。
+
+## 2026-09-28 · 音乐场景开栏与收录流程
+
+- 新增 [Audacity](https://github.com/audacity/audacity)：4.0.0（2026-09-03），Windows .msi / macOS .dmg / Linux AppImage。GitHub 许可证字段为 NOASSERTION、仓库 topics 标注 gplv2，正文如实写明「商用前自行核对 LICENSE」。
+- 新增 [MusicBrainz Picard](https://github.com/metabrainz/picard)：GPL-2.0，2.13.3（2025-02）。依赖 MusicBrainz 在线库，中文与小众发行匹配率低，已写入正文第三段。
+- 补入 [Mineradio](https://github.com/XxHuberrr/Mineradio)（GPL-3.0）：此前只存在于 `data/samples.ts`，运行库缺失导致「音乐」场景计数为 0，与 09-15 的记录矛盾。
+- 同时写入 `data/store/catalog.json`（SHA-256 同步）与 `data/samples.ts`；音乐场景库存 0 → 3。
+- 新增运维脚本：`scripts/backup.mjs`（带时间戳快照，可选调用系统 tar）、`scripts/content-audit.mjs`（字段缺口与场景库存报告），已接进 `package.json` 与 README。
+- 新增项目级技能 `.workbuddy/skills/ashare-curation`：收录流程、字段规格、红线清单、踩坑库，以及 `ingest-item.mjs`（校验 + 写入）与 `check-links.mjs`（链接探活，github.com 直连失败时改用 API 代验）。
+
 ## 2026-09-19
 
 - 首页直接搜索；搜索支持全角字符和多关键词，筛选状态可移除且保留排序与视图。

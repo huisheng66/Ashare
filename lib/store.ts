@@ -6,30 +6,14 @@ import path from "node:path";
 
 import { samples } from "@/data/samples";
 import { software as seed } from "@/data/software";
-import type { FeedbackEntry, SeedSoftware, Software, Submission } from "@/data/types";
+import type { FeedbackEntry, Software, Submission } from "@/data/types";
 import { JsonStore } from "./json-store";
+import { seedToItem } from "./seed";
 
 const DIR = path.join(process.cwd(), "data", "store");
 // One Node process owns this local store. Each mutation includes its read in the queue.
 const store = new JsonStore(DIR);
 let checkedCatalogIntegrity = false;
-
-function seedToItem(s: SeedSoftware): Software {
-  const { installTips, officialUrl, ...rest } = s;
-  const now = new Date().toISOString();
-  return {
-    ...rest,
-    kind: s.source === "opensource" ? "opensource" : "app",
-    status: "published",
-    tags: [],
-    body: "",
-    tutorial: installTips,
-    links: { official: officialUrl },
-    previews: [],
-    createdAt: now,
-    updatedAt: now,
-  };
-}
 
 const seedCatalog = (): Software[] => [...seed.map(seedToItem), ...structuredClone(samples)];
 

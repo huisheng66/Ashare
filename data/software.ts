@@ -27,12 +27,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "git",
     name: "Git",
-    aliases: ["git scm", "版本控制"],
+    aliases: ["git scm", "版本控制", "代码版本", "版本管理"],
     summary: "记录改动、分支和协作的基础工具，写代码几乎都会用到。",
     scenes: ["code"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["版本控制", "Git", "协作开发", "开源"],
+    body:
+      "Git 是分布式版本控制系统，记录每一次改动、支持分支与合并，是代码协作的基础设施。它解决的是「改坏了要能退回去，多人改同一份代码要能对得上」。\n工作方式是把历史存在本地仓库里：提交形成一条可回退的时间线，分支只是指向某个提交的可移动指针，合并与变基用来把两条线合起来。因为每个克隆都是完整仓库，断网也能提交和查看历史，推送只是同步。\n代价要提前知道：概念多且抽象，工作区 / 暂存区 / 版本库三层和 detached HEAD 会劝退不少人；冲突解决需要真的读懂差异；历史一旦推送到共享仓库，再用变基或强制推送改写会影响别人——共享分支上别这么做。\n许可证为 GPL-2.0-only（仓库 COPYING 明确：本项目只认 GPL 第二版这一份，不是 v2 或更高版本）。安装包从 git-scm.com 下载；Windows 建议连 Git Bash 一起装，macOS 用 Xcode 命令行工具或 Homebrew，Linux 用发行版包管理器。",
     officialUrl: "https://git-scm.com/downloads",
+    links: {
+      official: "https://git-scm.com/downloads",
+      github: "https://github.com/git/git",
+    },
     officialLabel: "git-scm.com",
     whoFor: "需要版本历史、分支，或要和远程仓库同步。",
     whoNot: "只做单次、不保留历史的改文件，可以先不装。",
@@ -48,12 +55,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "python",
     name: "Python",
-    aliases: ["python3", "pip"],
+    aliases: ["python3", "pip", "py", "python 解释器"],
     summary: "脚本、数据分析、爬虫和不少课程作业的默认语言。",
     scenes: ["code", "data"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["Python", "脚本", "数据分析", "开源"],
+    body:
+      "Python 是一门以可读性见长的通用编程语言，写脚本、做数据分析、爬网页、自动化重复操作和教学都常用它。它解决的是「想用尽量少的代码把一件事先跑通」。\n生态是它最大的资本：标准库覆盖文件、网络、正则、日期这些日常需求，pip 加上 PyPI 的第三方包能直接接上数值计算（NumPy、pandas）、绘图、网页请求、自动化测试与机器学习框架；语法接近伪代码，改起来也快。\n代价要提前知道：它是解释执行，纯计算性能不如编译型语言，重计算的场景通常靠 C 扩展或换语言；包与环境管理是新手最容易踩坑的地方，每个项目建议用虚拟环境隔离；另外 Python 2 已停止维护，遇到还在用 2 语法的教程要换掉。\n许可证为 PSF License Version 2（Python 软件基金会许可第二版，条款与常见的 MIT / GPL 不同，商用前建议读一遍原文）。安装包从 python.org 下载；Windows 安装时勾选 Add python.exe to PATH，macOS 与 Linux 多数自带但版本可能偏旧。",
     officialUrl: "https://www.python.org/downloads/",
+    links: {
+      official: "https://www.python.org/downloads/",
+      github: "https://github.com/python/cpython",
+    },
     officialLabel: "python.org",
     whoFor: "要写脚本、做分析，或课程指定 Python。",
     whoNot: "只想点选出统计图，不必先装语言，可看 JASP。",
@@ -69,12 +83,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "nodejs",
     name: "Node.js",
-    aliases: ["node", "npm"],
+    aliases: ["node", "npm", "node.js", "javascript 运行时"],
     summary: "在电脑上跑 JavaScript，前端工具链和不少开发服务器都靠它。",
     scenes: ["code"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["JavaScript", "运行时", "npm", "开源"],
+    body:
+      "Node.js 让 JavaScript 能跑在浏览器之外：服务端、命令行工具、构建脚本都用它。它解决的是「前端项目需要一套本地运行环境，以及一个装包和跑脚本的入口」。\n装了它就同时有了 node 与 npm：npm install 装依赖，npx 直接跑工具，package.json 记录脚本和版本。绝大多数前端构建工具、脚手架和本地开发服务器都建立在它之上，做网页开发基本绕不开。\n代价要提前知道：版本迭代快，老项目在新版 Node 上可能跑不起来，通常要配 nvm 这类版本管理器来切换；node_modules 体积大、依赖树深，装包前看清来源——供应链风险主要出在这一层；另外它是单线程事件循环，CPU 密集任务是短板。\n许可证为 MIT（仓库内含第三方组件，各自另有许可）。安装包从 nodejs.org 下载，一般选 LTS 比 Current 更稳；Windows、macOS、Linux 都有。",
     officialUrl: "https://nodejs.org/",
+    links: {
+      official: "https://nodejs.org/",
+      github: "https://github.com/nodejs/node",
+    },
     officialLabel: "nodejs.org",
     whoFor: "做网页、用 npm 装工具，或课程要求 Node。",
     whoNot: "只写 Python 或只改静态 HTML，可以后装。",
@@ -89,13 +110,16 @@ export const software: SeedSoftware[] = [
   {
     slug: "dbeaver",
     name: "DBeaver",
-    aliases: ["数据库客户端", "sql 客户端"],
+    aliases: ["数据库客户端", "sql 客户端", "DBeaver CE", "数据库工具", "SQL 客户端"],
     summary: "连上各类数据库看表、跑 SQL，社区版免费。",
     scenes: ["code", "data"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     officialUrl: "https://dbeaver.io/download/",
     officialLabel: "dbeaver.io",
+    tags: ["数据库", "SQL", "数据库客户端", "跨平台"],
+    body:
+      "DBeaver 是跨平台的数据库客户端，用一个界面连上 MySQL、PostgreSQL、SQLite、Oracle、SQL Server 等几十种数据库，看表结构、写 SQL、导数据都在里面完成。它解决的是「同时用好几种数据库，不想每个都装一个官方客户端」。\n社区版（Community）开源免费，覆盖日常绝大多数操作：ER 图、数据导入导出、带自动补全的 SQL 编辑器、结果集直接编辑。企业版（PRO）额外支持云数据库、NoSQL 与更多导出格式，按订阅收费——如果只需要连关系型数据库，社区版就够。\n代价是它基于 Eclipse 平台、打包了 Java 运行时，启动偏慢、占用内存偏高，老旧机器上会明显感觉到。安装包从 dbeaver.io 的下载页获取，Windows、macOS、Linux 都有。",
     whoFor: "需要图形界面看库、写查询，而不想只待在命令行。",
     whoNot: "还没有数据库可连，或只用电子表格就够。",
     installTips: [
@@ -130,13 +154,17 @@ export const software: SeedSoftware[] = [
   {
     slug: "obsidian",
     name: "Obsidian",
-    aliases: ["笔记", "markdown 笔记"],
+    aliases: ["笔记", "markdown 笔记", "双向链接", "知识库", "obsidian md"],
     summary: "本地 Markdown 笔记，适合长期积累和双向链接。",
     scenes: ["docs", "office"],
     platforms: ["windows", "macos", "linux"],
     source: "official",
     price: "个人免费",
+    tags: ["笔记", "Markdown", "知识管理", "双链笔记"],
+    body:
+      "Obsidian 是本地 Markdown 笔记软件，笔记以 .md 文件存在你自己选的文件夹里，靠双向链接把零散笔记连成一张网。它解决的是「笔记要放很多年、文件要握在自己手里、还想看出想法之间的联系」这类需求。\n所谓库就是一个普通文件夹，Obsidian 只是把它渲染出来：笔记是纯文本，Ctrl/Cmd 点击进入反向链接面板能看到谁引用了当前页，图谱视图把整库的关系画成图；社区插件上千，看板、日历、任务、Dataview 式查询、Canvas 白板都能装；Windows、macOS、Linux 和移动端都有，搜索在本地跑，几千篇笔记也能秒出结果。\n代价要提前想清楚：主程序是专有软件，不是开源项目；官方同步和 Publish 站点是付费的，不想掏钱就得自己拿网盘或 Git 同步库目录，而多端同时编辑会产生冲突文件；插件质量参差，装多了会拖慢启动，版本升级也可能让某个插件暂时失效；库目录要自己备份，误删就是真删，没有厂商替你兜底；移动端能力明显弱于桌面端。\n许可证方面，个人使用免费，商业使用需要购买商业许可证；绝大多数插件是开源的，但主程序不是。安装包从 obsidian.md/download 获取。",
     officialUrl: "https://obsidian.md/download",
+    links: { official: "https://obsidian.md/download" },
     officialLabel: "obsidian.md",
     whoFor: "要用本地文件做长期笔记，并能接受 Markdown。",
     whoNot: "只想要微信式云笔记、不想管文件夹。",
@@ -171,12 +199,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "sumatrapdf",
     name: "Sumatra PDF",
-    aliases: ["pdf 阅读", "pdf"],
+    aliases: ["pdf 阅读", "pdf", "pdf 阅读器", "轻量 pdf", "epub 阅读"],
     summary: "Windows 上很轻的 PDF 阅读器，打开快、广告没有。",
     scenes: ["docs"],
     platforms: ["windows"],
     source: "opensource",
+    tags: ["PDF", "阅读器", "轻量", "开源"],
+    body:
+      "Sumatra PDF 是 Windows 上的轻量 PDF 阅读器，安装包只有几 MB，启动几乎瞬时，没有广告也没有遥测。它解决的是「只是想把 PDF 打开看完，不想被一个沉重的套件拖住」这类需求。除了 PDF，它还支持 EPUB、MOBI、CBZ、DjVu、XPS 等格式。\n它把力气都花在读这件事上：界面极简、冷启动快、内存占用低；提供便携版（portable），可以放 U 盘随身带，不写注册表；支持命令行参数调用；和 LaTeX 编辑器的协作做得不错，靠 SyncTeX 做正向与反向搜索，改完编译能直接跳回对应位置；可以自定义背景色和深色模式，长时间看文档眼睛舒服些；也支持标签页和基础的 PDF 表单填写。\n代价很明确：只做 Windows，macOS 和 Linux 没有官方版本；批注和高亮功能很基础，指望多人协作批注或复杂审阅流程它做不到；没有账户、没有云同步，换机器要自己搬；界面朴素，触摸屏和手写笔体验弱；更新节奏慢，几个月才发一版；它不是编辑器，改 PDF 内容不是它的活。\n许可证为 GPL-3.0，源码在 github.com/sumatrapdfreader/sumatrapdf，安装包从官网 sumatrapdfreader.org 获取，installer 和 portable 两种都要从官网下，别从第三方站拿。",
     officialUrl: "https://www.sumatrapdfreader.org/download-free-pdf-viewer",
+    links: {
+      official: "https://www.sumatrapdfreader.org/download-free-pdf-viewer",
+      github: "https://github.com/sumatrapdfreader/sumatrapdf",
+    },
     officialLabel: "sumatrapdfreader.org",
     whoFor: "在 Windows 上大量读 PDF，想要启动快、界面干净。",
     whoNot: "用 Mac 或 Linux，或需要重度批注协作。",
@@ -191,12 +226,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "pandoc",
     name: "Pandoc",
-    aliases: ["markdown 转换", "文档转换"],
+    aliases: ["markdown 转换", "文档转换", "格式转换", "docx 转换", "命令行转换"],
     summary: "Markdown、Word、HTML、LaTeX 之间互转。",
     scenes: ["docs", "code"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["文档转换", "Markdown", "命令行", "开源"],
+    body:
+      "Pandoc 是命令行文档转换工具，常被叫做文档转换界的瑞士军刀，能把 Markdown、Word、HTML、LaTeX、EPUB、reStructuredText 等几十种格式互相转换。它解决的是「同一份稿件要在不同格式之间来回切换，且希望这件事能脚本化重跑」的问题。\n它的核心是一套统一的文档模型：先把输入格式解析成抽象语法树，再渲染成目标格式，所以组合数量远多于逐个两两转换；用 Lua 过滤器可以在转换过程中改写内容，模板系统控制输出骨架，内置 citeproc 支持 CSL 引文与参考文献，还能输出 reveal.js 或 Beamer 幻灯片。最常用的就是一条命令：pandoc 输入.md -o 输出.docx，能直接塞进构建脚本或 CI。\n代价也要说：它是纯命令行，没有图形界面，参数得记；复杂排版不可能百分百保真，精细的表格、页眉页脚、套既有 Word 模板这类需求转换后仍需人工收拾；导出 PDF 还要另外装引擎，LaTeX 体积大，wkhtmltopdf 或 WeasyPrint 是轻量替代；默认模板处理中文要显式指定字体，否则容易出方块或回退字体。\n许可证为 GPL-2.0-or-later，源码在 github.com/jgm/pandoc，安装包从 pandoc.org 获取。它由 Haskell 编写，分发的是单个可执行文件，不需要装运行时；GPL 约束的是再分发，日常用它转自己的文档不受影响。",
     officialUrl: "https://pandoc.org/installing.html",
+    links: {
+      official: "https://pandoc.org/installing.html",
+      github: "https://github.com/jgm/pandoc",
+    },
     officialLabel: "pandoc.org",
     whoFor: "稿件要在 Markdown 和 Word / PDF 之间切换。",
     whoNot: "只在一个软件里写到底，从不导出其他格式。",
@@ -211,7 +253,7 @@ export const software: SeedSoftware[] = [
   {
     slug: "figma",
     name: "Figma",
-    aliases: ["界面设计", "ui", "原型"],
+    aliases: ["界面设计", "ui", "原型", "Figma 设计", "UI 设计", "原型工具"],
     summary: "浏览器里做界面和原型，个人档免费，也有教育优惠。",
     scenes: ["design"],
     platforms: ["windows", "macos"],
@@ -221,6 +263,9 @@ export const software: SeedSoftware[] = [
     officialLabel: "figma.com",
     discountNote:
       "个人档可免费用。符合条件的教育邮箱可在官网申请教育计划，不要买来路不明的「共享账号」。",
+    tags: ["界面设计", "原型", "协作设计", "UI"],
+    body:
+      "Figma 是运行在浏览器里的界面设计与原型工具，文件存在云端，多人可以同时编辑同一份稿子并在画板上留言。它解决的是「设计师和开发要对着同一份最新稿子说话」——分享链接即是最新版本，不用传来传去对版本号。\n价值集中在协作与交接：组件和变量可以复用，原型能直接点开演示，开发模式下能看尺寸、导出资源与代码片段。代价是它依赖联网和账号，离线场景基本不可用；免费的个人档有文件数与项目数限制，多人协作需要付费席位，教育用途另有优惠通道。\n官方提供 Windows 与 macOS 的桌面端安装包（本质上是本地套壳应用），Linux 用户直接用浏览器即可。",
     whoFor: "做界面稿、组件和可点击原型，需要和别人同时看同一文件。",
     whoNot: "只做印刷排版或像素级修图；或完全不想注册账号。可看 Penpot / Inkscape。",
     installTips: [
@@ -235,12 +280,20 @@ export const software: SeedSoftware[] = [
   {
     slug: "inkscape",
     name: "Inkscape",
-    aliases: ["svg", "矢量", "ai 替代"],
+    aliases: ["svg", "矢量", "ai 替代", "illustrator 替代"],
     summary: "开源矢量绘图，做图标、海报和 SVG。",
     scenes: ["design"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["矢量绘图", "SVG", "图标", "开源"],
+    body:
+      "Inkscape 是开源矢量绘图工具，用来画图标、示意图、海报和插画，原生格式是 SVG。它解决的是「要一个放大不糊的图，或者要一个能被代码和印刷流程复用的图形」。\n工作在路径和节点上：贝塞尔曲线、布尔运算、渐变与网格、描边转路径都齐备，导出可以给 PNG、PDF、EPS，也能输出供激光切割和刻字机使用的路径。做界面稿时它能出资源，但没有组件复用和多人协作。\n代价是两条：一是复杂渐变和滤镜的渲染结果与浏览器、Illustrator 可能不一致，交付前要在目标环境里过一眼；二是文字排版能力有限，长文本海报不该在这里排。\n许可证为 GPL 系列——上游仓库用 REUSE 规范管理许可证，LICENSES 目录里同时包含 GPL-2.0-or-later 与 GPL-3.0-or-later，整体以官网声明为准。本次核验时 inkscape.org 对本机自动化请求返回 403（Cloudflare 拦截），具体版本未能在线确认，需要的话请自行打开官网核对。安装包从 inkscape.org 发布，Windows、macOS、Linux 都有。",
+    // 上游在 gitlab.com（不是自托管的 gitlab.gnome.org），在 Git host 白名单内。
     officialUrl: "https://inkscape.org/release/",
+    links: {
+      official: "https://inkscape.org/release/",
+      github: "https://gitlab.com/inkscape/inkscape",
+    },
     officialLabel: "inkscape.org",
     whoFor: "要做图标、示意图、可缩放的印刷稿，不想订 Illustrator。",
     whoNot: "主要做界面组件协作，Figma 更合适；主要修照片，看 GIMP。",
@@ -255,11 +308,14 @@ export const software: SeedSoftware[] = [
   {
     slug: "gimp",
     name: "GIMP",
-    aliases: ["修图", "photoshop 替代"],
+    aliases: ["修图", "photoshop 替代", "图像处理", "位图编辑"],
     summary: "开源位图编辑，裁切、合成、修照片。",
     scenes: ["design"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["图像编辑", "修图", "抠图", "开源"],
+    body:
+      "GIMP 是开源位图编辑器，裁切、抠图、合成、调色与批量处理都在里面完成。它解决的是「要改照片或做一张海报，但不想为偶尔用一次订阅一套商业图像软件」。\n能力集中在像素层面：图层与蒙版、路径抠图、色彩曲线与色阶、脚本批处理（Script-Fu 与 Python-Fu），插件能扩展滤镜和文件格式。PSD 可以导入，但智能对象、部分调整层和复杂图层效果会丢。\n代价要提前知道：界面是单文档多窗口模式，与主流图像软件的操作习惯差别很大，第一次上手会觉得别扭；它面向位图，做矢量图标该用 Inkscape，画画该用 Krita，硬拿它顶替只会两头别扭。\n许可证为 GPL-3.0（上游仓库 COPYING 文件明确为 GPL 第三版）。安装包与源码都从 gimp.org 发布，Windows、macOS、Linux 三平台同步更新——只从官网下，第三方打包常捆绑安装器。",
     officialUrl: "https://www.gimp.org/downloads/",
     officialLabel: "gimp.org",
     whoFor: "要修图、抠图、做海报而不订 Photoshop。",
@@ -275,13 +331,16 @@ export const software: SeedSoftware[] = [
   {
     slug: "blender",
     name: "Blender",
-    aliases: ["三维", "3d", "建模"],
+    aliases: ["三维", "3d", "建模", "Blender 3D", "三维建模", "建模软件"],
     summary: "开源三维：建模、动画、渲染、视频剪辑都能做。",
     scenes: ["design", "engineering"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     officialUrl: "https://www.blender.org/download/",
     officialLabel: "blender.org",
+    tags: ["三维建模", "动画", "渲染", "开源"],
+    body:
+      "Blender 是开源三维创作套件，建模、雕刻、动画、渲染、合成与视频剪辑都在同一个软件里完成。它解决的是「想做三维但不想先付一套商业套件的订阅费」——个人和小团队可以零成本用上完整管线。\n功能覆盖面是它最大的特点：内置 Cycles 与 EEVEE 两个渲染器，几何节点可以做程序化建模， grease pencil 能做二维动画，Python 脚本可以把重复流程批处理化。代价是学习曲线陡：界面逻辑与 Maya / 3ds Max 差异很大，快捷键体系要重新练，插件和工程文件在跨大版本时偶尔不兼容。\n项目由 Blender 基金会维护，采用 GPL 许可，安装包与源码都从 blender.org 发布，Windows、macOS、Linux 三平台同步更新，每隔几个月一个大版本。",
     whoFor: "要建模、渲染或做短动画，机器显卡还过得去。",
     whoNot: "只画 2D，或电脑核显很弱只想做简单示意图。",
     installTips: [
@@ -296,12 +355,20 @@ export const software: SeedSoftware[] = [
   {
     slug: "krita",
     name: "Krita",
-    aliases: ["绘画", "板绘"],
+    aliases: ["绘画", "板绘", "插画", "数位板绘画"],
     summary: "开源绘画软件，笔刷和分层适合插画、分镜。",
     scenes: ["design"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
-    officialUrl: "https://krita.org/download/",
+    tags: ["绘画", "插画", "数位板", "开源"],
+    body:
+      "Krita 是开源绘画软件，面向数位板创作：笔刷引擎、图层、蒙版、色彩管理都按画画的习惯设计。它解决的是「要画插画、概念图或分镜，而不是修照片」。\n笔刷是它的强项：内置像素、形变、滤镜、纹理等多种引擎，可调参数很多，配合压感数位板能画出接近传统媒介的笔触；另有矢量图层、参考图工具、逐帧动画时间轴和 Python 脚本扩展。色彩管理支持 CMYK，能直接用于印刷稿。\n代价要提前知道：它不做照片精修（那是 GIMP 的活），也不做矢量 logo（那是 Inkscape 的活）；大画布叠高分辨率笔刷很吃内存，画布尺寸要按输出用途提前定好，别铺开了再改。\n许可证为 GPL-3.0。安装包从 krita.org 发布，Windows、macOS、Linux 都有；有数位板的话先在系统里装好压感驱动再画。",
+    // 旧地址 https://krita.org/download/ 已 404，现下载页在 /en/download/。
+    officialUrl: "https://krita.org/en/download/",
+    links: {
+      official: "https://krita.org/en/download/",
+      github: "https://github.com/KDE/krita",
+    },
     officialLabel: "krita.org",
     whoFor: "用数位板画画、做概念图或逐帧。",
     whoNot: "主要做矢量 logo 或照片精修。",
@@ -398,13 +465,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "geogebra",
     name: "GeoGebra",
-    aliases: ["几何", "函数图像", "数学"],
+    aliases: ["几何", "函数图像", "数学", "GeoGebra 数学", "函数画图", "数学工具"],
     summary: "几何、代数和函数图像，课堂演示和自己推导都能用。",
     scenes: ["data"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    // 源码公开但采用自家非商业许可，不是开源软件：source 不能标 opensource，否则会渲染成「开源」。
+    source: "official",
+    kind: "app",
+    price: "非商业免费",
     officialUrl: "https://www.geogebra.org/download",
     officialLabel: "geogebra.org",
+    tags: ["数学", "函数图像", "几何", "教学演示"],
+    body:
+      "GeoGebra 是把几何、代数、表格、函数图像和统计放在同一个界面里的数学工具。它解决的是「把一个数学关系画出来看」——拖动一个点，图形、方程和数值同时跟着变，适合课堂演示和自己推导验证。\n用法是输入即所得：在输入框写函数或点坐标，代数区与图形区同步更新；另有 CAS 视图做符号运算、3D 视图看立体关系。网页版、桌面版与移动端共用同一套文件格式，课件可以直接分享链接。\n许可要留意：它不是开源软件——源码公开但采用自家的非商业许可，个人学习与教学免费，商业用途（付费课程、商业出版物等）需要单独获得授权。安装包从 geogebra.org 下载，Windows、macOS、Linux 都有。",
     whoFor: "要画函数、几何或动态演示，不想写绘图代码。",
     whoNot: "做统计推断或大规模数据处理。",
     installTips: [
@@ -458,12 +531,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "joplin",
     name: "Joplin",
-    aliases: ["开源笔记", "markdown"],
+    aliases: ["开源笔记", "markdown", "笔记软件", "evernote 替代"],
     summary: "开源笔记，Markdown、待办、可自己选同步方式。",
     scenes: ["office", "docs"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["笔记", "Markdown", "知识管理", "开源"],
+    body:
+      "Joplin 是开源笔记应用，用 Markdown 写笔记和待办，同步方式由自己选。它解决的是「笔记要能自己掌握、能整包导出，不想锁进一家云服务」。\n内容是纯文本的：笔记以 Markdown 存在本地，支持待办、标签、笔记本层级和端到端加密；导出直接给 Markdown 或 HTML 文件，换软件不用求人。同步不绑单一厂商——可以接 WebDAV、文件系统、Dropbox、OneDrive，也可以用官方的 Joplin Cloud；桌面、手机和命令行客户端共用同一套数据。\n代价要提前知道：同步配置是新手最容易卡住的地方；多端同时编辑可能产生冲突副本（它会保留冲突笔记而不是静默覆盖，但清理要自己来）；插件与主题生态不如商业笔记丰富，界面偏朴素，没有数据库式的多维视图。\n许可证为 AGPL-3.0-or-later（仓库默认许可，部分子目录另有单独声明）。Joplin 名称与商标归 JOPLIN SAS，图标与 logo 需授权才能使用——做二次分发或换皮发布前请注意这一点。安装包从 joplinapp.org 下载，Windows、macOS、Linux 与移动端都有。",
     officialUrl: "https://joplinapp.org/",
+    links: {
+      official: "https://joplinapp.org/",
+      github: "https://github.com/laurent22/joplin",
+    },
     officialLabel: "joplinapp.org",
     whoFor: "要笔记可导出、可自己同步，不想锁进一家云。",
     whoNot: "只要系统自带备忘录，或完全依赖某个商业云笔记生态。",
@@ -478,12 +558,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "localsend",
     name: "LocalSend",
-    aliases: ["传文件", "隔空投送", "局域网"],
+    aliases: ["传文件", "隔空投送", "局域网", "本地传输", "airdrop 替代"],
     summary: "同一网络里互传文件，开源，不用账号。",
     scenes: ["office"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["文件传输", "局域网", "跨平台", "开源"],
+    body:
+      "LocalSend 是开源的局域网传文件工具，同一网络下两台设备直接互传，不需要账号、不经过服务器。它解决的是「手机和电脑之间传个文件，不想先上传到网盘再下载，也不想找数据线」。\n用法是打开即看见：两端都运行软件后，对方会出现在列表里，选中文件发送，接收端确认即可。本地传输走 HTTPS 加密，图片、视频、文件和文本都能发，也可以直接把一段文字推到对方剪贴板。Windows、macOS、Linux、Android、iOS 都有客户端。\n代价要提前知道：它只能在同一局域网内工作——设备不在同一个 Wi-Fi、跨网段或被 AP 隔离就看不见对方，要发给外网的人得换别的工具；公司网络或防火墙若拦了设备间通信也会失败；实际速度取决于局域网本身。\n许可证为 Apache-2.0。安装包从 localsend.org 下载。",
     officialUrl: "https://localsend.org/",
+    links: {
+      official: "https://localsend.org/",
+      github: "https://github.com/localsend/localsend",
+    },
     officialLabel: "localsend.org",
     whoFor: "手机和电脑互传文件，不想走网盘或数据线。",
     whoNot: "两台设备不在同一局域网，或必须发给外网同事。",
@@ -498,11 +585,15 @@ export const software: SeedSoftware[] = [
   {
     slug: "thunderbird",
     name: "Thunderbird",
-    aliases: ["邮件客户端", "邮箱"],
+    aliases: ["邮件客户端", "邮箱", "邮件", "outlook 替代"],
     summary: "开源桌面邮件客户端，多账号、本地归档。",
     scenes: ["office"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["邮件客户端", "IMAP", "本地归档", "开源"],
+    body:
+      "Thunderbird 是开源桌面邮件客户端，把多个邮箱账号收进同一个界面，并在本地留一份完整副本。它解决的是「要在电脑上集中处理邮件，做本地归档和全文检索，而不是开一堆网页邮箱」。\n配置以标准协议为准：IMAP 或 POP 收信、SMTP 发信，多个账号并列显示，标签、过滤器、搜索与本地归档都能用；日历和通讯录由内置功能补齐，加密邮件可配合 OpenPGP。邮件存在本地意味着归档不依赖服务商是否继续提供网页版。\n代价要提前知道：它面向标准协议，各家网页邮箱的专有功能用不上；企业或学校邮箱常要求「应用专用密码」或干脆限制第三方客户端，得按对方的文档配置；长期归档会占用不少磁盘，备份要自己安排。\n许可证为 MPL-2.0。安装包从 thunderbird.net 下载，Windows、macOS、Linux 都有。",
+    // 源码在 hg.mozilla.org，不在 Git host 白名单内，因此只有官网链接。
     officialUrl: "https://www.thunderbird.net/",
     officialLabel: "thunderbird.net",
     whoFor: "要在电脑上集中收多个邮箱，并保留本地副本。",
@@ -518,12 +609,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "librecad",
     name: "LibreCAD",
-    aliases: ["cad", "二维绘图", "autocad 替代"],
+    aliases: ["cad", "二维绘图", "autocad 替代", "二维 cad", "dxf"],
     summary: "开源二维 CAD，画平面图、零件轮廓。",
     scenes: ["engineering"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["CAD", "二维绘图", "工程图", "开源"],
+    body:
+      "LibreCAD 是开源二维 CAD，用来画平面图、零件轮廓和工程草图，原生格式是 DXF。它解决的是「要一张能标注尺寸的二维图纸，但不需要三维建模那一整套」。\n用法接近传统 CAD：可以直接输入坐标或长度，图层与线型分开管理，尺寸标注和图块都能用，正交与捕捉能把线画得很准。它启动快、占用小，老旧机器上也能跑。\n代价要提前知道：它只做二维，需要三维装配或参数化零件就去 FreeCAD；DWG 是 AutoCAD 的私有格式，LibreCAD 对它的读写只能算有限兼容，交换文件用 DXF 最稳；另外单位和图层要在开工前定好，画到一半再改很麻烦。\n许可证为 GPL-2.0（上游仓库 LICENSE 明确为 GPLv2，GitHub 自动识别为 NOASSERTION）。安装包从 librecad.org 下载，Windows、macOS、Linux 都有。",
     officialUrl: "https://librecad.org/",
+    links: {
+      official: "https://librecad.org/",
+      github: "https://github.com/LibreCAD/LibreCAD",
+    },
     officialLabel: "librecad.org",
     whoFor: "做二维工程图，没有 AutoCAD 许可。",
     whoNot: "要做三维装配或参数化零件，看 FreeCAD。",
@@ -538,12 +636,20 @@ export const software: SeedSoftware[] = [
   {
     slug: "kicad",
     name: "KiCad",
-    aliases: ["电路", "pcb", "原理图"],
+    aliases: ["电路", "pcb", "原理图", "电路板设计", "EDA"],
     summary: "开源电子设计：原理图和 PCB。",
     scenes: ["engineering"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["电路设计", "PCB", "原理图", "开源"],
+    body:
+      "KiCad 是开源电子设计自动化套件，从画原理图到布 PCB、出生产文件都在同一套工具里完成。它解决的是「要把一块电路板从想法做到能发给工厂打样」。\n流程是连着的：eeschema 画原理图 → 关联封装 → pcbnew 布线 → 3D 预览检查干涉 → 生成 Gerber 与钻孔文件。自带封装库和 3D 模型库覆盖了常见器件，符号库编辑器可以自己补件；差分对、长度匹配和高速规则也都有，多层板能胜任。\n代价要提前知道：它不做电路仿真，需要仿真得配合 ngspice 这类外部工具；自动布线和推挤不如商业 EDA 顺手，复杂板大量时间花在手工调整上；库管理是新手最容易卡住的地方。\n许可证为 GPL-3.0（上游仓库 LICENSE 文件为 GPL 第三版）。安装包从 kicad.org 下载，Windows、macOS、Linux 都有；建议装完整包，只装主程序会缺封装库。",
+    // 上游在 gitlab.com/kicad/code/kicad（gitlab.com 在 Git host 白名单内）。
     officialUrl: "https://www.kicad.org/download/",
+    links: {
+      official: "https://www.kicad.org/download/",
+      github: "https://gitlab.com/kicad/code/kicad",
+    },
     officialLabel: "kicad.org",
     whoFor: "画原理图、布 PCB，要交生产文件。",
     whoNot: "只画机械结构，或只做纯软件。",
@@ -559,13 +665,16 @@ export const software: SeedSoftware[] = [
   {
     slug: "freecad",
     name: "FreeCAD",
-    aliases: ["三维 cad", "参数化"],
+    aliases: ["三维 cad", "参数化", "FreeCAD 建模", "三维 CAD", "零件设计"],
     summary: "开源参数化三维 CAD，适合零件和简单装配。",
     scenes: ["engineering", "design"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     officialUrl: "https://www.freecad.org/downloads.php",
     officialLabel: "freecad.org",
+    tags: ["CAD", "参数化建模", "工程制图", "开源"],
+    body:
+      "FreeCAD 是开源的参数化三维 CAD，用来画零件、做简单装配并导出工程图。它解决的是「只需要画几个能加工的零件，没必要买一套商业 CAD」。\n参数化是它的工作方式：草图上标注尺寸，后面改尺寸会驱动整个模型更新；工作台按用途划分（零件、草图、装配、路径、有限元等），可以只装常用的几个。代价要提前知道：装配与工程图环节不如商业套件顺手，复杂模型容易出现拓扑命名问题导致报错，界面与术语沿用传统 CAD 概念，第一次上手需要跟着教程走一遍。\n项目以 LGPL 许可开源，安装包从 freecad.org 发布，Windows、macOS、Linux 都有，稳定版与开发版分开提供。",
     whoFor: "要参数化零件、出工程图，没有 SolidWorks / Fusion 许可。",
     whoNot: "只做影视级造型渲染，Blender 更合适；只画 2D 看 LibreCAD。",
     installTips: [
@@ -599,12 +708,19 @@ export const software: SeedSoftware[] = [
   {
     slug: "openscad",
     name: "OpenSCAD",
-    aliases: ["代码建模", "3d 打印"],
+    aliases: ["代码建模", "3d 打印", "脚本建模", "参数化建模"],
     summary: "用代码描述三维模型，适合精确尺寸和可重复零件。",
     scenes: ["engineering", "code"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
+    tags: ["代码建模", "3D打印", "参数化", "开源"],
+    body:
+      "OpenSCAD 用代码描述三维模型：写脚本定义形状和尺寸，再渲染成网格导出。它解决的是「要一个尺寸精确、可复用、能进版本管理的零件」。\n工作方式是纯文本的：用 cube、cylinder 这类基本体做布尔运算和变换，变量可以参数化，改一个数字就重新生成整个模型——同一份脚本调参数就能出一整套规格。它特别适合 3D 打印件、夹具这类以尺寸为准的零件。\n代价要提前知道：它不是交互式建模，没有鼠标拖拽雕塑，想做有机曲面应该去 Blender 或 FreeCAD；复杂模型渲染要等，F5 只是预览、F6 才真正计算网格；导出 STL 前要检查是否流形，破面会让切片软件报错。\n许可证为 GPL-2.0（上游 COPYING 为 GPL 第二版，并附带 CGAL 链接例外；GitHub 自动识别为 NOASSERTION）。安装包从 openscad.org 下载，Windows、macOS、Linux 都有。",
     officialUrl: "https://openscad.org/downloads.html",
+    links: {
+      official: "https://openscad.org/downloads.html",
+      github: "https://github.com/openscad/openscad",
+    },
     officialLabel: "openscad.org",
     whoFor: "喜欢用代码控制尺寸，做可参数化的打印件。",
     whoNot: "想靠鼠标雕塑有机外形，看 Blender 或 FreeCAD。",

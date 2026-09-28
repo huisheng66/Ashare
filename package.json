@@ -10,7 +10,11 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
     "check": "npm run lint && npm run typecheck && npm test",
-    "admin:password": "node scripts/hash-password.mjs"
+    "admin:password": "node scripts/hash-password.mjs",
+  "backup": "node scripts/backup.mjs",
+  "content:audit": "node scripts/content-audit.mjs",
+  "smoke:detail": "node scripts/smoke-detail.mjs",
+  "seed:drift": "node scripts/seed-drift.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

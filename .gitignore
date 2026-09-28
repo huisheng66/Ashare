@@ -45,6 +45,7 @@ next-env.d.ts
 # data/icons/ 是提交进仓库的本地图标，不忽略
 data/store/
 public/media/
+backups/
 
 # agent tool state
 .mimosa/
