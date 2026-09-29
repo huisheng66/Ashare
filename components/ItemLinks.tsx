@@ -1,9 +1,8 @@
-import { ExternalLink, GitBranch, Globe, HardDrive } from "lucide-react";
+import { ArrowUpRight, GitBranch, Globe, HardDrive, House, type LucideIcon } from "lucide-react";
 
-import { Card } from "@/components/ui/card";
 import type { ItemLinks as ItemLinksData } from "@/data/types";
 
-function hostOf(url: string) {
+export function hostOf(url: string) {
   try {
     return new URL(url).host;
   } catch {
@@ -11,78 +10,65 @@ function hostOf(url: string) {
   }
 }
 
-type Row = { label: string; url: string; icon: typeof Globe };
+type Row = { label: string; url: string; icon: LucideIcon };
 
 function LinkRow({ row }: { row: Row }) {
   const Icon = row.icon;
   return (
-    <div className="flex items-center gap-3 px-4 py-3.5">
-      <Icon className="size-4 shrink-0 text-muted-foreground" />
-      <span className="w-16 shrink-0 text-[13px] text-muted-foreground">
-        {row.label}
-      </span>
-      <a
-        href={row.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="min-w-0 flex-1 truncate text-sm font-medium text-primary hover:underline"
-      >
+    <a
+      href={row.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex min-h-11 items-center gap-3 rounded-xl px-3 transition-colors hover:bg-muted"
+    >
+      <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <span className="shrink-0 text-sm">{row.label}</span>
+      <span className="ml-auto min-w-0 truncate font-mono text-xs text-muted-foreground">
         {hostOf(row.url)}
-      </a>
-      <ExternalLink className="size-3.5 shrink-0 text-muted-foreground" />
-    </div>
+      </span>
+      <ArrowUpRight className="size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:-translate-y-px group-hover:translate-x-px group-hover:text-foreground" aria-hidden="true" />
+      <span className="sr-only">（在新标签页打开）</span>
+    </a>
   );
 }
 
-export function ItemLinks({ links }: { links: ItemLinksData }) {
-  const rows = [
+function linkRows(links: ItemLinksData, exclude?: string): Row[] {
+  return [
     links.official && { label: "官网", url: links.official, icon: Globe },
-    links.homepage && {
-      label: "产品主页",
-      url: links.homepage,
-      icon: ExternalLink,
-    },
+    links.homepage && { label: "产品主页", url: links.homepage, icon: House },
     links.github && { label: "GitHub", url: links.github, icon: GitBranch },
-  ].filter((row): row is Row => Boolean(row));
+    links.disk && { label: "已核验镜像", url: links.disk, icon: HardDrive },
+  ].filter((row): row is Row => Boolean(row) && (row as Row).url !== exclude);
+}
+
+/** 除主渠道外还有几条可列的渠道。 */
+export function otherLinkCount(links: ItemLinksData, primaryUrl: string) {
+  return linkRows(links, primaryUrl).length;
+}
+
+/** 获取渠道：官网 → 产品主页 → GitHub → 已核验镜像。镜像必须附说明。exclude 用来去掉已做成主按钮的那条。 */
+export function ItemLinks({ links, exclude }: { links: ItemLinksData; exclude?: string }) {
+  const rows = linkRows(links, exclude);
+
+  if (!rows.length) {
+    return <p className="px-3 text-sm text-muted-foreground">暂未填写链接。</p>;
+  }
 
   return (
-    <Card className="gap-0 overflow-hidden py-0">
-      <div className="divide-y divide-border">
+    <div>
+      <ul className="-mx-3 flex flex-col">
         {rows.map((row) => (
-          <LinkRow key={row.label} row={row} />
+          <li key={row.label}>
+            <LinkRow row={row} />
+          </li>
         ))}
-        {links.disk ? (
-          <>
-            <div className="flex items-center gap-3 px-4 py-3.5">
-              <HardDrive className="size-4 shrink-0 text-muted-foreground" />
-              <span className="w-16 shrink-0 text-[13px] text-muted-foreground">
-                镜像
-              </span>
-              <a
-                href={links.disk}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="min-w-0 flex-1 truncate text-sm font-medium text-primary hover:underline"
-              >
-                {hostOf(links.disk)}
-              </a>
-              <ExternalLink className="size-3.5 shrink-0 text-muted-foreground" />
-            </div>
-            <div className="px-4 py-3.5">
-              <p className="text-[13px] text-muted-foreground">镜像说明</p>
-              <p className="mt-1 text-sm leading-relaxed">
-                {links.diskNote ||
-                  "作者或项目方提供的合法镜像。请优先使用官网或 GitHub。"}
-              </p>
-            </div>
-          </>
-        ) : null}
-        {!rows.length && !links.disk ? (
-          <p className="px-4 py-3.5 text-sm text-muted-foreground">
-            暂未填写链接。
-          </p>
-        ) : null}
-      </div>
-    </Card>
+      </ul>
+      {links.disk ? (
+        <p className="mt-2 rounded-xl bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+          <span className="font-medium text-foreground">镜像说明：</span>
+          {links.diskNote || "作者或项目方提供的合法镜像。请优先使用官网或 GitHub。"}
+        </p>
+      ) : null}
+    </div>
   );
 }

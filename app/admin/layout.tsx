@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { ArrowUpRight, LogOut } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { AdminTabs } from "@/components/AdminTabs";
 import { Button } from "@/components/ui/button";
 import { hasValidSession } from "@/lib/auth";
 import { getFeedback } from "@/lib/store";
@@ -20,38 +21,35 @@ export default async function AdminLayout({
   const unread = authed ? (await getFeedback()).filter((f) => !f.read).length : 0;
 
   return (
-    <div className="mx-auto w-full max-w-[960px] px-5 py-8 sm:px-8">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-bold tracking-tight">Ashare 后台</h1>
-        {authed ? (
-          <div className="flex items-center gap-1">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/admin">条目</Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/admin/inbox">
-                投稿与反馈
-                {unread > 0 ? (
-                  <Badge className="ml-0.5 bg-discount text-white">
-                    {unread}
-                  </Badge>
-                ) : null}
-              </Link>
-            </Button>
-            <form action={logout}>
-              <Button
-                type="submit"
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground"
-              >
-                退出登录
-              </Button>
-            </form>
-          </div>
-        ) : null}
+    <div className="flex-1">
+      <div className="border-b border-border bg-card/60">
+        <div className="shell flex min-h-14 flex-wrap items-center gap-x-4 gap-y-2 py-2">
+          <p className="inline-flex items-center gap-2 text-sm font-semibold">
+            <span className="size-1.5 rounded-[2px] bg-brand" aria-hidden="true" />
+            管理后台
+          </p>
+          {authed ? (
+            <>
+              <AdminTabs unread={unread} />
+              <div className="ml-auto flex items-center gap-1">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/">
+                    查看前台
+                    <ArrowUpRight />
+                  </Link>
+                </Button>
+                <form action={logout}>
+                  <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground">
+                    <LogOut />
+                    退出
+                  </Button>
+                </form>
+              </div>
+            </>
+          ) : null}
+        </div>
       </div>
-      <div className="mt-6">{children}</div>
+      <div className="shell py-8">{children}</div>
     </div>
   );
 }

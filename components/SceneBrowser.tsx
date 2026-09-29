@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List, MonitorX } from "lucide-react";
 
+import { EmptyState } from "@/components/EmptyState";
 import { SoftwareCard } from "@/components/SoftwareCard";
 import { SoftwareRow } from "@/components/SoftwareRow";
 import { Button } from "@/components/ui/button";
@@ -10,123 +11,99 @@ import type { CatalogItem, Platform } from "@/data/types";
 import { filterSoftware } from "@/lib/items";
 
 const platforms: { id: Platform | "all"; label: string }[] = [
-  { id: "all", label: "全部系统" },
+  { id: "all", label: "全部" },
   { id: "windows", label: "Windows" },
   { id: "macos", label: "macOS" },
   { id: "linux", label: "Linux" },
 ];
 
+const segment = (active: boolean) =>
+  `inline-flex h-8 items-center justify-center rounded-lg px-3 text-[13px] font-medium transition-colors pointer-coarse:h-11 ${
+    active ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+  }`;
+
+/** 场景页列表：平台分段 + 视图切换，默认列表视图。 */
 export function SceneBrowser({ items }: { items: CatalogItem[] }) {
   const [platform, setPlatform] = useState<Platform | "all">("all");
-  const [view, setView] = useState<"grid" | "row">("row");
-  const visible = useMemo(
-    () => filterSoftware(items, { platform }),
-    [items, platform],
-  );
+  const [view, setView] = useState<"grid" | "list">("list");
+  const visible = useMemo(() => filterSoftware(items, { platform }), [items, platform]);
 
   return (
-    <div className="mt-8">
+    <section aria-label="工具列表" className="mt-8">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant={view === "grid" ? "default" : "outline"}
-            size="icon"
-            className="size-11"
-            aria-label="网格视图"
-            aria-pressed={view === "grid"}
-            onClick={() => setView("grid")}
-          >
-            <LayoutGrid className="size-4" />
-          </Button>
-          <Button
-            type="button"
-            variant={view === "row" ? "default" : "outline"}
-            size="icon"
-            className="size-11"
-            aria-label="列表视图"
-            aria-pressed={view === "row"}
-            onClick={() => setView("row")}
-          >
-            <List className="size-4" />
-          </Button>
-        </div>
-        <FilterGroup
-          legend="系统"
-          value={platform}
-          options={platforms}
-          onChange={setPlatform}
-        />
-      </div>
-
-      <p className="mt-4 text-sm text-muted-foreground" role="status">
-        {visible.length} 个工具
-      </p>
-
-      {visible.length ? (
-        view === "grid" ? (
-          <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-5">
-            {visible.map((item) => (
-              <SoftwareCard key={item.slug} item={item} />
-            ))}
-          </div>
-        ) : (
-          <div className="mt-1 space-y-2">
-            {visible.map((item) => (
-              <SoftwareRow key={item.slug} item={item} />
-            ))}
-          </div>
-        )
-      ) : (
-        <div className="mt-6 rounded-xl bg-muted p-6">
-          <p className="text-sm text-muted-foreground">
-            {platform === "all" ? "这个场景还没有收录工具。" : "这个场景暂时没有支持该系统的工具。"}
-          </p>
-          {platform !== "all" ? (
-            <Button variant="outline" onClick={() => setPlatform("all")} className="mt-4 min-h-11">
-              查看全部系统
-            </Button>
-          ) : null}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function FilterGroup<T extends string>({
-  legend,
-  value,
-  options,
-  onChange,
-}: {
-  legend: string;
-  value: T;
-  options: { id: T; label: string }[];
-  onChange: (value: T) => void;
-}) {
-  return (
-    <fieldset className="min-w-0">
-      <legend className="sr-only">{legend}</legend>
-      <div className="inline-flex flex-wrap gap-1 rounded-xl bg-muted p-1">
-        {options.map((option) => {
-          const active = option.id === value;
-          return (
+        <div role="group" aria-label="按系统筛选" className="inline-flex rounded-xl bg-muted p-1">
+          {platforms.map((option) => (
             <button
               key={option.id}
               type="button"
-              onClick={() => onChange(option.id)}
-              aria-pressed={active}
-              className={`min-h-11 rounded-lg px-3.5 text-[13px] font-medium transition-colors ${
-                active
-                  ? "bg-background text-foreground shadow-card"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              aria-pressed={option.id === platform}
+              onClick={() => setPlatform(option.id)}
+              className={segment(option.id === platform)}
             >
               {option.label}
             </button>
-          );
-        })}
+          ))}
+        </div>
+
+        <p className="text-sm text-muted-foreground" role="status">
+          <span className="font-semibold text-foreground tabular-nums">{visible.length}</span> 款
+        </p>
+
+        <div role="group" aria-label="视图" className="ml-auto inline-flex rounded-xl bg-muted p-1">
+          <button
+            type="button"
+            aria-label="网格视图"
+            aria-pressed={view === "grid"}
+            onClick={() => setView("grid")}
+            className={`${segment(view === "grid")} w-9 px-0 pointer-coarse:w-11`}
+          >
+            <LayoutGrid className="size-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="列表视图"
+            aria-pressed={view === "list"}
+            onClick={() => setView("list")}
+            className={`${segment(view === "list")} w-9 px-0 pointer-coarse:w-11`}
+          >
+            <List className="size-4" />
+          </button>
+        </div>
       </div>
-    </fieldset>
+
+      <div className="mt-5">
+        {visible.length ? (
+          view === "grid" ? (
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {visible.map((item) => (
+                <li key={item.slug} className="flex *:flex-1">
+                  <SoftwareCard item={item} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <ul className="flex flex-col gap-2.5">
+              {visible.map((item) => (
+                <li key={item.slug}>
+                  <SoftwareRow item={item} />
+                </li>
+              ))}
+            </ul>
+          )
+        ) : (
+          <EmptyState
+            icon={MonitorX}
+            title="这个系统上暂时没有"
+            actions={
+              <Button variant="outline" onClick={() => setPlatform("all")}>
+                看全部系统
+              </Button>
+            }
+          >
+            这个场景里还没有支持该系统的工具，可以先看看其他系统的选项。
+          </EmptyState>
+        )}
+      </div>
+    </section>
   );
 }

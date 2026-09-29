@@ -14,6 +14,13 @@ export const platformLabel: Record<Platform, string> = {
   linux: "Linux",
 };
 
+/** 卡片等窄位用的简写 */
+export const platformShort: Record<Platform, string> = {
+  windows: "Win",
+  macos: "Mac",
+  linux: "Linux",
+};
+
 export const sourceLabel: Record<SourceKind, string> = {
   official: "官方",
   opensource: "开源",
@@ -32,6 +39,21 @@ export function primaryLink(item: Software): { url: string; label: string } {
   if (item.links.github) return { url: item.links.github, label: "GitHub" };
   if (item.links.homepage) return { url: item.links.homepage, label: "主页" };
   return { url: "", label: "" };
+}
+
+/** 「2026 年 9 月 28 日」；固定按北京时间，避免服务端时区让日期漂移。 */
+export function formatDate(iso?: string): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(date);
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value;
+  return `${part("year")} 年 ${part("month")} 月 ${part("day")} 日`;
 }
 
 /** 列表无需下载正文、安装步骤、替代品和站外链接等详情数据。 */

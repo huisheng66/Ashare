@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
-import { ArrowUpDown, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
+import { LayoutGrid, List, SearchX, SlidersHorizontal, X } from "lucide-react";
 
+import { EmptyState } from "@/components/EmptyState";
 import { FilterPanel } from "@/components/FilterPanel";
 import { SoftwareCard } from "@/components/SoftwareCard";
 import { SoftwareRow } from "@/components/SoftwareRow";
@@ -15,6 +16,30 @@ import { sceneById } from "@/data/scenes";
 import type { CatalogCounts, CatalogItem } from "@/data/types";
 import { activeFilterCount, catalogFiltersFromURL, catalogHref, clearCatalogFilters } from "@/lib/catalog-query";
 import { kindLabel, platformLabel } from "@/lib/items";
+
+/** 网格 / 列表切换：分段控件，状态写在 URL 里。 */
+export function ViewSwitch({
+  view,
+  gridHref,
+  listHref,
+}: {
+  view: "grid" | "list";
+  gridHref: string;
+  listHref: string;
+}) {
+  const item = (active: boolean) =>
+    `inline-flex size-9 items-center justify-center rounded-lg transition-colors pointer-coarse:size-11 ${active ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`;
+  return (
+    <div role="group" aria-label="目录视图" className="inline-flex rounded-xl bg-muted p-1">
+      <Link href={gridHref} scroll={false} aria-label="网格视图" aria-current={view === "grid" ? "true" : undefined} className={item(view === "grid")}>
+        <LayoutGrid className="size-4" />
+      </Link>
+      <Link href={listHref} scroll={false} aria-label="列表视图" aria-current={view === "list" ? "true" : undefined} className={item(view === "list")}>
+        <List className="size-4" />
+      </Link>
+    </div>
+  );
+}
 
 export function CatalogBrowser({
   items,
@@ -45,115 +70,153 @@ export function CatalogBrowser({
     ...[...filters.kinds].map((id) => ({ key: "kind", id, label: kindLabel[id], picked: filters.kinds })),
   ];
 
+  const chip = "inline-flex h-8 items-center gap-1 rounded-full bg-primary pl-3 pr-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-85 pointer-coarse:h-11";
+
   return (
-    <section className="mt-6" aria-label="工具目录" aria-busy={isPending}>
-      <div className="flex flex-wrap items-center gap-2">
-        <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-          <SheetTrigger asChild>
-            <Button variant="outline" className="min-h-11">
-              <SlidersHorizontal className="size-4" />
-              筛选{filterCount ? ` (${filterCount})` : ""}
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[min(340px,100%)] overflow-y-auto p-5">
-            <SheetHeader className="px-0">
-              <SheetTitle>筛选工具</SheetTitle>
-              <SheetDescription>可组合选择类型、场景和平台。</SheetDescription>
-            </SheetHeader>
-            <div className="mt-4">
-              <FilterPanel counts={counts} onDone={() => setFiltersOpen(false)} />
-            </div>
-          </SheetContent>
-        </Sheet>
-
-        <div className="flex items-center gap-1" role="group" aria-label="目录视图">
-          <Button asChild variant={view === "grid" ? "default" : "outline"} size="icon" className="size-11">
-            <Link href={withParams((p) => p.delete("view"))} scroll={false} aria-label="网格视图" aria-current={view === "grid" ? "true" : undefined}>
-              <LayoutGrid className="size-4" />
-            </Link>
-          </Button>
-          <Button asChild variant={view === "list" ? "default" : "outline"} size="icon" className="size-11">
-            <Link href={withParams((p) => p.set("view", "list"))} scroll={false} aria-label="列表视图" aria-current={view === "list" ? "true" : undefined}>
-              <List className="size-4" />
-            </Link>
-          </Button>
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[14.5rem_minmax(0,1fr)] lg:gap-10">
+      <aside aria-label="筛选" className="hidden lg:block">
+        <div className="sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto overscroll-contain pb-6 pr-1">
+          <FilterPanel counts={counts} />
         </div>
+      </aside>
 
-        <p className="order-last w-full text-sm text-muted-foreground sm:order-none sm:ml-auto sm:w-auto" role="status">
-          {filterCount ? `找到 ${items.length} 个工具，共 ${total} 个` : `共 ${total} 个工具`}
-        </p>
+      <section aria-label="工具列表" aria-busy={isPending} className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="lg:hidden">
+                <SlidersHorizontal />
+                筛选
+                {filterCount ? (
+                  <span className="grid size-5 place-items-center rounded-full bg-primary font-mono text-[11px] text-primary-foreground">{filterCount}</span>
+                ) : null}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[min(340px,100%)] gap-0 overflow-y-auto p-5 pb-0">
+              <SheetHeader className="px-0 pt-1 pb-4">
+                <SheetTitle>筛选工具</SheetTitle>
+                <SheetDescription>类型、场景和平台可以组合选择。</SheetDescription>
+              </SheetHeader>
+              <FilterPanel counts={counts} resultCount={items.length} onDone={() => setFiltersOpen(false)} />
+            </SheetContent>
+          </Sheet>
 
-        <Select
-          value={filters.sort}
-          disabled={isPending}
-          onValueChange={(value) =>
-            startTransition(() => router.push(withParams((p) => {
-              if (value === "featured") p.delete("sort");
-              else p.set("sort", value);
-            }), { scroll: false }))
-          }
-        >
-          <SelectTrigger className="ml-auto min-h-11 w-[140px] sm:ml-0" aria-label="工具排序">
-            <ArrowUpDown className="size-3.5 text-muted-foreground" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="featured">推荐</SelectItem>
-            <SelectItem value="updated">最近更新</SelectItem>
-            <SelectItem value="name">按名称</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {filterCount ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2" aria-label="已选筛选条件">
-          {selected.map(({ key, id, label, picked }) => (
-            <Button key={`${key}-${id}`} asChild variant="secondary" size="sm" className="min-h-11">
-              <Link href={withParams((p) => {
-                const remaining = [...picked].filter((value) => value !== id);
-                if (remaining.length) p.set(key, remaining.join(","));
-                else p.delete(key);
-              })} scroll={false} aria-label={`移除筛选：${label}`}>
-                {label}<X className="size-3" aria-hidden="true" />
-              </Link>
-            </Button>
-          ))}
-          {filters.discountOnly ? (
-            <Button asChild variant="secondary" size="sm" className="min-h-11">
-              <Link href={withParams((p) => p.delete("discount"))} scroll={false} aria-label="移除筛选：只看优惠">
-                只看优惠<X className="size-3" aria-hidden="true" />
-              </Link>
-            </Button>
-          ) : null}
-          <Button asChild variant="ghost" size="sm" className="min-h-11 text-muted-foreground">
-            <Link href={resetHref} scroll={false}>清除筛选</Link>
-          </Button>
-        </div>
-      ) : null}
-
-      {items.length ? (
-        view === "grid" ? (
-          <div className="mt-5 grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-5">
-            {items.map((item) => <SoftwareCard key={item.slug} item={item} />)}
-          </div>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {items.map((item) => <SoftwareRow key={item.slug} item={item} />)}
-          </div>
-        )
-      ) : (
-        <div className="my-12 rounded-xl bg-muted px-5 py-10 text-center">
-          <h2 className="font-semibold">{filterCount ? "没有符合这些条件的工具" : "工具目录正在整理"}</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {filterCount ? "移除部分条件，或清除筛选重新浏览。" : "可以提交你正在使用的工具，帮助完善目录。"}
+          <p className="text-sm text-muted-foreground" role="status">
+            {filterCount ? (
+              <>
+                找到 <span className="font-semibold text-foreground tabular-nums">{items.length}</span> 款，共 {total} 款
+              </>
+            ) : (
+              <>
+                共 <span className="font-semibold text-foreground tabular-nums">{total}</span> 款
+              </>
+            )}
           </p>
-          <Button asChild variant="outline" className="mt-5 min-h-11">
-            <Link href={filterCount ? resetHref : "/submit"} scroll={false}>
-              {filterCount ? "清除筛选" : "提交工具推荐"}
-            </Link>
-          </Button>
+
+          <div className="ml-auto flex items-center gap-2">
+            <Select
+              value={filters.sort}
+              disabled={isPending}
+              onValueChange={(value) =>
+                startTransition(() =>
+                  router.push(
+                    withParams((p) => {
+                      if (value === "featured") p.delete("sort");
+                      else p.set("sort", value);
+                    }),
+                    { scroll: false },
+                  ),
+                )
+              }
+            >
+              <SelectTrigger size="sm" className="w-[7.5rem] border-border" aria-label="排序方式">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper" align="end">
+                <SelectItem value="featured">精选优先</SelectItem>
+                <SelectItem value="updated">最近更新</SelectItem>
+                <SelectItem value="name">按名称</SelectItem>
+              </SelectContent>
+            </Select>
+            <ViewSwitch
+              view={view}
+              gridHref={withParams((p) => p.delete("view"))}
+              listHref={withParams((p) => p.set("view", "list"))}
+            />
+          </div>
         </div>
-      )}
-    </section>
+
+        {filterCount ? (
+          <ul className="mt-4 flex flex-wrap items-center gap-2" aria-label="已选条件">
+            {selected.map(({ key, id, label, picked }) => (
+              <li key={`${key}-${id}`}>
+                <Link
+                  href={withParams((p) => {
+                    const remaining = [...picked].filter((value) => value !== id);
+                    if (remaining.length) p.set(key, remaining.join(","));
+                    else p.delete(key);
+                  })}
+                  scroll={false}
+                  aria-label={`移除条件：${label}`}
+                  className={chip}
+                >
+                  {label}
+                  <X className="size-3.5 opacity-70" aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+            {filters.discountOnly ? (
+              <li>
+                <Link href={withParams((p) => p.delete("discount"))} scroll={false} aria-label="移除条件：只看优惠" className={chip}>
+                  只看优惠
+                  <X className="size-3.5 opacity-70" aria-hidden="true" />
+                </Link>
+              </li>
+            ) : null}
+            <li>
+              <Link href={resetHref} scroll={false} className="inline-flex h-8 items-center px-2 text-xs text-muted-foreground ink-link pointer-coarse:h-11">
+                清除全部
+              </Link>
+            </li>
+          </ul>
+        ) : null}
+
+        <div className={`mt-5 transition-opacity duration-150 ${isPending ? "opacity-60" : ""}`}>
+          {items.length ? (
+            view === "grid" ? (
+              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {items.map((item) => (
+                  <li key={item.slug} className="flex *:flex-1">
+                    <SoftwareCard item={item} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="flex flex-col gap-2.5">
+                {items.map((item) => (
+                  <li key={item.slug}>
+                    <SoftwareRow item={item} />
+                  </li>
+                ))}
+              </ul>
+            )
+          ) : (
+            <EmptyState
+              icon={SearchX}
+              title={filterCount ? "没有符合这些条件的工具" : "目录正在整理"}
+              actions={
+                <Button asChild variant="outline">
+                  <Link href={filterCount ? resetHref : "/submit"} scroll={false}>
+                    {filterCount ? "清除筛选" : "推荐一款工具"}
+                  </Link>
+                </Button>
+              }
+            >
+              {filterCount ? "去掉一两个条件试试，或清除筛选重新浏览。" : "可以推荐你正在用的工具，帮我们把目录补全。"}
+            </EmptyState>
+          )}
+        </div>
+      </section>
+    </div>
   );
 }
