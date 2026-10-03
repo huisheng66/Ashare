@@ -12,9 +12,10 @@
     "check": "npm run lint && npm run typecheck && npm test",
     "admin:password": "node scripts/hash-password.mjs",
   "backup": "node scripts/backup.mjs",
-  "content:audit": "node scripts/content-audit.mjs",
-  "smoke:detail": "node scripts/smoke-detail.mjs",
-  "seed:drift": "node scripts/seed-drift.mjs"
+    "content:audit": "node scripts/content-audit.mjs",
+    "smoke:detail": "node scripts/smoke-detail.mjs",
+    "seed:drift": "node scripts/seed-drift.mjs",
+    "stale-links": "node scripts/stale-links.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

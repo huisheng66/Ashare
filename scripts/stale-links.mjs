@@ -1,0 +1,212 @@
+#!/usr/bin/env node
+/**
+ * 外链巡检：找出该复验的条目，并可对复验通过的条目回写核验日期。
+ *
+ *   node scripts/stale-links.mjs                       列出超过 90 天没核验的条目
+ *   node scripts/stale-links.mjs --days 30             改阈值
+ *   node scripts/stale-links.mjs --all                 连刚核验过的也列出（看全量）
+ *   node scripts/stale-links.mjs --check               顺便探活（只读，不改数据）
+ *   node scripts/stale-links.mjs --check --update      探活并回写通过者的核验日期
+ *   node scripts/stale-links.mjs --all --json          机器可读
+ *   node scripts/stale-links.mjs --strict              有该复验的条目时退出码 1（用于 CI）
+ *
+ * **回写只覆盖本次真正探活过且可达的条目。** 失败项的日期保持不变 ——
+ * 把失效链接的核验日期刷成今天，会让下一轮巡检以为它刚查过，掩盖真死链。
+ *
+ * 安全：抓取走 safeFetch（只放行 http/https、拒绝私有网段、逐跳校验重定向）。
+ * 本机服务需显式加 --allow-private。
+ */
+import { createHash } from "node:crypto";
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import process from "node:process";
+
+import { DEFAULT_STALE_DAYS, checkFreshness, reasonLabel, staleItems, summarize, today } from "../lib/stale.ts";
+import { mapLimit, parseFlags, readCatalog, safeFetch } from "./_shared.mjs";
+
+const CONCURRENCY = 5;
+const UA = "Mozilla/5.0 (compatible; AshareStaleLinks/1.0; +https://example.invalid)";
+const RETRY_STATUS = new Set([400, 403, 405, 501]);
+const LINK_KEYS = ["official", "homepage", "github", "disk"];
+const USAGE = `用法: node scripts/stale-links.mjs [--days <天数>] [--all] [--check] [--update] [--json] [--strict] [--allow-private]`;
+
+function parseArgs(argv) {
+  const args = parseFlags(argv, {
+    "--days": "number",
+    "--all": "bool",
+    "--check": "bool",
+    "--update": "bool",
+    "--json": "bool",
+    "--strict": "bool",
+    "--allow-private": "bool",
+  });
+  if (args.days !== undefined && (!Number.isInteger(args.days) || args.days < 0)) {
+    throw new Error("--days 需为不小于 0 的整数");
+  }
+  // --update 必须建立在 --check 上：没探活就刷新日期，等于伪造核验记录。
+  if (args.update && !args.check) throw new Error("--update 必须配合 --check 使用");
+  if (args.strict && !args.check) throw new Error("--strict 需要配合 --check 才有意义");
+  args.days ??= DEFAULT_STALE_DAYS;
+  return args;
+}
+
+function label(url) {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+}
+
+/** 已知误报域名：探活失败但站点活着，附人工确认日期。 */
+const FLAKY = new Map([
+  ["inkscape.org", "Cloudflare 拦自动化，403 是误报（2026-09-28 人工确认）"],
+  ["jasp-stats.org", "同上，403 是误报（2026-09-28 人工确认）"],
+  ["texstudio.org", "本机代理隧道超时，站点活着（2026-09-28 人工确认）"],
+  ["gimp.org", "同上，代理超时（2026-09-28 人工确认）"],
+]);
+
+async function probe(url, args) {
+  const started = Date.now();
+  const headers = { "user-agent": UA, accept: "*/*" };
+  const once = async () => {
+    const head = await safeFetch(url, { timeout: 10_000, allowPrivate: args.allowPrivate, method: "HEAD", headers });
+    return RETRY_STATUS.has(head.status)
+      ? await safeFetch(url, { timeout: 10_000, allowPrivate: args.allowPrivate, method: "GET", headers })
+      : head;
+  };
+  let last = await once();
+  if (!last.ok && !last.status) last = await once();
+  return { ...last, ms: Date.now() - started };
+}
+
+/** 复验通过后回写核验日期。只改本次确实探活过、且全部链接可达的条目。 */
+async function updateChecked(slugs, date) {
+  const file = path.join(process.cwd(), "data", "store", "catalog.json");
+  const raw = await fs.readFile(file, "utf8");
+  const catalog = JSON.parse(raw);
+  const targets = new Set(slugs);
+  let changed = 0;
+  const next = catalog.map((item) => {
+    if (!targets.has(item.slug) || item.linksCheckedAt === date) return item;
+    changed += 1;
+    return { ...item, linksCheckedAt: date };
+  });
+  if (!changed) return { changed: 0 };
+  const text = JSON.stringify(next, null, 2);
+  await fs.writeFile(file, text, "utf8");
+  // SHA-256 旁车必须同步，否则下次启动会打「文件被改动」的日志。
+  const digest = createHash("sha256").update(text).digest("hex");
+  await fs.writeFile(`${file.replace(/\.json$/, "")}.sha256.json`, digest, "utf8");
+  return { changed };
+}
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  if (args.help) {
+    console.log(USAGE);
+    return;
+  }
+
+  const catalog = await readCatalog();
+  const now = new Date();
+  const infos = args.all
+    ? catalog.map((item) => checkFreshness(item, args.days, now))
+    : staleItems(catalog, args.days, now);
+
+  const needCheck = infos.filter((info) => info.reason !== "fresh");
+  const stats = summarize(infos);
+
+  if (args.json) {
+    console.log(JSON.stringify({
+      thresholdDays: args.days,
+      total: catalog.length,
+      needCheck: needCheck.length,
+      byReason: stats.byReason,
+      items: needCheck,
+    }, null, 2));
+    if (args.check) {
+      console.error("[stale-links] --json 与 --check 同用时只输出过期清单，探活结果见文本模式。");
+    }
+    if (args.strict && needCheck.length) process.exitCode = 1;
+    return;
+  }
+
+  console.log(`阈值 ${args.days} 天 · 目录 ${catalog.length} 条 · 需复验 ${needCheck.length} 条`);
+  console.log(`  已过期 ${stats.byReason.stale} · 从未核验 ${stats.byReason.never} · 日期非法 ${stats.byReason.invalid}\n`);
+
+  if (!needCheck.length) {
+    console.log("所有条目的外链都在阈值内，无需复验。");
+    return;
+  }
+
+  const width = Math.max(...needCheck.map((info) => info.slug.length), 4);
+  for (const info of needCheck) {
+    const age = typeof info.ageDays === "number" ? `${info.ageDays} 天前` : "—";
+    console.log(`${reasonLabel(info.reason).padEnd(6)} ${info.slug.padEnd(width)} ${age.padStart(8)}  ${info.hosts.join(" ")}`);
+  }
+
+  if (!args.check) {
+    console.log(`\n加 --check 探活这 ${needCheck.length} 条；确认无误后加 --update 回写核验日期。`);
+    if (args.strict) process.exitCode = 1;
+    return;
+  }
+
+  const jobs = [];
+  for (const info of needCheck) {
+    const item = catalog.find((entry) => entry.slug === info.slug);
+    for (const key of LINK_KEYS) {
+      if (item?.links?.[key]) jobs.push({ slug: item.slug, key, url: item.links[key] });
+    }
+  }
+  if (!jobs.length) {
+    console.log("\n这些条目没有填写外链，无从探活。");
+    return;
+  }
+
+  console.log(`\n探活 ${jobs.length} 个链接（并发 ${CONCURRENCY}）…\n`);
+  const results = await mapLimit(jobs, CONCURRENCY, (job) => probe(job.url, args).then((r) => ({ ...job, ...r })));
+
+  // 只有全部链接都可达的条目才回写日期：部分可达说明还有问题没解决。
+  const fullyOk = new Set();
+  const bySlug = new Map();
+  for (const result of results) {
+    const status = result.ok ? "可达" : result.status ? `异常 ${result.status}` : `失败 ${result.reason}`;
+    console.log(`${status.padEnd(12)} ${result.slug.padEnd(width)} ${result.key.padEnd(9)} ${label(result.url)}`);
+    if (!bySlug.has(result.slug)) bySlug.set(result.slug, []);
+    bySlug.get(result.slug).push(result);
+  }
+  for (const [slug, list] of bySlug) {
+    if (list.every((r) => r.ok)) fullyOk.add(slug);
+  }
+
+  const broken = results.filter((r) => !r.ok);
+  console.log(`\n合计 ${results.length} 个，异常 ${broken.length} 个；条目层面 ${fullyOk.size}/${needCheck.length} 条全部可达。`);
+  if (broken.length) {
+    console.log("需人工确认：403/405 多为站点拦截自动化，超时多为网络问题，别直接判定失效。");
+    for (const result of broken) {
+      const note = FLAKY.get(label(result.url).replace(/^www\./, ""));
+      if (note) console.log(`  ${result.slug} ${result.key}：${note}`);
+    }
+  }
+
+  if (args.update) {
+    if (!fullyOk.size) {
+      console.log("\n没有全部可达的条目，核验日期未改动。");
+    } else {
+      const date = today(now);
+      const { changed } = await updateChecked([...fullyOk], date);
+      console.log(`\n已把 ${changed} 条的核验日期更新为 ${date}${changed ? "" : "（无变化）"}。`);
+      if (changed) console.log("别忘了同步种子（两个落点），再跑 npm run seed:drift。");
+    }
+  } else if (fullyOk.size) {
+    console.log(`\n加 --update 可把 ${fullyOk.size} 条的核验日期更新为今天。`);
+  }
+
+  if (args.strict && broken.length) process.exitCode = 1;
+}
+
+main().catch((error) => {
+  console.error(`[stale-links] ${error instanceof Error ? error.message : error}`);
+  process.exitCode = 1;
+});

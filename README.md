@@ -34,6 +34,8 @@ npm run dev                  # 或 npm run build && npm run start
 
 `.bak` 只覆盖上一次保存，防不了磁盘故障与误删目录：定期跑 `npm run backup` 做整机快照，并让 `--out` 指向另一块盘或网盘同步目录。条目缺正文、缺标签、场景空栏这类内容缺口，用 `npm run content:audit` 查看。
 
+链接会失效，所以每条都有 `linksCheckedAt` 记录最近一次人工确认可达的日期。`npm run stale-links` 找出超过 90 天没核的条目，`--check --update` 探活并回写 —— **只有全部链接都可达的条目才回写**：把失效链接的日期刷成今天，下一轮巡检就会以为它刚查过，死链被永久掩盖。回写后仍需同步种子（`linksCheckedAt` 也在两个落点里），跑 `npm run seed:drift` 确认一致。
+
 ## 安全机制
 
 - 口令只存 scrypt 哈希；session 为 HMAC 签名 cookie（HttpOnly / Secure / SameSite=Strict / Path=/admin）。
@@ -78,5 +80,6 @@ npm run build   # 生产构建
 | `npm run content:audit` | 列出条目缺失字段、场景库存与待补清单（`--scene <id>` 只看某个场景，`--json` 机器可读） |
 | `npm run smoke:detail` | 详情页渲染冒烟：需先跑 `npm run dev`，逐个检查正文分段、外链、来源徽章与价格是否如实呈现 |
 | `npm run seed:drift` | 比对运行库与种子是否一致（`--strict` 有差异时非零退出），确认「两个落点」写的是同一份内容 |
+| `npm run stale-links` | 外链巡检：列出超过阈值没核验的条目（默认 90 天）。`--check` 探活、`--update` 回写通过者的核验日期、`--days N` 改阈值、`--strict` 有待复验项时非零退出（CI 用）、`--json` 机器可读 |
 
 收录与探活脚本在 `.workbuddy/skills/ashare-curation/scripts/`，它们与上面几个脚本共用 `scripts/_shared.mjs`（参数解析、运行库读取、并发限流、安全抓取）。对外抓取默认只放行 http/https、拒绝解析到私有网段的主机，并逐跳校验重定向；要探活本机服务才加 `--allow-private`。
