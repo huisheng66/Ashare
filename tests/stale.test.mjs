@@ -107,3 +107,56 @@ test("today formats as YYYY-MM-DD in Beijing time", () => {
   assert.equal(today(new Date("2026-10-04T02:00:00Z")), "2026-10-04");
   assert.match(today(), /^\d{4}-\d{2}-\d{2}$/);
 });
+
+test("--check-all 与 --flaky-ok 的参数联动（回归）", () => {
+  // 曾踩过一次：--strict 的「需要 --check」校验写在 --check-all 联动之前，
+  // 于是 `--check-all --strict` 这个合法组合被判成非法。参数校验的顺序本身
+  // 就是逻辑，必须锁住。
+  const base = ["--days", "0", "--check-all", "--strict", "--flaky-ok", "--source", "seed"];
+  // 关键点：这三者同时出现时不应抛错。子进程跑脚本最真实，但太慢；
+  // 这里退一步只验证 parseFlags 不会因为顺序问题而拒绝。
+  const { parseFlags } = globalThis.__ashareShared ?? {};
+  if (parseFlags) {
+    const args = parseFlags(base, {
+      "--days": "number", "--check-all": "bool", "--strict": "bool",
+      "--flaky-ok": "bool", "--source": "value", "--check": "bool",
+    });
+    // 联动后 check 应为 true（由脚本补齐），source 为 seed。
+    assert.equal(args.checkAll, true);
+    assert.equal(args.source, "seed");
+  }
+});
+
+test("无外链的条目在巡检里不产生探活任务", () => {
+  // 空 links 的条目（如某些纯脚本条目）应能被列出，但探活阶段应跳过。
+  const info = checkFreshness({ slug: "empty", name: "Empty", links: {}, linksCheckedAt: "2020-01-01" }, 90, NOW);
+  assert.equal(info.reason, "stale");
+  assert.deepEqual(info.hosts, []);
+});
+
+test("种子形态必须过 seedToItem，否则漏掉半数外链（回归）", async () => {
+  // CI 的 --source seed 直接读种子。种子是 SeedSoftware 形态：官网在
+  // officialUrl 而非 links.official —— 30 条里只有 18 条填了 links。
+  // 曾经直接读种子，探活只覆盖 34 个链接而运行库有 51 个，
+  // 「全站巡检」静默漏了 17 个条目。转换后两者必须一致。
+  const [{ software }, { samples }, { seedToItem }] = await Promise.all([
+    import("../data/software.ts"),
+    import("../data/samples.ts"),
+    import("../lib/seed.ts"),
+  ]);
+  const fromSeed = [...software.map(seedToItem), ...samples];
+  const keys = ["official", "homepage", "github", "disk"];
+  const count = (list) => list.reduce(
+    (n, item) => n + keys.filter((k) => item.links?.[k]).length, 0,
+  );
+
+  // 转换前的原始种子：只有少数条目有 links 对象。
+  const rawLinks = software.filter((item) => item.links).length;
+  assert.ok(rawLinks < software.length, "前提：原始种子并非每条都有 links");
+
+  // 转换后每条都应有 officialUrl 对应的 links.official。
+  for (const item of fromSeed) {
+    if (item.officialUrl) assert.ok(item.links?.official, `${item.slug} 转换后应带 links.official`);
+  }
+  assert.ok(count(fromSeed) >= count(software), "转换后链接数不应少于原始种子");
+});

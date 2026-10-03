@@ -118,6 +118,25 @@ async function assertReachable(hostname, allowPrivate) {
   if (blocked) throw new Error(`拒绝请求：${hostname} 解析到私有地址 ${blocked.address}`);
 }
 
+/** github.com 网页端在本机与 CI 上常被网络策略拦住（超时），api.github.com 通常可达。 */
+const GIT_HOSTS = new Set(["github.com", "www.github.com"]);
+
+/**
+ * github.com 的仓库页 → 同仓库的 API 地址；非 github 或路径不完整时返回 undefined。
+ * 探活脚本用它做代验：网页端超时不代表仓库不存在。
+ */
+export function githubApiOf(url) {
+  try {
+    const parsed = new URL(url);
+    if (!GIT_HOSTS.has(parsed.hostname)) return undefined;
+    const [owner, repo] = parsed.pathname.split("/").filter(Boolean);
+    if (!owner || !repo) return undefined;
+    return `https://api.github.com/repos/${owner}/${repo.replace(/\.git$/, "")}`;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * 带 SSRF 防护的抓取。只走 http/https，手动跟随重定向并逐跳校验。
  *

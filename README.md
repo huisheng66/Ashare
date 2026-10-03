@@ -36,6 +36,14 @@ npm run dev                  # 或 npm run build && npm run start
 
 链接会失效，所以每条都有 `linksCheckedAt` 记录最近一次人工确认可达的日期。`npm run stale-links` 找出超过 90 天没核的条目，`--check --update` 探活并回写 —— **只有全部链接都可达的条目才回写**：把失效链接的日期刷成今天，下一轮巡检就会以为它刚查过，死链被永久掩盖。回写后仍需同步种子（`linksCheckedAt` 也在两个落点里），跑 `npm run seed:drift` 确认一致。
 
+死链巡检由 GitHub Actions 每日自动跑（`.github/workflows/link-watch.yml`）。CI 上有三点与本地不同：
+
+- 用 `--source seed` 读目录。`data/store/` 已 gitignore，克隆后只有种子。
+- 用 `--check-all` 探全站，而不是只查过期的 —— **链接昨天还正常、今天挂了，只看门槛是发现不了的**。门槛决定「什么时候必须复验」，不限制「能查什么」。
+- 用 `--flaky-ok` 豁免人工确认过的误报（Cloudflare 拦自动化的 403、本机代理超时）。不加它流水线会长期变红，人就开始习惯性忽略，真死链反而被淹没。
+
+探活 `github.com` 网页端常被网络策略拦住，此时自动改用 `api.github.com` 代验同一仓库 —— 否则 CI 会把 6 个正常的 GitHub 链接全判成超时。
+
 ## 安全机制
 
 - 口令只存 scrypt 哈希；session 为 HMAC 签名 cookie（HttpOnly / Secure / SameSite=Strict / Path=/admin）。
@@ -80,6 +88,6 @@ npm run build   # 生产构建
 | `npm run content:audit` | 列出条目缺失字段、场景库存与待补清单（`--scene <id>` 只看某个场景，`--json` 机器可读） |
 | `npm run smoke:detail` | 详情页渲染冒烟：需先跑 `npm run dev`，逐个检查正文分段、外链、来源徽章与价格是否如实呈现 |
 | `npm run seed:drift` | 比对运行库与种子是否一致（`--strict` 有差异时非零退出），确认「两个落点」写的是同一份内容 |
-| `npm run stale-links` | 外链巡检：列出超过阈值没核验的条目（默认 90 天）。`--check` 探活、`--update` 回写通过者的核验日期、`--days N` 改阈值、`--strict` 有待复验项时非零退出（CI 用）、`--json` 机器可读 |
+| `npm run stale-links` | 外链巡检：列出超过阈值没核验的条目（默认 90 天）。`--check` 探活、`--check-all` 探活全站、`--update` 回写通过者的核验日期、`--days N` 改阈值、`--strict` 有待复验或异常链接时非零退出（CI 用）、`--flaky-ok` 豁免人工确认过的误报、`--source seed` 从种子读目录、`--json` 机器可读 |
 
 收录与探活脚本在 `.workbuddy/skills/ashare-curation/scripts/`，它们与上面几个脚本共用 `scripts/_shared.mjs`（参数解析、运行库读取、并发限流、安全抓取）。对外抓取默认只放行 http/https、拒绝解析到私有网段的主机，并逐跳校验重定向；要探活本机服务才加 `--allow-private`。

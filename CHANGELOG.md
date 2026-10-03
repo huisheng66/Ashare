@@ -1,5 +1,38 @@
 # 变更记录
 
+## 2026-10-04 · 外链巡检接入 CI（分支 bunny）
+
+上一轮做的是脚本，这轮接进 GitHub Actions。过程中发现并修掉三个真问题。
+
+**`.github/workflows/link-watch.yml`**
+
+- 每天 04:17 跑（刻意避开整点的调度拥堵），另支持 `workflow_dispatch` 手动触发，带 `days` 参数可临时改门槛。
+- 改了 `data/software.ts`、`data/samples.ts`、`lib/stale.ts`、`lib/links.ts` 等链接相关文件时立即触发，不用等明天。
+- 报告用 `tee` 一次产出：失败时 step 标为 failed，但 `if: always()` 的上传步骤仍会执行，报告不丢。
+- **不跑 `npm ci`** —— 巡检只用 `node:` 内置模块与仓库脚本，省掉安装时间，也让它不受 lockfile 变动影响。
+
+**三个必须适配 CI 的问题**
+
+1. **CI 上没有运行库。** `data/store/` 已 gitignore，克隆后只有种子。新增 `--source seed` 从 `data/software.ts` + `data/samples.ts` 读目录，并显式禁止在此模式下回写（种子由仓库管理，不该被运行库数据改写）。
+2. **`--check-all`：CI 该探全站，而不是只查过期的。** 链接昨天还正常、今天挂了，只看「过期」是发现不了的。**门槛决定「什么时候必须复验」，不限制「能查什么」。**
+3. **`--flaky-ok`：误报不能长期让流水线变红。** inkscape / jasp 的 Cloudflare 403 与 texstudio 的代理超时会让 CI 天天红，人就开始习惯性忽略，真死链反而被淹没。加此开关后 `--strict` 只对非误报判失败，输出里照样提示这些域名。
+
+**Bug 1：`github.com` 网页端在 CI 上全部超时**
+
+首次实跑 7 个异常，其中 6 个是 GitHub 链接超时 —— 网页端被网络策略拦住。`check-links.mjs` 早有「改用 `api.github.com` 代验同一仓库」的能力，但我没在新脚本里复用。已把 `githubApiOf` 抽到 `scripts/_shared.mjs` 由两者共用（消除重复实现），异常从 7 个降到 1 个（仅剩 inkscape 的已知误报）。
+
+**Bug 2：`--source seed` 漏掉半数条目 —— 「全站巡检」名不副实**
+
+探活数出只有 19 个条目、34 个链接，而运行库有 51 个链接。根因：**种子是 `SeedSoftware` 形态，官网在 `officialUrl` 而非 `links.official`**，30 条里只有 18 条填了 `links`。直接读种子，那 17 条条目的外链被静默漏掉 —— 而巡检报告仍显示一切正常。
+
+已改为先过 `seedToItem()` 转换，转换后链接数 51 = 运行库 51。新增测试锁住这个坑（断言转换后每条有 `officialUrl` 的都带上 `links.official`）。
+
+**Bug 3：参数校验顺序**
+
+`--strict` 的「需要配合 --check」校验写在 `--check-all` 联动 `args.check` 之前，于是 `--check-all --strict` 这个合法组合被判成非法、退出码 1。**参数校验的顺序本身就是逻辑**，已调整为先联动再校验。
+
+**验证**：`npm run check` 93 全过（新增 3）· 种子转换后链接数 51 与运行库一致 · 实机跑通完整 CI 命令（`--source seed --check-all --strict --flaky-ok`）· 已知误报被正确豁免 · GitHub 链接代验后异常从 7 降到 1。
+
 ## 2026-10-04 · 外链巡检脚本 stale-links（分支 bunny）
 
 上一轮回填了 `linksCheckedAt`，但没有「谁该复验了」的问法。目录站是死链重灾区 —— 官网改版、下载页迁移很常见，这次把复验流程补上。
