@@ -33,14 +33,6 @@ export const kindLabel: Record<ItemKind, string> = {
   opensource: "开源项目",
 };
 
-/** 主下载按钮：官网 → GitHub → 产品主页；镜像永不做主 CTA */
-export function primaryLink(item: Software): { url: string; label: string } {
-  if (item.links.official) return { url: item.links.official, label: "官网" };
-  if (item.links.github) return { url: item.links.github, label: "GitHub" };
-  if (item.links.homepage) return { url: item.links.homepage, label: "主页" };
-  return { url: "", label: "" };
-}
-
 /** 「2026 年 9 月 28 日」；固定按北京时间，避免服务端时区让日期漂移。 */
 export function formatDate(iso?: string): string {
   if (!iso) return "";

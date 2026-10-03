@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
         ],
       },
       // 图片不运行应用脚本；直接打开上传文件或 SVG 时同样限制主动内容。
+      // CORP 是防盗链的浏览器侧兜底：Referer 缺失时仍拒绝跨站 <img> 读取。
       ...["/media/:path*", "/icons/:path*"].map((source) => ({
         source,
         headers: [
@@ -24,6 +25,9 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; sandbox",
           },
+          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+          // 预览图是条目的一部分，不应被单独索引出去。
+          { key: "X-Robots-Tag", value: "noindex" },
         ],
       })),
     ];

@@ -56,8 +56,20 @@ const MIN_BODY_LENGTH = 200;
 const MAX = {
   name: 100, nameZh: 100, aliases: 2000, tags: 2000, summary: 500, body: 50_000,
   price: 100, tutorial: 10_000, whoFor: 2000, whoNot: 2000, discountNote: 1000,
-  diskNote: 1000, alternatives: 2000, simpleIcon: 100,
+  diskNote: 1000, alternatives: 2000, simpleIcon: 100, license: 100, version: 50,
 };
+
+// 来源 × 类型 的合法组合。与 lib/semantics.ts 的矩阵保持一致：
+// GeoGebra 那类「标开源但许可闭源」必须显式写 kind，不能靠推导。
+const SOURCE_KIND_MATRIX = {
+  official: ["app", "script"],
+  opensource: ["opensource", "app"],
+  discount: ["app"],
+};
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+// SPDX 标识的常见形态：GPL-3.0-only、MIT、Apache-2.0、MPL-2.0、LicenseRef-…
+const LICENSE_SHAPE = /^[A-Za-z0-9.+-]+(\s+AND\s+[A-Za-z0-9.+-]+)*$/;
 
 const USAGE = "用法: node scripts/ingest-item.mjs --file <草稿.json> [--dry-run] [--allow-http] [--patch] [--strict]";
 
@@ -107,6 +119,13 @@ async function validate(item, index, { allowHttp, knownSlugs, strict }) {
   if (!ITEM_KINDS.includes(item.kind)) fail(`kind 必须是 ${ITEM_KINDS.join(" / ")}`);
   if (!PUBLISH_STATUSES.includes(item.status)) fail(`status 必须是 ${PUBLISH_STATUSES.join(" / ")}`);
   if (!SOURCE_KINDS.includes(item.source)) fail(`source 必须是 ${SOURCE_KINDS.join(" / ")}`);
+  // 来源与类型的组合必须成立，否则前台会挂出与事实不符的来源徽章。
+  if (SOURCE_KINDS.includes(item.source) && ITEM_KINDS.includes(item.kind)) {
+    const allowed = SOURCE_KIND_MATRIX[item.source] ?? [];
+    if (!allowed.includes(item.kind)) {
+      fail(`source「${item.source}」与 kind「${item.kind}」不匹配，该来源下只允许 ${allowed.join(" / ")}`);
+    }
+  }
   if (!Array.isArray(item.scenes) || !item.scenes.length) fail("scenes 必须是非空数组");
   else if (item.scenes.some((id) => !SCENES.includes(id))) fail(`scenes 只允许 ${SCENES.join(" / ")}`);
   if (!Array.isArray(item.platforms) || !item.platforms.length) fail("platforms 必须是非空数组");
@@ -133,6 +152,16 @@ async function validate(item, index, { allowHttp, knownSlugs, strict }) {
   if (links.disk) {
     if (!links.diskNote) fail("填了网盘镜像就必须写 diskNote（镜像说明）");
     if (!links.official && !links.github) fail("网盘镜像只能作补充，必须先填官网或 GitHub");
+  }
+  // 标为开源项目却没有仓库链接，「开源」这个断言就无处核验。
+  if (item.source === "opensource" && item.kind === "opensource" && !links.github) {
+    soft("标为开源项目但没有 GitHub 链接，「开源」缺少可核验依据；上游不在白名单主机时可在正文说明并留空");
+  }
+  if (!isBlank(item.license) && !LICENSE_SHAPE.test(item.license.trim())) {
+    soft(`license「${item.license}」不像 SPDX 标识（如 GPL-3.0-only、MIT、Apache-2.0），确认后修正`);
+  }
+  if (!isBlank(item.linksCheckedAt) && !ISO_DATE.test(item.linksCheckedAt.trim())) {
+    fail("linksCheckedAt 必须是 YYYY-MM-DD");
   }
 
   const haystack = [item.name, item.summary, item.body, item.whoFor, item.whoNot, links.diskNote ?? "",

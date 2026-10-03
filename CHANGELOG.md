@@ -1,5 +1,48 @@
 # 变更记录
 
+## 2026-10-03 · 防盗链、外链规范化与数据范式（分支 bunny）
+
+三个方向一起做：把「图片被外站盗用」「外链跳转不可控」「同一语义写多处」这三类问题从根上收口。
+
+**防盗链（`lib/hotlink.ts`）**
+
+- `/media` 与 `/icons` 此前对所有来源照常返回图片。任意站点都能把预览图当免费图床。
+- 判定为**白名单放行 + 其余拒绝**，不是拉黑已知站点：站点自己的图片数量有限、可防盗，爬虫与分享流量不可枚举、不该误伤。放行四类——无 Referer（地址栏直开、分享、部分 App 内置浏览器、爬虫抓 og:image）、同站及其子域名、`ASSET_REFERRER_ALLOWLIST` 显式名单、`ASSET_HOTLINK_PROTECTION=0` 全关。
+- 拒绝返回 403 而非 404：文件确实存在，假装不存在只会让排障变难。响应带 `no-store`（否则 403 会被长缓存缓存住）与 `X-Robots-Tag: noindex`。
+- 判定放在读盘之前，被拒请求不消耗磁盘 IO 与 ETag 计算。
+- `next.config.ts` 为两条路径补 `Cross-Origin-Resource-Policy: same-origin`——Referer 会被浏览器策略裁剪，CORP 是浏览器侧的第二道拒绝。
+- 实机验证六项：无 Referer 200 / 同站 200 / 跨站 403 / `ashare.example.evil.com` 后缀伪装 403 / CORP 头正确 / 路径穿越 404。已实测拦住 `evilashare.example`、`ashare.example.evil.com`。
+
+**外链规范化（`lib/links.ts` + `components/OutboundLink.tsx`）**
+
+- 存量数据用命名槽位（`official`/`github`/`homepage`/`disk`）表达渠道，这四个字段在「主 CTA」「渠道列表」「镜像说明」三处各自判断了一遍，新增一种渠道要改三处。现在摊平成有序的 `LinkChannel[]`，读取侧统一，**存储结构不变**，35 条存量数据零迁移。
+- 收口三件事：`target`/`rel` 一律新标签 + `noopener noreferrer`（主 CTA 另加 `nofollow sponsored`）；域名等宽可见；点击自动上报（`mousedown` 而非 `click`，按住拖走也算跳转发生了）。
+- 镜像行加「镜像」角标，`sr-only` 提示改为「（第三方镜像域名，非官方，请核对）」——这是外链最容易出事的地方。
+- **无说明的镜像不予展示**（`isVerifiedMirror`）：无法核验的镜像与盗版网盘只有一线之隔。
+- 删掉 `lib/items.ts` 的 `primaryLink`，与新的 `primaryChannel` 构成双事实源，已消除。
+
+**外链点击统计（`lib/click-store.ts`）**
+
+- 目录站的价值在于「跳出去」，此前完全不知道哪些条目的哪些渠道被点。
+- **JSONL 追加写，不走 `JsonStore` 的读改写事务**：那会让每次点击都串行等锁，而点击是高频、低价值、允许极小概率丢失的事件。
+- **只存 slug + 渠道 + 时间，不存 IP 与 UA**。存 IP 会把这份数据变成第二份用户数据，隐私成本远高于收益。
+- 内存缓冲 5 秒或 200 条才落盘；定时器 `unref` 不拖住进程退出；失败只记日志不抛出。
+- Server Action `recordOutboundClick` 只接受白名单 slug 与渠道 id，按 IP 限速 60 次/分钟。
+
+**数据范式（`lib/semantics.ts` + `lib/derive.ts`）**
+
+- **`source` 与 `kind` 的矛盾根治**。此前两者独立填写、前台徽章只认 `source`，于是出现 GeoGebra 那类问题：种子标 `source: "opensource"` → 推导成 `kind: "opensource"` → 前台挂出「开源」徽章，但它仓库 `license` 为 null（源码公开、许可闭源），实为非商业免费。现写成矩阵（`official` → `app`/`script`，`opensource` → `opensource`/`app`，`discount` → `app`），后台 `saveItem` 与 `ingest` 脚本共用同一份定义，从人肉判断改为机器拦截。标为 `opensource` 却没有 GitHub 链接时 `--strict` 会拦下。
+- 图标三套机制（`iconImage` 上传图 / `icon.simpleIcon` 本地 svg / `icon.letter` 字母块）的回退顺序此前内嵌在 `SoftwareIcon` 里，抽成 `resolveIcon` 纯函数供 ingest 与测试复用。`scenes[0]` 主场景约定同样收进 `primaryScene`——它此前只散落在审计脚本注释里。
+- 新增三个可选字段 `license`（SPDX）、`version`、`linksCheckedAt`（YYYY-MM-DD）。「来源可核验」需要结构化字段支撑，不能只写在正文文字里。同步接入 `seedToItem` 透传、`seed-drift` 比对（漏进比对就会对该字段失明）、后台表单与 `ingest` 校验——**只加类型不加脚本，新字段就永远存不进运行库**。
+
+**一处回归及其教训**
+
+- `validateSemantics` 最初包含「至少归属一个场景 / 平台」，导致 `tests/admin-actions.test.mjs` 两个子测试失败。用 `git stash` 对比确认是本轮引入而非环境问题后，定位到根因：那些测试构造的 FormData 不带 `scenes`。
+- 修正方式是把**单字段必填**移出语义层——那本就该由 `saveItem` 与 ingest 各自的既有校验负责。语义层只管**跨字段**一致性，重复校验会让同一问题在两处以不同措辞报错。
+- 测试数 46 → 66（新增 `tests/hotlink.test.mjs` 7 项、`tests/data-model.test.mjs` 13 项）。
+
+**验证**：`npm run check` 66 全过 · `npm run build` 成功 · `seed:drift` 0 不一致 · `content:audit` 缺口未上升（仍为 10/35）· 防盗链 6 项实机验证 · 点击统计落盘与聚合实测（含确认不存 IP）· ingest `--strict` 与非 strict 两种路径均按预期分级。
+
 ## 2026-09-29 · 全站界面重做「纸与墨」
 
 按新规范 [claudedesign.md](./claudedesign.md) 重做所有页面，旧的 DESIGN.md 不再作为依据。

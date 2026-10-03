@@ -60,6 +60,12 @@ export type Software = {
   iconImage?: string;
   createdAt?: string;
   updatedAt?: string;
+  /** SPDX 许可证标识，如 GPL-3.0-only。核验不到时留空，不要猜。 */
+  license?: string;
+  /** 条目描述的版本号，如 4.9.8。 */
+  version?: string;
+  /** 链接最近一次人工核验的日期（YYYY-MM-DD），用于发现死链。 */
+  linksCheckedAt?: string;
   icon: {
     letter: string;
     color: string;
@@ -131,6 +137,10 @@ export type SeedSoftware = {
   tags?: string[];
   /** 可选：缺省由 source 推导；source 标 opensource 但实际闭源时（如 GeoGebra）必须显式写。 */
   kind?: ItemKind;
+  /** 可选：SPDX 许可证标识。与 Software.license 同名对应。 */
+  license?: string;
+  /** 可选：条目描述的版本号。与 Software.version 同名对应。 */
+  version?: string;
   /** 可选：缺省为 `{ official: officialUrl }`。需要额外给 github / mirror 时填写。 */
   links?: ItemLinks;
 };

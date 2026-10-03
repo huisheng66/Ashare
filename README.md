@@ -24,9 +24,12 @@ npm run dev                  # 或 npm run build && npm run start
 ## 内容管理（后台）
 
 - 入口 `/admin`（不进导航，robots 已禁止收录），单口令登录，会话约 8 小时。
-- 条目：类型 / 标签 / 简介 / 价格 / 使用教程 / 详细介绍（纯文本分段）/ 四类链接（官网、主页、GitHub、已核验镜像）/ 预览图（最多 6 张，JPEG/PNG/WebP/GIF，单张 ≤5MiB，合计最多 35MiB，服务器存储）与图标图，支持草稿与发布。
+- 条目：类型 / 标签 / 简介 / 价格 / 使用教程 / 详细介绍（纯文本分段）/ 四类链接（官网、主页、GitHub、已核验镜像）/ 预览图（最多 6 张，JPEG/PNG/WebP/GIF，单张 ≤5MiB，合计最多 35MiB，服务器存储）与图标图，支持草稿与发布。许可证、版本与链接核验日期可单独填写——「来源可核验」需要有结构化字段支撑，不能只写在正文里。
+- **来源与类型必须自洽**：组合由 `lib/semantics.ts` 定义（`official` → `app`/`script`，`opensource` → `opensource`/`app`，`discount` → `app`），后台保存与 `ingest` 脚本共用同一份矩阵。这是 GeoGebra 那类「标开源但许可闭源」的根治办法——此前靠人肉判断，已改为机器拦截。标为 `opensource` 却没有 GitHub 链接时，「开源」这一断言缺少可核验依据，`--strict` 下会拦下。
 - 投稿与反馈在 `/admin/inbox`：投稿可一键转为条目（自动预填表单）；反馈可标记已读 / 删除；IP 封禁列表可解封。
 - 数据都在 `data/store/*.json`（0600 权限，不进 git）。单个 Node 进程内，读改写事务按文件串行执行；损坏 JSON 会报错，不会自动用种子覆盖。每次保存目录会先备份上一版到 `catalog.bak.json`，并记录 SHA-256（启动时校验，文件被改动会打日志）。
+
+外链点击另存 `data/store/clicks.jsonl`（JSONL 追加写，0600，不进 git）。**只记录 slug、渠道与时间，不存 IP 与 UA** —— 定位到具体条目已经够用，存 IP 会让这份数据变成第二份用户数据。写入为 fire-and-forget：内存缓冲 5 秒或攒够 200 条才落盘，失败只记日志，绝不影响用户跳转。
 
 `.bak` 只覆盖上一次保存，防不了磁盘故障与误删目录：定期跑 `npm run backup` 做整机快照，并让 `--out` 指向另一块盘或网盘同步目录。条目缺正文、缺标签、场景空栏这类内容缺口，用 `npm run content:audit` 查看。
 
@@ -36,6 +39,9 @@ npm run dev                  # 或 npm run build && npm run start
 - `proxy.ts` 注入页面 CSP（nonce），`next.config.ts` 统一设置基础安全响应头；`/admin` 只允许 GET/HEAD/POST。
 - 限速：登录 5 次/10 分钟，投稿与反馈各 3 条/10 分钟；连续登录失败封 IP（`blocks.json`，可在后台解封）。
 - 后台正文按纯文本渲染，不解析 HTML/Markdown（无存储型 XSS）。
+- **防盗链**：`/media` 与 `/icons` 校验 `Referer`，跨站请求返回 403。判定为「白名单放行 + 其余拒绝」——无 Referer（地址栏直开、分享、爬虫抓 og:image）、同站及其子域名、配置的白名单一律放行，避免误伤正常访问。响应另带 `Cross-Origin-Resource-Policy: same-origin` 与 `X-Robots-Tag: noindex`。实测拦截 `evilashare.example`、`ashare.example.evil.com` 这类后缀伪装。
+
+  关闭：`ASSET_HOTLINK_PROTECTION=0`。额外放行来源（如需要在微信文章里显示预览图）：`ASSET_REFERRER_ALLOWLIST=weixin.qq.com`。
 
 ## 部署
 

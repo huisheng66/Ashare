@@ -12,6 +12,7 @@ import { getSubmissions, updateBlocks, updateCatalog, updateFeedback, updateSubm
 import { imageExtension, isHttpUrl, ITEM_KINDS, MAX_UPLOAD, mediaParts, PLATFORMS, PUBLISH_STATUSES, SLUG_PATTERN, SOURCE_KINDS } from "@/lib/input-validation";
 import { scenes } from "@/data/scenes";
 import type { ItemKind, Platform, PublishStatus, SceneId, Software, SourceKind } from "@/data/types";
+import { validateSemantics } from "@/lib/semantics";
 
 export async function requireAdmin(): Promise<void> {
   if (!(await hasValidSession())) redirect("/admin/login");
@@ -112,6 +113,9 @@ export async function saveItem(fd: FormData): Promise<void> {
     scenes: selectedScenes,
     platforms,
     price: checked("price", 100) || undefined,
+    license: checked("license", 100) || undefined,
+    version: checked("version", 50) || undefined,
+    linksCheckedAt: checked("linksCheckedAt", 10) || undefined,
     links,
     tutorial: checked("tutorial", 10_000).split("\n").map((value) => value.trim()).filter(Boolean),
     whoFor: checked("whoFor", 2000),
@@ -129,8 +133,14 @@ export async function saveItem(fd: FormData): Promise<void> {
     },
   };
   if (!draft.name || !draft.summary) bad("名称与简介必填");
+  if (draft.linksCheckedAt && !/^\d{4}-\d{2}-\d{2}$/.test(draft.linksCheckedAt)) {
+    bad("链接核验日期格式应为 YYYY-MM-DD");
+  }
   const haystack = [draft.name, draft.summary, draft.body, draft.whoFor, draft.whoNot, ...draft.tags, ...draft.tutorial, links.diskNote ?? ""].join(" ").toLowerCase();
   if (CRACK_WORDS.some((word) => haystack.includes(word))) bad("内容包含破解相关词，拒绝保存");
+  // 语义一致性：来源徽章、类型与镜像规则必须自洽，规则与 ingest 脚本共用同一份定义。
+  const semantic = validateSemantics(draft);
+  if (semantic.length) bad(semantic[0]);
 
   const previews = fd.getAll("previews").filter((entry): entry is File => entry instanceof File && entry.size > 0);
   const icon = fd.get("iconImage");

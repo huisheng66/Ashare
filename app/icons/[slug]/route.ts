@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { decideHotlink, hotlinkBlockedResponse, hotlinkOptionsFromEnv } from "@/lib/hotlink";
 import { SLUG_PATTERN } from "@/lib/input-validation";
 
 const ICON_DIR = path.join(process.cwd(), "data", "icons");
@@ -8,6 +9,9 @@ const ICON_DIR = path.join(process.cwd(), "data", "icons");
 export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!SLUG_PATTERN.test(slug)) return new Response(null, { status: 404 });
+  if (!decideHotlink(request.headers.get("referer"), hotlinkOptionsFromEnv()).allowed) {
+    return hotlinkBlockedResponse();
+  }
   try {
     const svg = await readFile(path.join(ICON_DIR, `${slug}.svg`));
     const etag = `"${createHash("sha256").update(svg).digest("base64url")}"`;
@@ -17,6 +21,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
       "Cache-Control": "public, max-age=86400, must-revalidate",
       "X-Content-Type-Options": "nosniff",
       "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+      "Cross-Origin-Resource-Policy": "same-origin",
       ETag: etag,
     };
     if (request.headers.get("if-none-match")?.split(",").some((tag) => tag.trim().replace(/^W\//, "") === etag || tag.trim() === "*")) {

@@ -214,6 +214,42 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
             <Field label="价格" htmlFor="f-price" hint="卡片展示，如「会员 ¥68/月」；留空按免费。">
               <Input id="f-price" name="price" aria-describedby="f-price-hint" defaultValue={item?.price} />
             </Field>
+            <Field
+              label="许可证"
+              htmlFor="f-license"
+              optional
+              hint="SPDX 标识，如 GPL-3.0-only、MIT。核验不到就留空，不要猜。"
+            >
+              <Input
+                id="f-license"
+                name="license"
+                aria-describedby="f-license-hint"
+                defaultValue={item?.license}
+                placeholder="MIT"
+              />
+            </Field>
+            <Field label="版本" htmlFor="f-version" optional hint="条目描述的版本号，如 4.9.8。">
+              <Input
+                id="f-version"
+                name="version"
+                aria-describedby="f-version-hint"
+                defaultValue={item?.version}
+              />
+            </Field>
+            <Field
+              label="链接核验于"
+              htmlFor="f-linksCheckedAt"
+              optional
+              hint="最近一次人工确认链接可达的日期，用于发现死链。"
+            >
+              <Input
+                id="f-linksCheckedAt"
+                name="linksCheckedAt"
+                type="date"
+                aria-describedby="f-linksCheckedAt-hint"
+                defaultValue={item?.linksCheckedAt}
+              />
+            </Field>
             <Field label="状态" htmlFor="f-status">
               <select
                 id="f-status"

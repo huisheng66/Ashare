@@ -4,10 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { ArrowUpRight, Check, MessageSquareWarning, ShieldCheck, TicketPercent, X } from "lucide-react";
+import { Check, MessageSquareWarning, ShieldCheck, TicketPercent, X } from "lucide-react";
 
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { hostOf, ItemLinks, otherLinkCount } from "@/components/ItemLinks";
+import { OutboundLink } from "@/components/OutboundLink";
 import { SectionHeading } from "@/components/SectionHeading";
 import { FeaturedMark, SoftwareCard } from "@/components/SoftwareCard";
 import { SoftwareIcon } from "@/components/SoftwareIcon";
@@ -16,7 +17,8 @@ import { TagList } from "@/components/TagList";
 import { Button } from "@/components/ui/button";
 import { scenes } from "@/data/scenes";
 import { alternativesOf, getSoftware } from "@/lib/catalog";
-import { formatDate, kindLabel, platformLabel, primaryLink, toCatalogItem } from "@/lib/items";
+import { formatDate, kindLabel, platformLabel, toCatalogItem } from "@/lib/items";
+import { primaryChannel } from "@/lib/links";
 import { absoluteSiteUrl } from "@/lib/site";
 
 type Props = {
@@ -88,8 +90,8 @@ export default async function SoftwarePage({ params }: Props) {
   if (!item) notFound();
   const [alts, requestHeaders] = await Promise.all([alternativesOf(item), headers()]);
   const nonce = requestHeaders.get("x-nonce") ?? undefined;
-  const primary = primaryLink(item);
-  const others = otherLinkCount(item.links, primary.url);
+  const primary = primaryChannel(item.links);
+  const others = otherLinkCount(item.links, primary?.url ?? "");
   const sceneLinks = scenes.filter((scene) => item.scenes.includes(scene.id));
   const firstScene = sceneLinks[0];
   const updated = formatDate(item.updatedAt);
@@ -165,14 +167,15 @@ export default async function SoftwarePage({ params }: Props) {
               <span className="text-[15px] font-semibold">{item.price ?? "免费"}</span>
             </div>
 
-            {primary.url ? (
+            {primary ? (
               <>
                 <Button asChild size="lg" className="mt-4 w-full">
-                  <a href={primary.url} target="_blank" rel="noopener noreferrer">
-                    前往{primary.label}
-                    <ArrowUpRight />
-                    <span className="sr-only">（在新标签页打开）</span>
-                  </a>
+                  <OutboundLink
+                    channel={primary}
+                    slug={item.slug}
+                    variant="cta"
+                    className="inline-flex h-full w-full items-center justify-center gap-2"
+                  />
                 </Button>
                 <p className="mt-2 truncate text-center font-mono text-xs text-muted-foreground">
                   {hostOf(primary.url)}
@@ -185,7 +188,7 @@ export default async function SoftwarePage({ params }: Props) {
             {others ? (
               <div className="mt-5 border-t border-border pt-4">
                 <h3 className="mb-1 text-xs font-medium text-muted-foreground">其他渠道</h3>
-                <ItemLinks links={item.links} exclude={primary.url} />
+                <ItemLinks links={item.links} exclude={primary?.url} slug={item.slug} />
               </div>
             ) : null}
 

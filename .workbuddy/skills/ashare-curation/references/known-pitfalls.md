@@ -90,3 +90,12 @@
 51. **IPv6 的私有段判断容易写错位宽。** 第一版取首段的前 8 位去比 `fe80::/10`，结果 `fe80::1` 判成了公网地址。正确做法是取首段前 16 位：`head & 0xfe00 === 0xfc00`（fc00::/7）与 `head & 0xffc0 === 0xfe80`（fe80::/10）。改完用 16 个地址的用例表回归。
 52. **`--keep` 是 `fs.rm -r`，只认自己产出的快照。** 名字符合 `ashare-backup-YYYYMMDD-HHMMSS` 不代表是本脚本写的——万一 `--out` 指到的目录里本来就有同名文件夹呢。现在删除前要求目录内有带 `createdAt` 的 `manifest.json`，归档则用 `tar -tzf` 确认含 manifest，否则跳过并提示。
 53. **全量探活每轮都会报同样 4 个「异常」，全是误报。** inkscape.org / jasp-stats.org 的 403 是 Cloudflare 拦自动化，texstudio.org / gimp.org 的超时是本机代理隧道。脚本现在对这几个域名附一句「已人工确认」的提示，省掉每轮重复的人工复核；但提示带日期，过期要重验，别让它变成掩盖真死链的遮羞布。
+
+## 2026-10-03 防盗链与数据范式（bunny 分支）新增
+
+54. **`source` 与 `kind` 会互相矛盾，前台徽章只认 `source`，错的那一边没人发现。** GeoGebra 的教训（见 #48）此前只靠人肉判断：种子写 `source: "opensource"`，`seedToItem()` 就推导出 `kind: "opensource"`，前台挂出「开源」徽章，而它仓库 `license` 为 null、实为非商业免费。现已写成矩阵（`lib/semantics.ts`），后台 `saveItem` 与 `ingest` 共用同一份定义。**新增 `source` 取值或 `kind` 取值时，矩阵要同步改，否则合法组合会被误拦。**
+55. **只加类型不加脚本，新字段就永远存不进运行库。** 加 `license` / `version` / `linksCheckedAt` 时，除了 `data/types.ts`，还必须同步四处：`lib/seed.ts` 的透传（靠 `...rest` 恰好生效，但要确认）、`scripts/seed-drift.mjs` 的 `COMPARE` 清单（漏进就会对该字段失明）、后台 `saveItem` 的落库、后台表单的输入框、以及 `ingest` 的 `MAX` 与校验。漏任何一处，字段就只在类型上存在。
+56. **新增的跨字段校验会让既有测试失败，先确认是不是回归。** `validateSemantics` 最初包含「至少归属一个场景 / 平台」，导致 `tests/admin-actions.test.mjs` 两个子测试报错——那些测试构造的 FormData 本来就不带 `scenes`。用 `git stash` 对比干净状态即可区分回归与环境问题。结论：**单字段必填归各自的入口校验，语义层只管跨字段一致性**，否则同一问题会在两处以不同措辞报错。
+57. **防盗链的方向是「白名单放行 + 其余拒绝」，不能反过来。** 站内图片数量有限、防得住；爬虫与分享流量不可枚举、拉黑就等于把 og:image 和地址栏直开一起废掉。实测三类必须放行：无 Referer（直开 / 微信内置浏览器 / 爬虫）、同站及其子域名、显式白名单。已实测拦住 `evilashare.example` 与 `ashare.example.evil.com` 这类后缀伪装。
+58. **防盗链被拒的响应不能带长缓存。** 图片路由原本是 `immutable` 一年缓存，若 403 也带上，浏览器与中间代理会把拒绝结果缓存住，改配置后仍不放行。拒绝响应必须 `no-store`。
+59. **写测试临时文件不要用 `/tmp`。** 在 Windows 的 Git Bash 下 `/tmp` 解析到别处，`node scripts/...` 读的是真实路径，会报 ENOENT。直接在项目目录生成、用完删掉。

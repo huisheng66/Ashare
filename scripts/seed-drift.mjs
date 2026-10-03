@@ -19,7 +19,12 @@ import { software as seed } from "../data/software.ts";
 import { seedToItem } from "../lib/seed.ts";
 
 const CATALOG = path.join(process.cwd(), "data", "store", "catalog.json");
-const COMPARE = ["summary", "body", "tags", "aliases", "links", "kind", "source", "price", "scenes", "platforms"];
+// 比对字段必须与 lib/seed.ts 的透传清单一致：
+// 新增可透传字段却漏进这里，漂移检测就会对它失明。
+const COMPARE = [
+  "summary", "body", "tags", "aliases", "links", "kind", "source", "price",
+  "scenes", "platforms", "license", "version",
+];
 const strict = process.argv.includes("--strict");
 
 const show = (value) =>
