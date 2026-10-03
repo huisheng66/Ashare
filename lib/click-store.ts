@@ -92,32 +92,114 @@ export async function flushClicks(): Promise<void> {
 export type ClickCount = { slug: string; channel: string; count: number };
 
 /**
- * 汇总点击。按 (slug, channel) 聚合，count 降序。
- * 逐行解析：写入时断电可能留下半行，坏行不能影响其余记录。
+ * 扫描上限。JSONL 每天只追加、永不压缩，理论上无上限；
+ * 但后台统计不该为了画一张图把整份历史读进内存。超限时只统计最新的一段，
+ * 并在页面上如实说明「仅统计最近 N 行」，不谎报全量。
  */
-export async function clickSummary(): Promise<ClickCount[]> {
-  let raw: string;
+const MAX_SCAN_BYTES = 8 * 1024 * 1024;
+const MAX_SCAN_LINES = 200_000;
+
+export type ClickScan = {
+  /** (slug, channel) 计数 */
+  byChannel: Map<string, ClickCount>;
+  /** 每条点击的日期（YYYY-MM-DD，北京时间）计数 */
+  byDay: Map<string, number>;
+  total: number;
+  /** 因超出上限而跳过的行数 */
+  skipped: number;
+  /** 实际扫描的字节数 */
+  bytes: number;
+};
+
+/** 取文件尾部不超过 limit 字节的片段，避免整文件读入。 */
+async function readTail(limit: number): Promise<{ text: string; bytes: number }> {
+  let handle;
   try {
-    raw = await fs.readFile(CLICK_FILE, "utf8");
+    handle = await fs.open(CLICK_FILE, "r");
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
-    console.error("[clicks] Could not read click log", error);
-    return [];
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return { text: "", bytes: 0 };
+    console.error("[clicks] Could not open click log", error);
+    return { text: "", bytes: 0 };
   }
-  const counts = new Map<string, ClickCount>();
-  for (const line of raw.split("\n")) {
+  try {
+    const { size } = await handle.stat();
+    const start = Math.max(0, size - limit);
+    const length = size - start;
+    if (!length) return { text: "", bytes: 0 };
+    const buffer = Buffer.allocUnsafe(length);
+    await handle.read(buffer, 0, length, start);
+    return { text: buffer.toString("utf8"), bytes: length };
+  } catch (error) {
+    console.error("[clicks] Could not read click log", error);
+    return { text: "", bytes: 0 };
+  } finally {
+    await handle.close();
+  }
+}
+
+/** 固定按北京时间分桶，与 formatDate 一致，避免服务端时区让日期漂一天。 */
+function dayKey(iso: string): string | undefined {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+/** 单次扫描，产出所有视图共用的聚合结果。 */
+export async function scanClicks(): Promise<ClickScan> {
+  const { text, bytes } = await readTail(MAX_SCAN_BYTES);
+  const scan: ClickScan = { byChannel: new Map(), byDay: new Map(), total: 0, skipped: 0, bytes };
+
+  let firstPartial = true;
+  let seen = 0;
+  for (const line of text.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    try {
-      const parsed = JSON.parse(trimmed) as Partial<OutboundClick>;
-      if (typeof parsed.slug !== "string" || typeof parsed.channel !== "string") continue;
-      const key = `${parsed.slug} ${parsed.channel}`;
-      const hit = counts.get(key);
-      if (hit) hit.count += 1;
-      else counts.set(key, { slug: parsed.slug, channel: parsed.channel, count: 1 });
-    } catch {
-      // 跳过损坏行。
+    // 从尾部截断时首行可能只有半条记录，跳过而不是把它算成一个坏行。
+    if (firstPartial) {
+      firstPartial = false;
+      if (!trimmed.startsWith("{")) continue;
     }
+    if (seen >= MAX_SCAN_LINES) {
+      scan.skipped += 1;
+      continue;
+    }
+    seen += 1;
+    let parsed: Partial<OutboundClick>;
+    try {
+      parsed = JSON.parse(trimmed) as Partial<OutboundClick>;
+    } catch {
+      // 写入时断电可能留下半行，跳过即可。
+      scan.skipped += 1;
+      continue;
+    }
+    if (typeof parsed.slug !== "string" || typeof parsed.channel !== "string") {
+      scan.skipped += 1;
+      continue;
+    }
+    scan.total += 1;
+
+    const key = `${parsed.slug} ${parsed.channel}`;
+    const hit = scan.byChannel.get(key);
+    if (hit) hit.count += 1;
+    else scan.byChannel.set(key, { slug: parsed.slug, channel: parsed.channel, count: 1 });
+
+    const day = dayKey(String(parsed.at ?? ""));
+    if (day) scan.byDay.set(day, (scan.byDay.get(day) ?? 0) + 1);
   }
-  return [...counts.values()].sort((a, b) => b.count - a.count);
+
+  return scan;
+}
+
+/**
+ * 汇总点击。按 (slug, channel) 聚合，count 降序。
+ * 损坏行不影响其余记录。
+ */
+export async function clickSummary(): Promise<ClickCount[]> {
+  const { byChannel } = await scanClicks();
+  return [...byChannel.values()].sort((a, b) => b.count - a.count);
 }
