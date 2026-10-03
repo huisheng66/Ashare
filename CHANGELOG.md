@@ -1,5 +1,32 @@
 # 变更记录
 
+## 2026-10-03 · 回填 license / version / linksCheckedAt（分支 bunny）
+
+上一轮把三个字段加进了数据模型，但存量 35 条全是空的。这轮按「有据可依才填」的原则回填。
+
+**核验方式**
+
+- **链接**：`check-links --all` 跑全量 51 个，48 可达。3 个异常（texstudio 超时、inkscape 与 jasp 的 403）与 09-28 记录完全一致，均为已知误报（代理隧道 / Cloudflare 拦自动化），站点本身正常。
+- **许可证**：GitHub API 的 `license.spdx_id` 优先；返回 `NOASSERTION` 或 404 时**直读上游 LICENSE / COPYING 原文**。原文确认：GIMP、Krita、Octave = GPL-3.0，QGIS = GPL-2.0，Jupyter = BSD-3-Clause，VS Code = MIT，Git = GPL-2.0-only（COPYING 明确「只认 v2」）。其余按此前已核验的结论填入。
+- **版本**：`releases/latest` 的 tag，排除预发布。Git v2.56.0、Python 3.15.0（FTP 目录实证）、Krita 5.3.4（官网）、Audacity 4.0.1（官网）等 14 条。**预发布与已停更仓库不采用** —— Python 的 `v3.15.0rc3`、KDE/krita 的 `v42.0-beta2` 均已排除。
+- **查不到权威来源的一律留空**，不用记忆或推测填。16 条因此留空（geogebra、obsidian、figma、wps 等专有软件本就无开源许可证）。
+
+**回填结果**：`license` 18 条、`version` 14 条、`linksCheckedAt` 35 条（全站 51 个链接今天都探活过；该字段记的是核验日期，不以「有版本号」为前提）。
+
+**语义规则抓到一处真实数据错误**
+
+上一轮新加的「来源 × 类型」矩阵在试运行阶段就拦下了 **yt-dlp 标 `opensource` + `script`** 的非法组合。它是 Unlicense（公开领域）的开源项目，正文第三段也这么写，「脚本」只是形态描述。已把 `kind` 改为 `opensource`（运行库与种子同步）。这正是把 GeoGebra 教训写成机器规则的价值。
+
+**本轮最重要的发现：漂移检测的失明是静默的**
+
+1. 草稿里给无版本号的条目写了空字符串，运行库存下 `""`、种子是 `undefined` —— `seed-drift` 报 6 处不一致。空字符串与缺省语义相同，已统一清理（6 处）并同步 SHA-256。
+2. 补 `linksCheckedAt` 到种子时，脚本**连续三次静默地什么都没做**，一度以为已同步完成。根因有三：shell 把正则里的 `$` 吞成字面量；用「已处理输出」判重会误判；**仓库文件是 CRLF 行尾，`$` 前留着 `\r`，`slug: "x",$` 永远不匹配**。改成写脚本文件 + 按条目切片 + 兼容 `\r` 后才真正插入 35 行。
+3. 插入后 `seed-drift` 仍报「0 不一致」—— **这次是假的**。上一轮加字段时只把 `license`/`version` 加进 COMPARE 清单，漏了 `linksCheckedAt`，于是运行库 35 条都有值、种子全空，脚本依然报 0。**漏一个字段名，漂移检测就对该字段完全失明，而且不报错。**
+
+修复：`COMPARE` 补上 `linksCheckedAt`；`SeedSoftware` 补上该字段（类型也漏了，`tsc` 报 TS2353）。新增两条测试 —— 一条校验种子里的 SPDX 与日期格式；另一条**从 `seed-drift.mjs` 源码里解析 COMPARE 清单并断言覆盖全部可透传字段**，专门守住「清单与类型脱节」这类静默失效。已用「临时删掉清单里的字段名」验证该测试确实会失败。
+
+**验证**：`npm run check` 78 全过（新增 2）· typecheck 通过 · `seed:drift` 0 不一致（已独立核验两侧覆盖均为 18/14/35，非假 0）· `content:audit` 缺口未上升。构建在本轮末尾被环境因素中断（SIGTERM），此前同一批改动的构建已通过。
+
 ## 2026-10-03 · 后台新增点击数据页（分支 bunny）
 
 上一轮把点击统计写进了 `clicks.jsonl`，但只能命令行看。这轮补上 `/admin/clicks`。

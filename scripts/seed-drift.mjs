@@ -21,9 +21,12 @@ import { seedToItem } from "../lib/seed.ts";
 const CATALOG = path.join(process.cwd(), "data", "store", "catalog.json");
 // 比对字段必须与 lib/seed.ts 的透传清单一致：
 // 新增可透传字段却漏进这里，漂移检测就会对它失明。
+// 实测教训：加 linksCheckedAt 时只补了 license/version，被漏掉的字段
+// 在运行库有值、种子为空时依然报「0 不一致」—— 失明是静默的，不会报错。
+// 改动这里后请同时跑一次真实有差异的用例确认它能报出来。
 const COMPARE = [
   "summary", "body", "tags", "aliases", "links", "kind", "source", "price",
-  "scenes", "platforms", "license", "version",
+  "scenes", "platforms", "license", "version", "linksCheckedAt",
 ];
 const strict = process.argv.includes("--strict");
 

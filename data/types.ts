@@ -141,6 +141,8 @@ export type SeedSoftware = {
   license?: string;
   /** 可选：条目描述的版本号。与 Software.version 同名对应。 */
   version?: string;
+  /** 可选：链接最近一次人工核验的日期（YYYY-MM-DD）。与 Software.linksCheckedAt 同名对应。 */
+  linksCheckedAt?: string;
   /** 可选：缺省为 `{ official: officialUrl }`。需要额外给 github / mirror 时填写。 */
   links?: ItemLinks;
 };

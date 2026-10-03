@@ -82,3 +82,41 @@ test("种子条目的正文若非空，至少两段且不含 Markdown 标题", (
     assert.ok(!entry.body.includes("##"), `${entry.slug} 的正文不应含 Markdown 标题`);
   }
 });
+
+test("种子里的许可证与核验日期格式合法", () => {
+  // SPDX 标识的常见形态；核验不到时应当整字段留空，而不是填「未知」之类占位。
+  const LICENSE = /^[A-Za-z0-9.+-]+(\s+AND\s+[A-Za-z0-9.+-]+)*$/;
+  for (const entry of seed) {
+    if (entry.license !== undefined) {
+      assert.ok(entry.license, `${entry.slug} 的 license 不应为空字符串`);
+      assert.match(entry.license, LICENSE, `${entry.slug} 的 license「${entry.license}」不像 SPDX 标识`);
+    }
+    if (entry.linksCheckedAt !== undefined) {
+      assert.match(entry.linksCheckedAt, /^\d{4}-\d{2}-\d{2}$/, `${entry.slug} 的 linksCheckedAt 应为 YYYY-MM-DD`);
+    }
+    if (entry.version !== undefined) {
+      assert.ok(entry.version.trim(), `${entry.slug} 的 version 不应为空字符串`);
+    }
+  }
+});
+
+test("漂移检测的字段清单覆盖全部可透传字段", async () => {
+  // 背景：加 linksCheckedAt 时只把它加进了类型与种子，忘了加进 seed-drift 的
+  // COMPARE 清单，于是运行库 35 条都有值、种子全空，脚本却报「0 不一致」。
+  // **漂移检测的失明是静默的，不会报错** —— 只能靠这条测试兜住。
+  const { readFile } = await import("node:fs/promises");
+  const script = await readFile(new URL("../scripts/seed-drift.mjs", import.meta.url), "utf8");
+  const match = /const COMPARE = \[([\s\S]*?)\]/.exec(script);
+  assert.ok(match, "seed-drift.mjs 里应能找到 COMPARE 数组");
+
+  const compared = new Set(
+    match[1]
+      .split(",")
+      .map((s) => s.trim().replace(/^["']|["']$/g, ""))
+      .filter(Boolean),
+  );
+  // 凡是 Software 上存在、且种子允许写入的可选字段，都必须被比对。
+  for (const field of ["license", "version", "linksCheckedAt"]) {
+    assert.ok(compared.has(field), `seed-drift 的 COMPARE 漏了 ${field}，该字段的漂移将无法被发现`);
+  }
+});

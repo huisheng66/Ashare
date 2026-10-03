@@ -3,7 +3,9 @@ import type { SeedSoftware } from "./types";
 /** 静态种子：首次启动灌入 data/store/catalog.json 后即以 store 为准 */
 export const software: SeedSoftware[] = [
   {
+    license: "MIT",
     slug: "vscode",
+    linksCheckedAt: "2026-10-03",
     name: "Visual Studio Code",
     nameZh: "VS Code",
     aliases: ["vscode", "vs code", "代码编辑器"],
@@ -25,7 +27,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "V", color: "#007ACC", simpleIcon: "visualstudiocode" },
   },
   {
+    license: "GPL-2.0-only",
+    version: "2.56.0",
     slug: "git",
+    linksCheckedAt: "2026-10-03",
     name: "Git",
     aliases: ["git scm", "版本控制", "代码版本", "版本管理"],
     summary: "记录改动、分支和协作的基础工具，写代码几乎都会用到。",
@@ -53,7 +58,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "G", color: "#F05032", simpleIcon: "git" },
   },
   {
+    license: "PSF-2.0",
+    version: "3.15.0",
     slug: "python",
+    linksCheckedAt: "2026-10-03",
     name: "Python",
     aliases: ["python3", "pip", "py", "python 解释器"],
     summary: "脚本、数据分析、爬虫和不少课程作业的默认语言。",
@@ -81,7 +89,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "P", color: "#3776AB", simpleIcon: "python" },
   },
   {
+    license: "MIT",
+    version: "26.10.0",
     slug: "nodejs",
+    linksCheckedAt: "2026-10-03",
     name: "Node.js",
     aliases: ["node", "npm", "node.js", "javascript 运行时"],
     summary: "在电脑上跑 JavaScript，前端工具链和不少开发服务器都靠它。",
@@ -109,6 +120,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "dbeaver",
+    linksCheckedAt: "2026-10-03",
     name: "DBeaver",
     aliases: ["数据库客户端", "sql 客户端", "DBeaver CE", "数据库工具", "SQL 客户端"],
     summary: "连上各类数据库看表、跑 SQL，社区版免费。",
@@ -132,6 +144,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "zotero",
+    linksCheckedAt: "2026-10-03",
     name: "Zotero",
     aliases: ["文献管理", "论文引用"],
     summary: "抓文献、生引用、插到 Word 或 Markdown 里。",
@@ -153,6 +166,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "obsidian",
+    linksCheckedAt: "2026-10-03",
     name: "Obsidian",
     aliases: ["笔记", "markdown 笔记", "双向链接", "知识库", "obsidian md"],
     summary: "本地 Markdown 笔记，适合长期积累和双向链接。",
@@ -178,6 +192,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "texstudio",
+    linksCheckedAt: "2026-10-03",
     name: "TeXstudio",
     aliases: ["latex", "tex", "论文排版"],
     summary: "写 LaTeX 的编辑器，公式和论文模板常用它。",
@@ -197,7 +212,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "T", color: "#008080" },
   },
   {
+    license: "GPL-3.0",
+    version: "3.6.1",
     slug: "sumatrapdf",
+    linksCheckedAt: "2026-10-03",
     name: "Sumatra PDF",
     aliases: ["pdf 阅读", "pdf", "pdf 阅读器", "轻量 pdf", "epub 阅读"],
     summary: "Windows 上很轻的 PDF 阅读器，打开快、广告没有。",
@@ -224,7 +242,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "S", color: "#C0392B" },
   },
   {
+    license: "GPL-2.0-or-later",
+    version: "3.12",
     slug: "pandoc",
+    linksCheckedAt: "2026-10-03",
     name: "Pandoc",
     aliases: ["markdown 转换", "文档转换", "格式转换", "docx 转换", "命令行转换"],
     summary: "Markdown、Word、HTML、LaTeX 之间互转。",
@@ -252,6 +273,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "figma",
+    linksCheckedAt: "2026-10-03",
     name: "Figma",
     aliases: ["界面设计", "ui", "原型", "Figma 设计", "UI 设计", "原型工具"],
     summary: "浏览器里做界面和原型，个人档免费，也有教育优惠。",
@@ -279,6 +301,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "inkscape",
+    linksCheckedAt: "2026-10-03",
     name: "Inkscape",
     aliases: ["svg", "矢量", "ai 替代", "illustrator 替代"],
     summary: "开源矢量绘图，做图标、海报和 SVG。",
@@ -306,7 +329,9 @@ export const software: SeedSoftware[] = [
     icon: { letter: "I", color: "#000000", simpleIcon: "inkscape" },
   },
   {
+    license: "GPL-3.0",
     slug: "gimp",
+    linksCheckedAt: "2026-10-03",
     name: "GIMP",
     aliases: ["修图", "photoshop 替代", "图像处理", "位图编辑"],
     summary: "开源位图编辑，裁切、合成、修照片。",
@@ -330,6 +355,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "blender",
+    linksCheckedAt: "2026-10-03",
     name: "Blender",
     aliases: ["三维", "3d", "建模", "Blender 3D", "三维建模", "建模软件"],
     summary: "开源三维：建模、动画、渲染、视频剪辑都能做。",
@@ -353,7 +379,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "B", color: "#E87D0D", simpleIcon: "blender" },
   },
   {
+    license: "GPL-3.0",
+    version: "5.3.4",
     slug: "krita",
+    linksCheckedAt: "2026-10-03",
     name: "Krita",
     aliases: ["绘画", "板绘", "插画", "数位板绘画"],
     summary: "开源绘画软件，笔刷和分层适合插画、分镜。",
@@ -382,6 +411,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "jasp",
+    linksCheckedAt: "2026-10-03",
     name: "JASP",
     aliases: ["统计", "spss 替代", "假设检验"],
     summary: "点选做常见统计，界面接近教材，开源免费。",
@@ -403,6 +433,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "rstudio",
+    linksCheckedAt: "2026-10-03",
     name: "RStudio",
     nameZh: "Posit Desktop",
     aliases: ["r 语言", "rstudio", "posit"],
@@ -423,7 +454,9 @@ export const software: SeedSoftware[] = [
     icon: { letter: "R", color: "#75AADB", simpleIcon: "rstudio" },
   },
   {
+    license: "GPL-3.0",
     slug: "octave",
+    linksCheckedAt: "2026-10-03",
     name: "GNU Octave",
     aliases: ["matlab 替代", "矩阵", "数值计算"],
     summary: "开源数值计算，语法接近 MATLAB，适合作业和原型。",
@@ -443,7 +476,9 @@ export const software: SeedSoftware[] = [
     icon: { letter: "O", color: "#0790C0", simpleIcon: "gnuoctave" },
   },
   {
+    license: "BSD-3-Clause",
     slug: "jupyter",
+    linksCheckedAt: "2026-10-03",
     name: "Jupyter",
     aliases: ["notebook", "ipynb"],
     summary: "在浏览器里交错写代码和说明，数据和教学演示常用。",
@@ -464,6 +499,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "geogebra",
+    linksCheckedAt: "2026-10-03",
     name: "GeoGebra",
     aliases: ["几何", "函数图像", "数学", "GeoGebra 数学", "函数画图", "数学工具"],
     summary: "几何、代数和函数图像，课堂演示和自己推导都能用。",
@@ -489,6 +525,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "libreoffice",
+    linksCheckedAt: "2026-10-03",
     name: "LibreOffice",
     aliases: ["writer", "calc", "office 替代", "文档"],
     summary: "开源办公套件：文档、表格、演示，能开常见 Office 文件。",
@@ -510,6 +547,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "wps",
+    linksCheckedAt: "2026-10-03",
     name: "WPS Office",
     aliases: ["wps", "金山"],
     summary: "国内常用办公套件，兼容常见 Office 格式，个人基础功能免费。",
@@ -529,7 +567,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "W", color: "#C53929" },
   },
   {
+    license: "AGPL-3.0-or-later",
+    version: "3.7.21",
     slug: "joplin",
+    linksCheckedAt: "2026-10-03",
     name: "Joplin",
     aliases: ["开源笔记", "markdown", "笔记软件", "evernote 替代"],
     summary: "开源笔记，Markdown、待办、可自己选同步方式。",
@@ -556,7 +597,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "J", color: "#1073D6" },
   },
   {
+    license: "Apache-2.0",
+    version: "1.18.2",
     slug: "localsend",
+    linksCheckedAt: "2026-10-03",
     name: "LocalSend",
     aliases: ["传文件", "隔空投送", "局域网", "本地传输", "airdrop 替代"],
     summary: "同一网络里互传文件，开源，不用账号。",
@@ -584,6 +628,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "thunderbird",
+    linksCheckedAt: "2026-10-03",
     name: "Thunderbird",
     aliases: ["邮件客户端", "邮箱", "邮件", "outlook 替代"],
     summary: "开源桌面邮件客户端，多账号、本地归档。",
@@ -607,7 +652,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "T", color: "#0A84FF", simpleIcon: "thunderbird" },
   },
   {
+    license: "GPL-2.0",
+    version: "2.2.1.5",
     slug: "librecad",
+    linksCheckedAt: "2026-10-03",
     name: "LibreCAD",
     aliases: ["cad", "二维绘图", "autocad 替代", "二维 cad", "dxf"],
     summary: "开源二维 CAD，画平面图、零件轮廓。",
@@ -635,6 +683,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "kicad",
+    linksCheckedAt: "2026-10-03",
     name: "KiCad",
     aliases: ["电路", "pcb", "原理图", "电路板设计", "EDA"],
     summary: "开源电子设计：原理图和 PCB。",
@@ -664,6 +713,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "freecad",
+    linksCheckedAt: "2026-10-03",
     name: "FreeCAD",
     aliases: ["三维 cad", "参数化", "FreeCAD 建模", "三维 CAD", "零件设计"],
     summary: "开源参数化三维 CAD，适合零件和简单装配。",
@@ -686,7 +736,9 @@ export const software: SeedSoftware[] = [
     icon: { letter: "F", color: "#418FDE", simpleIcon: "freecad" },
   },
   {
+    license: "GPL-2.0",
     slug: "qgis",
+    linksCheckedAt: "2026-10-03",
     name: "QGIS",
     aliases: ["gis", "地图", "地理信息"],
     summary: "开源地理信息桌面软件，看图层、做专题图。",
@@ -706,7 +758,10 @@ export const software: SeedSoftware[] = [
     icon: { letter: "Q", color: "#589632", simpleIcon: "qgis" },
   },
   {
+    license: "GPL-2.0",
+    version: "2021.01",
     slug: "openscad",
+    linksCheckedAt: "2026-10-03",
     name: "OpenSCAD",
     aliases: ["代码建模", "3d 打印", "脚本建模", "参数化建模"],
     summary: "用代码描述三维模型，适合精确尺寸和可重复零件。",

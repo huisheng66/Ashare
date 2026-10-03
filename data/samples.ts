@@ -3,10 +3,13 @@ import type { Software } from "./types";
 /** 新数据形态样例：脚本与开源项目（随首次灌入一起进 store） */
 export const samples: Software[] = [
   {
+    license: "Unlicense",
+    version: "2026.08.19",
     slug: "yt-dlp",
+    linksCheckedAt: "2026-10-03",
     name: "yt-dlp",
     aliases: ["ytdlp", "视频下载", "命令行下载"],
-    kind: "script",
+    kind: "opensource",
     status: "published",
     tags: ["CLI", "视频", "开源"],
     summary: "命令行视频下载脚本，支持大量站点，可只下音频或指定清晰度。",
@@ -32,7 +35,10 @@ export const samples: Software[] = [
     icon: { letter: "Y", color: "#7A57D1" },
   },
   {
+    license: "MPL-2.0",
+    version: "2.1.5",
     slug: "syncthing",
+    linksCheckedAt: "2026-10-03",
     name: "Syncthing",
     aliases: ["sync", "文件同步"],
     kind: "opensource",
@@ -62,6 +68,7 @@ export const samples: Software[] = [
   },
   {
     slug: "mineradio",
+    linksCheckedAt: "2026-10-03",
     name: "Mineradio",
     aliases: ["音乐播放器", "歌词舞台", "粒子视觉"],
     kind: "opensource",
@@ -91,7 +98,9 @@ export const samples: Software[] = [
     icon: { letter: "M", color: "#6D28D9" },
   },
   {
+    version: "4.0.1",
     slug: "audacity",
+    linksCheckedAt: "2026-10-03",
     name: "Audacity",
     aliases: ["音频剪辑", "录音剪辑", "Audacity 音频编辑器"],
     kind: "opensource",
@@ -120,7 +129,10 @@ export const samples: Software[] = [
     icon: { letter: "A", color: "#0056B3" },
   },
   {
+    license: "GPL-2.0",
+    version: "2.13.3",
     slug: "musicbrainz-picard",
+    linksCheckedAt: "2026-10-03",
     name: "MusicBrainz Picard",
     aliases: ["Picard", "音乐标签", "MusicBrainz"],
     kind: "opensource",
