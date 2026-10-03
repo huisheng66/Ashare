@@ -40,9 +40,11 @@ npm run dev                  # 或 npm run build && npm run start
 
 - 用 `--source seed` 读目录。`data/store/` 已 gitignore，克隆后只有种子。
 - 用 `--check-all` 探全站，而不是只查过期的 —— **链接昨天还正常、今天挂了，只看门槛是发现不了的**。门槛决定「什么时候必须复验」，不限制「能查什么」。
-- 用 `--flaky-ok` 豁免人工确认过的误报（Cloudflare 拦自动化的 403、本机代理超时）。不加它流水线会长期变红，人就开始习惯性忽略，真死链反而被淹没。
+- 用 `--flaky-ok` 豁免人工确认过的误报。不加它流水线会长期变红，人就开始习惯性忽略，真死链反而被淹没。
 
 探活 `github.com` 网页端常被网络策略拦住，此时自动改用 `api.github.com` 代验同一仓库 —— 否则 CI 会把 6 个正常的 GitHub 链接全判成超时。
+
+误报因环境而异：2026-10-04 实测在本机是 3 个（inkscape 与 jasp 的 Cloudflare 403、texstudio 的代理超时），**在 GitHub runner 上全部 200**。它们是本机网络环境的产物，不是站点问题。`--flaky-ok` 仍保留，作为将来 runner 换 IP 时的防护。
 
 ## 安全机制
 

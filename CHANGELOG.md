@@ -1,5 +1,32 @@
 # 变更记录
 
+## 2026-10-04 · 在真实 GitHub Actions 上验证（分支 bunny）
+
+上一轮只做了 YAML 语法检查，这轮真跑。远程 `huisheng66/Ashare`，分支已推送。
+
+**成功路径（run 37139362789，`workflow_dispatch` 手动触发）**
+
+51 个链接、**异常 0 个、35/35 条全部可达**，「巡检外链」「保留巡检报告」成功，「失败摘要」正确跳过。比本地干净：本地那 3 个异常（inkscape / jasp 的 Cloudflare 403、texstudio 的代理超时）在 runner 上**全部 200**。
+
+**这修正了此前的判断** —— 那 3 个不是站点问题，是本机网络环境的产物（代理隧道 + Cloudflare 对本机 IP 的拦截）。`--flaky-ok` 仍保留，作为将来 runner 换 IP 时的防护，但不必再把它当成「站点在拦自动化」。
+
+**失败路径（run 37140011070，注入不可解析域名后 push 触发）**
+
+先造了个假失败：注入死链后 CI 报的是 `success`。查下来是**注入方式错了** —— 改的是种子的 `officialUrl`，而 `seedToItem` 里 `links` 优先于 `officialUrl`，那 17 条有 `links` 的条目根本不看 `officialUrl`。改对位置后重跑：
+
+- 「巡检外链」→ **failure**（死链检出，退出码经 `set +e` + `${PIPESTATUS[0]}` 正确传递）
+- 「保留巡检报告」→ **success**（`if: always()` 生效，失败时工件仍上传，已下载核对内容完整）
+- 「失败摘要」→ **success**（`::error` 告警正常输出）
+
+**顺带确认的两件事**
+
+- `workflow_dispatch` 只能从默认分支触发是**过时说法**：`gh workflow run link-watch.yml --ref bunny` 直接成功，GitHub 用的是该 ref 上的工作流文件。因此不必为了手动触发而先合并到 main。
+- `push` 的 paths 过滤生效：改 `data/software.ts` 即触发，改 `README.md` 不会。
+
+**顺带发现的一处易错点**（已写进坑位库）：往种子里注入测试数据时，改 `officialUrl` 可能无效 —— **有 `links` 的条目以 `links.official` 为准**，`officialUrl` 只在缺 `links` 时才作为兜底。造测试数据前要先确认目标条目属于哪种形态。
+
+测试分支 `_ci-fail-test` 已删除，本地已回到 bunny。
+
 ## 2026-10-04 · 外链巡检接入 CI（分支 bunny）
 
 上一轮做的是脚本，这轮接进 GitHub Actions。过程中发现并修掉三个真问题。
