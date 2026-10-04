@@ -2,11 +2,11 @@
 /**
  * 收录条目：校验草稿并写入运行库 data/store/catalog.json，同步 SHA-256。
  *
- *   node scripts/ingest-item.mjs --file drafts/foo.json --dry-run
- *   node scripts/ingest-item.mjs --file drafts/foo.json
- *   node scripts/ingest-item.mjs --file drafts/补正文.json --patch   只更新草稿里写到的字段
- *   node scripts/ingest-item.mjs --file drafts/batch.json --allow-http
- *   node scripts/ingest-item.mjs --file drafts/batch.json --strict   内容质量提示升级为错误
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/foo.json --dry-run
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/foo.json
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/补正文.json --patch   只更新草稿里写到的字段
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/batch.json --allow-http
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/batch.json --strict   内容质量提示升级为错误
  *
  * --patch 用于给已有条目补内容（正文、标签、别名）：先与库中条目合并再校验，
  * 避免漏掉必填字段或覆盖掉 links / previews / icon 这些不想动的数据。
@@ -71,7 +71,7 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 // SPDX 标识的常见形态：GPL-3.0-only、MIT、Apache-2.0、MPL-2.0、LicenseRef-…
 const LICENSE_SHAPE = /^[A-Za-z0-9.+-]+(\s+AND\s+[A-Za-z0-9.+-]+)*$/;
 
-const USAGE = "用法: node scripts/ingest-item.mjs --file <草稿.json> [--dry-run] [--allow-http] [--patch] [--strict]";
+const USAGE = "用法: node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file <草稿.json> [--dry-run] [--allow-http] [--patch] [--strict]";
 
 function parseArgs(argv) {
   const args = parseFlags(argv, {

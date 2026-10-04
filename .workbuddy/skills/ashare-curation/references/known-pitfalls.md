@@ -122,3 +122,9 @@
 71. **验证失败路径别只看「跑过了」，要确认它真的会红。** 注入死链后 CI 报 success，追下去发现是注入方式错（见 70），死链压根没被探到。**绿灯必须逐项核对数字**（探了几个链接、几个异常），否则「没报错」和「没检查」分不清。
 72. **误报是环境产物，不是站点属性。** inkscape / jasp 的 Cloudflare 403 与 texstudio 的代理超时，本机复现但 GitHub runner 上全部 200。判断某个域名是否真拦自动化，要在不同环境各验一次，别把本机现象当站点特性写进文档。
 73. **`workflow_dispatch` 只能从默认分支触发是过时说法。** `gh workflow run <file> --ref <branch>` 直接成功，GitHub 用的是该 ref 上的工作流文件。所以为手动触发而先合并到 main 是多余的。
+
+## 2026-10-04 启动实机验证时补记
+
+74. **验证环境必须等于使用环境，否则等于没验。** 防盗链的六项验证是手工构造 `SESSION_SECRET=... NEXT_PUBLIC_SITE_URL=... npm run start` 跑出来的，而真实开发流程是 `npm run dev` + `.env.local`（后者没有 `NEXT_PUBLIC_SITE_URL`）。结果 **`siteHost` 为空 → 同站判断失效 → 本地开发时首屏所有图标 403**，而当时的验证全是绿的。修法是新增 `requestHost()` 拿请求自身的 host 兜底 ——「谁在访问我」不需要任何配置。**凭手工构造的环境变量验过的代码，等于没验。**
+75. **`getSiteUrl()` 在未配域名时返回 undefined 对 SEO 正确，对防盗链错误。** 两个模块共用「站点地址」这一个概念，但需求相反：SEO 要避免把 localhost 写进索引（所以宁缺勿滥），防盗链要的是「谁在访问我」（所以必须有值）。别因为看到 A 处返回 undefined 就以为 B 处也该返回 undefined。
+76. **`x-forwarded-host` 是客户端可伪造的。** 本场景不是安全关键（伪造它最多让伪造值等于 own，而真正的跨站请求其 referer 域不会因此变成 own），但仍按 `lib/guard.ts` 对 XFF 的既有约定收紧：只在 `TRUST_PROXY=1` 时采纳。

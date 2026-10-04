@@ -25,6 +25,11 @@ const CHECKS = [
   { key: "whoNot", label: "不适合", weight: 2, empty: (item) => !item.whoNot?.trim() },
   { key: "alternatives", label: "同类替代", weight: 2, empty: (item) => !item.alternatives?.length },
   { key: "official", label: "官网链接", weight: 2, empty: (item) => !item.links?.official && !item.links?.github },
+  // 许可证与核验日期是机器可校验的结构化字段。缺了它们，读者与后来的维护者
+  // 只能从正文里猜，而正文无法校验。这两项此前是监控盲区：stale-links 只看
+  // linksCheckedAt 是否过期，content:audit 完全不提，都没人报缺失。
+  { key: "license", label: "许可证", weight: 3, empty: (item) => !item.license?.trim() },
+  { key: "linksCheckedAt", label: "链接核验", weight: 2, empty: (item) => !item.linksCheckedAt?.trim() },
   { key: "previews", label: "预览图", weight: 1, empty: (item) => !item.previews?.length },
   { key: "tutorial", label: "使用教程", weight: 1, empty: (item) => !item.tutorial?.length },
 ];
