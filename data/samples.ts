@@ -27,6 +27,62 @@ export const samples: Software[] = [
       "基本用法：yt-dlp「视频链接」；只要音频加 -x。",
       "清晰度限制用 -f「bv*[height<=1080]+ba」这类格式表达式，避免下到 8K。",
     ],
+    guide: {
+      intro: "把最常用的几种下载写成可复用的命令，覆盖音频、画质与批量三种场景。",
+      markdown: `## 只取音频
+
+只要声音时用 \`-x\`，它会自动转成 m4a：
+
+\`\`\`bash
+yt-dlp -x "视频链接"
+\`\`\`
+
+转成 mp3 需要本机装有 ffmpeg，这是 yt-dlp 的硬依赖，缺了会直接报错。
+
+## 限制画质
+
+不限格式时默认取源站提供的最高画质，常常是几个 GB。加 \`-f\` 表达式限制高度：
+
+\`\`\`bash
+yt-dlp -f "bv*[height<=1080]+ba/b" "视频链接"
+\`\`\`
+
+前半段优先取 1080p 视频轨并合并音频；\`+b\` 表示同时取音频轨，末尾的 \`/b\` 是兜底格式。
+
+## 常用参数
+
+| 参数 | 作用 |
+| --- | --- |
+| \`-x\` | 只下音频并转 m4a |
+| \`-f 表达式\` | 按格式选择器挑画质 |
+| \`-o 模板\` | 自定义文件名，如 \`-o "%(title)s.%(ext)s"\` |
+| \`--no-playlist\` | 只下单个视频，跳过合集 |
+| \`--write-subs\` | 连带下载字幕 |
+
+## 批量下载
+
+把链接逐行写进文件，用 \`-a\` 批量处理；已下过的会自动跳过：
+
+\`\`\`bash
+yt-dlp -a urls.txt --no-playlist -o "%(title)s.%(ext)s"
+\`\`\`
+
+站点常改版，解析失败时先更新版本：\`yt-dlp -U\`，或重新下载 Releases 里的可执行文件。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方 README：完整选项与格式选择器",
+          url: "https://github.com/yt-dlp/yt-dlp#options",
+          note: "格式选择器的完整语法在这里，本页只列了最常用的几种。",
+        },
+        {
+          kind: "link",
+          title: "FFmpeg 安装指引",
+          url: "https://github.com/yt-dlp/FFmpeg-Builds/releases",
+          note: "要转 mp3 或合并音视频轨时必须先装 ffmpeg。",
+        },
+      ],
+    },
     whoFor: "愿意用终端、需要批量或可重复下载的人。",
     whoNot: "只想点一下按钮偶尔存个视频，命令行会觉得麻烦。",
     alternatives: [],
@@ -68,6 +124,7 @@ export const samples: Software[] = [
   },
   {
     slug: "mineradio",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-03",
     name: "Mineradio",
     aliases: ["音乐播放器", "歌词舞台", "粒子视觉"],
@@ -99,6 +156,7 @@ export const samples: Software[] = [
   },
   {
     version: "4.0.1",
+    license: "GPL-3.0",
     slug: "audacity",
     linksCheckedAt: "2026-10-03",
     name: "Audacity",
@@ -121,6 +179,53 @@ export const samples: Software[] = [
       "用「文件 → 导入」载入音频，选中波形后套用降噪等效果。",
       "用「文件 → 导出」选择格式；需要 mp3 时确认已按提示准备好编码器。",
     ],
+    guide: {
+      intro: "以「录一段口播并导出 mp3」为主线，串起降噪、剪切与导出的完整流程。",
+      markdown: `## 降噪：先处理再剪辑
+
+人声录音的底噪是后期最花时间的一环。做法是截取一小段**只有底噪**的波形，选中它，套用「效果 → 降噪/修复 → 降噪」，点「获取噪声配置」，再选中整段音频重新套一次。
+
+顺序反了会把人声一起削掉：噪声配置必须来自没有人说话的那一小段。
+
+## 常用效果链
+
+| 场景 | 效果链（按顺序） |
+| --- | --- |
+| 口播去底噪 | 降噪 → 噪声抑制 → 均衡器 |
+| 响度统一 | 压缩器 → 响度标准化 |
+| 剪辑拼接 | 剪切 → 淡入淡出 |
+
+## 导出格式
+
+「文件 → 导出」选目标格式。导出 mp3 需要本机装有 LAME 编码器，Audacity 会提示下载地址；不装就只能导出 wav。
+
+批量处理整个目录用「文件 → 批量处理」，选一个链式预设即可。
+
+## 快捷键
+
+| 操作 | 快捷键 |
+| --- | --- |
+| 播放 / 停止 | 空格 |
+| 放大到选区 | Ctrl + 1 |
+| 裁剪到选区 | Ctrl + T |
+| 撤销 | Ctrl + Z |
+
+插件是另一条路径：「效果 → 插件管理器」可安装 VST / LV2。注意 Windows 与 macOS 的插件格式不通用，装之前先确认来源平台的版本。`,
+      resources: [
+        {
+          kind: "html",
+          title: "下载页（各系统安装包与校验文件）",
+          url: "https://www.audacityteam.org/download/",
+          note: "发布页附 CHECKSUMS.txt，可校验下载完整性。",
+        },
+        {
+          kind: "link",
+          title: "官方 Wiki：Noise Reduction 使用指南",
+          url: "https://wiki.audacityteam.org/wiki/Noise_Reduction",
+          note: "降噪每一步的官方说明，含各参数含义。",
+        },
+      ],
+    },
     whoFor: "要剪掉录音里的杂音、拼接多轨声音、批量导出固定格式的人；不想为剪辑工具付订阅费的人。",
     whoNot: "要做多轨音乐混音、需要 MIDI 与虚拟乐器的人（那是 DAW 的活）；只想要一键自动成片、不想学波形编辑的人。",
     alternatives: [],

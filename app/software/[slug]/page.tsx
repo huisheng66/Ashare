@@ -7,7 +7,9 @@ import { notFound } from "next/navigation";
 import { Check, MessageSquareWarning, ShieldCheck, TicketPercent, X } from "lucide-react";
 
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { GuideSection } from "@/components/GuideSection";
 import { hostOf, ItemLinks, otherLinkCount } from "@/components/ItemLinks";
+import { LicenseNote } from "@/components/LicenseNote";
 import { OutboundLink } from "@/components/OutboundLink";
 import { SectionHeading } from "@/components/SectionHeading";
 import { FeaturedMark, SoftwareCard } from "@/components/SoftwareCard";
@@ -192,6 +194,10 @@ export default async function SoftwarePage({ params }: Props) {
               </div>
             ) : null}
 
+            {/* 许可证与渠道是两种信息，不依附「其他渠道」是否存在 ——
+                VS Code 只有官网一条渠道，挂在 others 里会跟着一起消失。 */}
+            <LicenseNote spdx={item.license} source={item.source} />
+
             <dl className="mt-4 divide-y divide-border border-t border-border">
               <Fact label="平台">{item.platforms.map((p) => platformLabel[p]).join(" · ")}</Fact>
               <Fact label="类型">{kindLabel[item.kind]}</Fact>
@@ -283,6 +289,10 @@ export default async function SoftwarePage({ params }: Props) {
                 ))}
               </ol>
             </section>
+          ) : null}
+
+          {item.guide ? (
+            <GuideSection guide={item.guide} />
           ) : null}
 
           {alts.length ? (

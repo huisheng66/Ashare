@@ -32,6 +32,9 @@ const CHECKS = [
   { key: "linksCheckedAt", label: "链接核验", weight: 2, empty: (item) => !item.linksCheckedAt?.trim() },
   { key: "previews", label: "预览图", weight: 1, empty: (item) => !item.previews?.length },
   { key: "tutorial", label: "使用教程", weight: 1, empty: (item) => !item.tutorial?.length },
+  // 详细教程是「上手步骤」的延伸：只有步骤、没有具体做法的条目，
+  // 读者遇到步骤之外的问题仍然无从下手。
+  { key: "guide", label: "详细教程", weight: 2, empty: (item) => !(item.guide?.markdown?.trim() || item.guide?.resources?.length) },
 ];
 
 const SCENE_MIN_STOCK = 3;

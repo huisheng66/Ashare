@@ -1,5 +1,68 @@
 # 变更记录
 
+## 2026-10-04 · 补齐许可证并在详情页展示（分支 bunny）
+
+上一轮把 35 条目录的 `license` 全部回填（18 条），但暴露两个问题：字段只存在后台表单、前台一个字都不展示；另有 10 条该补的没补。本轮处理两件事。
+
+**回填 7 条，18 → 25**
+
+| 条目 | SPDX | 依据 |
+|---|---|---|
+| audacity | `GPL-3.0` | 仓库 LICENSE.txt 原文 |
+| thunderbird | `MPL-2.0` | 仓库 LICENSE 与正文第 4 段 |
+| kicad | `GPL-3.0` | KiCad 官方镜像 API |
+| freecad | `LGPL-2.1` | FreeCAD 仓库 API |
+| dbeaver | `Apache-2.0` | DBeaver 仓库 API |
+| libreoffice | `MPL-2.0 OR LGPL-3.0-or-later` | 官方许可页 |
+| mineradio | `GPL-3.0` | 正文第 4 段 + 仓库 |
+
+**LibreOffice 差点填错，值得单说**：GitHub API 报 `GPL-3.0`（它取了仓库里 COPYING 那一份），但官方许可是 **MPLv2 与 LGPLv3+ 双许可**。直接用 API 的单值会丢掉「可闭源」这个对读者最关键的信息。
+
+**仍留空 10 条**：4 条专有（obsidian / figma / wps / geogebra 的非商业免费）本就无 SPDX 可写；另 6 条（inkscape / blender / texstudio / jasp / rstudio / zotero）仓库里没有 LICENSE 文件，查不到权威来源，按「不猜」原则留空。
+
+**展示：新增 `lib/license-info.ts` + `components/LicenseNote.tsx`**
+
+只给 `source === "opensource"` 显示。专有软件没有 SPDX 标识可写，非商业免费的 GeoGebra 是自家许可——给它们显示「许可证：未知」比不显示更糟，读者会以为是核验过但漏了。
+
+映射表把 SPDX 翻成一句人话（只回答「能不能闭源商用」），分三档：宽松（MIT/Apache/BSD）、弱 copyleft（LGPL/MPL，改动需开源但整体可闭源）、强 copyleft（GPL/AGPL，分发需开源）。AGPL 单独措辞——不是「用了就犯规」，而是「让用户联网访问」才触发义务，这两种情况必须分开说。
+
+支持双许可 `A OR B`（取更宽松的那个）；`AND` 与 `WITH` 不推断——都需要逐个读原文才能判断，一条通用提示语会给出错误的宽松/严格结论。
+
+**一个位置错误**
+
+许可证行最初挂在「其他渠道」区块里，结果只有官网一条渠道的条目（VS Code / DBeaver / LibreOffice）完全不显示。**信息不该依附于「其他渠道」是否存在**，已提到页面里独立渲染。
+
+**测试 12 项，其中一条是交叉核对**
+
+「运行库里每条 license 都必须有对应展示文案」——这条立刻抓到两个缺口：LGPL-2.1 的简写形式没在表里、LibreOffice 的双许可无法解析。这类失配（数据正常但页面静默不显示）只有靠交叉核对才发现。
+
+顺带修了 `tests/seed.test.mjs`：我自写的 SPDX 正则不支持 `OR`，把 LibreOffice 判成非法。改为把表达式交给 `describeLicense` 判定，不自己写正则。
+
+**验证**：`npm run check` 125 全过（新增 12）· `npm run verify:report` 66 条引用 0 问题 · `seed:drift` 0 不一致 · 实机验证 8 个开源条目显示正确（含双许可与三档措辞）、5 个专有/未核验条目确认不显示。
+
+## 2026-10-04 · 详情页新增「详细教程」区块（分支 bunny）
+
+在「上手步骤」和「同类替代」之间插入详细教程，支持 Markdown 正文与 PDF / 网页 / 插图 / 链接四类配套资料。
+
+**为什么加**：上手步骤回答「怎么开始」，但读者真正卡住的是步骤之外的具体问题 —— 某个参数怎么写、某个报错怎么处理。新增区块正好补上这一段，且不改动既有「先回答该不该用」的叙事顺序。
+
+**Markdown 为什么自己解析**（`lib/markdown.ts`）：教程正文由后台表单录入，属于半可控输入。引三方库要拖进一整套 HTML 清洗，用 `dangerouslySetInnerHTML` 拼字符串则把清洗责任全交给正则 —— 嵌套标签、属性里的引号、转义边界，正则都覆盖不全。改为**解析成 AST 交给 React 渲染**，不解析的字符一律当纯文本，根本没有注入面。代价是只支持明确子集：标题、段落、列表、围栏代码块、引用、水平线、表格，以及行内代码 / 粗体 / 斜体 / 链接 / 图片。
+
+**链接白名单比语法更重要**：行内链接与图片都过 `safeHref` / `safeImageSrc`，只收 https 与上传流程生成的站内 `/media/` 路径。实测 `javascript:alert(1)`、`data:text/html`、`<img onerror>`、`<iframe>` 全部降级为纯文本，不产出任何可点或可执行节点。
+
+**踩到的两个真bug**（都是测试先发现的）：
+
+1. 链接正则里的 `[^)]+` 会在 `javascript:alert(1)` 处提前截断，残留的 `)` 漏进正文；同时它也表达不了 URL 里合法的成对括号（维基类链接很常见）。改为按括号配平截取。
+2. 未闭合的 ``` 围栏会一路读到文末，把整篇剩余内容吞进代码块——而我原来的注释恰好声称「不吞掉后面的内容」。改为遇到空行即收尾。
+
+**顺带发现并修掉的工具链问题**：新增的 `lib/guide.ts` / `lib/markdown.ts` 之间有运行时导入，而 `node --test` 靠类型擦除直接跑 `.ts`，相对导入必须带 `.ts` 后缀才能被 Node 解析——项目里原本靠「不跨模块导入运行时值」绕开（见 `lib/click-analytics.ts` 注释）。开启 `allowImportingTsExtensions`（`noEmit` 已开，是官方支持的组合）后无需复制白名单，`npm run typecheck` 无回归。
+
+**监控接入**：教程正文与资料里的外链一并纳入 `stale-links` 探活。核验日期是全条目共用的一个，只探 `links` 会让教程链接烂掉却始终显示「新鲜」；`content:audit` 也新增「详细教程」内容债项（权重 2）。
+
+**验证**：`npm run check` 113 项全过（新增 `tests/guide.test.mjs` 17 项）· `npm run verify:report` 66 条引用 0 问题 · 实机 curl 确认区块顺序为「上手步骤 → 详细教程 → 同类替代」，目录 / 表格 / 代码块正常渲染、无残留 Markdown 标记 · 无教程的老条目不渲染该区块（存量数据零迁移）。
+
+> 注：`data/software.ts` 里 LibreOffice 的 `license: "MPL-2.0 OR LGPL-3.0-or-later"` 会让 `tests/seed.test.mjs` 的 SPDX 校验失败 —— 该校验只认单个标识与 `AND`，不认合法的 `OR` 表达式。与本次改动无关，留给许可证回填的任务一并处理。
+
 ## 2026-10-04 · 修复防盗链在本地开发时全站 403（分支 bunny）
 
 启动应用做实机验证时发现：curl 带同站 Referer 请求图标返回 403。

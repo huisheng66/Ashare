@@ -120,6 +120,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "dbeaver",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-03",
     name: "DBeaver",
     aliases: ["数据库客户端", "sql 客户端", "DBeaver CE", "数据库工具", "SQL 客户端"],
@@ -525,6 +526,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "libreoffice",
+    license: "MPL-2.0 OR LGPL-3.0-or-later",
     linksCheckedAt: "2026-10-03",
     name: "LibreOffice",
     aliases: ["writer", "calc", "office 替代", "文档"],
@@ -628,6 +630,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "thunderbird",
+    license: "MPL-2.0",
     linksCheckedAt: "2026-10-03",
     name: "Thunderbird",
     aliases: ["邮件客户端", "邮箱", "邮件", "outlook 替代"],
@@ -683,6 +686,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "kicad",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-03",
     name: "KiCad",
     aliases: ["电路", "pcb", "原理图", "电路板设计", "EDA"],
@@ -713,6 +717,7 @@ export const software: SeedSoftware[] = [
   },
   {
     slug: "freecad",
+    license: "LGPL-2.1",
     linksCheckedAt: "2026-10-03",
     name: "FreeCAD",
     aliases: ["三维 cad", "参数化", "FreeCAD 建模", "三维 CAD", "零件设计"],

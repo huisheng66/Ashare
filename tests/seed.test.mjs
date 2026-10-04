@@ -83,13 +83,25 @@ test("种子条目的正文若非空，至少两段且不含 Markdown 标题", (
   }
 });
 
-test("种子里的许可证与核验日期格式合法", () => {
+test("种子里的许可证与核验日期格式合法", async () => {
   // SPDX 标识的常见形态；核验不到时应当整字段留空，而不是填「未知」之类占位。
-  const LICENSE = /^[A-Za-z0-9.+-]+(\s+AND\s+[A-Za-z0-9.+-]+)*$/;
+  // 表达式（A OR B、A WITH B）交给 describeLicense 判定，不自己写正则 ——
+  // 自写的那版漏掉了 OR，LibreOffice 的双许可被误判为非法。
+  const { describeLicense } = await import("../lib/license-info.ts");
   for (const entry of seed) {
     if (entry.license !== undefined) {
       assert.ok(entry.license, `${entry.slug} 的 license 不应为空字符串`);
-      assert.match(entry.license, LICENSE, `${entry.slug} 的 license「${entry.license}」不像 SPDX 标识`);
+      // 单个标识必须能被认出来；双许可允许无法推断（AND/WITH），
+      // 但至少不能是空白或明显不是标识的东西。
+      const looksLikeSpdx = /^[A-Za-z0-9.+-]+(\s+(OR|AND|WITH)\s+[A-Za-z0-9.+-]+)*$/.test(entry.license);
+      assert.ok(
+        looksLikeSpdx,
+        `${entry.slug} 的 license「${entry.license}」不像 SPDX 标识`,
+      );
+      // 凡是单个（非表达式）标识，都必须有对应的展示文案，否则前台会静默不显示。
+      if (!/\s+(OR|AND|WITH)\s+/.test(entry.license)) {
+        assert.ok(describeLicense(entry.license), `${entry.slug} 的 license「${entry.license}」缺少展示文案`);
+      }
     }
     if (entry.linksCheckedAt !== undefined) {
       assert.match(entry.linksCheckedAt, /^\d{4}-\d{2}-\d{2}$/, `${entry.slug} 的 linksCheckedAt 应为 YYYY-MM-DD`);

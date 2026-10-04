@@ -13,6 +13,9 @@ export function otherLinkCount(links: ItemLinksData, primaryUrl: string): number
 /**
  * 获取渠道：官网 → 产品主页 → GitHub → 已核验镜像。
  * 没有说明的镜像不展示 —— 无法核验的镜像与盗版网盘只有一线之隔。
+ *
+ * 许可证说明不在这里：它是独立信息，由页面单独渲染。只有官网一条渠道的条目
+ * （如 VS Code）没有「其他渠道」区块，挂在里面会跟着一起消失。
  */
 export function ItemLinks({ links, exclude, slug }: { links: ItemLinksData; exclude?: string; slug: string }) {
   const rows = linkChannels(links).filter((c) => c.url !== exclude && isVerifiedMirror(c));

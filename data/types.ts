@@ -34,6 +34,39 @@ export type ItemLinks = {
   diskNote?: string;
 };
 
+/**
+ * 教程资源形态。决定图标、角标与打开方式，不影响存储结构。
+ *
+ * 分成这五种而不是笼统的「附件」，是因为读者的动作不同：
+ * markdown 要在页面上读，pdf / html 要新标签打开看，
+ * image 是插图（只能站内，外链图会被 CSP 挡掉），link 只是延伸阅读。
+ */
+export type GuideResourceKind = "markdown" | "pdf" | "html" | "image" | "link";
+
+export type GuideResource = {
+  kind: GuideResourceKind;
+  /** 展示标题，如「官方使用手册」 */
+  title: string;
+  /** https 外链；markdown 另允许站内 /media/ 文件，image 只允许站内 */
+  url: string;
+  /** 一句话说明：这个资源解决什么问题 */
+  note?: string;
+};
+
+/**
+ * 详细教程。放在「上手步骤」之后、「同类替代」之前：
+ * 步骤回答「怎么开始」，教程回答「遇到具体问题怎么办」。
+ *
+ * `markdown` 是站内渲染的正文（不是纯文本 —— 需要小标题、代码块与行内链接），
+ * `resources` 是配套的 PDF / HTML 手册与插图。
+ */
+export type Guide = {
+  /** 一句话导读，说明这篇教程覆盖到哪一步 */
+  intro?: string;
+  markdown?: string;
+  resources: GuideResource[];
+};
+
 export type Software = {
   slug: string;
   name: string;
@@ -51,6 +84,8 @@ export type Software = {
   price?: string;
   links: ItemLinks;
   tutorial: string[];
+  /** 详细教程。缺省即前台不渲染该区块，无需迁移存量数据。 */
+  guide?: Guide;
   whoFor: string;
   whoNot: string;
   discountNote?: string;
@@ -125,6 +160,8 @@ export type SeedSoftware = {
   whoNot: string;
   installTips: string[];
   alternatives: string[];
+  /** 可选：详细教程。缺省即前台不渲染该区块。 */
+  guide?: Guide;
   featured?: boolean;
   icon: {
     letter: string;
