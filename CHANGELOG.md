@@ -22,7 +22,9 @@
 
 **展示：新增 `lib/license-info.ts` + `components/LicenseNote.tsx`**
 
-只给 `source === "opensource"` 显示。专有软件没有 SPDX 标识可写，非商业免费的 GeoGebra 是自家许可——给它们显示「许可证：未知」比不显示更糟，读者会以为是核验过但漏了。
+只给 `source === "opensource"` 显示。专有软件没有 SPDX 标识可写，非商业免费的 GeoGebra 是自家许可——给它们挂一个「未知」比不显示更糟，读者会以为是核验过但漏了。
+
+行内不加「许可证：」前缀：天平图标已经说明了这是什么，重复一遍是噪音。
 
 映射表把 SPDX 翻成一句人话（只回答「能不能闭源商用」），分三档：宽松（MIT/Apache/BSD）、弱 copyleft（LGPL/MPL，改动需开源但整体可闭源）、强 copyleft（GPL/AGPL，分发需开源）。AGPL 单独措辞——不是「用了就犯规」，而是「让用户联网访问」才触发义务，这两种情况必须分开说。
 
