@@ -1,7 +1,12 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { decideHotlink, hotlinkBlockedResponse, hotlinkOptionsFromEnv } from "@/lib/hotlink";
+import {
+  decideHotlink,
+  hotlinkBlockedResponse,
+  hotlinkOptionsFromEnv,
+  requestHost,
+} from "@/lib/hotlink";
 import { SLUG_PATTERN } from "@/lib/input-validation";
 
 const ICON_DIR = path.join(process.cwd(), "data", "icons");
@@ -9,7 +14,11 @@ const ICON_DIR = path.join(process.cwd(), "data", "icons");
 export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!SLUG_PATTERN.test(slug)) return new Response(null, { status: 404 });
-  if (!decideHotlink(request.headers.get("referer"), hotlinkOptionsFromEnv()).allowed) {
+  // 配置了 NEXT_PUBLIC_SITE_URL 就以它为准；没配则用请求自身的 host 兜底，
+  // 否则本地开发时同站 Referer 也会被拒（siteHost 为空时同站判断无从下手）。
+  const options = hotlinkOptionsFromEnv();
+  if (!options.siteHost) options.siteHost = requestHost(request);
+  if (!decideHotlink(request.headers.get("referer"), options).allowed) {
     return hotlinkBlockedResponse();
   }
   try {

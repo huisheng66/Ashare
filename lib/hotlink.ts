@@ -103,6 +103,30 @@ export function hotlinkOptionsFromEnv(env: NodeJS.ProcessEnv = process.env): Hot
 }
 
 /**
+ * 取请求自身的 host，用作 `NEXT_PUBLIC_SITE_URL` 缺失时的兜底。
+ *
+ * `getSiteUrl()` 在未配置正式域名时返回 undefined —— 对 SEO 是对的（避免把
+ * localhost 写进索引），但对防盗链是错的：拿不到 siteHost 时同站判断直接失效，
+ * 结果是**本地开发时首屏图标全部 403**（curl 测同站 Referer 也是 403）。
+ *
+ * 请求自身的 host 正是「谁在访问我」，不需要任何配置。
+ *
+ * `x-forwarded-host` 只在 TRUST_PROXY=1 时采纳，与 lib/guard.ts 的 XFF 约定一致。
+ * 这一点在本场景不是安全关键：伪造它最多让伪造值等于 own，从而放过一个**本来
+ * 就来自本站 Referer 域**的请求；真正的跨站请求其 referer 域不会因此变成 own。
+ * 仍按约定收紧，避免在反向代理后部署时行为与文档不符。
+ */
+export function requestHost(request: Request, env: NodeJS.ProcessEnv = process.env): string {
+  const trustedProxy = env.TRUST_PROXY === "1";
+  const raw = (trustedProxy ? request.headers.get("x-forwarded-host") : null)
+    ?? request.headers.get("host")
+    ?? "";
+  // X-Forwarded-Host 可能是逗号分隔的代理链，取第一段。
+  const first = raw.split(",")[0]?.trim() ?? "";
+  return normalizeHost(first);
+}
+
+/**
  * 被拒绝时的响应。
  * 返回 403 而不是 404：图片确实存在，假装不存在只会让排障变难。
  * 附带 CORP 头，浏览器层面同样拒绝跨站读取（无 Referer 直开不受影响）。

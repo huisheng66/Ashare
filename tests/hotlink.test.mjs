@@ -76,3 +76,47 @@ test("blocked responses are not cacheable and stay uncrawlable", () => {
   assert.equal(res.headers.get("x-robots-tag"), "noindex");
   assert.equal(res.headers.get("cross-origin-resource-policy"), "same-origin");
 });
+
+test("requestHost falls back to the request host when the site url is unset", async () => {
+  // 回归：NEXT_PUBLIC_SITE_URL 未配置时 siteHost 为空，同站判断直接失效 ——
+  // 本地开发时首屏图标全部 403。请求自身的 host 正是「谁在访问我」，不需要配置。
+  const { requestHost } = await import("../lib/hotlink.ts");
+  const req = (headers) => new Request("https://ashare.example/icons/a.svg", { headers });
+
+  assert.equal(requestHost(req({ host: "localhost:3000" })), "localhost:3000");
+  // normalizeHost 会剥掉 www. 与末尾的点，端口保留（localhost:3000 要能对上 origin）。
+  assert.equal(requestHost(req({ host: "www.Ashare.Example." })), "ashare.example");
+  // X-Forwarded-Host 默认不采纳：它由客户端可伪造，只在 TRUST_PROXY=1 时可信。
+  assert.equal(requestHost(req({ host: "a.example", "x-forwarded-host": "b.example" })), "a.example");
+  assert.equal(
+    requestHost(req({ host: "a.example", "x-forwarded-host": "b.example" }), { TRUST_PROXY: "1" }),
+    "b.example",
+  );
+  // 代理链取第一段。
+  assert.equal(
+    requestHost(req({ host: "a.example", "x-forwarded-host": "b.example, c.example" }), { TRUST_PROXY: "1" }),
+    "b.example",
+  );
+  // 没有 host 头时不应抛错。
+  assert.equal(requestHost(req({})), "");
+});
+
+test("decideHotlink allows a same-site referer once the host is filled in", async () => {
+  // 路由的接法：配置缺失时用 requestHost 补上，然后同站必须放行。
+  const { decideHotlink, hotlinkOptionsFromEnv, requestHost } = await import("../lib/hotlink.ts");
+  const req = new Request("http://localhost:3000/icons/a.svg", {
+    headers: { host: "localhost:3000", referer: "http://localhost:3000/software/vscode" },
+  });
+  const options = hotlinkOptionsFromEnv({});
+  assert.equal(options.siteHost, "", "前提：未配置时 siteHost 为空");
+  options.siteHost = requestHost(req, {});
+  assert.equal(decideHotlink(req.headers.get("referer"), options).allowed, true);
+
+  // 补上 host 之后，跨站仍然必须被拒。
+  const cross = new Request("http://localhost:3000/icons/a.svg", {
+    headers: { host: "localhost:3000", referer: "https://evil.example.com/" },
+  });
+  const options2 = hotlinkOptionsFromEnv({});
+  options2.siteHost = requestHost(cross, {});
+  assert.equal(decideHotlink(cross.headers.get("referer"), options2).allowed, false);
+});

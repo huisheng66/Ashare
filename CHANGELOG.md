@@ -1,5 +1,21 @@
 # 变更记录
 
+## 2026-10-04 · 修复防盗链在本地开发时全站 403（分支 bunny）
+
+启动应用做实机验证时发现：curl 带同站 Referer 请求图标返回 403。
+
+**根因**：`hotlinkOptionsFromEnv()` 只读 `NEXT_PUBLIC_SITE_URL`（`lib/hotlink.ts:89`），而 `.env.local` 里没配这个变量 —— `siteHost` 为空，`decideHotlink` 的同站判断（`lib/hotlink.ts:77`）直接失效。结果**本地开发时首屏所有图标都是 403**。
+
+**为什么前几轮没发现**：那轮我是在 `SESSION_SECRET=... npm run start` 下手工构造了 `NEXT_PUBLIC_SITE_URL` 才做的六项验证，而真实开发流程是 `npm run dev` + `.env.local`。**验的环境不是实际使用的环境，等于没验。**
+
+**修法**：新增 `requestHost()`（`lib/hotlink.ts:119-131`），拿请求自身的 host 作兜底 ——「谁在访问我」本来不需要任何配置。两个路由改为「配置缺失时用 requestHost 补上」（`app/icons/[slug]/route.ts:17-19`、`app/media/[...path]/route.ts:19-21`）。`x-forwarded-host` 只在 `TRUST_PROXY=1` 时采纳，与 `lib/guard.ts` 对 XFF 的既有约定一致。
+
+**顺带验证**：伪装 Referer（`evilashare.example`、`ashare.example.evil.com`）仍 403；伪造 `X-Forwarded-Host` 不被采纳；同站子域名（`sub.localhost:3000`）放行（子域名本就是自己人）。
+
+**顺带被报告防线拦住**：修完代码后 `npm run check` 报 9 处行号漂移 —— 正是上一轮建的 `verify-report-refs` 起作用。新增 `requestHost` 使 `lib/hotlink.ts` 之后 24 行全部下移（110→134、112→136、115→139…），报告与预期表已同步。这也再次说明：改了被报告引用的代码，必须同步更新行号，否则 `npm run check` 会拦。
+
+**验证**：`npm run check` 96 全过 · `npm run verify:report` 62 条引用 0 问题 · 实机 curl 六项全部符合预期。
+
 ## 2026-10-04 · 在真实 GitHub Actions 上验证（分支 bunny）
 
 上一轮只做了 YAML 语法检查，这轮真跑。远程 `huisheng66/Ashare`，分支已推送。
