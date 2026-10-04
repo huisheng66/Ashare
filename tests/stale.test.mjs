@@ -160,3 +160,52 @@ test("种子形态必须过 seedToItem，否则漏掉半数外链（回归）", 
   }
   assert.ok(count(fromSeed) >= count(software), "转换后链接数不应少于原始种子");
 });
+
+test("优化改进报告里的行号引用与当前代码一致", async () => {
+  // 报告里的「精确到代码行」是它的全部价值所在。代码一改，行号就会漂，
+  // 而漂了的报告比没有报告更糟——它会让人按错误的位置去改代码。
+  // 这条测试把 scripts/verify-report-refs.mjs 的核心检查搬进 npm run check。
+  const { readFile } = await import("node:fs/promises");
+  const { existsSync } = await import("node:fs");
+
+  const verifier = await readFile(new URL("../scripts/verify-report-refs.mjs", import.meta.url), "utf8");
+  const reportPath = new URL("../docs/优化改进报告.md", import.meta.url);
+  if (!existsSync(reportPath)) return; // 报告未纳入仓库时跳过
+
+  const report = await readFile(reportPath, "utf8");
+
+  // 从核对脚本里解析出预期表，逐条验证「行号存在且内容含关键词」。
+  const block = /const EXPECT = \{([\s\S]*?)\n\};/.exec(verifier);
+  assert.ok(block, "核对脚本里应能找到 EXPECT 表");
+  const entries = [...block[1].matchAll(/"([^"]+:\d+)":\s*\[([^\]]+)\]/g)];
+  assert.ok(entries.length >= 50, `EXPECT 表应有 50 条以上，实际 ${entries.length}`);
+
+  const stale = [];
+  for (const [, ref, keywordsRaw] of entries) {
+    const idx = ref.lastIndexOf(":");
+    const file = ref.slice(0, idx);
+    const line = Number(ref.slice(idx + 1));
+    if (!existsSync(new URL(`../${file}`, import.meta.url))) {
+      stale.push(`${ref}：文件不存在`);
+      continue;
+    }
+    const lines = (await readFile(new URL(`../${file}`, import.meta.url), "utf8")).split("\n");
+    if (line > lines.length) {
+      stale.push(`${ref}：超出 ${lines.length} 行`);
+      continue;
+    }
+    const keywords = [...keywordsRaw.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+    const content = lines[line - 1] ?? "";
+    if (!keywords.some((k) => content.includes(k))) {
+      stale.push(`${ref}：该行是「${content.trim().slice(0, 40)}」`);
+    }
+  }
+
+  // 报告里出现的引用数应与 EXPECT 表相当（防止新增引用忘记登记）。
+  const refsInReport = new Set(
+    [...report.matchAll(/`([A-Za-z0-9_./[\]-]+\.(?:ts|tsx|mjs|yml|json)):(\d+)/g)].map((m) => `${m[1]}:${m[2]}`),
+  );
+  assert.ok(refsInReport.size >= 40, `报告里应至少有 40 处行号引用，实际 ${refsInReport.size}`);
+
+  assert.deepEqual(stale, [], `报告行号已漂移（${stale.length} 处）：\n  ${stale.join("\n  ")}`);
+});
