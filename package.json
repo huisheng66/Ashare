@@ -15,6 +15,10 @@
     "content:audit": "node scripts/content-audit.mjs",
     "smoke:detail": "node scripts/smoke-detail.mjs",
     "seed:drift": "node scripts/seed-drift.mjs",
+    "seed:guides": "node scripts/seed-guides.mjs",
+    "seed:sync": "node scripts/seed-sync.mjs",
+    "merge:guides": "node scripts/merge-guides.mjs",
+    "add:trending": "node scripts/add-trending.mjs",
     "stale-links": "node scripts/stale-links.mjs",
     "verify:report": "node scripts/verify-report-refs.mjs"
   },

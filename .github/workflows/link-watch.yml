@@ -22,11 +22,20 @@ on:
         type: string
   push:
     # 改到链接相关的数据时立刻验一次，不用等明天。
+    #
+    # 列表必须覆盖 stale-links.mjs 的**全部依赖**，不只是直接引用的那几个：
+    # lib/guide.ts 决定教程里哪些链接会被探活（漏了它，改了教程也不验）；
+    # lib/seed.ts 决定种子形态怎么转成条目（种子走 --source seed 路径必经）；
+    # scripts/_shared.mjs 提供 safeFetch 与 GitHub 代验。
+    # 漏掉任何一个的后果都一样：改了它，CI 不响，缺陷静默溜过去。
     paths:
       - "data/software.ts"
       - "data/samples.ts"
       - "scripts/stale-links.mjs"
+      - "scripts/_shared.mjs"
       - "lib/stale.ts"
+      - "lib/guide.ts"
+      - "lib/seed.ts"
       - "lib/links.ts"
       - ".github/workflows/link-watch.yml"
 
