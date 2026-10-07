@@ -15,9 +15,12 @@ import { searchSoftware, toCatalogItem } from "./items.ts";
 import { getCatalogAll } from "./store.ts";
 
 /**
- * 目录读路径门面：按 STORE_DRIVER 在「SQL 下推」与「内存全量」之间转发。
+ * 目录读路径门面：默认 SQL 下推，STORE_DRIVER=json 退回内存全量。
  *
- * 为什么保留内存实现：它是回滚路径，也是没有数据库的测试路径。
+ * 两个门面的判定必须一致（都是 `!== "json"`）：store 走 json 而catalog 走 SQL
+ * 会让写入与读取落在两份数据上 —— 那是静默的数据分裂，不是配置错误。
+ *
+ * 内存实现是回滚路径，也是没有数据库的测试路径，所以保留而不是删。
  * 但**请求路径不该调用 allPublished()** —— 它是 O(N) 的读，条目几何增长后第一个炸的就是它。
  * 请求路径请用 queryCatalog / getSoftware / byScene / catalogCounts / featuredCatalog。
  */
@@ -32,8 +35,9 @@ export const PAGE_SIZE = (() => {
   return Number.isInteger(raw) && raw > 0 && raw <= 500 ? raw : 60;
 })();
 
+/** 与 lib/store.ts 的 mysqlDriver 保持同一判定，两处不能各写一份。 */
 function mysqlDriver(): boolean {
-  return process.env.STORE_DRIVER === "mysql";
+  return process.env.STORE_DRIVER !== "json";
 }
 
 /** 整份已发布目录。O(N)：只给「确实需要全部」的地方（搜索、回滚路径）。 */

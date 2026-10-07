@@ -12,7 +12,7 @@ import { normalizeItems } from "./normalize";
 import { seedToItem } from "./seed";
 
 /**
- * 本机 JSON 运行库实现（STORE_DRIVER 未设为 mysql 时的默认路径）。
+ * 本机 JSON 运行库实现 —— **回滚路径**，仅 STORE_DRIVER=json 时生效。
  *
  * 这是迁移前的原实现，P4 起由 lib/store.ts 按驱动转发进来；P11 会连同 lib/json-store.ts 一起删除。
  * server-only 只挂在门面 lib/store.ts 上：本文件要能被测试直接 import（见 tests/admin-actions.test.mjs）。
