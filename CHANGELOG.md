@@ -1,5 +1,32 @@
 # 变更记录
 
+## 2026-10-07 · .mjs 语法闸门改用 tsc，脱离对 spawn 的依赖（分支 bunny）
+
+提交前跑全量校验，发现 `tests/script-syntax.test.mjs` 失败。查下去不是脚本里有TS 语法
+（`node --check` 逐个文件都过），而是**这个闸门在本机根本无法运行**。
+
+**根因**：它用 `execFileSync(process.execPath, ["--check", file])` 逐文件起子进程。
+而本机**任何** spawn 都返回 `EBUSY` —— 不只是 node，`cmd /c echo hi` 也一样。
+沙箱内外、系统 node 与托管 node，全都复现。
+
+于是这个闸门有两重问题：在spawn 受限的环境里**永远红**，而「一直红」的闸门
+等于没有闸门 —— 它看起来在保护 `.mjs`，实际只是在制造噪声。真出现语法错误时，
+没人会当回事。
+
+**换判据，不换意图**：改用 TypeScript 编译器的语法诊断（`createProgram` +
+`getSyntacticDiagnostics`）。理由是它和 `node --check` 用的是同一套解析器
+（V8 之前的那层），但纯进程内、不起子进程、没有环境依赖。实测三类 TS 语法
+（`as`断言、`: Type` 标注、`import { type X }`）全部检出，正常文件零误报。
+
+**验证闸门本身有效**：往`scripts/user-manage.mjs` 注入三种 TS 语法，
+确认三个诊断都报出来 —— 否则很容易写出一个永远绿的测试，那比没有测试更坏。
+
+顺带补一个覆盖面断言。扫描逻辑坏掉时最危险的表现是「扫到 0 个文件，全绿」，
+所以钉住几个必须扫到的文件。
+
+**改动**：`tests/script-syntax.test.mjs`（判据换tsc，新增覆盖面断言）。
+**验证**：`npm run check` 230 项（187 过 / 43 跳过 / 0 失败）· `npm run test:db` 48/48。
+
 ## 2026-10-07 · MySQL P10d：种子不导出，改为把漂移检查做严（分支 bunny）
 
 计划里 P10 写着「种子降级为导出产物」。动手前先判断可行性，结论是**不该做**：
