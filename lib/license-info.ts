@@ -34,6 +34,10 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   Zlib: { summary: "允许商用闭源分发", tier: "permissive", allowsClosedSource: true },
   "BSL-1.0": { summary: "允许商用闭源分发", tier: "permissive", allowsClosedSource: true },
   "0BSD": { summary: "公有领域等价", tier: "permissive", allowsClosedSource: true },
+  // 内容许可，不是软件许可，但同属宽松档：CC-BY 只要求署名，不要求衍生作品开源。
+  // 实测 free-programming-books 用它——书单仓库按 CC BY 4.0 发布，
+  // 不写进表里前台就静默不显示，读者会以为没核过。
+  "CC-BY-4.0": { summary: "允许商用闭源分发，需署名", tier: "permissive", allowsClosedSource: true },
 
   // 弱 copyleft：改动部分开源，整体可闭源
   "LGPL-2.1": { summary: "改动需开源，动态链接不传染", tier: "weak-copyleft", allowsClosedSource: true },

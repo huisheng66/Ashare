@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { software as seed } from "../data/software.ts";
 import { seedToItem } from "../lib/seed.ts";
+import { describeSourceKind, isValidSourceKind } from "../lib/semantics.ts";
 
 const baseSeed = {
   slug: "x-tool",
@@ -62,15 +63,24 @@ test("种子里写了正文的条目，全新部署后仍然带正文（不再�
   }
 });
 
-test("标了 opensource 的种子不允许显式 kind 为闭源类型，反之亦然", () => {
+test("显式写了 kind 的种子，其 source/kind 组合必须在语义矩阵内", () => {
+  // 早先的版本断言「source=opensource 就必须是 kind=opensource」，
+  // 那条约束过严：opensource + app 是 lib/semantics.ts 里明确允许的组合
+  // （「开源但以应用形态分发的工具」），也是覆盖 inferKind推导值的正规手段。
+  //
+  // n8n 就是这个用法：它是 fair-code，不是 OSI 开源，却因源码公开
+  // 而标了 source=opensource；若不加显式 kind，就会被推成 kind=opensource、
+  // 前台挂出「开源」徽章，与正文「n8n 不是 OSI 意义上的开源软件」矛盾。
+  //
+  // 真正该守的是**组合合法**，而不是某个字段的固定搭配 ——
+  // 合法性由 validateSemantics() 判定，不在这里重写一遍矩阵。
   for (const entry of seed) {
     if (!entry.kind) continue;
-    if (entry.kind === "opensource") {
-      assert.equal(entry.source, "opensource", `${entry.slug} 标了 kind=opensource 但 source 不是 opensource`);
-    }
-    if (entry.source === "opensource") {
-      assert.equal(entry.kind, "opensource", `${entry.slug} 标了 source=opensource 但 kind 是 ${entry.kind}`);
-    }
+    assert.ok(
+      isValidSourceKind(entry.source, entry.kind),
+      `${entry.slug} 的 source=${entry.source} + kind=${entry.kind} 不是合法组合` +
+        `（${describeSourceKind(entry.source, entry.kind)}）`,
+    );
   }
 });
 
@@ -132,3 +142,48 @@ test("漂移检测的字段清单覆盖全部可透传字段", async () => {
     assert.ok(compared.has(field), `seed-drift 的 COMPARE 漏了 ${field}，该字段的漂移将无法被发现`);
   }
 });
+
+test("seed-sync 的同步字段覆盖漂移检测的全部字段", async () => {
+  // 背景：seed-sync 早期只同步 guide，于是改了 body / summary 会被静默忽略——
+  // 运行库留旧值，seed:drift 报出不一致，而 seed-sync 又说「已是最新」，
+  // 两个脚本互相甩锅，只能靠人肉比对JSON 才发现。
+  //
+  // 这条测试锁住两个脚本的字段清单必须一致：**漂移能查出来的，同步就必须能修。**
+  const { readFile } = await import("node:fs/promises");
+  const drift = await readFile(new URL("../scripts/seed-drift.mjs", import.meta.url), "utf8");
+  const sync = await readFile(new URL("../scripts/seed-sync.mjs", import.meta.url), "utf8");
+
+  const driftMatch = /const COMPARE = \[([\s\S]*?)\]/.exec(drift);
+  const syncMatch = /const SYNCED_FIELDS = \[([\s\S]*?)\]/.exec(sync);
+  assert.ok(driftMatch, "seed-drift.mjs 里应能找到 COMPARE 数组");
+  assert.ok(syncMatch, "seed-sync.mjs 里应能找到 SYNCED_FIELDS 数组");
+
+  const toSet = (body) =>
+    new Set(
+      body.split(",")
+        .map((s) => s.trim().replace(/^["']|["']$/g, ""))
+        .filter(Boolean),
+    );
+
+  const compared = toSet(driftMatch[1]);
+  const synced = toSet(syncMatch[1]);
+
+  // price 有意不同步：它是商业信息，可能由后台按谈判结果维护，
+  // 种子里的值只是录入时的快照，合法地与运行库不同。
+  //
+  // license 与 kind 曾被列在这里，判断是错的，两者已移入 SYNCED_FIELDS：
+  //   - license 是项目自身的客观属性，后台无从手工裁定；
+  //   - kind 需要在种子里显式覆盖推导值（如 n8n 是 fair-code，
+  //     不能让 seedToItem 按 source 推成 "opensource"），
+  //     不同步的话种子里的修正永远传不到运行库。
+  const intentionallyManual = new Set(["price"]);
+
+  const missing = [...compared].filter((f) => !synced.has(f) && !intentionallyManual.has(f));
+
+  assert.deepEqual(
+    missing,
+    [],
+    `这些字段漂移检查会报，但 seed-sync 不同步，修不掉：${missing.join(", ")}`,
+  );
+});
+
