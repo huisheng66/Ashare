@@ -6,9 +6,8 @@ import { FeaturedIndex } from "@/components/FeaturedIndex";
 import { SceneGrid } from "@/components/SceneGrid";
 import { SearchPanel } from "@/components/SearchPanel";
 import { SectionHeading } from "@/components/SectionHeading";
-import { allPublished, catalogCounts } from "@/lib/catalog";
-import { parseCatalogFilters, selectCatalogItems, type PageSearchParams } from "@/lib/catalog-query";
-import { toCatalogItem } from "@/lib/items";
+import { catalogCounts, featuredCatalog, queryCatalog } from "@/lib/catalog";
+import { parseCatalogFilters, parseCatalogPage, type PageSearchParams } from "@/lib/catalog-query";
 import { taskSuggestions } from "@/lib/navigation";
 import { absoluteSiteUrl } from "@/lib/site";
 
@@ -29,10 +28,14 @@ const promises = [
 ];
 
 export default async function HomePage({ searchParams }: Props) {
-  const filters = parseCatalogFilters(await searchParams);
-  const [all, counts] = await Promise.all([allPublished(), catalogCounts()]);
-  const shown = selectCatalogItems(all, filters).map(toCatalogItem);
-  const featured = all.filter((item) => item.featured).map(toCatalogItem);
+  const params = await searchParams;
+  const filters = parseCatalogFilters(params);
+  // 筛选、排序、分页全部下推到数据库；这里不再把整份目录读进内存。
+  const [catalog, featured, counts] = await Promise.all([
+    queryCatalog(filters, parseCatalogPage(params)),
+    featuredCatalog(5),
+    catalogCounts(),
+  ]);
   const sceneCount = Object.values(counts.scenes).filter(Boolean).length;
 
   return (
@@ -67,7 +70,7 @@ export default async function HomePage({ searchParams }: Props) {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <FeaturedIndex items={featured.slice(0, 5)} total={featured.length} />
+            <FeaturedIndex items={featured.items} total={featured.total} />
           </div>
         </div>
       </section>
@@ -103,7 +106,13 @@ export default async function HomePage({ searchParams }: Props) {
           className="border-b border-border pb-5"
         />
         <div className="mt-6">
-          <CatalogBrowser items={shown} total={counts.total} counts={counts} />
+          <CatalogBrowser
+            items={catalog.items}
+            total={catalog.total}
+            counts={counts}
+            page={catalog.page}
+            pageCount={catalog.pageCount}
+          />
         </div>
       </section>
     </>

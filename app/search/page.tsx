@@ -8,9 +8,8 @@ import { SearchPanel } from "@/components/SearchPanel";
 import { Eyebrow } from "@/components/SectionHeading";
 import { SoftwareCard } from "@/components/SoftwareCard";
 import { Button } from "@/components/ui/button";
-import { allPublished, catalogCounts } from "@/lib/catalog";
-import { searchQueryParam, type PageSearchParams } from "@/lib/catalog-query";
-import { searchSoftware, toCatalogItem } from "@/lib/items";
+import { catalogCounts, searchCatalog } from "@/lib/catalog";
+import { parseCatalogPage, searchQueryParam, type PageSearchParams } from "@/lib/catalog-query";
 import { nameSuggestions, taskSuggestions } from "@/lib/navigation";
 
 export const metadata: Metadata = {
@@ -43,9 +42,18 @@ function TermList({ label, terms }: { label: string; terms: string[] }) {
 }
 
 export default async function SearchPage({ searchParams }: Props) {
-  const query = searchQueryParam((await searchParams).q);
-  const [all, counts] = await Promise.all([allPublished(), catalogCounts()]);
-  const results = query ? searchSoftware(query, all).map(toCatalogItem) : [];
+  const params = await searchParams;
+  const query = searchQueryParam(params.q);
+  // 搜索与分页都下推：不再把整份目录读进内存再打分。
+  const [results, counts] = await Promise.all([searchCatalog(query, parseCatalogPage(params)), catalogCounts()]);
+
+  const pageHref = (target: number) => {
+    const next = new URLSearchParams();
+    if (query) next.set("q", query);
+    if (target > 1) next.set("page", String(target));
+    const search = next.toString();
+    return search ? "/search?" + search : "/search";
+  };
 
   return (
     <div className="shell pb-20 pt-10 sm:pt-14">
@@ -65,22 +73,45 @@ export default async function SearchPage({ searchParams }: Props) {
       {query ? (
         <section aria-label="搜索结果" className="mt-10">
           <p className="border-b border-border pb-4 text-sm text-muted-foreground" role="status">
-            {results.length ? (
+            {results.total ? (
               <>
-                找到 <span className="font-semibold text-foreground tabular-nums">{results.length}</span> 款，按相关度排列
+                找到 <span className="font-semibold text-foreground tabular-nums">{results.total}</span> 款，按相关度排列
               </>
             ) : (
               "没有找到匹配的工具"
             )}
           </p>
-          {results.length ? (
-            <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {results.map((item) => (
-                <li key={item.slug} className="flex *:flex-1">
-                  <SoftwareCard item={item} headingLevel={2} />
-                </li>
-              ))}
-            </ul>
+          {results.total ? (
+            <>
+              <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {results.items.map((item) => (
+                  <li key={item.slug} className="flex *:flex-1">
+                    <SoftwareCard item={item} headingLevel={2} />
+                  </li>
+                ))}
+              </ul>
+              {results.pageCount > 1 ? (
+                <nav aria-label="搜索结果分页" className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                  {results.page > 1 ? (
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={pageHref(results.page - 1)} rel="prev">
+                        上一页
+                      </Link>
+                    </Button>
+                  ) : null}
+                  <span className="text-sm text-muted-foreground tabular-nums" role="status">
+                    第 {results.page} / {results.pageCount} 页
+                  </span>
+                  {results.page < results.pageCount ? (
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={pageHref(results.page + 1)} rel="next">
+                        下一页
+                      </Link>
+                    </Button>
+                  ) : null}
+                </nav>
+              ) : null}
+            </>
           ) : (
             <div className="mt-6 space-y-10">
               <EmptyState
