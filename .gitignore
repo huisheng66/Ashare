@@ -51,3 +51,9 @@ backups/
 .mimosa/
 .v2c/
 .zcode/
+
+# codebase-memory 图谱产物（本地产物，随本地代码变动，不入库）
+# 由 codebase-memory-mcp index_repository(persistence=true) 生成：
+#   graph.db.zst 约 1.1MB 压缩图谱 · artifact.json 记录 commit 与节点数 · .gitattributes 工具自动生成
+# 需要与团队共享图谱时，删掉下面这行并提交。
+.codebase-memory/
