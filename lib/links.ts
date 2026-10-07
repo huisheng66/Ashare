@@ -104,3 +104,50 @@ export function otherChannels(links: ItemLinksData): LinkChannel[] {
 export function isVerifiedMirror(channel: LinkChannel): boolean {
   return channel.role !== "mirror" || Boolean(channel.note?.trim());
 }
+
+/** SHA-256：64 位十六进制。存小写，比对前统一转小写，兼容上游大写写法。 */
+const SHA256_PATTERN = /^[0-9a-f]{64}$/i;
+
+/** 校验信息的展示形态：哈希分组 + 可直接粘贴的校验命令。 */
+export type MirrorChecksum = {
+  /** 文件名，含版本号，如 FreeCAD_1.1.4-Windows-x86_64-py311-installer.exe */
+  file: string;
+  /** 规范化后的 64 位小写十六进制 */
+  sha256: string;
+  /** 按操作系统给出的校验命令，读者复制就能跑 */
+  command: string;
+};
+
+/**
+ * 解析镜像的校验信息。
+ *
+ * 返回 undefined 而不是抛错或部分字段，理由和 isVerifiedMirror 一样：
+ * **数据有缺就当没有**。半个校验（只有文件名或只有哈希）不仅没用，
+ * 还会让读者以为有校验而跳过核对 —— 那比明确写「未提供校验」危险得多。
+ *
+ * 之所以强制哈希绑定文件名：磁盘槽位填的往往是 LatestRelease/ 这类
+ * 随上游发版浮动的目录，哈希只在「某个具体版本」上成立。
+ * 把两者绑在一起写死，读者才知道自己比对的是哪一次下载。
+ */
+export function mirrorChecksum(links: ItemLinksData): MirrorChecksum | undefined {
+  const file = links.diskFile?.trim();
+  const raw = links.diskSha256?.trim();
+  if (!file || !raw) return undefined;
+  const sha256 = raw.toLowerCase();
+  if (!SHA256_PATTERN.test(sha256)) return undefined;
+  return {
+    file,
+    sha256,
+    command: `certutil -hashfile "${file}" SHA256`,
+  };
+}
+
+/** 校验值是否合法。供数据校验与后台表单共用一套判定。 */
+export function isValidSha256(value: string): boolean {
+  return SHA256_PATTERN.test(value.trim());
+}
+
+/** 把哈希按 4 位一组断开，便于人工逐位核对。 */
+export function formatSha256(value: string): string {
+  return value.trim().toLowerCase().replace(/(.{4})(?=.)/g, "$1 ");
+}

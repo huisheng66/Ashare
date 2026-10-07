@@ -1,4 +1,6 @@
-import type { Software } from "@/data/types";
+import type { Guide, Software } from "@/data/types";
+
+import { guideUrls } from "./guide.ts";
 
 /**
  * 核验日期的判定与回写。
@@ -67,13 +69,14 @@ function daysBetween(from: string, to: Date): number {
 const LINK_KEYS = ["official", "homepage", "github", "disk"] as const;
 
 export function checkFreshness(
-  item: Pick<Software, "slug" | "name" | "links" | "linksCheckedAt">,
+  item: Pick<Software, "slug" | "name" | "links" | "linksCheckedAt"> & { guide?: Guide },
   staleDays = DEFAULT_STALE_DAYS,
   now = new Date(),
 ): StaleInfo {
+  // 教程正文与配套资料里的外链同样要复验：核验日期是全条目共用的一个，
+  // 只看 links 会让教程链接烂掉却始终显示「新鲜」。
   const hosts = [...new Set(
-    LINK_KEYS
-      .map((key) => item.links?.[key])
+    [...LINK_KEYS.map((key) => item.links?.[key]), ...guideUrls(item.guide)]
       .filter((url): url is string => typeof url === "string" && url.length > 0)
       .map((url) => {
         try {

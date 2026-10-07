@@ -124,14 +124,25 @@ const GIT_HOSTS = new Set(["github.com", "www.github.com"]);
 /**
  * github.com 的仓库页 → 同仓库的 API 地址；非 github 或路径不完整时返回 undefined。
  * 探活脚本用它做代验：网页端超时不代表仓库不存在。
+ *
+ * 路径里带 `blob/<分支>/<文件>`（README 精确地址）时，改为查**该文件**的 API：
+ * 只验仓库存在是不够的 —— `README_ZH.md` 拼错时仓库 API 照样 200，
+ * 死链会被判成可达。文件级代验才能真的发现「仓库在、文件不在」。
+ * 仓库根页（无文件路径）仍走仓库级 API。
  */
 export function githubApiOf(url) {
   try {
     const parsed = new URL(url);
     if (!GIT_HOSTS.has(parsed.hostname)) return undefined;
-    const [owner, repo] = parsed.pathname.split("/").filter(Boolean);
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    const [owner, repo, kind, branch, ...rest] = parts;
     if (!owner || !repo) return undefined;
-    return `https://api.github.com/repos/${owner}/${repo.replace(/\.git$/, "")}`;
+    const name = repo.replace(/\.git$/, "");
+    if (kind === "blob" && branch && rest.length) {
+      const file = decodeURIComponent(rest.join("/"));
+      return `https://api.github.com/repos/${owner}/${name}/contents/${file}?ref=${encodeURIComponent(branch)}`;
+    }
+    return `https://api.github.com/repos/${owner}/${name}`;
   } catch {
     return undefined;
   }

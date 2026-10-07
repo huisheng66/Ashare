@@ -1,6 +1,6 @@
 import type { ItemLinks as ItemLinksData } from "@/data/types";
-import { isVerifiedMirror, linkChannels, otherChannels } from "@/lib/links";
-import { MirrorNote, OutboundLink } from "./OutboundLink";
+import { isVerifiedMirror, linkChannels, mirrorChecksum, otherChannels } from "@/lib/links";
+import { MirrorChecksumNote, MirrorNote, OutboundLink } from "./OutboundLink";
 
 /** 旧路径的 host 工具，保留给页面里显示主域名。 */
 export { hostOf } from "@/lib/links";
@@ -20,6 +20,8 @@ export function otherLinkCount(links: ItemLinksData, primaryUrl: string): number
 export function ItemLinks({ links, exclude, slug }: { links: ItemLinksData; exclude?: string; slug: string }) {
   const rows = linkChannels(links).filter((c) => c.url !== exclude && isVerifiedMirror(c));
   const mirror = rows.find((c) => c.role === "mirror");
+  // 校验信息跟着镜像走：没有镜像链接却写校验值，等于挂了一个无从核对的数字。
+  const checksum = mirror ? mirrorChecksum(links) : undefined;
 
   if (!rows.length) {
     return <p className="px-3 text-sm text-muted-foreground">暂未填写链接。</p>;
@@ -35,6 +37,7 @@ export function ItemLinks({ links, exclude, slug }: { links: ItemLinksData; excl
         ))}
       </ul>
       {mirror ? <MirrorNote note={mirror.note} /> : null}
+      <MirrorChecksumNote checksum={checksum} />
     </div>
   );
 }

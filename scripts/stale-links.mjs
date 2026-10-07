@@ -34,6 +34,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
+import { guideUrls } from "../lib/guide.ts";
 import { DEFAULT_STALE_DAYS, checkFreshness, reasonLabel, staleItems, summarize, today } from "../lib/stale.ts";
 import { mapLimit, githubApiOf, parseFlags, readCatalog, safeFetch } from "./_shared.mjs";
 
@@ -222,6 +223,11 @@ async function main() {
     const item = catalog.find((entry) => entry.slug === info.slug);
     for (const key of LINK_KEYS) {
       if (item?.links?.[key]) jobs.push({ slug: item.slug, key, url: item.links[key] });
+    }
+    // 教程正文与配套资料里的外链同样会失效，而核验日期是与 links 共用的
+    // 那一个 —— 只探 links 会让教程链接永远轮不到复验。
+    for (const url of guideUrls(item?.guide)) {
+      jobs.push({ slug: item.slug, key: "guide", url });
     }
   }
   if (!jobs.length) {

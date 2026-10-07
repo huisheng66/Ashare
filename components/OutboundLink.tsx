@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ArrowUpRight, GitBranch, Globe, HardDrive, House, ShieldCheck, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, GitBranch, Globe, HardDrive, Hash, House, ShieldCheck, type LucideIcon } from "lucide-react";
 
 import { recordOutboundClick } from "@/app/track/actions";
-import type { LinkChannel } from "@/lib/links";
+import { formatSha256, type LinkChannel, type MirrorChecksum } from "@/lib/links";
 
 /**
  * 站内统一的出站链接。
@@ -120,5 +120,37 @@ export function MirrorNote({ note }: { note?: string }) {
         {note || "作者或项目方提供的合法镜像。请优先使用官网或 GitHub。"}
       </span>
     </p>
+  );
+}
+
+/**
+ * 镜像文件的校验信息。
+ *
+ * 单独一个组件而不是塞进 MirrorNote，因为两者的读者动作不同：
+ * 说明是**读**的，校验是**照着跑一遍**的 —— 所以哈希必须可复制、
+ * 命令必须能直接粘贴，读者不该再去读一篇文章才知道怎么用。
+ *
+ * 没有校验值时不渲染任何东西：宁可不显示，也不要显示一个
+ * 看起来像校验、实际没绑定具体文件的假校验。
+ */
+export function MirrorChecksumNote({ checksum }: { checksum?: MirrorChecksum }) {
+  if (!checksum) return null;
+  return (
+    <div className="mt-2 flex gap-2.5 rounded-xl bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+      <Hash className="mt-px size-4 shrink-0" aria-hidden="true" />
+      <div className="min-w-0 flex-1">
+        <p>
+          <span className="font-medium text-foreground">校验值：</span>
+          <span className="break-all font-mono">{formatSha256(checksum.sha256)}</span>
+        </p>
+        <p className="mt-1 break-all">
+          对应文件 <span className="font-mono">{checksum.file}</span>
+          ，下载后跑一次命令核对，不一致就别装：
+        </p>
+        <code className="mt-1.5 block overflow-x-auto rounded-md bg-background px-2 py-1.5 font-mono text-[11px] leading-relaxed text-foreground">
+          {checksum.command}
+        </code>
+      </div>
+    </div>
   );
 }

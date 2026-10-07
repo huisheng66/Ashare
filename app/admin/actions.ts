@@ -8,10 +8,12 @@ import { redirect } from "next/navigation";
 
 import { endSession, hasValidSession, startSession, verifyPassword } from "@/lib/auth";
 import { getClientIp, guardLogin, isBlocked, recordLoginFailure } from "@/lib/guard";
+import { isValidSha256 } from "@/lib/links";
 import { getSubmissions, updateBlocks, updateCatalog, updateFeedback, updateSubmissions } from "@/lib/store";
 import { imageExtension, isHttpUrl, ITEM_KINDS, MAX_UPLOAD, mediaParts, PLATFORMS, PUBLISH_STATUSES, SLUG_PATTERN, SOURCE_KINDS } from "@/lib/input-validation";
 import { scenes } from "@/data/scenes";
 import type { ItemKind, Platform, PublishStatus, SceneId, Software, SourceKind } from "@/data/types";
+import { GUIDE_LIMITS, normalizeGuide, parseGuideLines, validateGuide } from "@/lib/guide";
 import { validateSemantics } from "@/lib/semantics";
 
 export async function requireAdmin(): Promise<void> {
@@ -95,11 +97,34 @@ export async function saveItem(fd: FormData): Promise<void> {
     github: checkUrl("github", true),
     disk: checkUrl("disk"),
     diskNote: checked("diskNote", 1000) || undefined,
+    diskSha256: checked("diskSha256", 64) || undefined,
+    diskFile: checked("diskFile", 200) || undefined,
   };
   if (links.disk && !links.diskNote) bad("镜像链接必须填写镜像说明");
+  // 哈希与文件名必须成对：单给哈希，读者不知道该校验哪个文件；
+  // 单给文件名，等于没提供校验。两条都有、但格式不对，都要拦住。
+  if (links.diskSha256 && !isValidSha256(links.diskSha256)) {
+    bad("SHA-256 必须是 64 位十六进制字符");
+  }
+  if (Boolean(links.diskSha256) !== Boolean(links.diskFile)) {
+    bad("校验值与对应文件名必须同时填写");
+  }
   if (links.disk && !links.official && !links.github) bad("镜像只能作为补充，必须先填官网或 GitHub");
   const simpleIcon = checked("simpleIcon", 100);
   if (simpleIcon && !SLUG_PATTERN.test(simpleIcon)) bad("Simple Icon 名称格式不正确");
+
+  // 教程：行式资源先解析再校验，格式错与内容错分开报错 —— 「第 3 行类型无效」
+  // 比笼统的「教程有问题」更能让人直接改对。
+  const { resources: guideResources, invalid: guideLinesInvalid } = parseGuideLines(str(fd, "guideResources"));
+  if (guideLinesInvalid.length) bad(`配套资料格式有误：${guideLinesInvalid[0]}`);
+  const guide = normalizeGuide({
+    intro: checked("guideIntro", GUIDE_LIMITS.intro),
+    markdown: checked("guideMarkdown", GUIDE_LIMITS.markdown),
+    resources: guideResources,
+  });
+  const guideProblems = validateGuide(guide, { allowHttp: process.env.NODE_ENV !== "production" });
+  if (guideProblems.length) bad(guideProblems[0]);
+
   const now = new Date().toISOString();
   const draft: Software = {
     slug,
@@ -118,6 +143,7 @@ export async function saveItem(fd: FormData): Promise<void> {
     linksCheckedAt: checked("linksCheckedAt", 10) || undefined,
     links,
     tutorial: checked("tutorial", 10_000).split("\n").map((value) => value.trim()).filter(Boolean),
+    ...(guide ? { guide } : {}),
     whoFor: checked("whoFor", 2000),
     whoNot: checked("whoNot", 2000),
     discountNote: checked("discountNote", 1000) || undefined,

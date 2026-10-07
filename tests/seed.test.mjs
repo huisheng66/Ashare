@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { software as seed } from "../data/software.ts";
 import { seedToItem } from "../lib/seed.ts";
+import { formatSha256, isValidSha256, isVerifiedMirror, linkChannels, mirrorChecksum, primaryChannel } from "../lib/links.ts";
 import { describeSourceKind, isValidSourceKind } from "../lib/semantics.ts";
 
 const baseSeed = {
@@ -187,3 +188,111 @@ test("seed-sync 的同步字段覆盖漂移检测的全部字段", async () => {
   );
 });
 
+test("镜像必须附说明，且永不作主 CTA", () => {
+  // 这条断言是在 disk 槽位真正投入使用之后才补上的。
+  // 此前 50 条种子没有一条填 disk，lib/links.ts 的镜像规则只被
+  // tests/data-model.test.mjs 用构造出来的假数据测过——
+  // 也就是说，「真实条目里的镜像是否合规」从来没被检查过。
+  //
+  // 风险在于镜像链接是唯一一种「填错了会误导读者去下载不明文件」的字段：
+  // 官网链接填错只是打不开，镜像链接填错可能拿到被篡改的安装包。
+  // 所以规则要在真实数据上守着，不能只在单元测试的假数据里守着。
+  for (const entry of seed) {
+    const links = entry.links;
+    if (!links?.disk) continue;
+
+    // 1. 必须有说明。后台 actions.ts 有同样的硬校验，
+    //    这里是种子层的防线——后台只拦运行库，拦不住种子。
+    const mirror = linkChannels(links).find((c) => c.role === "mirror");
+    assert.ok(mirror, `${entry.slug}:填了 disk 却没被识别为镜像渠道`);
+    assert.ok(
+      isVerifiedMirror(mirror),
+      `${entry.slug}:镜像必须写diskNote（来源与校验方式），否则按不可信处理、不予展示`,
+    );
+
+    // 2. 镜像不得作主 CTA。primaryChannel() 本来就不会选镜像，
+    //    但那条只保证「有官网时用官网」；这条额外保证
+    //    「就算镜像被写成唯一渠道，也不会有任何人把它当主要入口推荐」。
+    assert.notEqual(
+      primaryChannel(links)?.role,
+      "mirror",
+      `${entry.slug}:镜像不得作为主 CTA`,
+    );
+
+    // 3. 必须同时有官网或GitHub。后台的 hint 也这么要求：
+    //    只有一个镜像链接的条目，读者无从判断镜像是否值得信。
+    assert.ok(
+      links.official || links.homepage || links.github,
+      `${entry.slug}:填了 disk 却没有官网或仓库，读者无从交叉核验`,
+    );
+  }
+});
+
+test("校验值必须是完整、格式正确、且绑定具体文件", () => {
+  // 校验值是给读者「照着跑一遍」用的，坏掉的校验比没有校验更糟：
+  // 读者按错误的哈希核对必然失败，而失败原因不明显，
+  // 最后要么被误当成「文件有问题」，要么干脆不再信任页面上的所有校验提示。
+  //
+  // 为什么坚持「哈希与文件名成对」：磁盘槽位填的往往是 LatestRelease/
+  // 这类随上游发版浮动的目录，哈希只在具体某个版本上成立。
+  // 只写哈希不写文件，读者不知道该比对哪个包；只写文件不给哈希，
+  // 读者会以为有校验而跳过核对 —— 后者比明确写「未提供校验」危险得多。
+  for (const entry of seed) {
+    const links = entry.links;
+    const sha = links?.diskSha256?.trim();
+    const file = links?.diskFile?.trim();
+
+    if (sha) {
+      assert.ok(
+        isValidSha256(sha),
+        `${entry.slug}:SHA-256 必须是 64 位十六进制，实际长度 ${sha.length}`,
+      );
+    }
+    if (sha || file) {
+      assert.ok(
+        sha && file,
+        `${entry.slug}:校验值与对应文件名必须成对填写（sha256=${Boolean(sha)} file=${Boolean(file)}）`,
+      );
+      assert.ok(links?.disk, `${entry.slug}:填了校验值却没有镜像链接，等于挂了个无从核对的文件`);
+    }
+
+    // 解析函数必须与原始字段保持一致：合法数据一定能取出展示形态，
+    // 不合法数据必须被解析成 undefined（而不是半截数据）。
+    const parsed = mirrorChecksum(links ?? {});
+    if (!sha && !file) {
+      assert.equal(parsed, undefined, `${entry.slug}:没有校验字段时不应解析出校验信息`);
+    } else {
+      assert.ok(parsed, `${entry.slug}:合法的校验字段却解析不出展示信息`);
+      assert.equal(parsed.sha256, sha.toLowerCase(), `${entry.slug}:解析出的哈希应与存储值一致（大小写归一后）`);
+      assert.ok(parsed.command.includes(file), `${entry.slug}:校验命令里应带上文件名，否则读者不知道跑什么`);
+    }
+  }
+});
+
+test("半截校验信息不得渲染（宁可显示未提供）", ()=> {
+  // 这几条是上面那条规则的反面：数据漏填一半时，
+  // 前台必须表现为「没有校验」，而不是渲染出一个残缺的校验块。
+  // 分开写是因为这是渲染侧的独立承诺，混在一起会被前面的断言覆盖不到。
+  for (const bad of [
+    { disk: "https://m.example/", diskNote: "n", diskSha256: "a".repeat(64) },
+    { disk: "https://m.example/", diskNote: "n", diskFile: "x.exe" },
+    { disk: "https://m.example/", diskNote: "n", diskSha256: "not-a-hash", diskFile: "x.exe" },
+    { disk: "https://m.example/", diskNote: "n", diskSha256: "a".repeat(63), diskFile: "x.exe" },
+    { disk: "https://m.example/", diskNote: "n", diskSha256: "a".repeat(65), diskFile: "x.exe" },
+  ]) {
+    assert.equal(
+      mirrorChecksum(bad),
+      undefined,
+      `残缺或非法的校验信息不应被解析：${JSON.stringify(bad)}`,
+    );
+  }
+});
+
+test("哈希分组只影响展示，不影响比对值", ()=> {
+  // formatSha256 给的是给人逐位核对的分组形式，
+  // 页面拿它做展示时绝不能顺手把带空格的值当成比对依据。
+  const raw = "845f7101d33faf257a82a0cadc5f4f3804441f46ee493eb32b92fcf9c7147a24";
+  assert.equal(formatSha256(raw).replace(/\s/g, ""), raw);
+  assert.equal(formatSha256(raw.toUpperCase()), formatSha256(raw), "大写小写应归一后分组一致");
+  assert.equal(formatSha256("  " + raw + "  ").replace(/\s/g, ""), raw, "首尾空白不应影响结果");
+});
