@@ -13,14 +13,13 @@
 //   node scripts/seed-sync.mjs --dry-run    只报告会变什么，不写
 //   node scripts/seed-sync.mjs             执行同步
 //   node scripts/seed-sync.mjs --guides-only  只补 guide，不追加新条目
-import { createHash } from "node:crypto";
-import { promises as fs } from "node:fs";
-import path from "node:path";
+import { persistCatalog } from "../lib/catalog-persist.ts";
+import { readCatalog, withDb } from "./_shared.mjs";
 
 const { samples } = await import("../data/samples.ts");
 const { software } = await import("../data/software.ts");
 const { normalizeGuide } = await import("../lib/guide.ts");
-const { seedToItem } = await import("../lib/seed.ts");
+const { seedToItem, SEED_SYNC_FIELDS } = await import("../lib/seed.ts");
 
 function parseArgs(argv) {
   const args = { dryRun: false, guidesOnly: false, help: false };
@@ -39,7 +38,20 @@ const USAGE = `用法:
   --dry-run      只报告会变什么，不写文件
   --guides-only  只补 guide，不追加种子里的新条目`;
 
+/** 递归按键排序后比对：与对象键顺序无关。 */
+function same(a, b) {
+  const stable = (value) => {
+    if (Array.isArray(value)) return value.map(stable);
+    if (value && typeof value === "object") {
+      return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]));
+    }
+    return value;
+  };
+  return JSON.stringify(stable(a) ?? null) === JSON.stringify(stable(b) ?? null);
+}
+
 async function main() {
+
   const args = parseArgs(process.argv.slice(2));
   if (args.help) { console.log(USAGE); return; }
 
@@ -50,8 +62,8 @@ async function main() {
   /** slug → 种子条目。samples 与 software 无重叠 slug。 */
   const seeds = new Map(seedEntries.map((s) => [s.slug, s]));
 
-  const file = path.join(process.cwd(), "data", "store", "catalog.json");
-  const catalog = JSON.parse(await fs.readFile(file, "utf8"));
+  // P10：运行库的权威位置是 MySQL；readCatalog 有 MYSQL_URL 时读库，否则回落 JSON 并告警。
+  const catalog = await readCatalog();
   const bySlug = new Map(catalog.map((item) => [item.slug, item]));
 
   const added = [];
@@ -75,12 +87,12 @@ async function main() {
   //     seedToItem 按 source 推成 "opensource"），不同步修正就传不到运行库。
   // 留在外面会让漂移检查报出不一致、而同步又说「已是最新」，
   // 正是本文件开头那段注释描述的甩锅现场。
-  const SYNCED_FIELDS = [
-    "summary", "body", "tags", "aliases", "links", "source",
-    "scenes", "platforms", "license", "kind", "version", "linksCheckedAt",
-  ];
+  // 同步范围同样从登记表取（比漂移比对窄：有些字段后台改得更准）。
+  const SYNCED_FIELDS = SEED_SYNC_FIELDS;
 
   for (const item of catalog) {
+    // 比对必须与对象键顺序无关：DB 往返会重排 links 的键（diskSha256/diskFile 先后不同），
+    // 直接 JSON.stringify 会每轮都判定「有变化」，脚本就不幂等了 —— 而且会和 seed:drift 互相甩锅。
     const source = seeds.get(item.slug);
     if (!source) { next.push(item); continue; }
 
@@ -88,10 +100,13 @@ async function main() {
     const merged = { ...item };
     const changed = [];
     for (const field of SYNCED_FIELDS) {
+      // guide 由下面的专门分支处理：它必须先过 normalizeGuide 再比对，
+      // 走通用分支会比到「原始值 vs 归一化值」的假差异（实测一次报 20 条）。
+      if (field === "guide") continue;
       // 种子没给这个字段时不覆盖：种子形态允许省略 version / license，
       // 直接写 undefined 会把运行库里已有的值抹掉。
       if (fresh[field] === undefined) continue;
-      if (JSON.stringify(item[field]) === JSON.stringify(fresh[field])) continue;
+      if (same(item[field], fresh[field])) continue;
       merged[field] = fresh[field];
       changed.push(field);
     }
@@ -101,7 +116,9 @@ async function main() {
     // 幂等性就没了。
     if (source.guide) {
       const guide = normalizeGuide(source.guide);
-      if (guide && JSON.stringify(item.guide) !== JSON.stringify(guide)) {
+      // 同样要用 same()：DB 往返把 guide 的键排成 resources/intro/markdown，
+      // 种子是 intro/markdown/resources —— 直接 stringify 会让**全部 55 条**每轮都判定「有变化」。
+      if (guide && !same(item.guide, guide)) {
         merged.guide = guide;
         changed.push("guide");
       }
@@ -147,12 +164,20 @@ async function main() {
     return;
   }
 
-  const text = JSON.stringify(next, null, 2);
-  await fs.writeFile(file, text, "utf8");
-  // SHA-256 旁车必须同步，否则下次启动会打「文件被改动」的日志。
-  const digest = createHash("sha256").update(text).digest("hex");
-  await fs.writeFile(file.replace(/\.json$/, "") + ".sha256.json", digest, "utf8");
-  console.log(`已同步到运行库：\n${report.join("\n")}\n运行库共 ${next.length} 条。`);
+  // 不 prune：种子只管「种子是唯一事实源」的字段与新增条目，
+  // 后台新建的条目不该因为种子里没有就被删掉。
+  const stats = await withDb(async (conn) => {
+    await conn.beginTransaction();
+    try {
+      const result = await persistCatalog(conn, next, { prune: false });
+      await conn.commit();
+      return result;
+    } catch (error) {
+      await conn.rollback().catch(() => {});
+      throw error;
+    }
+  });
+  console.log(`已同步到运行库：\n${report.join("\n")}\n运行库共 ${stats.items} 条。`);
 }
 
 main().catch((error) => {

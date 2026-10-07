@@ -2,9 +2,15 @@
 /**
  * Ashare 本地数据备份。
  *
- * 把运行库（data/store/*.json）与上传图片（public/media/）复制成带时间戳的
- * 快照目录。不自己实现归档格式：--zip 时调用系统自带的 tar。
- * 环境变量不进备份——ADMIN_PASSWORD_HASH 与 SESSION_SECRET 需另行保管。
+ * 快照内容：
+ *   - **MySQL 导出**（配了 MYSQL_URL 时，导出到快照的 db/ashare.sql）
+ *   - 遗留的 JSON 运行库（data/store）与上传图片（data/media，以及历史落点 public/media）
+ *
+ * 为什么必须有数据库那一半：P4 之后运行库的权威位置是 MySQL，**只备文件根本恢复不了站点**。
+ * 所以没配 MYSQL_URL 时会明确告警，而不是安静地出一份残缺快照。
+ *
+ * 不自己实现归档格式：--zip 时调用系统自带的 tar。
+ * 环境变量不进备份——ADMIN_PASSWORD_HASH、SESSION_SECRET、MYSQL_URL 需另行保管。
  *
  *   node scripts/backup.mjs            备份到 backups/
  *   node scripts/backup.mjs --out D:   指定输出目录（建议指向另一块盘或网盘同步目录）
@@ -12,8 +18,12 @@
  *   node scripts/backup.mjs --keep 10  只保留最近 10 份
  *   node scripts/backup.mjs --list     列出现有备份
  *
- * 恢复（停进程后）：把快照里的 data/store 与 public/media 覆盖回项目根目录。
- * --zip 产生的归档用 tar -xzf <file> -C <项目根目录> 解开。
+ * 恢复（停进程后）：
+ *   1. 数据库：mysql -u <用户> -p "<库名>" < db/ashare.sql
+ *      导出用的是 --single-transaction，备份期间站点可照常读写。
+ *   2. 文件：把快照里的 data/media（以及历史落点 public/media）覆盖回项目根目录。
+ *      data/store 只是历史快照，新部署不再需要。
+ *   --zip 产生的归档用 tar -xzf <file> -C <项目根目录> 解开。
  */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -22,7 +32,11 @@ import path from "node:path";
 import process from "node:process";
 import { parseFlags } from "./_shared.mjs";
 
-const SOURCES = ["data/store", "public/media"];
+/** mysqldump 可执行文件，可用环境变量覆盖（PATH 里没有时）。 */
+const MYSQL_DUMP = process.env.MYSQLDUMP?.trim() || "mysqldump";
+
+// data/media 是新落点；public/media 是历史落点，存量部署仍要能一起备份。
+const SOURCES = ["data/store", "data/media", "public/media"];
 const DEFAULT_OUT = "backups";
 const DIR_PATTERN = /^ashare-backup-\d{8}-\d{6}$/;
 const ARCHIVE_PATTERN = /^ashare-backup-\d{8}-\d{6}\.tar\.gz$/;
@@ -167,6 +181,76 @@ async function prune(outDir, keep) {
   if (skipped) console.log(`${skipped} 个同名目录不是备份产物，已保留。`);
 }
 
+/** 从 MYSQL_URL 拆出连接信息。口令只进临时 defaults 文件，绝不上命令行。 */
+function mysqlDumpArgs(url) {
+  const parsed = new URL(url);
+  const database = decodeURIComponent(parsed.pathname.replace(/^\/+/, ""));
+  if (!database) throw new Error("MYSQL_URL 缺少数据库名");
+  const defaults = [
+    "[client]",
+    "host=" + parsed.hostname,
+    "port=" + (parsed.port || "3306"),
+    "user=" + decodeURIComponent(parsed.username),
+    "password=" + decodeURIComponent(parsed.password),
+    "",
+  ].join("\n");
+  return { database, defaults };
+}
+
+/**
+ * 导出数据库到快照的 db/ashare.sql。
+ *
+ * 两个刻意的选择：
+ *  - 口令走 --defaults-extra-file（0600，用完立即删）而不是命令行 —— 后者会出现在进程列表里；
+ *  - 导出失败就抛错，不留一份「看起来成功了」但没有库的快照。
+ */
+async function dumpDatabase(target, manifest) {
+  const url = process.env.MYSQL_URL?.trim();
+  if (!url) return false;
+  const { database, defaults } = mysqlDumpArgs(url);
+  const dir = path.join(target, "db");
+  await fs.mkdir(dir, { recursive: true });
+  const file = path.join(dir, "ashare.sql");
+  const defaultsFile = path.join(dir, ".mysqldump.cnf");
+  await fs.writeFile(defaultsFile, defaults, { mode: 0o600 });
+  try {
+    const result = spawnSync(
+      MYSQL_DUMP,
+      [
+        "--defaults-extra-file=" + defaultsFile,
+        // 一致性快照：InnoDB 下不锁表，备份期间站点照常读写。
+        "--single-transaction",
+        "--routines",
+        "--triggers",
+        "--events",
+        "--default-character-set=utf8mb4",
+        "--databases",
+        database,
+        "--result-file=" + file,
+      ],
+      { encoding: "utf8" },
+    );
+    if (result.error) {
+      throw new Error("mysqldump 执行失败：" + result.error.message + "（可用 MYSQLDUMP 环境变量指定可执行文件路径）");
+    }
+    if (result.status !== 0) {
+      throw new Error("mysqldump 退出码 " + result.status + "：" + String(result.stderr || "").trim().slice(0, 300));
+    }
+  } finally {
+    // 凭据文件必须立刻删除，哪怕导出失败。
+    await fs.rm(defaultsFile, { force: true });
+  }
+  const content = await fs.readFile(file);
+  manifest.database = {
+    file: "db/ashare.sql",
+    bytes: content.length,
+    sha256: createHash("sha256").update(content).digest("hex"),
+    database,
+  };
+  console.log("已导出数据库 " + database + "：" + (content.length / 1024).toFixed(1) + " KiB");
+  return true;
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -182,8 +266,9 @@ async function main() {
   }
 
   const sources = await existingSources(root);
-  if (!sources.length) {
-    throw new Error("data/store 与 public/media 都不存在，没有可备份的数据。先启动一次应用以生成运行库。");
+  const hasDatabase = Boolean(process.env.MYSQL_URL?.trim());
+  if (!sources.length && !hasDatabase) {
+    throw new Error("既没有 data/store / data/media，也没有配置 MYSQL_URL —— 没有可备份的数据。");
   }
 
   const baseName = `ashare-backup-${stamp()}`;
@@ -207,6 +292,11 @@ async function main() {
       totalBytes += content.length;
     }
     console.log(`复制 ${source}：${files.length} 个文件`);
+  }
+
+  // 数据库那一半放在写 manifest 之前：导出失败就整个失败，不留残缺快照。
+  if (!(await dumpDatabase(target, manifest))) {
+    console.warn("[backup] 未配置 MYSQL_URL：本次**没有备份数据库**。运行库的权威位置已是 MySQL，只有文件快照恢复不了站点。");
   }
 
   await fs.writeFile(path.join(target, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);

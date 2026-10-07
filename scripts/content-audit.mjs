@@ -94,7 +94,7 @@ async function main() {
     items = await readCatalog();
   } catch (error) {
     if (error.code === "ENOENT") {
-      console.error("data/store/catalog.json 不存在。先启动一次应用（npm run dev）生成运行库。");
+      console.error("读不到运行库：配置 MYSQL_URL 指向运行库，或先启动一次应用生成 data/store/catalog.json。");
       process.exitCode = 1;
       return;
     }

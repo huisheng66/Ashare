@@ -29,14 +29,11 @@
  * 安全：抓取走 safeFetch（只放行 http/https、拒绝私有网段、逐跳校验重定向）。
  * 本机服务需显式加 --allow-private。
  */
-import { createHash } from "node:crypto";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import process from "node:process";
 
 import { guideUrls } from "../lib/guide.ts";
 import { DEFAULT_STALE_DAYS, checkFreshness, reasonLabel, staleItems, summarize, today } from "../lib/stale.ts";
-import { mapLimit, githubApiOf, parseFlags, readCatalog, safeFetch } from "./_shared.mjs";
+import { isDbMode, mapLimit, githubApiOf, parseFlags, readCatalog, safeFetch, withDb } from "./_shared.mjs";
 
 const CONCURRENCY = 5;
 const UA = "Mozilla/5.0 (compatible; AshareStaleLinks/1.0; +https://example.invalid)";
@@ -136,24 +133,27 @@ async function probe(url, args) {
   return { ...last, ms: Date.now() - started };
 }
 
-/** 复验通过后回写核验日期。只改本次确实探活过、且全部链接可达的条目。 */
+/**
+ * 复验通过后回写核验日期。只改本次确实探活过、且全部链接可达的条目。
+ *
+ * P10 起写的是 MySQL（运行库的权威位置）。--source seed 时无法回写 —— 种子在 git 里，
+ * 由收录流程维护，不该被巡检脚本改。
+ */
 async function updateChecked(slugs, date) {
-  const file = path.join(process.cwd(), "data", "store", "catalog.json");
-  const raw = await fs.readFile(file, "utf8");
-  const catalog = JSON.parse(raw);
-  const targets = new Set(slugs);
+  if (!isDbMode()) {
+    throw new Error("--update 需要 MySQL 运行库（配置 MYSQL_URL）。种子在 git 里，巡检不回写。");
+  }
   let changed = 0;
-  const next = catalog.map((item) => {
-    if (!targets.has(item.slug) || item.linksCheckedAt === date) return item;
-    changed += 1;
-    return { ...item, linksCheckedAt: date };
+  await withDb(async (conn) => {
+    for (const slug of slugs) {
+      // 只动 links_checked_at：核验外链不是内容更新，改 updated_at 会让条目虚假地跳到「最近更新」。
+      const [result] = await conn.query(
+        "UPDATE items SET links_checked_at = ? WHERE slug = ? AND (links_checked_at IS NULL OR links_checked_at <> ?)",
+        [date, slug, date],
+      );
+      changed += Number(result.affectedRows ?? 0);
+    }
   });
-  if (!changed) return { changed: 0 };
-  const text = JSON.stringify(next, null, 2);
-  await fs.writeFile(file, text, "utf8");
-  // SHA-256 旁车必须同步，否则下次启动会打「文件被改动」的日志。
-  const digest = createHash("sha256").update(text).digest("hex");
-  await fs.writeFile(`${file.replace(/\.json$/, "")}.sha256.json`, digest, "utf8");
   return { changed };
 }
 

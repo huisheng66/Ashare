@@ -1,18 +1,15 @@
 // 详情页渲染冒烟：抓页面 HTML，检查正文分段、链接、徽章与分类是否如实呈现。
 // 用法：node scripts/smoke-detail.mjs [--base http://127.0.0.1:3000] [slug ...]
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import process from "node:process";
 
-const ROOT = process.cwd();
-const CATALOG = path.join(ROOT, "data", "store", "catalog.json");
+import { readCatalog } from "./_shared.mjs";
 const BASE = "http://127.0.0.1:3000";
 
 const args = process.argv.slice(2);
 const slugs = args.filter((a) => !a.startsWith("--"));
 const base = args.find((a) => a.startsWith("--base="))?.slice(7) ?? BASE;
 
-const catalog = JSON.parse(await fs.readFile(CATALOG, "utf8"));
+const catalog = await readCatalog();
 const targets = slugs.length ? slugs : catalog.map((i) => i.slug);
 
 const strip = (html) => html.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]+>/g, " ");
