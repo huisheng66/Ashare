@@ -209,3 +209,24 @@ test("优化改进报告里的行号引用与当前代码一致", async () => {
 
   assert.deepEqual(stale, [], `报告行号已漂移（${stale.length} 处）：\n  ${stale.join("\n  ")}`);
 });
+
+// 回归：GitHub 网页端常被网络策略拦住，探活靠 API 代验。但代验若只验「仓库存在」，
+// 拼错的中文 README（README_ZH.md）会被判成可达，死链就漏过去了。
+test("GitHub 代验区分仓库页与文件路径，文件级才查文件", async () => {
+  const { githubApiOf } = await import("../scripts/_shared.mjs");
+  // README 精确地址 → 查该文件，文件不存在时 API 会 404
+  assert.equal(
+    githubApiOf("https://github.com/yt-dlp/yt-dlp/blob/master/README.md"),
+    "https://api.github.com/repos/yt-dlp/yt-dlp/contents/README.md?ref=master",
+  );
+  // 仓库根页 → 仍走仓库级
+  assert.equal(githubApiOf("https://github.com/yt-dlp/yt-dlp"), "https://api.github.com/repos/yt-dlp/yt-dlp");
+  // 非 github 主机不代验
+  assert.equal(githubApiOf("https://gitlab.com/kicad/code/kicad"), undefined);
+  // .git 后缀要去掉，路径不全要落空
+  assert.equal(githubApiOf("https://github.com/only-owner"), undefined);
+  assert.equal(
+    githubApiOf("https://github.com/inkscape/inkscape.git/blob/master/README.md"),
+    "https://api.github.com/repos/inkscape/inkscape/contents/README.md?ref=master",
+  );
+});
