@@ -18,7 +18,7 @@
  * 才加 --allow-private，别用它去碰内网。
  */
 import process from "node:process";
-import { mapLimit, parseFlags, readCatalog, safeFetch } from "../../../../scripts/_shared.mjs";
+import { githubApiOf, mapLimit, parseFlags, readCatalog, safeFetch } from "../../../../scripts/_shared.mjs";
 
 const UA = "Mozilla/5.0 (compatible; AshareLinkCheck/1.0; +https://example.invalid)";
 const RETRY_STATUS = new Set([400, 403, 405, 501]);
@@ -50,8 +50,6 @@ function parseArgs(argv) {
   return args;
 }
 
-const GIT_HOSTS = new Set(["github.com", "www.github.com"]);
-
 /**
  * 探活会失败、但站点其实活着的域名。每行都曾人工打开确认过，标注日期。
  * 输出时只做提示、不改变判定——真死链时这条提示会误导，所以过期要重验。
@@ -62,19 +60,6 @@ const FLAKY = new Map([
   ["texstudio.org", "本机代理隧道超时，站点活着（2026-09-28 人工打开确认）"],
   ["gimp.org", "同上，代理超时（2026-09-28 人工打开确认）"],
 ]);
-
-/** github.com 网页端可能被网络策略拦住，改用 api.github.com 代验同一仓库。 */
-function githubApiOf(url) {
-  try {
-    const parsed = new URL(url);
-    if (!GIT_HOSTS.has(parsed.hostname)) return undefined;
-    const [owner, repo] = parsed.pathname.split("/").filter(Boolean);
-    if (!owner || !repo) return undefined;
-    return `https://api.github.com/repos/${owner}/${repo.replace(/\.git$/, "")}`;
-  } catch {
-    return undefined;
-  }
-}
 
 /** 单次判定：HEAD 被拒就改用 GET。 */
 async function once(url, options) {

@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowUpRight, ChevronLeft, CircleAlert, Info } from "lucide-react";
 
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { DraftKeeper } from "@/components/DraftKeeper";
 import { Field } from "@/components/form-field";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { scenes } from "@/data/scenes";
 import type { Software } from "@/data/types";
-import { getCatalogAll } from "@/lib/store";
+import { formatGuideLines, GUIDE_KINDS } from "@/lib/guide";
+import { getItemForEdit } from "@/lib/store";
 import { kindLabel, platformLabel, sourceLabel } from "@/lib/items";
 import { requireAdmin, saveItem } from "../../actions";
 
@@ -29,9 +31,8 @@ type Props = {
 };
 
 const selectCls =
-  "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
-const cell = "flex flex-col gap-1.5";
-const hintCls = "text-[12px] font-medium text-muted-foreground";
+  "h-11 w-full min-w-0 appearance-auto rounded-lg border border-input bg-card px-3 text-base text-foreground transition-[border-color,box-shadow] duration-150 outline-none focus-visible:border-foreground focus-visible:ring-4 focus-visible:ring-foreground/8 md:text-sm";
+const fileCls = "h-auto py-1.5";
 
 const GIT_HOSTS = /(^|\.)github\.com$|^gitlab\.com$|^gitee\.com$|^codeberg\.org$/;
 
@@ -47,13 +48,13 @@ function Check({
   children: React.ReactNode;
 }) {
   return (
-    <label className="flex h-7 items-center gap-1.5 text-[13px]">
+    <label className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-border bg-card px-3 text-[13px] transition-colors hover:border-foreground/30 has-checked:border-foreground has-checked:font-medium pointer-coarse:h-11">
       <input
         type="checkbox"
         name={name}
         value={value}
         defaultChecked={defaultChecked}
-        className="size-3.5 accent-primary"
+        className="size-4 accent-primary"
       />
       {children}
     </label>
@@ -61,17 +62,39 @@ function Check({
 }
 
 function Section({
+  index,
   title,
+  description,
   children,
 }: {
+  index: number;
   title: string;
+  description?: string;
   children: React.ReactNode;
 }) {
+  const id = `section-${index}`;
   return (
-    <Card className="mt-4 p-4">
-      <h2 className="text-[15px] font-semibold">{title}</h2>
-      <div className="mt-3">{children}</div>
-    </Card>
+    <section aria-labelledby={id} className="grid grid-cols-1 gap-5 rounded-3xl border border-border bg-card p-5 sm:p-7 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
+      <div>
+        <span className="font-mono text-[13px] text-muted-foreground tabular-nums" aria-hidden="true">
+          {String(index).padStart(2, "0")}
+        </span>
+        <h2 id={id} className="mt-1.5 text-base font-semibold">
+          {title}
+        </h2>
+        {description ? <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{description}</p> : null}
+      </div>
+      <div className="min-w-0">{children}</div>
+    </section>
+  );
+}
+
+function Group({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium">{label}</legend>
+      <div className="mt-2 flex flex-wrap gap-2">{children}</div>
+    </fieldset>
   );
 }
 
@@ -86,10 +109,11 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
     note: prefillNote,
   } = await searchParams;
   const isNew = id === "new";
-  const item = isNew
-    ? undefined
-    : (await getCatalogAll()).find((i) => i.slug === id);
-  if (!isNew && !item) notFound();
+  // 编辑表单要带上 row_version，提交时做乐观锁比对（并发编辑不再静默覆盖）。
+  const loaded = isNew ? undefined : await getItemForEdit(id);
+  if (!isNew && !loaded) notFound();
+  const item = loaded?.item;
+  const rowVersion = loaded?.rowVersion;
 
   // 投稿转条目：主链接按主机归到 GitHub 或官网
   let prefillGithub = "";
@@ -104,157 +128,248 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
   }
 
   return (
-    <form action={saveItem} id="item-form" className="pb-16">
+    <form action={saveItem} id="item-form">
       <DraftKeeper formId="item-form" storageKey={isNew ? "new" : item!.slug} />
       {item ? (
-        <input type="hidden" name="originalSlug" value={item.slug} />
+        <>
+          <input type="hidden" name="originalSlug" value={item.slug} />
+          {/* 乐观锁：提交时与库里的 row_version 比对，不一致就提示「刚被别人改过」。 */}
+          <input type="hidden" name="version" value={rowVersion ?? 0} />
+        </>
       ) : null}
 
+      <Breadcrumb items={[{ href: "/admin", label: "条目" }, { label: isNew ? "新建" : item!.name }]} />
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
+        <h1 className="text-2xl font-bold tracking-[-0.01em]">{isNew ? "新建条目" : `编辑：${item!.name}`}</h1>
+        {item?.status === "published" ? (
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/software/${item.slug}`} target="_blank" rel="noopener">
+              看前台页面
+              <ArrowUpRight />
+            </Link>
+          </Button>
+        ) : null}
+      </div>
+
       {e ? (
-        <p className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-[13px] text-destructive">
+        <p role="alert" className="mt-5 flex items-start gap-2 rounded-xl bg-destructive/8 px-3 py-2.5 text-[13px] font-medium text-destructive">
+          <CircleAlert className="mt-px size-4 shrink-0" aria-hidden="true" />
           {e}
         </p>
       ) : null}
       {isNew && prefillName ? (
-        <p className="mb-4 rounded-lg bg-primary/10 px-3 py-2 text-[13px] text-primary">
-          已带入投稿「{prefillName}」的内容，核对后保存即可上架。
+        <p role="status" className="mt-5 flex items-start gap-2 rounded-xl bg-muted px-3 py-2.5 text-[13px]">
+          <Info className="mt-px size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          已带入投稿「{prefillName}」的内容，核对后保存即可。
         </p>
       ) : null}
 
-      <Section title="基本">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="名称 *" htmlFor="f-name">
-            <Input
-              id="f-name"
-              name="name"
-              required
-              defaultValue={item?.name ?? prefillName}
-            />
-          </Field>
-          <Field label="slug（URL，小写字母数字中划线）*" htmlFor="f-slug">
-            <Input id="f-slug" name="slug" required defaultValue={item?.slug} />
-          </Field>
-          <Field label="中文名（可选）" htmlFor="f-nameZh">
-            <Input id="f-nameZh" name="nameZh" defaultValue={item?.nameZh} />
-          </Field>
-          <Field label="别名（逗号分隔，用于搜索）" htmlFor="f-aliases">
-            <Input
-              id="f-aliases"
-              name="aliases"
-              defaultValue={item?.aliases.join("，")}
-            />
-          </Field>
-          <Field label="类型" htmlFor="f-kind">
-            <select
-              id="f-kind"
-              name="kind"
-              defaultValue={item?.kind ?? prefillKind ?? "app"}
-              className={selectCls}
-            >
-              {Object.entries(kindLabel).map(([value, text]) => (
-                <option key={value} value={value}>
-                  {text}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="来源徽章" htmlFor="f-source">
-            <select
-              id="f-source"
-              name="source"
-              defaultValue={item?.source ?? "official"}
-              className={selectCls}
-            >
-              {Object.entries(sourceLabel).map(([value, text]) => (
-                <option key={value} value={value}>
-                  {text}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field
-            label="价格（卡片展示，如 免费 / 会员 ¥68/月；留空按免费）"
-            htmlFor="f-price"
-          >
-            <Input id="f-price" name="price" defaultValue={item?.price} />
-          </Field>
-          <Field label="状态" htmlFor="f-status">
-            <select
-              id="f-status"
-              name="status"
-              defaultValue={item?.status ?? "draft"}
-              className={selectCls}
-            >
-              <option value="draft">草稿（前台不可见）</option>
-              <option value="published">已发布</option>
-            </select>
-          </Field>
-          <Field label="标签（逗号分隔，最多展示 3 个）" htmlFor="f-tags">
-            <Input id="f-tags" name="tags" defaultValue={item?.tags.join("，")} />
-          </Field>
-        </div>
-        <div className="mt-3">
-          <Check name="featured" value="on" defaultChecked={item?.featured}>
-            精选（卡片显示 NEW）
-          </Check>
-        </div>
-      </Section>
-
-      <Section title="文案">
-        <div className="grid gap-3">
-          <Field label="一句话简介 *（卡片两行展示）" htmlFor="f-summary">
-            <Input
-              id="f-summary"
-              name="summary"
-              required
-              defaultValue={item?.summary ?? prefillNote}
-            />
-          </Field>
-          <Field
-            label="详细介绍（纯文本，空行分段，不解析 HTML）"
-            htmlFor="f-body"
-          >
-            <Textarea
-              id="f-body"
-              name="body"
-              rows={6}
-              defaultValue={item?.body}
-            />
-          </Field>
-          <Field label="使用教程（每行一步）" htmlFor="f-tutorial">
-            <Textarea
-              id="f-tutorial"
-              name="tutorial"
-              rows={5}
-              defaultValue={item?.tutorial.join("\n")}
-            />
-          </Field>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="适合" htmlFor="f-whoFor">
-              <Textarea
-                id="f-whoFor"
-                name="whoFor"
-                rows={2}
-                defaultValue={item?.whoFor}
+      <div className="mt-6 space-y-4">
+        <Section index={1} title="基本" description="名称、网址和在卡片上展示的信息。">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <Field label="名称" htmlFor="f-name">
+              <Input
+                id="f-name"
+                name="name"
+                required
+                defaultValue={item?.name ?? prefillName}
               />
             </Field>
-            <Field label="不适合" htmlFor="f-whoNot">
+            <Field label="slug" htmlFor="f-slug" hint="网址里的标识，小写字母、数字和中划线。">
+              <Input id="f-slug" name="slug" required className="font-mono" aria-describedby="f-slug-hint" defaultValue={item?.slug} />
+            </Field>
+            <Field label="中文名" htmlFor="f-nameZh" optional>
+              <Input id="f-nameZh" name="nameZh" defaultValue={item?.nameZh} />
+            </Field>
+            <Field label="别名" htmlFor="f-aliases" hint="逗号分隔，只用于搜索。">
+              <Input
+                id="f-aliases"
+                name="aliases"
+                aria-describedby="f-aliases-hint"
+                defaultValue={item?.aliases.join("，")}
+              />
+            </Field>
+            <Field label="类型" htmlFor="f-kind">
+              <select
+                id="f-kind"
+                name="kind"
+                defaultValue={item?.kind ?? prefillKind ?? "app"}
+                className={selectCls}
+              >
+                {Object.entries(kindLabel).map(([value, text]) => (
+                  <option key={value} value={value}>
+                    {text}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="来源徽章" htmlFor="f-source">
+              <select
+                id="f-source"
+                name="source"
+                defaultValue={item?.source ?? "official"}
+                className={selectCls}
+              >
+                {Object.entries(sourceLabel).map(([value, text]) => (
+                  <option key={value} value={value}>
+                    {text}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="价格" htmlFor="f-price" hint="卡片展示，如「会员 ¥68/月」；留空按免费。">
+              <Input id="f-price" name="price" aria-describedby="f-price-hint" defaultValue={item?.price} />
+            </Field>
+            <Field
+              label="许可证"
+              htmlFor="f-license"
+              optional
+              hint="SPDX 标识，如 GPL-3.0-only、MIT。核验不到就留空，不要猜。"
+            >
+              <Input
+                id="f-license"
+                name="license"
+                aria-describedby="f-license-hint"
+                defaultValue={item?.license}
+                placeholder="MIT"
+              />
+            </Field>
+            <Field label="版本" htmlFor="f-version" optional hint="条目描述的版本号，如 4.9.8。">
+              <Input
+                id="f-version"
+                name="version"
+                aria-describedby="f-version-hint"
+                defaultValue={item?.version}
+              />
+            </Field>
+            <Field
+              label="链接核验于"
+              htmlFor="f-linksCheckedAt"
+              optional
+              hint="最近一次人工确认链接可达的日期，用于发现死链。"
+            >
+              <Input
+                id="f-linksCheckedAt"
+                name="linksCheckedAt"
+                type="date"
+                aria-describedby="f-linksCheckedAt-hint"
+                defaultValue={item?.linksCheckedAt}
+              />
+            </Field>
+            <Field label="状态" htmlFor="f-status">
+              <select
+                id="f-status"
+                name="status"
+                defaultValue={item?.status ?? "draft"}
+                className={selectCls}
+              >
+                <option value="draft">草稿（前台不可见）</option>
+                <option value="review">待审核（等管理员发布）</option>
+                <option value="published">已发布</option>
+              </select>
+            </Field>
+            <Field label="标签" htmlFor="f-tags" hint="逗号分隔，卡片最多展示 3 个。">
+              <Input id="f-tags" name="tags" aria-describedby="f-tags-hint" defaultValue={item?.tags.join("，")} />
+            </Field>
+            <div className="flex items-end">
+              <Check name="featured" value="on" defaultChecked={item?.featured}>
+                精选（卡片与首页显示「精选」）
+              </Check>
+            </div>
+          </div>
+        </Section>
+
+        <Section index={2} title="文案" description="先回答该不该用：一句话、适合、不适合，再写详细介绍、上手步骤与详细教程。">
+          <div className="grid grid-cols-1 gap-5">
+            <Field label="一句话简介" htmlFor="f-summary" hint="卡片最多展示两行。">
+              <Input
+                id="f-summary"
+                name="summary"
+                required
+                aria-describedby="f-summary-hint"
+                defaultValue={item?.summary ?? prefillNote}
+              />
+            </Field>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <Field label="适合" htmlFor="f-whoFor">
+                <Textarea
+                  id="f-whoFor"
+                  name="whoFor"
+                  rows={3}
+                  defaultValue={item?.whoFor}
+                />
+              </Field>
+              <Field label="不适合" htmlFor="f-whoNot">
+                <Textarea
+                  id="f-whoNot"
+                  name="whoNot"
+                  rows={3}
+                  defaultValue={item?.whoNot}
+                />
+              </Field>
+            </div>
+            <Field label="详细介绍" htmlFor="f-body" hint="纯文本，空行分段，不解析 HTML。">
               <Textarea
-                id="f-whoNot"
-                name="whoNot"
-                rows={2}
-                defaultValue={item?.whoNot}
+                id="f-body"
+                name="body"
+                rows={7}
+                aria-describedby="f-body-hint"
+                defaultValue={item?.body}
+              />
+            </Field>
+            <Field label="上手步骤" htmlFor="f-tutorial" hint="每行一步。">
+              <Textarea
+                id="f-tutorial"
+                name="tutorial"
+                rows={5}
+                aria-describedby="f-tutorial-hint"
+                defaultValue={item?.tutorial.join("\n")}
+              />
+            </Field>
+            <Field
+              label="教程导读"
+              htmlFor="f-guideIntro"
+              optional
+              hint="一句话说明这篇教程覆盖到哪一步。"
+            >
+              <Input id="f-guideIntro" name="guideIntro" defaultValue={item?.guide?.intro} />
+            </Field>
+            <Field
+              label="教程正文"
+              htmlFor="f-guideMarkdown"
+              optional
+              hint="支持 Markdown：## 小节、**粗体**、`代码`、- 列表、``` 围栏代码块、| 表格 |、[文字](https://链接)。原始 HTML 不解析。"
+            >
+              <Textarea
+                id="f-guideMarkdown"
+                name="guideMarkdown"
+                rows={10}
+                className="font-mono text-[13px]"
+                aria-describedby="f-guideMarkdown-hint"
+                defaultValue={item?.guide?.markdown}
+              />
+            </Field>
+            <Field
+              label="配套资料"
+              htmlFor="f-guideResources"
+              optional
+              hint={`一行一条：类型 | 标题 | 链接 | 说明（说明可省）。类型可用 ${GUIDE_KINDS.join(" / ")}。插图只能填本站已上传的 /media/ 图片。`}
+            >
+              <Textarea
+                id="f-guideResources"
+                name="guideResources"
+                rows={4}
+                className="font-mono text-[13px]"
+                aria-describedby="f-guideResources-hint"
+                defaultValue={formatGuideLines(item?.guide?.resources)}
               />
             </Field>
           </div>
-        </div>
-      </Section>
+        </Section>
 
-      <Section title="归类">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <p className={hintCls}>场景（可多选）</p>
-            <div className="mt-1 flex flex-wrap gap-x-4">
+        <Section index={3} title="归类" description="决定条目出现在哪些场景和平台筛选里。">
+          <div className="grid grid-cols-1 gap-6">
+            <Group label="场景（可多选）">
               {scenes.map((s) => (
                 <Check
                   key={s.id}
@@ -265,11 +380,8 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
                   {s.name}
                 </Check>
               ))}
-            </div>
-          </div>
-          <div>
-            <p className={hintCls}>平台（可多选）</p>
-            <div className="mt-1 flex flex-wrap gap-x-4">
+            </Group>
+            <Group label="平台（可多选）">
               {Object.entries(platformLabel).map(([value, text]) => (
                 <Check
                   key={value}
@@ -282,164 +394,203 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
                   {text}
                 </Check>
               ))}
+            </Group>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <Field label="同类替代" htmlFor="f-alternatives" hint="填 slug，逗号分隔。">
+                <Input
+                  id="f-alternatives"
+                  name="alternatives"
+                  className="font-mono"
+                  aria-describedby="f-alternatives-hint"
+                  defaultValue={item?.alternatives.join("，")}
+                />
+              </Field>
+              <Field label="优惠说明" htmlFor="f-discountNote" optional>
+                <Input
+                  id="f-discountNote"
+                  name="discountNote"
+                  defaultValue={item?.discountNote}
+                />
+              </Field>
             </div>
           </div>
-          <Field label="同类替代（slug，逗号分隔）" htmlFor="f-alternatives">
-            <Input
-              id="f-alternatives"
-              name="alternatives"
-              defaultValue={item?.alternatives.join("，")}
-            />
-          </Field>
-          <Field label="优惠说明（可选）" htmlFor="f-discountNote">
-            <Input
-              id="f-discountNote"
-              name="discountNote"
-              defaultValue={item?.discountNote}
-            />
-          </Field>
-        </div>
-      </Section>
+        </Section>
 
-      <Section title="链接（只允许 https）">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="官网（主 CTA）" htmlFor="f-official">
-            <Input
-              id="f-official"
-              name="official"
-              type="url"
-              defaultValue={item?.links.official ?? prefillOfficial}
-            />
-          </Field>
-          <Field label="产品主页（可与官网不同）" htmlFor="f-homepage">
-            <Input
-              id="f-homepage"
-              name="homepage"
-              type="url"
-              defaultValue={item?.links.homepage}
-            />
-          </Field>
-          <Field label="GitHub（限 github.com 等 Git 托管）" htmlFor="f-github">
-            <Input
-              id="f-github"
-              name="github"
-              type="url"
-              defaultValue={item?.links.github ?? prefillGithub}
-            />
-          </Field>
-          <Field
-            label="已核验镜像（必须同时有官网或 GitHub）"
-            htmlFor="f-disk"
-          >
-            <Input
-              id="f-disk"
-              name="disk"
-              type="url"
-              defaultValue={item?.links.disk}
-            />
-          </Field>
-          <Field
-            label="镜像说明（镜像必填：来源、校验方式）"
-            htmlFor="f-diskNote"
-          >
-            <Input
-              id="f-diskNote"
-              name="diskNote"
-              defaultValue={item?.links.diskNote}
-            />
-          </Field>
-        </div>
-      </Section>
+        <Section index={4} title="链接" description="只允许 https。主按钮按官网 → GitHub → 产品主页取第一个；镜像永远不做主按钮。">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <Field label="官网" htmlFor="f-official">
+              <Input
+                id="f-official"
+                name="official"
+                type="url"
+                className="font-mono"
+                defaultValue={item?.links.official ?? prefillOfficial}
+              />
+            </Field>
+            <Field label="产品主页" htmlFor="f-homepage" optional>
+              <Input
+                id="f-homepage"
+                name="homepage"
+                type="url"
+                className="font-mono"
+                defaultValue={item?.links.homepage}
+              />
+            </Field>
+            <Field label="GitHub" htmlFor="f-github" hint="限 github.com、GitLab、Gitee、Codeberg。">
+              <Input
+                id="f-github"
+                name="github"
+                type="url"
+                className="font-mono"
+                aria-describedby="f-github-hint"
+                defaultValue={item?.links.github ?? prefillGithub}
+              />
+            </Field>
+            <Field label="已核验镜像" htmlFor="f-disk" hint="必须同时有官网或 GitHub。">
+              <Input
+                id="f-disk"
+                name="disk"
+                type="url"
+                className="font-mono"
+                aria-describedby="f-disk-hint"
+                defaultValue={item?.links.disk}
+              />
+            </Field>
+            <div className="sm:col-span-2">
+              <Field label="镜像说明" htmlFor="f-diskNote" hint="填了镜像就必须写：来源、校验方式。">
+                <Input
+                  id="f-diskNote"
+                  name="diskNote"
+                  aria-describedby="f-diskNote-hint"
+                  defaultValue={item?.links.diskNote}
+                />
+              </Field>
+            </div>
+            <Field
+              label="对应文件名"
+              htmlFor="f-diskFile"
+              hint="镜像里被校验的那个文件，含版本号。与 SHA-256 必须成对填写。"
+            >
+              <Input
+                id="f-diskFile"
+                name="diskFile"
+                className="font-mono"
+                aria-describedby="f-diskFile-hint"
+                defaultValue={item?.links.diskFile}
+              />
+            </Field>
+            <Field label="SHA-256" htmlFor="f-diskSha256" hint="64 位十六进制。留空表示不提供校验值。">
+              <Input
+                id="f-diskSha256"
+                name="diskSha256"
+                className="font-mono"
+                maxLength={64}
+                aria-describedby="f-diskSha256-hint"
+                defaultValue={item?.links.diskSha256}
+              />
+            </Field>
+          </div>
+        </Section>
 
-      <Section title="图标与预览图（存服务器，单张 ≤5MB，JPEG/PNG/WebP/GIF）">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className={cell}>
-            <label className={hintCls} htmlFor="f-previews">
-              预览图（可多选，按住 Ctrl/Cmd 追加，最多 6 张；GIF 可动图）
-            </label>
-            <Input
-              id="f-previews"
-              name="previews"
-              type="file"
-              multiple
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              className="h-auto py-1.5"
-            />
+        <Section index={5} title="图标与截图" description="存在服务器上，单张不超过 5MB，支持 JPEG、PNG、WebP、GIF。">
+          <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <Field label="截图" htmlFor="f-previews" hint="可多选，最多 6 张；GIF 可以是动图。">
+                <Input
+                  id="f-previews"
+                  name="previews"
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  aria-describedby="f-previews-hint"
+                  className={fileCls}
+                />
+              </Field>
+              <Field label="图标图" htmlFor="f-iconImage" hint={item?.iconImage ? `当前：${item.iconImage}` : "优先于 Simple Icons 和字母。"}>
+                <Input
+                  id="f-iconImage"
+                  name="iconImage"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  aria-describedby="f-iconImage-hint"
+                  className={fileCls}
+                />
+              </Field>
+            </div>
             {item?.previews.length ? (
-              <div className="mt-1 space-y-1.5">
-                {item.previews.map((src, index) => (
-                  <label
-                    key={src}
-                    className="flex items-center gap-2 text-[12px] text-muted-foreground"
-                  >
-                    <input
-                      type="checkbox"
-                      name="removePreview"
-                      value={index}
-                      className="size-3.5 accent-destructive"
-                    />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={src}
-                      alt=""
-                      className="h-8 w-14 rounded border border-border object-cover"
-                    />
-                    第 {index + 1} 张（勾选保存后删除）
-                  </label>
-                ))}
-              </div>
+              <fieldset>
+                <legend className="text-sm font-medium">现有截图</legend>
+                <p className="mt-1 text-xs text-muted-foreground">勾选的会在保存后删除。</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {item.previews.map((src, index) => (
+                    <label
+                      key={src}
+                      className="flex cursor-pointer items-center gap-2 rounded-xl border border-border p-1.5 pr-3 text-xs text-muted-foreground transition-colors has-checked:border-destructive has-checked:text-destructive"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={src}
+                        alt=""
+                        className="h-10 w-16 rounded-lg border border-border object-cover"
+                      />
+                      <input
+                        type="checkbox"
+                        name="removePreview"
+                        value={index}
+                        className="size-4 accent-destructive"
+                      />
+                      删除第 {index + 1} 张
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
             ) : null}
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+              <Field label="字母回退" htmlFor="f-letter">
+                <Input
+                  id="f-letter"
+                  name="letter"
+                  maxLength={2}
+                  defaultValue={item?.icon.letter}
+                />
+              </Field>
+              <Field label="品牌色" htmlFor="f-color">
+                <Input
+                  id="f-color"
+                  name="color"
+                  placeholder="#1f6feb"
+                  className="font-mono"
+                  defaultValue={item?.icon.color}
+                />
+              </Field>
+              <Field label="Simple Icons id" htmlFor="f-simpleIcon">
+                <Input
+                  id="f-simpleIcon"
+                  name="simpleIcon"
+                  className="font-mono"
+                  defaultValue={item?.icon.simpleIcon}
+                />
+              </Field>
+            </div>
           </div>
-          <div className={cell}>
-            <label className={hintCls} htmlFor="f-iconImage">
-              图标图（替代字母/Simple Icons）
-            </label>
-            <Input
-              id="f-iconImage"
-              name="iconImage"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="h-auto py-1.5"
-            />
-            {item?.iconImage ? (
-              <p className="text-[12px] text-muted-foreground">
-                当前：{item.iconImage}
-              </p>
-            ) : null}
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Field label="字母回退" htmlFor="f-letter">
-              <Input
-                id="f-letter"
-                name="letter"
-                maxLength={2}
-                defaultValue={item?.icon.letter}
-              />
-            </Field>
-            <Field label="品牌色" htmlFor="f-color">
-              <Input
-                id="f-color"
-                name="color"
-                placeholder="#0071e3"
-                defaultValue={item?.icon.color}
-              />
-            </Field>
-            <Field label="Simple Icons id" htmlFor="f-simpleIcon">
-              <Input
-                id="f-simpleIcon"
-                name="simpleIcon"
-                defaultValue={item?.icon.simpleIcon}
-              />
-            </Field>
-          </div>
-        </div>
-      </Section>
+        </Section>
+      </div>
 
-      <div className="mt-5 flex items-center gap-4">
-        <Button type="submit">保存</Button>
-        <Button asChild variant="ghost">
-          <Link href="/admin">取消</Link>
-        </Button>
+      <div className="glass sticky bottom-0 z-10 -mx-5 mt-8 border-t border-border px-5 py-3 sm:-mx-8 sm:px-8">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" size="lg">
+            保存
+          </Button>
+          <Button asChild variant="ghost" size="lg">
+            <Link href="/admin">
+              <ChevronLeft />
+              返回列表
+            </Link>
+          </Button>
+          <p className="ml-auto hidden text-xs text-muted-foreground sm:block">
+            填写内容会暂存在本机，校验失败跳回时自动恢复。
+          </p>
+        </div>
       </div>
     </form>
   );

@@ -2,26 +2,17 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
-import { SoftwareIcon } from "@/components/SoftwareIcon";
+import { TicketPercent } from "lucide-react";
+
+import { SceneIcon } from "@/components/SceneIcon";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { scenes } from "@/data/scenes";
-import type { CatalogCounts, Platform } from "@/data/types";
-import { activeFilterCount, catalogFiltersFromURL, catalogHref, clearCatalogFilters } from "@/lib/catalog-query";
+import type { CatalogCounts } from "@/data/types";
+import { activeFilterCount, catalogFiltersFromURL, catalogHref, clearCatalogFilters, kindIds, platformIds } from "@/lib/catalog-query";
 import { kindLabel, platformLabel } from "@/lib/items";
-
-const platformMeta: {
-  id: Platform;
-  letter: string;
-  simpleIcon?: string;
-  color: string;
-}[] = [
-  { id: "windows", letter: "W", color: "#0078D4" },
-  { id: "macos", letter: "M", simpleIcon: "apple", color: "#111111" },
-  { id: "linux", letter: "L", simpleIcon: "linux", color: "#FCC624" },
-];
 
 function FilterRow({
   id,
@@ -39,25 +30,33 @@ function FilterRow({
   icon?: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-11 items-center gap-2">
+    <div className="-mx-2 flex min-h-10 items-center gap-3 rounded-lg px-2 transition-colors hover:bg-muted pointer-coarse:min-h-11">
       <Checkbox id={id} checked={checked} onCheckedChange={onToggle} />
-      <Label
-        htmlFor={id}
-        className="flex min-h-11 flex-1 cursor-pointer items-center gap-2 text-sm font-normal"
-      >
+      <Label htmlFor={id} className="flex min-h-10 flex-1 cursor-pointer items-center gap-2.5 text-sm font-normal leading-none">
         {icon}
-        <span>{label}</span>
-        <span className="ml-auto text-xs tabular-nums text-muted-foreground">{count}</span>
+        <span className={checked ? "font-medium" : undefined}>{label}</span>
+        <span className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">{count}</span>
       </Label>
+    </div>
+  );
+}
+
+function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="border-t border-border pt-4">
+      <h3 className="mb-1.5 text-xs font-medium text-muted-foreground">{title}</h3>
+      {children}
     </div>
   );
 }
 
 export function FilterPanel({
   counts,
+  resultCount,
   onDone,
 }: {
   counts: CatalogCounts;
+  resultCount?: number;
   onDone?: () => void;
 }) {
   const router = useRouter();
@@ -70,6 +69,8 @@ export function FilterPanel({
   const push = (mutate: (p: URLSearchParams) => void) => {
     const p = new URLSearchParams(sp.toString());
     mutate(p);
+    // 改了筛选，原来的页码可能已越界（第 3 页只剩 1 页），统一回到第 1 页。
+    p.delete("page");
     startTransition(() => router.push(catalogHref(p), { scroll: false }));
   };
 
@@ -85,25 +86,23 @@ export function FilterPanel({
   return (
     <fieldset disabled={isPending} aria-busy={isPending} className="min-w-0">
       <legend className="sr-only">目录筛选条件</legend>
-      <div className="flex items-center justify-between border-b border-border pb-2">
-        <h2 className="text-base font-semibold tracking-tight">分类</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="-mr-2 min-h-11 px-2 text-sm text-muted-foreground"
+      <div className="flex min-h-8 items-center justify-between">
+        <h2 className="text-sm font-semibold">筛选</h2>
+        <button
+          type="button"
+          className="-mr-1 rounded-md px-1 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-40 pointer-coarse:min-h-11"
           disabled={!dirty || isPending}
           onClick={() => push(clearCatalogFilters)}
         >
-          清除筛选
-        </Button>
+          清除全部
+        </button>
       </div>
 
-      <div className="mt-3 flex min-h-11 items-center justify-between gap-2">
-        <Label
-          htmlFor="filter-discount"
-          className="flex min-h-11 flex-1 cursor-pointer items-center text-sm font-medium text-discount"
-        >
-          只看优惠（{counts.discount}）
+      <div className="mt-3 mb-4 flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-card px-3">
+        <Label htmlFor="filter-discount" className="flex min-h-11 flex-1 cursor-pointer items-center gap-2 text-sm font-normal">
+          <TicketPercent className="size-4 text-discount" aria-hidden="true" />
+          只看优惠
+          <span className="font-mono text-xs text-muted-foreground tabular-nums">{counts.discount}</span>
         </Label>
         <Switch
           id="filter-discount"
@@ -117,61 +116,54 @@ export function FilterPanel({
         />
       </div>
 
-      <h3 className="mb-1 mt-4 text-sm font-semibold text-muted-foreground">类型</h3>
-      {(Object.keys(kindLabel) as (keyof typeof kindLabel)[]).map((id) => (
-        <FilterRow
-          key={id}
-          id={`kind-${id}`}
-          label={kindLabel[id]}
-          count={counts.kinds[id]}
-          checked={kindPicked.has(id)}
-          onToggle={() => toggleListParam("kind", kindPicked, id)}
-        />
-      ))}
-
-      <h3 className="mb-1 mt-4 text-sm font-semibold text-muted-foreground">使用场景</h3>
-      <FilterRow
-        id="scene-all"
-        label="全部场景"
-        count={counts.total}
-        checked={scenePicked.size === 0}
-        onToggle={() => push((p) => p.delete("scene"))}
-      />
-      {scenes.map((s) => (
-        <FilterRow
-          key={s.id}
-          id={`scene-${s.id}`}
-          label={s.name}
-          count={counts.scenes[s.id]}
-          checked={scenePicked.has(s.id)}
-          onToggle={() => toggleListParam("scene", scenePicked, s.id)}
-        />
-      ))}
-
-      <h3 className="mb-1 mt-4 text-sm font-semibold text-muted-foreground">平台</h3>
-      {platformMeta.map((p) => (
-        <FilterRow
-          key={p.id}
-          id={`platform-${p.id}`}
-          label={platformLabel[p.id]}
-          count={counts.platforms[p.id]}
-          checked={platformPicked.has(p.id)}
-          onToggle={() => toggleListParam("platform", platformPicked, p.id)}
-          icon={
-            <SoftwareIcon
-              item={{
-                name: platformLabel[p.id],
-                icon: { letter: p.letter, color: p.color, simpleIcon: p.simpleIcon },
-              }}
-              size={16}
+      <div className="space-y-4">
+        <FilterGroup title="类型">
+          {kindIds.map((id) => (
+            <FilterRow
+              key={id}
+              id={`kind-${id}`}
+              label={kindLabel[id]}
+              count={counts.kinds[id]}
+              checked={kindPicked.has(id)}
+              onToggle={() => toggleListParam("kind", kindPicked, id)}
             />
-          }
-        />
-      ))}
+          ))}
+        </FilterGroup>
+
+        <FilterGroup title="场景">
+          {scenes
+            .filter((s) => counts.scenes[s.id] > 0 || scenePicked.has(s.id))
+            .map((s) => (
+              <FilterRow
+                key={s.id}
+                id={`scene-${s.id}`}
+                label={s.name}
+                count={counts.scenes[s.id]}
+                checked={scenePicked.has(s.id)}
+                onToggle={() => toggleListParam("scene", scenePicked, s.id)}
+                icon={<SceneIcon id={s.id} size={22} />}
+              />
+            ))}
+        </FilterGroup>
+
+        <FilterGroup title="平台">
+          {platformIds.map((id) => (
+            <FilterRow
+              key={id}
+              id={`platform-${id}`}
+              label={platformLabel[id]}
+              count={counts.platforms[id]}
+              checked={platformPicked.has(id)}
+              onToggle={() => toggleListParam("platform", platformPicked, id)}
+            />
+          ))}
+        </FilterGroup>
+      </div>
+
       {onDone ? (
-        <div className="sticky bottom-0 mt-4 border-t border-border bg-popover pb-1 pt-4">
-          <Button onClick={onDone} className="min-h-11 w-full" disabled={isPending}>
-            {isPending ? "正在更新…" : "查看结果"}
+        <div className="sticky bottom-0 -mx-5 mt-6 border-t border-border bg-popover px-5 pb-5 pt-4">
+          <Button onClick={onDone} size="lg" className="w-full" disabled={isPending}>
+            {isPending ? "正在更新…" : resultCount === undefined ? "查看结果" : `查看 ${resultCount} 个结果`}
           </Button>
         </div>
       ) : null}

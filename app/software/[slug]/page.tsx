@@ -1,22 +1,28 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { ChevronLeft, ExternalLink } from "lucide-react";
+import { Check, MessageSquareWarning, ShieldCheck, TicketPercent, X } from "lucide-react";
 
-import { AppCardRow } from "@/components/AppCard";
-import { ItemLinks } from "@/components/ItemLinks";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { GuideSection } from "@/components/GuideSection";
+import { hostOf, ItemLinks, otherLinkCount } from "@/components/ItemLinks";
+import { LicenseNote } from "@/components/LicenseNote";
+import { OutboundLink } from "@/components/OutboundLink";
+import { RichText } from "@/components/RichText";
+import { SectionHeading } from "@/components/SectionHeading";
+import { FeaturedMark, SoftwareCard } from "@/components/SoftwareCard";
 import { SoftwareIcon } from "@/components/SoftwareIcon";
 import { SourceBadge } from "@/components/SourceBadge";
 import { TagList } from "@/components/TagList";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { scenes } from "@/data/scenes";
 import { alternativesOf, getSoftware } from "@/lib/catalog";
-import { kindLabel, platformLabel, primaryLink, sourceLabel } from "@/lib/items";
+import { splitBodyColumns } from "@/lib/bodyColumns";
+import { formatDate, kindLabel, platformLabel, toCatalogItem } from "@/lib/items";
+import { primaryChannel } from "@/lib/links";
 import { absoluteSiteUrl } from "@/lib/site";
 
 type Props = {
@@ -54,34 +60,50 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+function Fact({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 py-2.5">
+      <dt className="shrink-0 text-[13px] text-muted-foreground">{label}</dt>
+      <dd className="min-w-0 text-right text-[13px] font-medium">{children}</dd>
+    </div>
+  );
+}
+
+function FitCard({ fit, text }: { fit: boolean; text: string }) {
+  const Icon = fit ? Check : X;
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <h3 className="flex items-center gap-2.5 text-sm font-semibold">
+        <span
+          className="tint-soft grid size-7 place-items-center rounded-full"
+          style={{ "--tone": fit ? "var(--opensource)" : "var(--destructive)" } as CSSProperties}
+          aria-hidden="true"
+        >
+          <Icon className="size-4" strokeWidth={2.25} />
+        </span>
+        {fit ? "适合" : "不适合"}
+      </h3>
+      <p className="mt-3 text-[15px] leading-[1.75]">{text}</p>
+    </div>
+  );
+}
+
 export default async function SoftwarePage({ params }: Props) {
   const { slug } = await params;
   const item = await getSoftware(slug);
   if (!item) notFound();
   const [alts, requestHeaders] = await Promise.all([alternativesOf(item), headers()]);
   const nonce = requestHeaders.get("x-nonce") ?? undefined;
-  const primary = primaryLink(item);
-  let primaryHost = primary.url;
-  try {
-    primaryHost = primary.url ? new URL(primary.url).host : "";
-  } catch {
-    primaryHost = primary.url;
-  }
+  const primary = primaryChannel(item.links);
+  const others = otherLinkCount(item.links, primary?.url ?? "");
   const sceneLinks = scenes.filter((scene) => item.scenes.includes(scene.id));
+  const firstScene = sceneLinks[0];
+  const updated = formatDate(item.updatedAt);
   const paragraphs = item.body
     .split(/\n+/)
     .map((text) => text.trim())
     .filter(Boolean);
-
-  const infoCells = [
-    {
-      label: "平台",
-      value: item.platforms.map((p) => platformLabel[p]).join(" · "),
-    },
-    { label: "类型", value: kindLabel[item.kind] },
-    { label: "场景", value: sceneLinks.map((s) => s.name).join(" · ") },
-    { label: "同类替代", value: alts.length ? `${alts.length} 款` : "—" },
-  ];
+  const bodyColumns = splitBodyColumns(paragraphs, 2);
 
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
@@ -98,221 +120,236 @@ export default async function SoftwarePage({ params }: Props) {
   }).replace(/</g, "\\u003c");
 
   return (
-    <div className="w-full px-5 py-8 sm:px-8">
+    <div className="shell-wide pb-20 pt-6 sm:pt-8">
       <script
         type="application/ld+json"
         nonce={nonce}
         dangerouslySetInnerHTML={{ __html: jsonLd }}
       />
 
-      <Link
-        href="/"
-        className="inline-flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ChevronLeft className="size-3.5" />
-        探索
-      </Link>
+      <Breadcrumb
+        items={[
+          { href: "/", label: "探索" },
+          ...(firstScene ? [{ href: `/scenes/${firstScene.id}`, label: firstScene.name }] : []),
+          { label: item.name },
+        ]}
+      />
 
-      <header className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start">
-        <SoftwareIcon
-          item={{ name: item.name, icon: item.icon, iconImage: item.iconImage }}
-          size={112}
-          className="shadow-card"
-        />
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              {item.name}
-            </h1>
-            {item.nameZh ? (
-              <span className="text-sm text-muted-foreground">
-                {item.nameZh}
-              </span>
-            ) : null}
+      {/* 三栏：正文 / 获取卡 / 场景与标签。
+          主栏在宽屏下再分两列（见下方 .item-prose 的双栏规则），
+          这样 1440px 里的空间是被内容填满的，而不是把字拉成长行。 */}
+      <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:grid-rows-[auto_1fr] lg:gap-x-14 xl:grid-cols-[minmax(0,1fr)_380px] xl:gap-x-16">
+        <header className="min-w-0 lg:col-start-1 lg:row-start-1">
+          <div className="flex items-start gap-5">
+            <SoftwareIcon item={{ name: item.name, icon: item.icon, iconImage: item.iconImage }} size={80} />
+            <div className="min-w-0 flex-1 pt-1">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h1 className="text-[28px] font-bold leading-tight tracking-[-0.015em] sm:text-4xl">{item.name}</h1>
+                {item.nameZh ? <span className="text-sm text-muted-foreground">{item.nameZh}</span> : null}
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                <SourceBadge kind={item.source} />
+                <span className="text-[13px] text-muted-foreground">{kindLabel[item.kind]}</span>
+                <span className="text-[13px] text-muted-foreground" aria-hidden="true">·</span>
+                <span className="text-[13px] text-muted-foreground">
+                  {item.platforms.map((p) => platformLabel[p]).join(" · ")}
+                </span>
+                {item.featured ? <FeaturedMark /> : null}
+              </div>
+            </div>
           </div>
-
-          <div className="mt-2.5 flex flex-wrap items-center gap-2">
-            <Badge variant="secondary">{kindLabel[item.kind]}</Badge>
-            <SourceBadge kind={item.source} />
-            <span className="text-sm font-semibold">
-              {item.price ?? "免费"}
-            </span>
-          </div>
-
-          <p className="mt-3 max-w-[62ch] text-[15px] leading-relaxed text-muted-foreground">
-            {item.summary}
-          </p>
-
+          {/* summary 是导语，行宽比正文可以稍宽（读者还在扫读阶段），
+              但仍设 34em 上限：超过这个长度就不是导语了。 */}
+          <p className="mt-6 max-w-[34em] text-[17px] leading-[1.75] text-muted-foreground">{item.summary}</p>
           {item.tags.length ? (
-            <div className="mt-3">
+            <div className="mt-5">
               <TagList tags={item.tags} />
             </div>
           ) : null}
+        </header>
 
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            {primary.url ? (
-              <Button asChild size="lg">
-                <a href={primary.url} target="_blank" rel="noopener noreferrer">
-                  前往{primary.label}
-                  <ExternalLink className="size-4" />
-                </a>
-              </Button>
+        <aside aria-labelledby="get-title" className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <div className="rounded-3xl border border-border bg-card p-5 shadow-lift lg:sticky lg:top-24">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 id="get-title" className="text-sm font-semibold">
+                获取
+              </h2>
+              <span className="text-[15px] font-semibold">{item.price ?? "免费"}</span>
+            </div>
+
+            {primary ? (
+              <>
+                <Button asChild size="lg" className="mt-4 w-full">
+                  <OutboundLink
+                    channel={primary}
+                    slug={item.slug}
+                    variant="cta"
+                    className="inline-flex h-full w-full items-center justify-center gap-2"
+                  />
+                </Button>
+                <p className="mt-2 truncate text-center font-mono text-xs text-muted-foreground">
+                  {hostOf(primary.url)}
+                </p>
+              </>
+            ) : (
+              <p className="mt-4 rounded-xl bg-muted px-3 py-3 text-sm text-muted-foreground">暂未填写可用渠道。</p>
+            )}
+
+            {others ? (
+              <div className="mt-5 border-t border-border pt-4">
+                <h3 className="mb-1 text-xs font-medium text-muted-foreground">其他渠道</h3>
+                <ItemLinks links={item.links} exclude={primary?.url} slug={item.slug} />
+              </div>
             ) : null}
-            <p className="text-[12px] text-muted-foreground">
-              {primaryHost ? <>将打开 {primaryHost}。</> : null}
-              本站不提供安装包。
-              {item.updatedAt
-                ? ` 更新于 ${new Date(item.updatedAt).toLocaleDateString("zh-CN")}。`
-                : null}
-            </p>
-          </div>
-        </div>
-      </header>
 
-      {item.previews.length ? (
-        <div className="scroll-row mt-8 gap-4">
-          {item.previews.map((src, index) => (
-            <div
-              key={src}
-              className="relative aspect-[16/10] w-[85%] shrink-0 overflow-hidden rounded-xl border border-border bg-muted sm:w-[70%]"
+            {/* 许可证与渠道是两种信息，不依附「其他渠道」是否存在 ——
+                VS Code 只有官网一条渠道，挂在 others 里会跟着一起消失。 */}
+            <LicenseNote spdx={item.license} source={item.source} />
+
+            <dl className="mt-4 divide-y divide-border border-t border-border">
+              <Fact label="平台">{item.platforms.map((p) => platformLabel[p]).join(" · ")}</Fact>
+              <Fact label="类型">{kindLabel[item.kind]}</Fact>
+              {updated ? <Fact label="更新">{updated}</Fact> : null}
+            </dl>
+
+            {item.discountNote ? (
+              <p
+                className="tint-soft mt-3 flex gap-2.5 rounded-xl px-3 py-2.5 text-xs leading-relaxed"
+                style={{ "--tone": "var(--discount)" } as CSSProperties}
+              >
+                <TicketPercent className="mt-px size-4 shrink-0" aria-hidden="true" />
+                <span className="text-foreground">{item.discountNote}</span>
+              </p>
+            ) : null}
+
+            <p className="mt-3 flex gap-2.5 rounded-xl bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+              <ShieldCheck className="mt-px size-4 shrink-0" aria-hidden="true" />
+              <span>
+                优先用上面列出的官方渠道。镜像里的安装包可对照下方 SHA-256 自行核验；
+                不要下载「绿色版」或被修改过的包。
+              </span>
+            </p>
+
+            <Link
+              href={`/feedback?item=${encodeURIComponent(item.slug)}`}
+              className="mt-4 flex min-h-10 items-center justify-center gap-1.5 rounded-xl text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              <Image
-                src={src}
-                alt={`${item.name} 预览 ${index + 1}`}
-                fill
-                sizes="(max-width: 640px) 85vw, (max-width: 1024px) 70vw, 60vw"
-                className="object-contain"
+              <MessageSquareWarning className="size-3.5" aria-hidden="true" />
+              信息有误？反馈
+            </Link>
+          </div>
+        </aside>
+
+        <div className="min-w-0 space-y-14 lg:col-start-1 lg:row-start-2">
+          <section aria-labelledby="fit-title">
+            <h2 id="fit-title" className="sr-only">
+              适合谁
+            </h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <FitCard fit text={item.whoFor} />
+              <FitCard fit={false} text={item.whoNot} />
+            </div>
+          </section>
+
+          {item.previews.length ? (
+            <section aria-labelledby="preview-title">
+              <SectionHeading id="preview-title" title="截图" />
+              <div className="scroll-row mt-5 gap-4">
+                {item.previews.map((src, index) => (
+                  <div
+                    key={src}
+                    className="relative aspect-[16/10] w-[85%] shrink-0 overflow-hidden rounded-2xl border border-border bg-muted sm:w-[70%]"
+                  >
+                    <Image
+                      src={src}
+                      alt={`${item.name} 预览 ${index + 1}`}
+                      fill
+                      sizes="(max-width: 640px) 85vw, (max-width: 1024px) 70vw, 560px"
+                      className="object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {paragraphs.length ? (
+            <section aria-labelledby="about-title">
+              <SectionHeading id="about-title" title="详细介绍" />
+              {/* 双栏只在 xl（1280px+）起效：每栏约 28 个汉字，仍在中文舒适行宽里。
+                  窄屏用 max-width 把每栏压回满宽，两个 div 自然堆成单栏，
+                  段落顺序仍是原来的上下顺序（grid 不改变 DOM 顺序），
+                  读屏与键盘导航都不会乱。不用 CSS 隐藏内容 ——
+                  隐藏的段落对读屏软件依然存在，会让朗读顺序变成「先跳到第二栏」。*/}
+              <div
+                className={
+                  bodyColumns.length > 1
+                    ? "mt-5 grid gap-x-12 gap-y-4 xl:grid-cols-2"
+                    : "mt-5 max-w-[42em] space-y-4"
+                }
+              >
+                {bodyColumns.length > 1
+                  ? bodyColumns.map((column, ci) => (
+                      // max-w 只在 xl 以下起作用：分栏成立时（xl 起）
+                      // 由grid 决定列宽，这里给个上限防止窄屏堆叠后行长失控。
+                      // 42em 约 42 个汉字，是中文长行的舒适上限。
+                      <div key={ci} className="max-w-[42em] space-y-4 xl:max-w-none">
+                        {column.map((text, pi) => (
+                          <p key={pi} className="text-[15px] leading-[1.85]">
+                            <RichText text={text} />
+                          </p>
+                        ))}
+                      </div>
+                    ))
+                  : paragraphs.map((text, index) => (
+                      <p key={index} className="text-[15px] leading-[1.85]">
+                        <RichText text={text} />
+                      </p>
+                    ))}
+              </div>
+            </section>
+          ) : null}
+
+          {item.tutorial.length ? (
+            <section aria-labelledby="steps-title">
+              <SectionHeading id="steps-title" title="上手步骤" />
+              {/* 步骤不改双栏：每步是一个带序号的整块，拆到两栏会让
+                  「01」和「02」分居左右，读起来失去顺序感。 */}
+              <ol className="mt-5 border-t border-border xl:max-w-[46em]">
+                {item.tutorial.map((step, index) => (
+                  <li key={step} className="flex gap-4 border-b border-border py-4 text-[15px] leading-[1.75]">
+                    <span className="w-6 shrink-0 pt-0.5 font-mono text-[13px] text-muted-foreground tabular-nums" aria-hidden="true">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+
+          {item.guide ? (
+            <GuideSection guide={item.guide} />
+          ) : null}
+
+          {alts.length ? (
+            <section aria-labelledby="alts-title">
+              <SectionHeading
+                id="alts-title"
+                title="同类替代"
+                description="同一需求下可以先试这些，尤其是不想买商业许可的时候。"
               />
-            </div>
-          ))}
+              <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {alts.map((alt) => (
+                  <li key={alt.slug} className="flex *:flex-1">
+                    <SoftwareCard item={toCatalogItem(alt)} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
         </div>
-      ) : null}
-
-      <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-border sm:grid-cols-4">
-        {infoCells.map((cell) => (
-          <div key={cell.label} className="bg-card px-3 py-4 text-center">
-            <p className="text-[15px] font-semibold">{cell.value}</p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
-              {cell.label}
-            </p>
-          </div>
-        ))}
       </div>
-
-      {paragraphs.length ? (
-        <section className="mt-10">
-          <h2 className="text-xl font-bold tracking-tight">详细介绍</h2>
-          <div className="mt-3 max-w-[68ch] space-y-3">
-            {paragraphs.map((text, index) => (
-              <p key={index} className="text-[15px] leading-relaxed">
-                {text}
-              </p>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      <Separator className="my-10" />
-
-      <section>
-        <h2 className="text-xl font-bold tracking-tight">概览</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl bg-opensource/5 p-4">
-            <h3 className="text-[13px] font-semibold text-opensource">适合</h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed">{item.whoFor}</p>
-          </div>
-          <div className="rounded-xl bg-discount/5 p-4">
-            <h3 className="text-[13px] font-semibold text-discount">不适合</h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed">{item.whoNot}</p>
-          </div>
-        </div>
-      </section>
-
-      {item.tutorial.length ? (
-        <>
-          <Separator className="my-10" />
-          <section>
-            <h2 className="text-xl font-bold tracking-tight">使用教程</h2>
-            <ol className="mt-4 max-w-[68ch] space-y-3">
-              {item.tutorial.map((step, index) => (
-                <li
-                  key={step}
-                  className="flex gap-3 text-[15px] leading-relaxed"
-                >
-                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-muted-foreground">
-                    {index + 1}
-                  </span>
-                  <span>{step}</span>
-                </li>
-              ))}
-            </ol>
-          </section>
-        </>
-      ) : null}
-
-      <Separator className="my-10" />
-
-      <section>
-        <h2 className="text-xl font-bold tracking-tight">下载渠道</h2>
-        <p className="mt-1 text-[13px] text-muted-foreground">
-          只列可核验的渠道。镜像指作者或项目方提供的合法分发，请优先官网。
-        </p>
-        <div className="mt-4">
-          <ItemLinks links={item.links} />
-        </div>
-      </section>
-
-      <Separator className="my-10" />
-
-      <section>
-        <h2 className="text-xl font-bold tracking-tight">信息与安全</h2>
-        <Card className="mt-4 gap-0 overflow-hidden py-0">
-          <div className="divide-y divide-border">
-            <div className="flex gap-6 px-4 py-3.5">
-              <p className="w-20 shrink-0 text-[13px] text-muted-foreground">
-                价格
-              </p>
-              <p className="text-sm">{item.price ?? "免费"}</p>
-            </div>
-            <div className="flex gap-6 px-4 py-3.5">
-              <p className="w-20 shrink-0 text-[13px] text-muted-foreground">
-                来源类型
-              </p>
-              <p className="text-sm">
-                {kindLabel[item.kind]} · {sourceLabel[item.source]}
-              </p>
-            </div>
-            <div className="flex gap-6 px-4 py-3.5">
-              <p className="w-20 shrink-0 text-[13px] text-muted-foreground">
-                优惠渠道
-              </p>
-              <p className="text-sm leading-relaxed">
-                {item.discountNote
-                  ? item.discountNote
-                  : item.source !== "discount"
-                    ? "无单独优惠渠道。若为付费产品，请看下方同类替代。"
-                    : "—"}
-              </p>
-            </div>
-          </div>
-        </Card>
-        <p className="mt-3 text-[13px] text-muted-foreground">
-          请只使用上面列出的渠道，不要下载「绿色版」或修改包。
-        </p>
-      </section>
-
-      {alts.length ? (
-        <>
-          <Separator className="my-10" />
-          <section>
-            <h2 className="text-xl font-bold tracking-tight">同类替代</h2>
-            <p className="mt-1 text-[13px] text-muted-foreground">
-              同一需求下可以先试这些，尤其是不想订商业许可的时候。
-            </p>
-            <AppCardRow className="mt-4" items={alts} />
-          </section>
-        </>
-      ) : null}
     </div>
   );
 }

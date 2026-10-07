@@ -25,8 +25,16 @@ const CHECKS = [
   { key: "whoNot", label: "不适合", weight: 2, empty: (item) => !item.whoNot?.trim() },
   { key: "alternatives", label: "同类替代", weight: 2, empty: (item) => !item.alternatives?.length },
   { key: "official", label: "官网链接", weight: 2, empty: (item) => !item.links?.official && !item.links?.github },
+  // 许可证与核验日期是机器可校验的结构化字段。缺了它们，读者与后来的维护者
+  // 只能从正文里猜，而正文无法校验。这两项此前是监控盲区：stale-links 只看
+  // linksCheckedAt 是否过期，content:audit 完全不提，都没人报缺失。
+  { key: "license", label: "许可证", weight: 3, empty: (item) => !item.license?.trim() },
+  { key: "linksCheckedAt", label: "链接核验", weight: 2, empty: (item) => !item.linksCheckedAt?.trim() },
   { key: "previews", label: "预览图", weight: 1, empty: (item) => !item.previews?.length },
   { key: "tutorial", label: "使用教程", weight: 1, empty: (item) => !item.tutorial?.length },
+  // 详细教程是「上手步骤」的延伸：只有步骤、没有具体做法的条目，
+  // 读者遇到步骤之外的问题仍然无从下手。
+  { key: "guide", label: "详细教程", weight: 2, empty: (item) => !(item.guide?.markdown?.trim() || item.guide?.resources?.length) },
 ];
 
 const SCENE_MIN_STOCK = 3;
@@ -86,7 +94,7 @@ async function main() {
     items = await readCatalog();
   } catch (error) {
     if (error.code === "ENOENT") {
-      console.error("data/store/catalog.json 不存在。先启动一次应用（npm run dev）生成运行库。");
+      console.error("读不到运行库：配置 MYSQL_URL 指向运行库，或先启动一次应用生成 data/store/catalog.json。");
       process.exitCode = 1;
       return;
     }

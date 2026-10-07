@@ -1,5 +1,6 @@
 export const ITEM_KINDS = ["app", "script", "opensource"] as const;
-export const PUBLISH_STATUSES = ["draft", "published"] as const;
+/** 状态流转见 lib/users.ts 的 canSetStatus：编辑走 draft <-> review，发布是管理员动作。 */
+export const PUBLISH_STATUSES = ["draft", "review", "published"] as const;
 export const SOURCE_KINDS = ["official", "opensource", "discount"] as const;
 export const PLATFORMS = ["windows", "macos", "linux"] as const;
 export const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{0,99}$/;
