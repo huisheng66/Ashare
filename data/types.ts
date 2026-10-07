@@ -18,7 +18,8 @@ export type SourceKind = "official" | "opensource" | "discount";
 
 export type ItemKind = "app" | "script" | "opensource";
 
-export type PublishStatus = "draft" | "published";
+/** 状态流转：draft <-> review（编辑）→ published（管理员）。见 lib/users.ts 的 canSetStatus。 */
+export type PublishStatus = "draft" | "review" | "published";
 
 export type Scene = {
   id: SceneId;
