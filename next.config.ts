@@ -40,6 +40,9 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "36mb",
     },
   },
+  // mysql2 是 CJS 且依赖 Node 原生能力，交给 Node 直接 require，不走 Next 的服务端打包。
+  // 放在对象末尾：改动只追加行，不会让 docs/优化改进报告.md 的行号引用漂移。
+  serverExternalPackages: ["mysql2"],
 };
 
 export default nextConfig;

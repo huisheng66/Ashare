@@ -58,7 +58,7 @@ npm run dev                  # 或 npm run build && npm run start
 
 ## 部署
 
-1. Node 常驻进程（VPS 上 `npm run build && npm run start`），保证 `data/store/` 与 `public/media/` 可写、`data/` 不在部署时被清空。
+1. Node 常驻进程（VPS 上 `npm run build && npm run start`），保证 `data/store/` 与 `data/media/` 可写、`data/` 不在部署时被清空。
 2. 前置 HTTPS 反向代理。仅当应用端口只对你控制的代理开放时设置 `TRUST_PROXY=1`。单层 Nginx 使用 `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;` 或覆盖为 `$remote_addr`，应用使用最右侧地址；有 CDN / 多层代理时需先在代理正确解析可信来源。没有可信代理时共享限速，不接受客户端自报的 IP。
 3. 图片表单最多为 6 张预览与 1 张图标，各 5MiB；应用请求上限 36MiB，代理可设 `client_max_body_size 36m;`。
 4. 环境变量：`ADMIN_PASSWORD_HASH`、`SESSION_SECRET`（生成命令见 [.env.example](./.env.example)），可选 `TRUST_PROXY=1`、`NEXT_PUBLIC_SITE_URL`（正式站点的 HTTP(S) origin，不带子路径；未配置时省略绝对 SEO 链接，sitemap 返回空列表）。

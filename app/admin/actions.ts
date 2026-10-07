@@ -1,35 +1,65 @@
 "use server";
 
 import { randomBytes } from "node:crypto";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { endSession, hasValidSession, startSession, verifyPassword } from "@/lib/auth";
+import { authenticate, currentUser, endSession, startSession } from "@/lib/auth";
 import { getClientIp, guardLogin, isBlocked, recordLoginFailure } from "@/lib/guard";
 import { isValidSha256 } from "@/lib/links";
-import { getSubmissions, updateBlocks, updateCatalog, updateFeedback, updateSubmissions } from "@/lib/store";
+import { auditSummary, diffFields } from "@/lib/audit";
+import {
+  deleteItem as deleteCatalogItem,
+  getItem as getCatalogItem,
+  getSubmissions,
+  recordAudit,
+  saveItem as saveCatalogItem,
+  setItemStatus as setCatalogItemStatus,
+  updateBlocks,
+  updateFeedback,
+  updateSubmissions,
+} from "@/lib/store";
 import { imageExtension, isHttpUrl, ITEM_KINDS, MAX_UPLOAD, mediaParts, PLATFORMS, PUBLISH_STATUSES, SLUG_PATTERN, SOURCE_KINDS } from "@/lib/input-validation";
 import { scenes } from "@/data/scenes";
 import type { ItemKind, Platform, PublishStatus, SceneId, Software, SourceKind } from "@/data/types";
 import { GUIDE_LIMITS, normalizeGuide, parseGuideLines, validateGuide } from "@/lib/guide";
+import { putMedia as putMediaObject, removeMedia as removeMediaKey } from "@/lib/media-storage";
 import { validateSemantics } from "@/lib/semantics";
+import { can, canSetStatus, STATUS_LABEL, type Role } from "@/lib/users";
 
+/** 已登录且未被封禁即可。页面级守卫用它；写操作请用 requirePermission。 */
 export async function requireAdmin(): Promise<void> {
-  if (!(await hasValidSession())) redirect("/admin/login");
+  if (!(await currentUser())) redirect("/admin/login");
   if (await isBlocked(await getClientIp())) redirect("/admin/login?e=blocked");
+}
+
+/**
+ * 需要具体权限才放行。
+ *
+ * 权限矩阵集中在 lib/users.ts —— 散在各个入口里最容易出现「新加了入口忘了加检查」。
+ * 这里只负责取当前用户、判断、重定向。
+ */
+export async function requirePermission(
+  permission: "edit" | "publish" | "moderate" | "users",
+): Promise<{ username: string; displayName: string; role: Role }> {
+  const user = await currentUser();
+  if (!user) redirect("/admin/login");
+  if (await isBlocked(await getClientIp())) redirect("/admin/login?e=blocked");
+  if (!can(user.role, permission)) redirect("/admin?e=forbidden");
+  return user;
 }
 
 export async function login(formData: FormData): Promise<void> {
   const ip = await getClientIp();
   if (!(await guardLogin(ip))) redirect("/admin/login?e=rate");
+  const username = text(formData, "username");
   const password = text(formData, "password");
-  if (!(await verifyPassword(password))) {
+  const identity = await authenticate(username, password);
+  if (!identity) {
     await recordLoginFailure(ip);
     redirect("/admin/login?e=wrong");
   }
-  await startSession();
+  await startSession(identity.username, identity.role);
   redirect("/admin");
 }
 
@@ -40,6 +70,10 @@ export async function logout(): Promise<void> {
 
 const CRACK_WORDS = ["破解", "序列号", "绿色版", "激活码", "注册机", "盗版", "crack", "keygen", "nulled"];
 const GIT_HOSTS = new Set(["github.com", "www.github.com", "gitlab.com", "gitee.com", "codeberg.org"]);
+/** 上传时写给对象存储的 Content-Type；本地驱动不看它，但对象存储要看。 */
+const MIME_BY_EXTENSION: Record<string, string> = {
+  jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif",
+};
 const SCENES = new Set<string>(scenes.map((scene) => scene.id));
 
 function text(fd: FormData, key: string): string {
@@ -55,14 +89,14 @@ async function removeMedia(mediaPath: string): Promise<void> {
   const parts = mediaParts(mediaPath);
   if (!parts) return;
   try {
-    await fs.rm(path.join(process.cwd(), "public", "media", ...parts), { force: true });
+    await removeMediaKey(parts.join("/"));
   } catch (error) {
     console.error("[media] Could not remove unused image", error);
   }
 }
 
 export async function saveItem(fd: FormData): Promise<void> {
-  await requireAdmin();
+  const actor = await requirePermission("edit");
   const original = str(fd, "originalSlug");
   const errorBack = SLUG_PATTERN.test(original) ? original : "new";
   // Each request owns its validation target; concurrent actions cannot overwrite it.
@@ -183,27 +217,30 @@ export async function saveItem(fd: FormData): Promise<void> {
 
   const uploaded: string[] = [];
   const obsolete: string[] = [];
+  // 上传走存储抽象：本地磁盘或对象存储。多副本时只有后者能让每台机器都拿到图。
   const upload = async (file: File): Promise<string> => {
     const { data, extension } = validatedFiles.get(file)!;
-    const name = `${randomBytes(8).toString("hex")}.${extension}`;
-    const dir = path.join(process.cwd(), "public", "media", slug);
-    await fs.mkdir(dir, { recursive: true });
-    const mediaPath = `/media/${slug}/${name}`;
-    const handle = await fs.open(path.join(dir, name), "wx", 0o600);
+    const key = `${slug}/${randomBytes(8).toString("hex")}.${extension}`;
+    const mediaPath = `/media/${key}`;
+    // 先登记再写：写入失败时它仍在 uploaded 里，会被统一清理。
     uploaded.push(mediaPath);
-    try {
-      await handle.writeFile(data);
-      await handle.sync();
-    } finally {
-      await handle.close();
-    }
+    await putMediaObject(key, data, MIME_BY_EXTENSION[extension] ?? "application/octet-stream");
     return mediaPath;
   };
+  // 读现有条目与 slug 冲突检查放在上传之前：上传是不可回滚的副作用，越晚做越好。
+  const existing = original ? await getCatalogItem(original, { publishedOnly: false }) : undefined;
+  if (original && !existing) bad("条目已被删除，请刷新后重试");
+  if (slug !== original && (await getCatalogItem(slug, { publishedOnly: false }))) bad("slug 已存在");
+  const submittedVersion = Number.parseInt(str(fd, "version"), 10);
+  const expectedVersion = Number.isInteger(submittedVersion) ? submittedVersion : undefined;
+  // 状态流转走集中规则：编辑不能把草稿推上线，也不能把已发布的撤下来。
+  const previousStatus = existing?.status ?? "draft";
+  if (!canSetStatus(actor.role, previousStatus, draft.status)) {
+    bad("没有把条目改成「" + STATUS_LABEL[draft.status] + "」的权限");
+  }
+
   try {
-    await updateCatalog(async (all) => {
-      const existing = original ? all.find((item) => item.slug === original) : undefined;
-      if (original && !existing) bad("条目已被删除，请刷新后重试");
-      if (all.some((item) => item.slug === slug && item.slug !== original)) bad("slug 已存在");
+    {
       const remove = new Set(fd.getAll("removePreview").map(String));
       const kept = (existing?.previews ?? []).filter((image, index) => {
         if (!remove.has(String(index))) return true;
@@ -219,7 +256,27 @@ export async function saveItem(fd: FormData): Promise<void> {
         if (existing?.iconImage) obsolete.push(existing.iconImage);
       }
       draft.createdAt = existing?.createdAt ?? now;
-      return existing ? all.map((item) => item.slug === original ? draft : item) : [draft, ...all];
+    }
+
+    // 单条原子写 + row_version 乐观锁：不再「读全量、改一条、写全量」。
+    // 改名走 renameFrom，在同一个事务里完成，避免「先删后插」中途失败丢条目。
+    const outcome = await saveCatalogItem(draft, {
+      renameFrom: original || undefined,
+      expectedVersion,
+    });
+    if (outcome === "conflict") bad("这个条目刚被别人改过，请刷新页面后重试");
+
+    const action = outcome === "created" ? "create" : "update";
+    const fields = diffFields(existing, draft);
+    await recordAudit({
+      at: now,
+      actor: actor.username,
+      action,
+      slug: draft.slug,
+      summary: auditSummary(action, draft.name, fields),
+      fields,
+      versionBefore: existing ? expectedVersion : undefined,
+      versionAfter: existing ? (expectedVersion === undefined ? undefined : expectedVersion + 1) : 1,
     });
   } catch (error) {
     await Promise.all(uploaded.map(removeMedia));
@@ -232,19 +289,42 @@ export async function saveItem(fd: FormData): Promise<void> {
 }
 
 export async function setItemStatus(fd: FormData): Promise<void> {
-  await requireAdmin();
+  const actor = await requirePermission("edit");
   const slug = str(fd, "slug");
   const status = str(fd, "status") as PublishStatus;
   if (!SLUG_PATTERN.test(slug) || !PUBLISH_STATUSES.includes(status)) redirect("/admin?e=invalid");
-  await updateCatalog((all) => all.map((item) => item.slug === slug ? { ...item, status, updatedAt: new Date().toISOString() } : item));
+  const before = await getCatalogItem(slug, { publishedOnly: false });
+  if (!before) redirect("/admin?e=missing");
+  if (!canSetStatus(actor.role, before.status, status)) redirect("/admin?e=forbidden");
+  const outcome = await setCatalogItemStatus(slug, status);
+  if (outcome === "conflict") redirect("/admin?e=missing");
+  await recordAudit({
+    at: new Date().toISOString(),
+    actor: actor.username,
+    action: "status",
+    slug,
+    summary: auditSummary("status", before?.name ?? slug) + " → " + status,
+    fields: ["status"],
+  });
   revalidatePath("/", "layout");
   redirect("/admin?saved=1");
 }
 
 export async function deleteItem(fd: FormData): Promise<void> {
-  await requireAdmin();
+  const actor = await requirePermission("publish");
   const slug = str(fd, "slug");
-  await updateCatalog((all) => all.filter((item) => item.slug !== slug));
+  const before = await getCatalogItem(slug, { publishedOnly: false });
+  const removed = await deleteCatalogItem(slug);
+  if (removed) {
+    await recordAudit({
+      at: new Date().toISOString(),
+      actor: actor.username,
+      action: "delete",
+      slug,
+      summary: auditSummary("delete", before?.name ?? slug),
+      fields: [],
+    });
+  }
   revalidatePath("/", "layout");
   redirect("/admin");
 }

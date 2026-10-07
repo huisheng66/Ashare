@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { scenes } from "@/data/scenes";
 import type { Software } from "@/data/types";
 import { formatGuideLines, GUIDE_KINDS } from "@/lib/guide";
-import { getCatalogAll } from "@/lib/store";
+import { getItemForEdit } from "@/lib/store";
 import { kindLabel, platformLabel, sourceLabel } from "@/lib/items";
 import { requireAdmin, saveItem } from "../../actions";
 
@@ -109,10 +109,11 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
     note: prefillNote,
   } = await searchParams;
   const isNew = id === "new";
-  const item = isNew
-    ? undefined
-    : (await getCatalogAll()).find((i) => i.slug === id);
-  if (!isNew && !item) notFound();
+  // 编辑表单要带上 row_version，提交时做乐观锁比对（并发编辑不再静默覆盖）。
+  const loaded = isNew ? undefined : await getItemForEdit(id);
+  if (!isNew && !loaded) notFound();
+  const item = loaded?.item;
+  const rowVersion = loaded?.rowVersion;
 
   // 投稿转条目：主链接按主机归到 GitHub 或官网
   let prefillGithub = "";
@@ -130,7 +131,11 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
     <form action={saveItem} id="item-form">
       <DraftKeeper formId="item-form" storageKey={isNew ? "new" : item!.slug} />
       {item ? (
-        <input type="hidden" name="originalSlug" value={item.slug} />
+        <>
+          <input type="hidden" name="originalSlug" value={item.slug} />
+          {/* 乐观锁：提交时与库里的 row_version 比对，不一致就提示「刚被别人改过」。 */}
+          <input type="hidden" name="version" value={rowVersion ?? 0} />
+        </>
       ) : null}
 
       <Breadcrumb items={[{ href: "/admin", label: "条目" }, { label: isNew ? "新建" : item!.name }]} />
@@ -259,6 +264,7 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
                 className={selectCls}
               >
                 <option value="draft">草稿（前台不可见）</option>
+                <option value="review">待审核（等管理员发布）</option>
                 <option value="published">已发布</option>
               </select>
             </Field>

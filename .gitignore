@@ -45,6 +45,8 @@ next-env.d.ts
 # data/icons/ 是提交进仓库的本地图标，不忽略
 data/store/
 public/media/
+# 上传的图片实际落点（早前是 public/media，那样会被 next start 静态直送、绕过防盗链）
+data/media/
 backups/
 
 # agent tool state

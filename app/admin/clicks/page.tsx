@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Eyebrow, SectionHeading } from "@/components/SectionHeading";
 import { SourceBadge } from "@/components/SourceBadge";
 import { Button } from "@/components/ui/button";
-import { allPublished } from "@/lib/catalog";
+import { itemSummaries } from "@/lib/catalog";
 import { channelTotals, dailySeries, itemClickRows, shortDay, type ItemClickRow } from "@/lib/click-analytics";
 import { scanClicks } from "@/lib/click-store";
 import { kindLabel } from "@/lib/items";
@@ -78,7 +78,10 @@ function ChannelBar({ row, max }: { row: ItemClickRow; max: number }) {
 
 export default async function ClicksPage() {
   await requireAdmin();
-  const [scan, published] = await Promise.all([scanClicks(), allPublished()]);
+  const scan = await scanClicks();
+  // 只查统计里出现过的 slug：补名称不该把整份目录读出来。
+  const slugs = [...new Set([...scan.byChannel.values()].map((entry) => entry.slug))];
+  const published = await itemSummaries(slugs);
   const rows = itemClickRows(scan.byChannel.values(), published);
   const totals = channelTotals(rows);
   const trend = dailySeries(scan.byDay, TREND_DAYS);
