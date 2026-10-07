@@ -69,6 +69,8 @@ export function FilterPanel({
   const push = (mutate: (p: URLSearchParams) => void) => {
     const p = new URLSearchParams(sp.toString());
     mutate(p);
+    // 改了筛选，原来的页码可能已越界（第 3 页只剩 1 页），统一回到第 1 页。
+    p.delete("page");
     startTransition(() => router.push(catalogHref(p), { scroll: false }));
   };
 

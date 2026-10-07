@@ -16,21 +16,54 @@ export async function verifyPasswordHash(password: string, stored: string): Prom
   return timingSafeEqual(expected, actual);
 }
 
-function sign(expiresAt: number, secret: string): string {
-  return createHmac("sha256", secret).update(String(expiresAt)).digest("hex");
+/** 会话负载：谁、什么角色。签名覆盖两者，改任何一项都会失效。 */
+export type SessionSubject = { username: string; role: string };
+
+const ENCODED_PATTERN = /^[A-Za-z0-9_-]{1,256}$/;
+const ROLE_PATTERN = /^[a-z]{1,16}$/;
+
+/** 签名覆盖 base64url 后的用户名：签的就是实际传输的字节，不存在编码歧义。 */
+function signSession(expiresAt: number, role: string, encoded: string, secret: string): string {
+  return createHmac("sha256", secret).update(`${expiresAt}.${role}.${encoded}`).digest("hex");
 }
 
-export function createSessionToken(secret: string, now = Date.now()): string {
+/** 令牌形态：过期时间.角色.base64url(用户名).签名 */
+export function createSessionToken(secret: string, subject: SessionSubject, now = Date.now()): string {
   const expiresAt = now + SESSION_MS;
-  return `${expiresAt}.${sign(expiresAt, secret)}`;
+  const encoded = Buffer.from(subject.username, "utf8").toString("base64url");
+  return `${expiresAt}.${subject.role}.${encoded}.${signSession(expiresAt, subject.role, encoded, secret)}`;
 }
 
-export function verifySignedSessionToken(token: string | undefined, secret: string, now = Date.now()): boolean {
-  if (!token || !/^\d{13}\.[a-f\d]{64}$/.test(token)) return false;
-  const [expRaw, signature] = token.split(".");
+/**
+ * 校验并取回身份。任何一项不合法都返回 undefined —— 绝不抛异常，
+ * 因为输入完全来自 cookie，构造畸形值是最省事的攻击方式。
+ */
+export function parseSessionToken(
+  token: string | undefined,
+  secret: string,
+  now = Date.now(),
+): SessionSubject | undefined {
+  if (!token) return undefined;
+  const parts = token.split(".");
+  if (parts.length !== 4) return undefined;
+  const [expRaw, role, encoded, signature] = parts;
+  if (!/^\d{13}$/.test(expRaw) || !ROLE_PATTERN.test(role) || !ENCODED_PATTERN.test(encoded) || !/^[a-f\d]{64}$/.test(signature)) {
+    return undefined;
+  }
   const expiresAt = Number(expRaw);
-  if (!Number.isSafeInteger(expiresAt) || expiresAt <= now || expiresAt > now + SESSION_MS) return false;
-  return timingSafeEqual(Buffer.from(signature, "hex"), Buffer.from(sign(expiresAt, secret), "hex"));
+  if (!Number.isSafeInteger(expiresAt) || expiresAt <= now || expiresAt > now + SESSION_MS) return undefined;
+
+  const expected = Buffer.from(signSession(expiresAt, role, encoded, secret), "hex");
+  const actual = Buffer.from(signature, "hex");
+  if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return undefined;
+
+  const username = Buffer.from(encoded, "base64url").toString("utf8");
+  return username ? { username, role } : undefined;
+}
+
+/** 只判真伪，不关心身份。 */
+export function verifySignedSessionToken(token: string | undefined, secret: string, now = Date.now()): boolean {
+  return parseSessionToken(token, secret, now) !== undefined;
 }
 
 export function hashPassword(password: string): string {

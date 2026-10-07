@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   { href: "/admin", label: "条目", match: (path: string) => path === "/admin" || path.startsWith("/admin/items") },
   { href: "/admin/inbox", label: "投稿与反馈", match: (path: string) => path.startsWith("/admin/inbox") },
+  { href: "/admin/clicks", label: "点击数据", match: (path: string) => path.startsWith("/admin/clicks") },
 ];
 
 /** 后台分段式标签；未读反馈数挂在「投稿与反馈」上。 */

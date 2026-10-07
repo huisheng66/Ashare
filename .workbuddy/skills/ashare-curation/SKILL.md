@@ -19,6 +19,7 @@ agent_created: true
 - 不托管安装包；条目里不出现「本站下载」。
 - Git 链接只允许 `github.com` / `gitlab.com` / `gitee.com` / `codeberg.org`。
 - 链接必须 HTTPS、不含用户名密码、长度 ≤ 2048。
+- **`source` 与 `kind` 必须自洽**（矩阵见 `lib/semantics.ts`）：`official` → `app`/`script`，`opensource` → `opensource`/`app`，`discount` → `app`。标 `opensource` 却没有 GitHub 链接时 `--strict` 会拦下——开源断言必须可核验。
 
 判定细则见 `references/sources-and-redlines.md`。
 
@@ -51,6 +52,8 @@ node .workbuddy/skills/ashare-curation/scripts/check-links.mjs --url <候选地�
 
 正文四段式：① 是什么、解决什么 ② 核心特性，写具体行为 ③ 代价与风险 ④ 许可证与发布渠道。段落间空一行，不用 Markdown。
 
+**结构化字段**：核验到的许可证（SPDX，如 `GPL-3.0-only`）、版本号、链接核验日期要写进 `license` / `version` / `linksCheckedAt`，不要只写在正文里——写进正文就无法机器校验，也无法用于死链巡检。核验不到就留空，不要猜。
+
 ### 5. 预检 → `--dry-run` 零错误
 
 ```bash
@@ -74,6 +77,8 @@ node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file <草稿.js
 
 种子的字段形态与运行库不同：`officialUrl` ↔ `links.official`、`installTips` ↔ `tutorial`。
 
+**种子里有 `links` 的条目，`links.official` 才是生效字段**，`officialUrl` 只在缺 `links` 时才作为兜底（`seedToItem` 里是 `s.links ?? { official: officialUrl }`）。造测试数据或临时改数据时改错字段，脚本会「正常」跑完而改动根本没生效——坑位 70 就是这么拿到一次假绿灯的。
+
 ### 7. 校验 → 检查全绿且缺口数字下降
 
 ```bash
@@ -84,6 +89,20 @@ npm run smoke:detail   # 渲染冒烟，默认遍历全部条目
 ```
 
 冒烟逐条检查正文每段是否真的渲染、外链是否出现、徽章是否与 `source` 一致、价格是否展示。闸门：异常 0 个。
+
+**验证环境必须等于使用环境。** 手工构造 `SESSION_SECRET=… npm run start` 跑出来的绿灯不算数——真实开发是 `npm run dev` + `.env.local`，两者的环境变量集合不同。防盗链就栽在这上面：`.env.local` 没有 `NEXT_PUBLIC_SITE_URL`，手工构造时却补上了，于是同站图标在真实开发环境下全部 403 而验证全绿（坑位 74）。**验完要顺手用浏览器打开页面看一眼图标显不显示。**
+
+### 7b. 复验 → 链接核验日期没过期
+
+```bash
+npm run stale-links                    # 列出超过 90 天没核验的条目
+npm run stale-links -- --check         # 探活
+npm run stale-links -- --check --update # 回写通过者的核验日期
+```
+
+`linksCheckedAt` 记的是「最近一次人工确认可达」，目录站是死链重灾区。回写只覆盖**全部链接都可达**的条目，把失效链接的日期刷成今天会让下一轮以为它刚查过，死链被永久掩盖（坑位 60）。
+
+`--update` 会改运行库，因此**种子里的 `linksCheckedAt` 要同步**，跑 `npm run seed:drift` 确认。CI 上每天自动跑（`.github/workflows/link-watch.yml`），本地一般不需要手动跑。
 
 ### 8. 记录与迭代 → CHANGELOG 已写，教训已沉淀
 
@@ -98,9 +117,19 @@ npm run smoke:detail   # 渲染冒烟，默认遍历全部条目
 - 两个落点都已写入，`catalog.sha256.json` 已同步
 - `npm run check` 通过，`content:audit` 缺口下降，`smoke:detail` 无异常，`CHANGELOG.md` 已记录
 
-达不到就以 `status: "draft"` 入库，不要为凑数发布空壳——目录里已有 30 条这样的历史欠账。
+达不到就以 `status: "draft"` 入库，不要为凑数发布空壳——目录里已有 10 条缺正文与标签的历史欠账（`npm run content:audit` 可查当前数字，不要凭记忆引用）。
 
-**预览图不是发布门槛。** 全站 35 条都没有截图，补它需要真实素材与授权判断；「内容债」只按正文与标签计。
+**预览图不是发布门槛。** 全站 35 条都没有截图，补它需要真实素材与授权判断。
+
+**内容债的口径**（`content:audit` 报的数字决定工作量，别凭记忆引用）：
+
+| 算债 | 不算债 |
+|---|---|
+| 详细介绍、标签（发布门槛，权重最高） | 预览图（需要真实素材与授权判断） |
+| 许可证 `license`（机器可校验，缺了读者只能猜） | 使用教程（`tutorial`） |
+| 链接核验日期 `linksCheckedAt`（缺了等于没核验过外链） | |
+
+当前 35 条里缺正文与标签 10 条、缺许可证 17 条、缺同类替代 4 条；预览图 35 条全缺但不算债。
 
 ## 批量节奏
 
@@ -118,6 +147,13 @@ npm run smoke:detail   # 渲染冒烟，默认遍历全部条目
 1. **校验脚本有没有漏掉本该拦住的错误？** 有就直接改脚本，改完用同一份草稿重跑 `--dry-run`。
 2. **有没有新的字段或渲染行为认知？** 追加到 `references/known-pitfalls.md`，不删历史。
 3. **流程里哪一步卡住了？** 规则性问题改本文件；**同一类问题第二次出现时必须从 pitfalls 提升进主流程**。
+
+第 3 条的判定要主动做，别等被提醒。已提升过的例子：
+
+- 「字段只加类型不加脚本 → 存不进运行库」（坑位 55）→ 流程第 6 步的「两个落点」表
+- 「`--patch` 整体替换不是追加」（漏过两次）→ 流程第 6 步的显式警告
+- 「`source` 与 `kind` 会矛盾」→ 硬红线
+- 「验证环境必须等于使用环境」（坑位 74）→ 流程第 7 步
 
 ## 资源
 

@@ -1,54 +1,27 @@
-import { ArrowUpRight, GitBranch, Globe, HardDrive, House, type LucideIcon } from "lucide-react";
-
 import type { ItemLinks as ItemLinksData } from "@/data/types";
+import { isVerifiedMirror, linkChannels, mirrorChecksum, otherChannels } from "@/lib/links";
+import { MirrorChecksumNote, MirrorNote, OutboundLink } from "./OutboundLink";
 
-export function hostOf(url: string) {
-  try {
-    return new URL(url).host;
-  } catch {
-    return url;
-  }
-}
-
-type Row = { label: string; url: string; icon: LucideIcon };
-
-function LinkRow({ row }: { row: Row }) {
-  const Icon = row.icon;
-  return (
-    <a
-      href={row.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex min-h-11 items-center gap-3 rounded-xl px-3 transition-colors hover:bg-muted"
-    >
-      <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-      <span className="shrink-0 text-sm">{row.label}</span>
-      <span className="ml-auto min-w-0 truncate font-mono text-xs text-muted-foreground">
-        {hostOf(row.url)}
-      </span>
-      <ArrowUpRight className="size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:-translate-y-px group-hover:translate-x-px group-hover:text-foreground" aria-hidden="true" />
-      <span className="sr-only">（在新标签页打开）</span>
-    </a>
-  );
-}
-
-function linkRows(links: ItemLinksData, exclude?: string): Row[] {
-  return [
-    links.official && { label: "官网", url: links.official, icon: Globe },
-    links.homepage && { label: "产品主页", url: links.homepage, icon: House },
-    links.github && { label: "GitHub", url: links.github, icon: GitBranch },
-    links.disk && { label: "已核验镜像", url: links.disk, icon: HardDrive },
-  ].filter((row): row is Row => Boolean(row) && (row as Row).url !== exclude);
-}
+/** 旧路径的 host 工具，保留给页面里显示主域名。 */
+export { hostOf } from "@/lib/links";
 
 /** 除主渠道外还有几条可列的渠道。 */
-export function otherLinkCount(links: ItemLinksData, primaryUrl: string) {
-  return linkRows(links, primaryUrl).length;
+export function otherLinkCount(links: ItemLinksData, primaryUrl: string): number {
+  return otherChannels(links).filter((c) => c.url !== primaryUrl).length;
 }
 
-/** 获取渠道：官网 → 产品主页 → GitHub → 已核验镜像。镜像必须附说明。exclude 用来去掉已做成主按钮的那条。 */
-export function ItemLinks({ links, exclude }: { links: ItemLinksData; exclude?: string }) {
-  const rows = linkRows(links, exclude);
+/**
+ * 获取渠道：官网 → 产品主页 → GitHub → 已核验镜像。
+ * 没有说明的镜像不展示 —— 无法核验的镜像与盗版网盘只有一线之隔。
+ *
+ * 许可证说明不在这里：它是独立信息，由页面单独渲染。只有官网一条渠道的条目
+ * （如 VS Code）没有「其他渠道」区块，挂在里面会跟着一起消失。
+ */
+export function ItemLinks({ links, exclude, slug }: { links: ItemLinksData; exclude?: string; slug: string }) {
+  const rows = linkChannels(links).filter((c) => c.url !== exclude && isVerifiedMirror(c));
+  const mirror = rows.find((c) => c.role === "mirror");
+  // 校验信息跟着镜像走：没有镜像链接却写校验值，等于挂了一个无从核对的数字。
+  const checksum = mirror ? mirrorChecksum(links) : undefined;
 
   if (!rows.length) {
     return <p className="px-3 text-sm text-muted-foreground">暂未填写链接。</p>;
@@ -57,18 +30,14 @@ export function ItemLinks({ links, exclude }: { links: ItemLinksData; exclude?: 
   return (
     <div>
       <ul className="-mx-3 flex flex-col">
-        {rows.map((row) => (
-          <li key={row.label}>
-            <LinkRow row={row} />
+        {rows.map((channel) => (
+          <li key={channel.id}>
+            <OutboundLink channel={channel} slug={slug} />
           </li>
         ))}
       </ul>
-      {links.disk ? (
-        <p className="mt-2 rounded-xl bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-          <span className="font-medium text-foreground">镜像说明：</span>
-          {links.diskNote || "作者或项目方提供的合法镜像。请优先使用官网或 GitHub。"}
-        </p>
-      ) : null}
+      {mirror ? <MirrorNote note={mirror.note} /> : null}
+      <MirrorChecksumNote checksum={checksum} />
     </div>
   );
 }

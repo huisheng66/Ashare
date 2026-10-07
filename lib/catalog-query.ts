@@ -70,6 +70,15 @@ export function catalogFiltersFromURL(
   });
 }
 
+/**
+ * 目录分页页码。上限 10000 是为了挡住 ?page=999999999 这类请求去打数据库的深分页。
+ * 非法值一律回落到第 1 页，不报错 —— 分页参数不该让页面 500。
+ */
+export function parseCatalogPage(params: PageSearchParams): number {
+  const value = Number.parseInt(firstSearchParam(params.page), 10);
+  return Number.isFinite(value) && value >= 1 ? Math.min(value, 10_000) : 1;
+}
+
 export function activeFilterCount(filters: CatalogFilters): number {
   return filters.scenes.size + filters.platforms.size + filters.kinds.size +
     Number(filters.discountOnly);

@@ -90,3 +90,41 @@
 51. **IPv6 的私有段判断容易写错位宽。** 第一版取首段的前 8 位去比 `fe80::/10`，结果 `fe80::1` 判成了公网地址。正确做法是取首段前 16 位：`head & 0xfe00 === 0xfc00`（fc00::/7）与 `head & 0xffc0 === 0xfe80`（fe80::/10）。改完用 16 个地址的用例表回归。
 52. **`--keep` 是 `fs.rm -r`，只认自己产出的快照。** 名字符合 `ashare-backup-YYYYMMDD-HHMMSS` 不代表是本脚本写的——万一 `--out` 指到的目录里本来就有同名文件夹呢。现在删除前要求目录内有带 `createdAt` 的 `manifest.json`，归档则用 `tar -tzf` 确认含 manifest，否则跳过并提示。
 53. **全量探活每轮都会报同样 4 个「异常」，全是误报。** inkscape.org / jasp-stats.org 的 403 是 Cloudflare 拦自动化，texstudio.org / gimp.org 的超时是本机代理隧道。脚本现在对这几个域名附一句「已人工确认」的提示，省掉每轮重复的人工复核；但提示带日期，过期要重验，别让它变成掩盖真死链的遮羞布。
+
+## 2026-10-03 防盗链与数据范式（bunny 分支）新增
+
+54. **`source` 与 `kind` 会互相矛盾，前台徽章只认 `source`，错的那一边没人发现。** GeoGebra 的教训（见 #48）此前只靠人肉判断：种子写 `source: "opensource"`，`seedToItem()` 就推导出 `kind: "opensource"`，前台挂出「开源」徽章，而它仓库 `license` 为 null、实为非商业免费。现已写成矩阵（`lib/semantics.ts`），后台 `saveItem` 与 `ingest` 共用同一份定义。**新增 `source` 取值或 `kind` 取值时，矩阵要同步改，否则合法组合会被误拦。**
+55. **只加类型不加脚本，新字段就永远存不进运行库。** 加 `license` / `version` / `linksCheckedAt` 时，除了 `data/types.ts`，还必须同步四处：`lib/seed.ts` 的透传（靠 `...rest` 恰好生效，但要确认）、`scripts/seed-drift.mjs` 的 `COMPARE` 清单（漏进就会对该字段失明）、后台 `saveItem` 的落库、后台表单的输入框、以及 `ingest` 的 `MAX` 与校验。漏任何一处，字段就只在类型上存在。
+56. **新增的跨字段校验会让既有测试失败，先确认是不是回归。** `validateSemantics` 最初包含「至少归属一个场景 / 平台」，导致 `tests/admin-actions.test.mjs` 两个子测试报错——那些测试构造的 FormData 本来就不带 `scenes`。用 `git stash` 对比干净状态即可区分回归与环境问题。结论：**单字段必填归各自的入口校验，语义层只管跨字段一致性**，否则同一问题会在两处以不同措辞报错。
+57. **防盗链的方向是「白名单放行 + 其余拒绝」，不能反过来。** 站内图片数量有限、防得住；爬虫与分享流量不可枚举、拉黑就等于把 og:image 和地址栏直开一起废掉。实测三类必须放行：无 Referer（直开 / 微信内置浏览器 / 爬虫）、同站及其子域名、显式白名单。已实测拦住 `evilashare.example` 与 `ashare.example.evil.com` 这类后缀伪装。
+58. **防盗链被拒的响应不能带长缓存。** 图片路由原本是 `immutable` 一年缓存，若 403 也带上，浏览器与中间代理会把拒绝结果缓存住，改配置后仍不放行。拒绝响应必须 `no-store`。
+59. **写测试临时文件不要用 `/tmp`。** 在 Windows 的 Git Bash 下 `/tmp` 解析到别处，`node scripts/...` 读的是真实路径，会报 ENOENT。直接在项目目录生成、用完删掉。
+
+## 2026-10-04 外链巡检新增
+
+60. **刷新核验日期不能掩盖死链。** `stale-links --update` 只回写「全部链接都可达」的条目：单链接全失效、或部分可达（一个正常一个失效）都不回写。**把失效链接的日期刷成今天，下一轮巡检就会以为它刚查过，死链被永久掩盖** —— 这比链接过期本身更危险。已实测两种场景都正确拒绝回写。
+61. **`--update` 必须配合 `--check`。** 没探活就刷新日期等于伪造核验记录，脚本直接拒绝执行。同理「缺 `linksCheckedAt`」必须算「从未核验」而不是「新鲜」—— 否则从未核验的条目永远不进报告，而它们最该核。
+62. **`2026-13-45` 是非法日期，正则查不出来。** `^\d{4}-\d{2}-\d{2}$` 会放行，但 `Date.UTC` 把 13 月 45 日进位成 2027-02-14，算出负数天数后被当成「未来 → 新鲜」。必须回读校验年月日：`2026-02-29` 非法（2026 非闰年）、`2024-02-29` 合法。
+63. **回写 `linksCheckedAt` 后必须同步种子。** 它在 `SeedSoftware` 里也是显式字段，两个落点都要写，再跑 `seed:drift`。脚本会提示，但别指望自己记得。
+
+## 2026-10-04 CI 自动化新增
+
+64. **CI 上没有运行库。** `data/store/` 已 gitignore，GitHub 克隆后只有 `data/software.ts` 与 `data/samples.ts`。任何读目录的脚本在 CI 上都要准备种子路径（`stale-links --source seed`）。注意 `npm ci` 也不需要 —— 巡检只用 node: 内置模块。
+65. **直接读种子会漏掉半数外链。** 种子是 `SeedSoftware` 形态，官网在 `officialUrl` 而非 `links.official`，30 条里只有 18 条填了 `links`。**必须先过 `seedToItem()` 转换**，否则「全站巡检」静默漏掉 17 个条目而报告一切正常。转换后链接数 51 与运行库一致。
+66. **`github.com` 网页端在 CI 上会全部超时。** 网络策略拦住网页端，`api.github.com` 通常可达。`githubApiOf()` 已抽到 `scripts/_shared.mjs` 由 `check-links` 与 `stale-links` 共用。不做代验，CI 会把 6 个正常链接判成超时。
+67. **参数校验的顺序本身就是逻辑。** `--strict` 的「需要 --check」校验写在 `--check-all` 联动 `args.check` 之前，会把 `--check-all --strict` 这个合法组合判成非法。先联动、再校验。
+68. **死链巡检在 CI 上要用 `--check-all` 而不是只查过期的。** 链接昨天还正常、今天挂了，只看门槛发现不了。门槛决定「什么时候必须复验」，不限制「能查什么」。
+69. **已知误报不能让流水线长期变红。** Cloudflare 403 与代理超时会天天让 CI 失败，人就开始习惯性忽略，真死链被淹没。用 `--flaky-ok` 豁免（仅在 `--strict` 下有意义），输出里照样提示这些域名。
+
+## 2026-10-04 真实 CI 验证新增
+
+70. **往种子里注入测试数据时，`officialUrl` 可能不是生效字段。** `seedToItem` 里 `s.links ?? { official: officialUrl }` —— **`links` 优先于 `officialUrl`**。30 条种子里 18 条填了 `links`，改它们的 `officialUrl` 完全无效。造测试数据前先确认目标条目属于哪种形态，否则会「改了但没反应」，误判成脚本失效。
+71. **验证失败路径别只看「跑过了」，要确认它真的会红。** 注入死链后 CI 报 success，追下去发现是注入方式错（见 70），死链压根没被探到。**绿灯必须逐项核对数字**（探了几个链接、几个异常），否则「没报错」和「没检查」分不清。
+72. **误报是环境产物，不是站点属性。** inkscape / jasp 的 Cloudflare 403 与 texstudio 的代理超时，本机复现但 GitHub runner 上全部 200。判断某个域名是否真拦自动化，要在不同环境各验一次，别把本机现象当站点特性写进文档。
+73. **`workflow_dispatch` 只能从默认分支触发是过时说法。** `gh workflow run <file> --ref <branch>` 直接成功，GitHub 用的是该 ref 上的工作流文件。所以为手动触发而先合并到 main 是多余的。
+
+## 2026-10-04 启动实机验证时补记
+
+74. **验证环境必须等于使用环境，否则等于没验。** 防盗链的六项验证是手工构造 `SESSION_SECRET=... NEXT_PUBLIC_SITE_URL=... npm run start` 跑出来的，而真实开发流程是 `npm run dev` + `.env.local`（后者没有 `NEXT_PUBLIC_SITE_URL`）。结果 **`siteHost` 为空 → 同站判断失效 → 本地开发时首屏所有图标 403**，而当时的验证全是绿的。修法是新增 `requestHost()` 拿请求自身的 host 兜底 ——「谁在访问我」不需要任何配置。**凭手工构造的环境变量验过的代码，等于没验。**
+75. **`getSiteUrl()` 在未配域名时返回 undefined 对 SEO 正确，对防盗链错误。** 两个模块共用「站点地址」这一个概念，但需求相反：SEO 要避免把 localhost 写进索引（所以宁缺勿滥），防盗链要的是「谁在访问我」（所以必须有值）。别因为看到 A 处返回 undefined 就以为 B 处也该返回 undefined。
+76. **`x-forwarded-host` 是客户端可伪造的。** 本场景不是安全关键（伪造它最多让伪造值等于 own，而真正的跨站请求其 referer 域不会因此变成 own），但仍按 `lib/guard.ts` 对 XFF 的既有约定收紧：只在 `TRUST_PROXY=1` 时采纳。

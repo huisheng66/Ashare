@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { scenes } from "@/data/scenes";
 import type { Software } from "@/data/types";
-import { getCatalogAll } from "@/lib/store";
+import { formatGuideLines, GUIDE_KINDS } from "@/lib/guide";
+import { getItemForEdit } from "@/lib/store";
 import { kindLabel, platformLabel, sourceLabel } from "@/lib/items";
 import { requireAdmin, saveItem } from "../../actions";
 
@@ -108,10 +109,11 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
     note: prefillNote,
   } = await searchParams;
   const isNew = id === "new";
-  const item = isNew
-    ? undefined
-    : (await getCatalogAll()).find((i) => i.slug === id);
-  if (!isNew && !item) notFound();
+  // 编辑表单要带上 row_version，提交时做乐观锁比对（并发编辑不再静默覆盖）。
+  const loaded = isNew ? undefined : await getItemForEdit(id);
+  if (!isNew && !loaded) notFound();
+  const item = loaded?.item;
+  const rowVersion = loaded?.rowVersion;
 
   // 投稿转条目：主链接按主机归到 GitHub 或官网
   let prefillGithub = "";
@@ -129,7 +131,11 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
     <form action={saveItem} id="item-form">
       <DraftKeeper formId="item-form" storageKey={isNew ? "new" : item!.slug} />
       {item ? (
-        <input type="hidden" name="originalSlug" value={item.slug} />
+        <>
+          <input type="hidden" name="originalSlug" value={item.slug} />
+          {/* 乐观锁：提交时与库里的 row_version 比对，不一致就提示「刚被别人改过」。 */}
+          <input type="hidden" name="version" value={rowVersion ?? 0} />
+        </>
       ) : null}
 
       <Breadcrumb items={[{ href: "/admin", label: "条目" }, { label: isNew ? "新建" : item!.name }]} />
@@ -214,6 +220,42 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
             <Field label="价格" htmlFor="f-price" hint="卡片展示，如「会员 ¥68/月」；留空按免费。">
               <Input id="f-price" name="price" aria-describedby="f-price-hint" defaultValue={item?.price} />
             </Field>
+            <Field
+              label="许可证"
+              htmlFor="f-license"
+              optional
+              hint="SPDX 标识，如 GPL-3.0-only、MIT。核验不到就留空，不要猜。"
+            >
+              <Input
+                id="f-license"
+                name="license"
+                aria-describedby="f-license-hint"
+                defaultValue={item?.license}
+                placeholder="MIT"
+              />
+            </Field>
+            <Field label="版本" htmlFor="f-version" optional hint="条目描述的版本号，如 4.9.8。">
+              <Input
+                id="f-version"
+                name="version"
+                aria-describedby="f-version-hint"
+                defaultValue={item?.version}
+              />
+            </Field>
+            <Field
+              label="链接核验于"
+              htmlFor="f-linksCheckedAt"
+              optional
+              hint="最近一次人工确认链接可达的日期，用于发现死链。"
+            >
+              <Input
+                id="f-linksCheckedAt"
+                name="linksCheckedAt"
+                type="date"
+                aria-describedby="f-linksCheckedAt-hint"
+                defaultValue={item?.linksCheckedAt}
+              />
+            </Field>
             <Field label="状态" htmlFor="f-status">
               <select
                 id="f-status"
@@ -222,6 +264,7 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
                 className={selectCls}
               >
                 <option value="draft">草稿（前台不可见）</option>
+                <option value="review">待审核（等管理员发布）</option>
                 <option value="published">已发布</option>
               </select>
             </Field>
@@ -236,7 +279,7 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
           </div>
         </Section>
 
-        <Section index={2} title="文案" description="先回答该不该用：一句话、适合、不适合，再写详细介绍。">
+        <Section index={2} title="文案" description="先回答该不该用：一句话、适合、不适合，再写详细介绍、上手步骤与详细教程。">
           <div className="grid grid-cols-1 gap-5">
             <Field label="一句话简介" htmlFor="f-summary" hint="卡片最多展示两行。">
               <Input
@@ -281,6 +324,44 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
                 rows={5}
                 aria-describedby="f-tutorial-hint"
                 defaultValue={item?.tutorial.join("\n")}
+              />
+            </Field>
+            <Field
+              label="教程导读"
+              htmlFor="f-guideIntro"
+              optional
+              hint="一句话说明这篇教程覆盖到哪一步。"
+            >
+              <Input id="f-guideIntro" name="guideIntro" defaultValue={item?.guide?.intro} />
+            </Field>
+            <Field
+              label="教程正文"
+              htmlFor="f-guideMarkdown"
+              optional
+              hint="支持 Markdown：## 小节、**粗体**、`代码`、- 列表、``` 围栏代码块、| 表格 |、[文字](https://链接)。原始 HTML 不解析。"
+            >
+              <Textarea
+                id="f-guideMarkdown"
+                name="guideMarkdown"
+                rows={10}
+                className="font-mono text-[13px]"
+                aria-describedby="f-guideMarkdown-hint"
+                defaultValue={item?.guide?.markdown}
+              />
+            </Field>
+            <Field
+              label="配套资料"
+              htmlFor="f-guideResources"
+              optional
+              hint={`一行一条：类型 | 标题 | 链接 | 说明（说明可省）。类型可用 ${GUIDE_KINDS.join(" / ")}。插图只能填本站已上传的 /media/ 图片。`}
+            >
+              <Textarea
+                id="f-guideResources"
+                name="guideResources"
+                rows={4}
+                className="font-mono text-[13px]"
+                aria-describedby="f-guideResources-hint"
+                defaultValue={formatGuideLines(item?.guide?.resources)}
               />
             </Field>
           </div>
@@ -385,6 +466,29 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
                 />
               </Field>
             </div>
+            <Field
+              label="对应文件名"
+              htmlFor="f-diskFile"
+              hint="镜像里被校验的那个文件，含版本号。与 SHA-256 必须成对填写。"
+            >
+              <Input
+                id="f-diskFile"
+                name="diskFile"
+                className="font-mono"
+                aria-describedby="f-diskFile-hint"
+                defaultValue={item?.links.diskFile}
+              />
+            </Field>
+            <Field label="SHA-256" htmlFor="f-diskSha256" hint="64 位十六进制。留空表示不提供校验值。">
+              <Input
+                id="f-diskSha256"
+                name="diskSha256"
+                className="font-mono"
+                maxLength={64}
+                aria-describedby="f-diskSha256-hint"
+                defaultValue={item?.links.diskSha256}
+              />
+            </Field>
           </div>
         </Section>
 

@@ -45,10 +45,14 @@ export function CatalogBrowser({
   items,
   total,
   counts,
+  page = 1,
+  pageCount = 1,
 }: {
   items: CatalogItem[];
   total: number;
   counts: CatalogCounts;
+  page?: number;
+  pageCount?: number;
 }) {
   const router = useRouter();
   const sp = useSearchParams();
@@ -58,11 +62,18 @@ export function CatalogBrowser({
   const filterCount = activeFilterCount(filters);
   const view = sp.get("view") === "list" ? "list" : "grid";
 
-  const withParams = (mutate: (p: URLSearchParams) => void) => {
+  // 分页链接要保住 page；其余改动（筛选、排序、视图）都应回到第 1 页。
+  const withParams = (mutate: (p: URLSearchParams) => void, keepPage = false) => {
     const p = new URLSearchParams(sp.toString());
     mutate(p);
+    if (!keepPage) p.delete("page");
     return catalogHref(p);
   };
+  const pageHref = (target: number) =>
+    withParams((p) => {
+      if (target <= 1) p.delete("page");
+      else p.set("page", String(target));
+    }, true);
   const resetHref = withParams(clearCatalogFilters);
   const selected = [
     ...[...filters.scenes].map((id) => ({ key: "scene", id, label: sceneById[id].name, picked: filters.scenes })),
@@ -97,7 +108,7 @@ export function CatalogBrowser({
                 <SheetTitle>筛选工具</SheetTitle>
                 <SheetDescription>类型、场景和平台可以组合选择。</SheetDescription>
               </SheetHeader>
-              <FilterPanel counts={counts} resultCount={items.length} onDone={() => setFiltersOpen(false)} />
+              <FilterPanel counts={counts} resultCount={total} onDone={() => setFiltersOpen(false)} />
             </SheetContent>
           </Sheet>
 
@@ -216,6 +227,28 @@ export function CatalogBrowser({
             </EmptyState>
           )}
         </div>
+
+        {pageCount > 1 ? (
+          <nav aria-label="分页" className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            {page > 1 ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href={pageHref(page - 1)} scroll={false} rel="prev">
+                  上一页
+                </Link>
+              </Button>
+            ) : null}
+            <span className="text-sm text-muted-foreground tabular-nums" role="status">
+              第 {page} / {pageCount} 页
+            </span>
+            {page < pageCount ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href={pageHref(page + 1)} scroll={false} rel="next">
+                  下一页
+                </Link>
+              </Button>
+            ) : null}
+          </nav>
+        ) : null}
       </section>
     </div>
   );

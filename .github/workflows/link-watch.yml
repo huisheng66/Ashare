@@ -1,0 +1,94 @@
+name: Link watch
+
+# 外链巡检。目录站的价值全在「点进去能下到东西」，链接一挂就什么都没有了。
+#
+# 与 Checks 的分工：
+#   Checks     —— 代码质量（lint / 类型 / 测试 / 构建），每次 push 与 PR 都跑
+#   Link watch —— 外链可达性，每天跑一次；链接挂了在 PR 之前就能发现
+#
+# 用 `--source seed`：`data/store/` 已 gitignore，CI 克隆后没有运行库，
+# 只有 data/software.ts 与 data/samples.ts。Node 靠类型擦除能直接 import .ts。
+
+on:
+  schedule:
+    # 每天 04:17 跑。刻意避开整点：整点是各类定时任务的拥堵时段，
+    # GitHub 也会在 :00 集中调度，错开几分钟更稳。
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "把核验门槛调到几天（留空用默认 90）"
+        required: false
+        type: string
+  push:
+    # 改到链接相关的数据时立刻验一次，不用等明天。
+    #
+    # 列表必须覆盖 stale-links.mjs 的**全部依赖**，不只是直接引用的那几个：
+    # lib/guide.ts 决定教程里哪些链接会被探活（漏了它，改了教程也不验）；
+    # lib/seed.ts 决定种子形态怎么转成条目（种子走 --source seed 路径必经）；
+    # scripts/_shared.mjs 提供 safeFetch 与 GitHub 代验。
+    # 漏掉任何一个的后果都一样：改了它，CI 不响，缺陷静默溜过去。
+    paths:
+      - "data/software.ts"
+      - "data/samples.ts"
+      - "scripts/stale-links.mjs"
+      - "scripts/_shared.mjs"
+      - "lib/stale.ts"
+      - "lib/guide.ts"
+      - "lib/seed.ts"
+      - "lib/links.ts"
+      - ".github/workflows/link-watch.yml"
+
+permissions:
+  contents: read
+
+# 允许人工重跑：外链异常常是网络抖动，当场再验一次往往就通了。
+concurrency:
+  group: link-watch-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    # 51 个链接、并发 5、超时 10s，最坏约两分钟；留足余量给网络抖动。
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # 巡检只用到 node: 内置模块与仓库里的脚本，不需要 npm ci：
+      # 省掉安装时间，也让这个工作流不受 lockfile 变动影响。
+      #
+      # 报告与退出码一次性产出：先写文件再上传，失败时 step 标记为 failed，
+      # 但 if: always() 的上传步骤仍会执行，报告不会丢。
+      - name: 巡检外链
+        run: |
+          set +e
+          node scripts/stale-links.mjs \
+            --source seed \
+            --check-all \
+            --strict \
+            --flaky-ok \
+            ${{ inputs.days && format('--days {0}', inputs.days) || '' }} \
+            2>&1 | tee link-report.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: 保留巡检报告
+        # 即使失败也上传：排查死链时第一手就是这份清单。
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: link-report
+          path: link-report.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: 失败摘要
+        if: failure()
+        run: |
+          echo "::error::外链巡检发现异常。完整报告见本次运行的 link-report 工件。"
+          echo "::warning::403 与超时多为站点拦自动化或网络问题，先人工打开确认再改地址。"

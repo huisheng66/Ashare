@@ -2,11 +2,11 @@
 /**
  * 收录条目：校验草稿并写入运行库 data/store/catalog.json，同步 SHA-256。
  *
- *   node scripts/ingest-item.mjs --file drafts/foo.json --dry-run
- *   node scripts/ingest-item.mjs --file drafts/foo.json
- *   node scripts/ingest-item.mjs --file drafts/补正文.json --patch   只更新草稿里写到的字段
- *   node scripts/ingest-item.mjs --file drafts/batch.json --allow-http
- *   node scripts/ingest-item.mjs --file drafts/batch.json --strict   内容质量提示升级为错误
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/foo.json --dry-run
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/foo.json
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/补正文.json --patch   只更新草稿里写到的字段
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/batch.json --allow-http
+ *   node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file drafts/batch.json --strict   内容质量提示升级为错误
  *
  * --patch 用于给已有条目补内容（正文、标签、别名）：先与库中条目合并再校验，
  * 避免漏掉必填字段或覆盖掉 links / previews / icon 这些不想动的数据。
@@ -19,16 +19,13 @@
  * 写入前请先跑 npm run backup。运行库不在 git 里，本脚本不替代备份。
  * 别忘了同步种子文件（data/software.ts 或 data/samples.ts，只影响全新部署）与 CHANGELOG.md。
  */
-import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { parseFlags } from "../../../../scripts/_shared.mjs";
+import { getItem, saveItem } from "../../../../lib/store-sql.ts";
+import { closePool, parseFlags, readCatalog } from "../../../../scripts/_shared.mjs";
 
 const ROOT = process.cwd();
-const STORE = path.join(ROOT, "data", "store");
-const CATALOG = path.join(STORE, "catalog.json");
-const CHECKSUM = path.join(STORE, "catalog.sha256.json");
 
 const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{0,99}$/;
 const ITEM_KINDS = ["app", "script", "opensource"];
@@ -56,10 +53,22 @@ const MIN_BODY_LENGTH = 200;
 const MAX = {
   name: 100, nameZh: 100, aliases: 2000, tags: 2000, summary: 500, body: 50_000,
   price: 100, tutorial: 10_000, whoFor: 2000, whoNot: 2000, discountNote: 1000,
-  diskNote: 1000, alternatives: 2000, simpleIcon: 100,
+  diskNote: 1000, alternatives: 2000, simpleIcon: 100, license: 100, version: 50,
 };
 
-const USAGE = "用法: node scripts/ingest-item.mjs --file <草稿.json> [--dry-run] [--allow-http] [--patch] [--strict]";
+// 来源 × 类型 的合法组合。与 lib/semantics.ts 的矩阵保持一致：
+// GeoGebra 那类「标开源但许可闭源」必须显式写 kind，不能靠推导。
+const SOURCE_KIND_MATRIX = {
+  official: ["app", "script"],
+  opensource: ["opensource", "app"],
+  discount: ["app"],
+};
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+// SPDX 标识的常见形态：GPL-3.0-only、MIT、Apache-2.0、MPL-2.0、LicenseRef-…
+const LICENSE_SHAPE = /^[A-Za-z0-9.+-]+(\s+AND\s+[A-Za-z0-9.+-]+)*$/;
+
+const USAGE = "用法: node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file <草稿.json> [--dry-run] [--allow-http] [--patch] [--strict]";
 
 function parseArgs(argv) {
   const args = parseFlags(argv, {
@@ -107,6 +116,13 @@ async function validate(item, index, { allowHttp, knownSlugs, strict }) {
   if (!ITEM_KINDS.includes(item.kind)) fail(`kind 必须是 ${ITEM_KINDS.join(" / ")}`);
   if (!PUBLISH_STATUSES.includes(item.status)) fail(`status 必须是 ${PUBLISH_STATUSES.join(" / ")}`);
   if (!SOURCE_KINDS.includes(item.source)) fail(`source 必须是 ${SOURCE_KINDS.join(" / ")}`);
+  // 来源与类型的组合必须成立，否则前台会挂出与事实不符的来源徽章。
+  if (SOURCE_KINDS.includes(item.source) && ITEM_KINDS.includes(item.kind)) {
+    const allowed = SOURCE_KIND_MATRIX[item.source] ?? [];
+    if (!allowed.includes(item.kind)) {
+      fail(`source「${item.source}」与 kind「${item.kind}」不匹配，该来源下只允许 ${allowed.join(" / ")}`);
+    }
+  }
   if (!Array.isArray(item.scenes) || !item.scenes.length) fail("scenes 必须是非空数组");
   else if (item.scenes.some((id) => !SCENES.includes(id))) fail(`scenes 只允许 ${SCENES.join(" / ")}`);
   if (!Array.isArray(item.platforms) || !item.platforms.length) fail("platforms 必须是非空数组");
@@ -133,6 +149,16 @@ async function validate(item, index, { allowHttp, knownSlugs, strict }) {
   if (links.disk) {
     if (!links.diskNote) fail("填了网盘镜像就必须写 diskNote（镜像说明）");
     if (!links.official && !links.github) fail("网盘镜像只能作补充，必须先填官网或 GitHub");
+  }
+  // 标为开源项目却没有仓库链接，「开源」这个断言就无处核验。
+  if (item.source === "opensource" && item.kind === "opensource" && !links.github) {
+    soft("标为开源项目但没有 GitHub 链接，「开源」缺少可核验依据；上游不在白名单主机时可在正文说明并留空");
+  }
+  if (!isBlank(item.license) && !LICENSE_SHAPE.test(item.license.trim())) {
+    soft(`license「${item.license}」不像 SPDX 标识（如 GPL-3.0-only、MIT、Apache-2.0），确认后修正`);
+  }
+  if (!isBlank(item.linksCheckedAt) && !ISO_DATE.test(item.linksCheckedAt.trim())) {
+    fail("linksCheckedAt 必须是 YYYY-MM-DD");
   }
 
   const haystack = [item.name, item.summary, item.body, item.whoFor, item.whoNot, links.diskNote ?? "",
@@ -190,18 +216,6 @@ async function validate(item, index, { allowHttp, knownSlugs, strict }) {
   return { errors, warnings };
 }
 
-async function writeAtomic(file, content) {
-  const tmp = `${file}.${Date.now()}.tmp`;
-  const handle = await fs.open(tmp, "wx", 0o600);
-  try {
-    await handle.writeFile(content, "utf8");
-    await handle.sync();
-  } finally {
-    await handle.close();
-  }
-  await fs.rename(tmp, file);
-}
-
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -213,16 +227,9 @@ async function main() {
   const parsed = JSON.parse(await fs.readFile(draftPath, "utf8"));
   const drafts = Array.isArray(parsed) ? parsed : [parsed];
 
-  let catalog;
-  try {
-    catalog = JSON.parse(await fs.readFile(CATALOG, "utf8"));
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      throw new Error("data/store/catalog.json 不存在。先启动一次应用（npm run dev）生成运行库。");
-    }
-    throw error;
-  }
-  if (!Array.isArray(catalog)) throw new Error("catalog.json 必须是数组");
+  // P10：运行库的权威位置是 MySQL。readCatalog 有 MYSQL_URL 时读库（否则回落 JSON 并告警）。
+  const catalog = await readCatalog();
+  if (!Array.isArray(catalog)) throw new Error("运行库必须是条目数组");
 
   const knownSlugs = new Set(catalog.map((item) => item.slug));
   // --patch 先与库中条目合并再校验，避免局部更新漏掉必填字段或覆盖不想动的数据。
@@ -257,32 +264,29 @@ async function main() {
     throw new Error(`${errors.length} 项校验未通过，未写入任何数据。`);
   }
 
-  const changes = [];
-  for (const plan of planned) {
-    const now = new Date().toISOString();
-    const index = catalog.findIndex((item) => item.slug === plan.slug);
-    if (index >= 0) {
-      catalog[index] = { ...plan.item, createdAt: catalog[index].createdAt ?? now, updatedAt: now };
-    } else {
-      catalog.unshift({ ...plan.item, createdAt: plan.item.createdAt ?? now, updatedAt: now });
-    }
-    changes.push(`${plan.mode} ${plan.slug}`);
-  }
-
-  const text = JSON.stringify(catalog, null, 2);
   if (args.dryRun) {
-    console.log(`试运行：${changes.join("、")}（共 ${catalog.length} 条）`);
+    console.log(`试运行：${planned.map((plan) => `${plan.mode} ${plan.slug}`).join("、")}（目录 ${catalog.length} 条）`);
     console.log("未写入。确认无误后去掉 --dry-run。");
     return;
   }
 
-  await writeAtomic(CATALOG, text);
-  await writeAtomic(CHECKSUM, JSON.stringify(createHash("sha256").update(text).digest("hex")));
-  console.log(`已写入 ${changes.join("、")}，目录共 ${catalog.length} 条，SHA-256 已同步。`);
+  // 逐条原子写（lib/store-sql.ts 的 saveItem 自带事务与行级更新）。
+  // 校验在写入之前已经全部通过，所以不会出现「写了一半才发现数据不合法」。
+  const changes = [];
+  for (const plan of planned) {
+    const existing = await getItem(plan.slug, { publishedOnly: false });
+    const now = new Date().toISOString();
+    const item = { ...plan.item, createdAt: existing?.createdAt ?? plan.item.createdAt ?? now, updatedAt: now };
+    const outcome = await saveItem(item);
+    changes.push(`${plan.mode} ${plan.slug}（${outcome === "created" ? "新增" : "更新"}）`);
+  }
+  console.log(`已写入 ${changes.join("、")}，运行库原有 ${catalog.length} 条。`);
   console.log("下一步：同步种子文件（data/software.ts 或 data/samples.ts，全新部署才生效）→ npm run check（含 tests/seed.test.mjs）→ npm run content:audit → 补 CHANGELOG.md。");
 }
 
-main().catch((error) => {
+main()
+  .finally(() => closePool())
+  .catch((error) => {
   console.error(`[ingest] ${error instanceof Error ? error.message : error}`);
   process.exitCode = 1;
 });

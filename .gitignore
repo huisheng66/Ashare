@@ -45,9 +45,17 @@ next-env.d.ts
 # data/icons/ 是提交进仓库的本地图标，不忽略
 data/store/
 public/media/
+# 上传的图片实际落点（早前是 public/media，那样会被 next start 静态直送、绕过防盗链）
+data/media/
 backups/
 
 # agent tool state
 .mimosa/
 .v2c/
 .zcode/
+
+# codebase-memory 图谱产物（本地产物，随本地代码变动，不入库）
+# 由 codebase-memory-mcp index_repository(persistence=true) 生成：
+#   graph.db.zst 约 1.1MB 压缩图谱 · artifact.json 记录 commit 与节点数 · .gitattributes 工具自动生成
+# 需要与团队共享图谱时，删掉下面这行并提交。
+.codebase-memory/

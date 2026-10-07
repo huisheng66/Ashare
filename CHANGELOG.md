@@ -1,5 +1,615 @@
 # 变更记录
 
+## 2026-10-07 · .mjs 语法闸门改用 tsc，脱离对 spawn 的依赖（分支 bunny）
+
+提交前跑全量校验，发现 `tests/script-syntax.test.mjs` 失败。查下去不是脚本里有TS 语法
+（`node --check` 逐个文件都过），而是**这个闸门在本机根本无法运行**。
+
+**根因**：它用 `execFileSync(process.execPath, ["--check", file])` 逐文件起子进程。
+而本机**任何** spawn 都返回 `EBUSY` —— 不只是 node，`cmd /c echo hi` 也一样。
+沙箱内外、系统 node 与托管 node，全都复现。
+
+于是这个闸门有两重问题：在spawn 受限的环境里**永远红**，而「一直红」的闸门
+等于没有闸门 —— 它看起来在保护 `.mjs`，实际只是在制造噪声。真出现语法错误时，
+没人会当回事。
+
+**换判据，不换意图**：改用 TypeScript 编译器的语法诊断（`createProgram` +
+`getSyntacticDiagnostics`）。理由是它和 `node --check` 用的是同一套解析器
+（V8 之前的那层），但纯进程内、不起子进程、没有环境依赖。实测三类 TS 语法
+（`as`断言、`: Type` 标注、`import { type X }`）全部检出，正常文件零误报。
+
+**验证闸门本身有效**：往`scripts/user-manage.mjs` 注入三种 TS 语法，
+确认三个诊断都报出来 —— 否则很容易写出一个永远绿的测试，那比没有测试更坏。
+
+顺带补一个覆盖面断言。扫描逻辑坏掉时最危险的表现是「扫到 0 个文件，全绿」，
+所以钉住几个必须扫到的文件。
+
+**改动**：`tests/script-syntax.test.mjs`（判据换tsc，新增覆盖面断言）。
+**验证**：`npm run check` 230 项（187 过 / 43 跳过 / 0 失败）· `npm run test:db` 48/48。
+
+## 2026-10-07 · MySQL P10d：种子不导出，改为把漂移检查做严（分支 bunny）
+
+计划里 P10 写着「种子降级为导出产物」。动手前先判断可行性，结论是**不该做**：
+
+`SeedSoftware` 有 `officialLabel` 与 `officialUrl`，而运行库（`Software`）里**没有对应字段**。从数据库反向生成种子会静默丢掉它们 —— **那比「两个落点」更糟**。所以种子保持「人手维护的内容源 + 全新部署的引导数据」的定位，与数据库并存。
+
+**改做的事：把漂移检查从「手写清单」变成「有契约的登记表」。**
+
+这个坑本项目踩过三次 —— 漂移检查与同步脚本各有一份手写字段清单，新增可透传字段却漏登记，检查就对它**永远「相等」**：不报错、不警告，只是从此看不见那个字段。guide 就是这么漏掉的（漂移说 0 不一致，同步却每轮重写 55 条）。
+
+- `lib/seed.ts` 新增 `SEED_CARRIED_FIELDS` / `SEED_DRIFT_EXCLUDED` / `SEED_DRIFT_FIELDS` / `SEED_SYNC_FIELDS`，两个脚本不再各写一份
+- `tests/seed-contract.test.mjs` 钉住四条不变量：名字必须真的是 `Software` 的键（**写错名字和漏登记一样致命**）、CARRIED = DRIFT ∪ EXCLUDED、SYNC ⊆ DRIFT、每个登记字段实际能被 `seedToItem` 带过去
+
+**检查强度**：比对字段从 13 个扩到 **24 个**。展开后先冒出 **23 条假漂移** —— 全部是「缺省 vs 显式空值」（`featured` 缺省 vs `false`）与 `guide` 未归一化（漂移比原始值、同步写归一化后的值）。两处都修掉后：**0 条真实差异**。
+
+**顺带补上 `.mjs` 语法闸门**：`tests/script-syntax.test.mjs` 用 `node --check` 扫全仓 `.mjs`。`.mjs` 不做类型擦除，本项目在脚本里连踩**四次** TS 语法（`as Role`、`: UserRecord`、`import { type X }`），每次都是运行到才发现。**用语法检查而不是正则**——正则会把字符串里的 `as Foo` 误判成类型断言。
+
+**验证**：`npm run check` 通过（新增 4 个测试）· `seed:drift` 24 字段 0 不一致 · `seed:sync --dry-run` 报「已是最新」。
+
+## 2026-10-07 · MySQL P9：最小权限三账号，「API 是唯一写者」落成授权（分支 bunny）
+
+`ashare_app` 原来对 `ashare.*` 是 **ALL PRIVILEGES —— 含 DROP / ALTER / CREATE**。一个只做 CRUD 的应用握着删表权限，等于把「改结构」与「改数据」的边界抹掉了：任何一次注入或代码事故的后果都从「改错数据」升级成「删库」。本轮把它拆开。
+
+**三个账号**
+
+| 账号 | 权限 | 谁用 |
+|---|---|---|
+| `ashare_app` | SELECT / INSERT / UPDATE / DELETE | 应用运行时，**不含任何 DDL** |
+| `ashare_migrate` | ALL（DDL） | 只有 `db:migrate` / `db:reindex` |
+| `ashare_ro` | 只读**已发布目录的 5 个视图** | 其他服务与报表 |
+
+**只读账号刻意只授视图，不授基础表**：库级 SELECT 会让它看到 `users.password_hash`、`submissions`/`feedback` 里的用户内容、`audit_log`。视图用 `SQL SECURITY DEFINER`，只授视图就够，顺带把 `search_text`/`row_version` 这类内部列挡在外面。
+
+**可验证，不是「配了就算」**：`npm run db:grants` 末尾把边界当断言跑，`tests/grants.test.mjs` 再钉进 `npm run test:db` —— 权限「配好了」和「还在」是两件事，下一次手动 GRANT 就可能悄悄放宽，而且不会有任何报错。
+
+**实测**：应用账号对真实库 INSERT/SELECT/UPDATE/DELETE 全部可用 · 实机首页 / 搜索 / 详情 / 场景 / 站点地图 / 后台登录页全 200 · `db:reindex` 用迁移账号跑通真实 DDL · 应用 DROP/CREATE 与只读读 `users` 均被拒。
+
+**顺带的坑**：降权后 `db:migrate` 会以 `command denied` 失败 —— 这是**预期**，已在 `lib/db.ts` 加 `migrationConnectionOptions()` 走 `MYSQL_MIGRATE_URL`。建视图的语句还必须带默认库，否则报 `No database selected`（报在 CREATE VIEW 上，容易误判成权限问题）。
+
+**验证**：`npm run test:db` 48/48 · `npm run check` 221 项 · `npx eslint` 无告警 · `npx tsc --noEmit` 通过。
+
+## 2026-10-07 · MySQL P11：规模验证，并查出列表查询一直是全表扫描（分支 bunny）
+
+整个迁移的理由是「条目会几何式增长」，但**在此之前没有任何数字证明设计撑得住**。这轮把它测出来做成可重复的闸门 —— 结果闸门否掉了一个设计断言。
+
+**新增闸门**：`npm run scale:check`（`--items N`，默认 5000）。往隔离库 `ashare_scale` 灌合成数据，测代表性查询，并**用 EXPLAIN 断言走索引**。
+
+**查出的真问题**：默认排序的查询是全表扫描。`0001` 的 `idx_items_status_sort (status, sort_index, id)` 只覆盖 `WHERE(status)`，而默认排序是 `featured DESC, sort_index ASC, id ASC` —— 优化器既没法用它排序，就干脆扫表：`type=ALL / rows=5001 / key=(无)`。
+
+**而这件事只看耗时发现不了**：5,000 条时全表扫描只要 14ms，比索引扫描还快。**规模闸门必须断言查询计划，不能只断言耗时。**
+
+修法：`0005_list-indexes.sql` 按 ORDER BY 的列序与方向补三条复合索引（`featured` 是 DESC，用 MySQL 8 降序索引），删掉被完全覆盖的旧索引；场景/平台筛选从逐行 `EXISTS` 改成 `IN(子查询)` 走半连接；`catalogCounts` 加 30 秒 TTL 缓存（挂在根布局上，2 万条时原始聚合 387ms）。
+
+**2 万条实测**：首页列表 16.7 → **13.6ms** · 深分页 47.9 → **36.2ms** · 单条写入 25.3 → 17.8ms · 列表计划 `type=ALL key=(无)` → `type=ref key=idx_items_status_featured`。
+
+**最想要的性质成立**：详情单条从 5,000 到 20,000 几乎不变（4.2 → 5.5 ms）—— 按条读取是真正的 O(1)。
+
+**如实记录未修的**：场景筛选 2 万条时 82ms。`item_scenes` 已有正确的覆盖索引，这是「筛出约 1,800 条再排序取前 60」的固有成本，不是缺索引。
+
+**也刻意不设绝对耗时阈值**：阈值随机器变，容易变成假保证。改成断言查询计划与「按条读取保持平坦」。
+
+**验证**：`npm run check` 221 项（182 过 / 40 跳过 / 0 失败）· `npm run test:db` 45/45（含新增的列表索引断言）· `npx tsc --noEmit` 通过 · 2 万条闸门通过。
+
+## 2026-10-07 · MySQL P10c：数据库备份，并做了一次还原演练（分支 bunny）
+
+数据都进库之后，「备份还只备文件」是风险最高的一件事 —— 文件快照恢复不了站点。本轮补上。
+
+**改了什么**
+
+- `scripts/backup.mjs` 增加 MySQL 导出到快照的 `db/ashare.sql`（`--single-transaction`，InnoDB 下不锁表，备份期间站点照常读写），manifest 记字节数与 SHA-256。
+- **口令走 0600 的 `--defaults-extra-file`，绝不上命令行**（`-p<口令>` 会留在进程列表里），用完立即删。
+- **导出失败让整个备份失败** —— 一份「看起来成功了」但没有库的快照，比没有备份更危险。
+- 未配置 `MYSQL_URL` 时明确告警「本次没有备份数据库」；备份源也不再强求文件，只有数据库也能备。
+- `npm run backup` 补上 `--env-file-if-exists=.env.local`（否则看不到 `MYSQL_URL`，会静默跳过导出）。
+
+**只验证「生成了文件」不够，所以做了还原演练**：把 dump 导进临时库 `ashare_restore_check`，逐表比对 —— items 55/55、item_tags 199/199、item_links 94/94、clicks 73/73、schema_migrations 4/4。中文完好；**FULLTEXT 正确重建**：`MATCH AGAINST('+git')` 在还原库里同样返回 2 条。
+
+**验证**：`npm run backup` 产出 dump（430 KiB）+ manifest 含 SHA-256 + 临时凭据文件已删 · 还原演练逐表一致 · `npm run check` 221 项（182 过 / 39 跳过 / 0 失败）。
+
+**仍未做（P10d）**：种子降级为导出产物。
+
+## 2026-10-07 · MySQL P10b：最后三个 JSON 落点改完（分支 bunny）
+
+接上一轮，把仍在写 `data/store/catalog.json` 的脚本全部改到数据库。**现在没有任何脚本会写那份冻结的快照。**
+
+**改了什么**
+
+- `seed-sync`：读 `readCatalog()`、写 `persistCatalog(prune:false)` 单事务。
+- `ingest-item.mjs`（收录脚本）：读库 + 逐条原子写。**语义变化**：从「一次写全量」变成「逐条写」；校验仍在写入之前全部完成，所以不会写一半才发现数据不合法。
+- **退役 `seed-guides`**：一次性回填脚本，guide 早已补齐，库模式下它无事可做。
+
+**顺带修掉「两个脚本互相甩锅」——比看起来严重**。
+
+`seed:sync --dry-run` 报 3 条待同步（dbeaver / texstudio / freecad），而 `seed:drift` 说 0 不一致。根因是**对象键顺序**：DB 往返会重排 `links` 的键（`diskSha256`/`diskFile` 先后不同），直接 `JSON.stringify` 比对就判定「有变化」。
+
+修掉 `links` 之后又冒出一条：**补 guide 55 条** —— 全部条目。同样原因：DB 往返把 `guide` 的键排成 `resources/intro/markdown`，而种子是 `intro/markdown/resources`。
+
+两次都不是「误报一下就算了」：它们让 `seed:sync` **每轮重写 55 条**，完全不幂等。而 `seed:drift` 的 COMPARE 清单里根本没有 `guide`，所以漂移检查看不见这件事 —— 正是脚本注释里写的「两个脚本互相甩锅」。现在两处比对都改成递归按键排序，`seed:sync --dry-run` 报「运行库已是最新（55 条）」。
+
+**验证**：`npx eslint scripts .workbuddy` 无告警 · `npm run check` 221 项（182 过 / 39 跳过 / 0 失败）· `seed:drift` 0 不一致 · `seed:sync --dry-run` 幂等 · `content:audit` 走库返回 55 条。
+
+**仍未做（P10c）**：`backup.mjs` 的 `mysqldump`、种子降级为导出产物。
+
+## 2026-10-07 · MySQL P10：脚本读路径改指向数据库（部分完成，分支 bunny）
+
+P4 之后应用只写 MySQL，但脚本还在读 `data/store/catalog.json` —— 那份文件已经冻结。于是 `content:audit` / `stale-links` 报的是历史数字，而「脚本跑得好好的」，这类错最难发现。本轮把读路径掰过来。
+
+**改了什么**
+
+- `scripts/_shared.mjs` 的 `readCatalog`：**有 `MYSQL_URL` 就读库**，否则回落 JSON 并**明确告警**。一处改动覆盖 `content-audit` / `stale-links` / `check-links` / `smoke-detail`。
+- `seed-drift` 改为种子 vs **运行库**；`stale-links --update` 改为**写库**（`--source seed` 时拒绝回写 —— 种子在 git 里，巡检不该改它）。
+- **退役 `db-verify`**：它的职责是 P3/P4 的一次性 JSON↔DB 闸门；JSON 已冻结，继续比对必然假红。持续闸门交给 `seed:drift`。
+- `seed:sync` / `seed:guides` 在 DB 模式下**直接拒绝**，免得「跑得很成功」却写进一份没人读的文件。
+
+**两个坑，都写进了计划文档第七章**：
+
+1. **老脚本都不加载 `.env.local`** —— 加了 DB 分支后它们仍然走 JSON，因为看不到 `MYSQL_URL`。已给六个 DB 相关脚本补上 `--env-file-if-exists=.env.local`。
+2. **`stale-links --update` 不能顺手改 `updated_at`** —— 核验外链不是内容更新，改了会让条目虚假地跳到「最近更新」排序顶部。
+
+**顺带修掉漂移检查自身的假阳性**：`seed-drift` 用 `JSON.stringify` 直接比对象，DB 往返把 `links` 的键重排（`diskSha256`/`diskFile` 先后不同）就报「不一致」。**一个会误报的漂移检测比没有更糟 —— 它会训练人忽略它。** 改成递归按键排序后比对。
+
+**验证**：`npm run check` 221 项（182 过 / 39 跳过 / 0 失败）· `seed:drift` 读库 · `content:audit` 走库返回 55 条 · `stale-links` 读库。
+
+**仍未做（P10b）**：`seed:sync` / `seed:guides` 的库版本、技能脚本 `ingest-item.mjs`、`backup.mjs` 的 `mysqldump`、种子降级为导出产物。
+
+## 2026-10-07 · MySQL P8：媒体存储抽象，并修掉一个既有的防盗链缺口（分支 bunny）
+
+图片一直写在 `public/media/`。单进程 + 持久磁盘时没问题，但多副本一上来，「请求落到哪台机器」就决定了图片 404 不 404 —— 这是横向扩容剩下的最后一块硬骨头。动手时顺带发现了一个**一直存在**的安全缺口。
+
+**改了什么**
+
+- `lib/media-storage.ts`：存储抽象，`MEDIA_DRIVER=local | s3`。上传、读取、删除三处全部改走它。
+- `lib/s3.ts`：手写 SigV4 + fetch 的最小 S3 客户端（PUT / HEAD / GET / DELETE）。不引入 AWS SDK —— 与自研 markdown 解析器、自写迁移器同一个取舍。
+- `/media` 路由改为从存储驱动读；防盗链仍在读取之前判定。
+- `npm run media:check`：对真实 bucket 的冒烟，验证 PUT/HEAD/GET/DELETE 与字节往返。
+
+**顺带修掉的既有缺口**：`public/media/**` 会被 `next start` **当静态文件直送**，`app/media/[...path]/route.ts` 根本不执行 —— 所以 `/media` 的防盗链**一直是无效的**。实测（生产模式、跨站 Referer）响应头是 next 的静态默认：`cache-control: public, max-age=0`、带 `last-modified`，没有 `immutable`，也没有 403。
+
+修法：本地媒体根从 `public/media/` 移到 `data/media/`，让每个 `/media` 请求都必须过路由处理器。修完实测：**跨站 Referer 403 + no-store、无 Referer 200 + immutable、非法文件名 404**。（`/icons` 从来没问题，它在 `data/icons`。）
+
+**一件必须说清的事**：`tests/s3.test.mjs` 验证的是 SigV4 最容易错的一步 —— **规范化与签名串**（逐字符字面量断言），加上请求形态（假端点往返）。**没有对着真实 bucket 签过**：region、path-style、STS token、bucket 策略这类环境差异只有真机能暴露。所以 S3 驱动是 opt-in，启用前必须跑 `media:check`。
+
+**验证**：`tests/s3.test.mjs` 7/7 · `npm run test:db` 44/44 · `npm run check` 221 项（182 过 / 39 跳过 / 0 失败）· `npm run build` 通过 · 实机防盗链四项符合预期。
+
+**兼容**：`data/media` 是新落点，`public/media` 保留在备份源里，存量部署把目录搬过去即可（`npm run backup` 两个落点都会备）。
+
+## 2026-10-07 · MySQL P7：多用户账号与权限（分支 bunny）
+
+单口令后台只能一个人用。本轮把账号、角色、审核流转补上，并让审计记到真人。
+
+**改了什么**
+
+- `users` 表（`0004_users.sql`）：口令仍只存 scrypt 哈希，`role` 两档，`disabled` 立即生效。
+- **权限矩阵集中在 `lib/users.ts`**：`admin` 全权；`editor` 只能 `edit` / `moderate`。判断散在各个入口最容易出现「新加了入口忘了加检查」，所以只留一处。
+- **会话带身份**：令牌是 `过期时间.角色.base64url(用户名).签名`，篡改任一字段都失效；**每个请求回查账号表** —— 停用与降权立即生效，而不是等 8 小时会话过期。
+- **草稿→审核→发布**：`PublishStatus` 增加 `review`。`canSetStatus(role, from, to)` 带「从哪来」，否则编辑可以把已发布的条目拉回草稿。
+- 后台三个写入口改用 `requirePermission`；审计的 `actor` 从写死的 `admin` 换成真实账号。
+- `npm run user` 命令行管账号，口令一律交互式隐藏输入。
+
+**引导模式**：账号表为空时 `ADMIN_PASSWORD_HASH` 仍可登录（签发 `env-admin`）。没有它，新部署在建出第一个账号之前根本进不去后台。
+
+**三个踩到的坑（都写进了计划文档第七章）**：
+
+1. **`.mjs` 不做类型擦除** —— CLI 里写了 `as Role`、`: UserRecord`、`import { type Role }`，连踩三次，且都是**运行时**才报 SyntaxError（`npm run check` 不覆盖 `scripts/*.mjs`）。
+2. **`app/admin/actions.ts` 是 CRLF 行尾** —— 多行字符串替换会静默失配（单行能中、多行不中）。跨行替换必须按文件实际行尾归一化。
+3. **状态流转必须带「从哪来」** —— 只看目标状态会让编辑把已发布的撤下来。
+
+**验证**：`tests/users.test.mjs` 5/5 · `tests/security.test.mjs` 会话身份与四类篡改 · `npm run test:db` 44/44 · `npm run check` 214 项（175 过 / 39 跳过 / 0 失败）· `npm run build` 通过 · 实机：登录页含账号与口令字段、未登录 `/admin` 307、公开页不受影响。
+
+**未做**：后台 `/admin/users` 管理界面与 `item_revisions` —— 列为 P7b，目前用命令行管账号。
+
+## 2026-10-07 · MySQL P6：写路径彻底改写（分支 bunny）
+
+读写两条路之前都还是「整表读改写」。P5 解决了读，本轮解决写 —— 这是多用户并发下最后一个正确性缺口。
+
+**改了什么**
+
+- 后台的保存 / 状态 / 删除改走 `lib/store-sql.ts` 的单条原子写：只碰一行加它的子行，不再重写整张表。
+- **乐观锁**：编辑表单带上 `row_version`，落库时写进 `WHERE` 条件。不一致就返回 `conflict`，页面提示「刚被别人改过，请刷新后重试」，**不覆盖别人的改动**。
+- **改名原子化**：同一事务里先改 slug 再更新字段。从前若写成「先删后插」，中途失败就直接丢条目 —— 现在目标被占用时返回 `conflict`，源条目保持不动。
+- **审计**：新表 `audit_log`，记录操作人、动作、slug、字段级 diff 与前后版本号。
+
+**踩到两个并发坑，都写进了计划文档第七章**：
+
+1. **对「不存在」的行做 `SELECT ... FOR UPDATE` 会取间隙锁** —— 两个并发新建直接死锁。改成 `UPDATE ... WHERE slug = ? AND row_version = ?`：乐观检查就是这条语句本身，不需要先锁行。
+2. **并发 INSERT 仍会死锁**（间隙锁 + 全文索引辅助表锁）。死锁是瞬态错误、InnoDB 已回滚，官方解法是有界重试 —— 新增 `withWriteTransaction`，对 `ER_LOCK_DEADLOCK` / `ER_LOCK_WAIT_TIMEOUT` 重试 3 次。测试日志里能看到它真的触发过。
+
+**闸门里最有价值的一条**：断言「保存条目 A 之后，条目 B 的 `row_version` 与 `updated_at` 完全不变」。这正是替换掉整表写的证据 —— 从前每次保存都会重写所有行。
+
+**顺带**：报告行号又漂了 6 处（`lib/store-json.ts` 与后台两个文件的改动），已同步 EXPECT 表与报告正文；`tests/db.test.mjs` 的迁移清单与表清单也补上了 0003。
+
+**验证**：`tests/write-path.test.mjs` 10/10 · `npm run test:db` 39/39（串行）· `npm run db:verify` 0 差异 · `npm run check` 209 项（171 过 / 38 跳过 / 0 失败）· `npm run build` 通过。
+
+**移入 P7**：草稿→审核→发布工作流。审核只有配上角色才有意义，单独做只是多一个状态位。
+
+## 2026-10-07 · MySQL P5b：搜索下推，并修掉一个致命的召回缺陷（分支 bunny）
+
+搜索是最后一条还在全量加载的读路径。原本只打算简单下推，结果被闸门拦下，牵出一个会让**最常见工具名搜不到**的配置问题。
+
+**改了什么**
+
+- `lib/catalog-sql.ts` 新增 `searchCatalog`：FULLTEXT + ngram 选候选；短于 2 字的词走 `LIKE` 兜底（ngram_token_size=2 下 FULLTEXT 对单字必然为空）；布尔模式操作符与 LIKE 通配符都做了净化；排序为「名称命中档 → 全文相关度 → 目录顺序」。
+- `lib/catalog.ts` 增 `searchCatalog` 门面，`app/search/page.tsx` 接上分页。
+
+**闸门抓住的缺陷**：用 `search_text` 的包含口径当预言机比对，搜 `git` 期望 2 条、实际 0 条。查下去发现 InnoDB 默认停用词表里有**单字母** `a` 与 `i`，而 ngram 会丢弃**包含**停用词的 token。受控实验（`ft_probe` 表）看得很清楚：
+
+| 输入 | 留下的 token | 为什么 |
+|---|---|---|
+| `gimp` | `mp` | gi 含 i、im 含 i |
+| `git` | 无 | gi 含 i，it 本身是停用词 |
+| `code` | `co` `od` | de 本身是停用词 |
+
+**后果**：搜 Git / Figma / KiCad / Inkscape 全部 0 条。这不是边缘情况，是目录里最常见的工具名。
+
+**修法**：空表 `ft_stopwords` + `innodb_ft_server_stopword_table` 指向它 + `npm run db:reindex` 重建索引。新增 `scripts/db-reindex.mjs`，配置不对时**拒绝执行** —— 默认停用词表会让这些词静默搜不到，这必须是响亮的失败。配置检查同时进了 `tests/search-sql.test.mjs`。
+
+**另一个关键事实**：停用词表是在**创建全文索引时绑定**的 —— 改完变量再往旧索引插数据，token 仍按旧表生成。所以必须重建索引，测试库也必须整库重建。这条写进了计划文档第七章。
+
+**顺带修掉/发现的**：迁移文件名只允许 `[a-z0-9-]`，`0002_search_stopwords.sql` 的下划线会被**静默忽略**（migrate 只报「共 1 个迁移文件」）；三个数据库测试文件共用同一个测试库，并行会互相踩，`npm run test:db` 改为 `--test-concurrency=1` 串行跑全部四个。
+
+**验证**：`tests/search-sql.test.mjs` 8/8（30+ 查询，含含 a/i 的名称、单字、纯符号）· `npm run test:db` 29/29 · `npm run db:verify` 0 差异 · `npm run check` 199 项（170 过 / 29 跳过 / 0 失败）· 生产构建实机：`git` 2 · `figma` 1 · `kicad` 1 · `inkscape` 1 · `python` 4 · `图像` 2 · `图` 10 · 不存在的词走空态。
+
+**已知差异（刻意）**：SQL 搜索的字段是 `search_text`（名称 / 中文名 / 别名 / 标签 / 简介），不含长正文；内存实现还会扫 `body` / `whoFor` / `whoNot`。这是「不把 5 万字正文塞进全文索引」换来的取舍。
+
+## 2026-10-07 · MySQL P5：读路径下推（分支 bunny）
+
+P4 把存储换成了 MySQL，但**读法没变** —— 每次请求仍把整份目录读进内存再过滤。按 8.2 KB/条算，5,500 条时每个请求要吞 45 MB、每次保存要重写 45 MB。本轮把筛选、排序、计数、分页全部下推。
+
+**改了什么**
+
+- `lib/catalog-sql.ts`（新）：**列表只做窄投影**（卡片 14 个字段，不读 `body` / `guide`）；**子行按 `IN (?)` 收窄** —— 详情页只取一条，就不再整表读子表。
+- `lib/catalog.ts` 变成驱动门面：SQL 路径下推，JSON 路径在内存里做等价的事。两条路径可互换，回滚路径仍然可用。
+- 计数下推成聚合查询 —— 根布局每页都要用它，是全站最热的读。
+- 首页分页（默认每页 60，`CATALOG_PAGE_SIZE` 可调）；**超过一页才渲染分页控件**，所以 55 条时界面与从前一模一样。
+- 站点地图改读窄投影（只取 slug 与更新时间）。
+
+**闸门：SQL 与内存实现逐字段一致。** `tests/catalog-sql.test.mjs` 拿种子的 55 条，对 13 种筛选组合 × 全部分页做逐字段比对，外加计数、精选、详情、替代品顺序、场景、窄投影、越界分页。这是本轮最有价值的一条 —— 只要回滚路径还在，两条路径就必须可互换。
+
+**踩到四个坑，都写进了计划文档第七章**：
+
+1. **Next 16 的 `generateSitemaps` 不提供 `/sitemap.xml`**，只生成 `/sitemap/[id].xml`；而 `robots.txt` 指向 `/sitemap.xml` —— 实测生产环境下该地址 404。先试了 `force-dynamic` 与 `revalidate`，都不是原因；最后删掉 `app/sitemap.ts`，自己写 `app/sitemap.xml/route.ts`（少则一张 urlset，多则索引）+ `app/sitemaps/[id]/route.ts`。顺带发现 `app/sitemap.ts` 与 `app/sitemap.xml/route.ts` 会直接冲突（`Conflicting route and metadata`）。
+2. **静态化会让 sitemap 变空**：`revalidate` 那次构建时没有 `NEXT_PUBLIC_SITE_URL`，产物里 0 条 URL。所以两条路由都保持 `force-dynamic`。
+3. **`toCatalogItem` 总是带上可选键**（值可能 `undefined`），窄投影必须逐字对齐，否则 `deepStrictEqual` 会因「键存在但为 undefined」判不等。同理 `featured: false` 与「没有 featured」在库里都归一成 0。
+4. **`sort=name` 两个驱动不完全等价**：SQL 用 `utf8mb4_0900_ai_ci`，JSON 路径用 `Intl.Collator("zh-CN", { numeric: true })`，差异只在含数字的名称。要完全一致得另加排序键列。
+
+**验证**：`tests/catalog-sql.test.mjs` 9/9 · `tests/sitemap.test.mjs` 6/6 · `npm run db:verify` 0 差异 · `npm run check` 191 项（170 过 / 21 跳过 / 0 失败）· 生产构建下 `/sitemap.xml` 200（71 条 URL）、首页 software 链接从 55 降到 15、`?page=2` 与第 1 页无重叠、详情/搜索/场景全 200、`/admin/clicks` 307。
+
+**未完成**：`app/search/page.tsx` 仍在内存里全量打分。FULLTEXT + ngram 下推、单字 `LIKE` 兜底、结果分页留给 P5b。
+
+## 2026-10-07 · MySQL P4：应用切到数据库（分支 bunny）
+
+P3 证明「库里和线上一致」，本轮把应用真的切过去。
+
+**结构**：`lib/store.ts` 变成按 `STORE_DRIVER` 转发的门面，**导出签名一字未改** —— 图谱证实它是唯一收口点，所以 20 个调用点一行未动。实现分到 `lib/store-json.ts`（迁移前的原实现）与 `lib/store-sql.ts`。目录读写又抽了一层 `lib/catalog-persist.ts`，让 ETL、`db:verify`、应用共用同一份 —— 连同名 SQL 都不该有两份。
+
+**`STORE_DRIVER` 默认仍是 `json`**，`.env.local` 里显式设 `mysql`。理由不是保守：`npm test` 不加载 `.env.local`，`tests/admin-actions.test.mjs` 靠 `chdir` 到临时目录里的 JSON 文件做隔离；默认 mysql 会让「没有数据库的 CI」被迫连库。该测试现在也自己锁定驱动，不依赖环境。
+
+**并发语义换了实现**：JSON 靠进程内文件队列串行，多进程下失效 —— 这正是迁移原因之一。SQL 侧改用 MySQL 命名锁（`GET_LOCK`）跨进程串行整表读改写。`tests/store-sql.test.mjs` 里有并发用例：两个 `updateCatalog` 同时跑，两个条目都得留下。P6 换成单条原子更新 + 乐观锁后撤掉这把大锁。
+
+**契约测试打独立库**：`saveCatalog` 是整表镜像语义，跑在开发库上会把这 55 条清空。新建 `ashare_test` 库，用 `MYSQL_TEST_URL` 指向它，没设就整组跳过（CI 因此不红）。
+
+**实机验证 + 直连证明**：五个页面全部 200，首页显示收录 55 款。更有力的一条是：**直接改库里 `vscode` 的 `name`，页面立刻跟着变；还原后页面同时还原** —— 排除了「悄悄回退到 JSON」的可能。
+
+**两个新踩到的坑**：ESLint 的 `react-hooks/rules-of-hooks` 把 `useMysql()` 当成 React Hook，一次报 11 处错，已改名 `mysqlDriver()`；`lib/catalog-persist.ts` 里的相对导入必须带 `.ts` 后缀，否则 Node 跑脚本时解析不到。
+
+**验证**：`npm run test:store` 7/7 · `npm run db:verify` 重构后仍 0 差异 · `npm run check` 176 项（164 过 / 12 跳过 / 0 失败）· 实机五页 200 · 直连改库页面同步变化。
+
+**回滚方式**：`STORE_DRIVER=json` 即回到本机 JSON，无需回滚代码。
+
+## 2026-10-07 · MySQL P3：ETL 与逐字段一致性闸门（分支 bunny）
+
+P4 要把应用切到数据库，切之前必须先证明「数据库里的东西和现在线上跑的完全一样」。本轮就是这道闸门。
+
+**新增**：`lib/catalog-rows.ts`（Software ↔ 数据库行的纯映射）、`lib/normalize.ts`、`scripts/db-import-json.mjs`、`scripts/db-verify.mjs`、`tests/catalog-rows.test.mjs`；`npm run db:import` / `db:verify`。
+
+**为什么把映射写成纯函数**：ETL 导入、`db:verify` 还原、P4 的 `lib/store.ts` 三处必须共用同一份。各写一份的话，「导入的逻辑」与「读回的逻辑」会各自漂移，而漂移只有靠往返比对才发现。
+
+**顺带抽出了 `lib/normalize.ts`**：`data/samples.ts` 的条目没有时间戳，靠 `lib/store.ts` 读时补。ETL 必须复用同一套规则，否则「导入时补了、读回时没补」只会在比对里冒出来。这次测试正是先抓到了 `yt-dlp 缺少 createdAt` 才发现的。
+
+**@db:verify` 通过**：JSON 55 条 / DB 55 条 · **逐字段不一致 0** · 顺序一致 · 无多余条目 · clicks 73/73。
+
+**顺带查清一个遗留字段**：`officialLabel` 是 `SeedSoftware` 的字段，不在 `Software` 契约里、应用侧无人读取，但经 `seedToItem` 的 `...rest` 泄漏进运行库（55 条里 50 条有）。ETL 丢弃它，且 `db:verify` 会显式报告「未入库字段」，不静默。根治要等 P10 收窄 `seedToItem` 的透传。
+
+**三个新踩到的坑**（已进计划文档第七章）：mysql2 会把 JSON 列解析成对象，读回必须经 `itemRowFromDb()` 还原；`linksCheckedAt` 只精确到天，连接层设 `dateStrings: ["DATE"]` 免得漂一天；`db:verify` 里 `conn.query` 返回 `[rows, fields]`，别把 fields 也解构进来。
+
+**行号守卫第二次拦下**：抽出 `normalize` 让 `lib/store.ts` 的 `seedCatalog` 从第 18 行移到 19 行，`npm run check` 立刻报 `lib/store.ts:18` 漂移。报告与 `verify-report-refs.mjs` 的 `EXPECT` 表已同步。
+
+**验证**：`npm run db:import -- --dry-run` 回滚生效 · 二次导入幂等 · `npm run db:verify` 0 差异 · `tests/catalog-rows.test.mjs` 8/8 · `npm run check` 169 项（164 过 / 5 跳过 / 0 失败）。
+
+**仍未改动任何业务代码**：`lib/store.ts` 只用到 `lib/normalize.ts`，切换是 P4 的事。
+
+## 2026-10-07 · 接入 MySQL：P0 决策与 P1 基础设施（分支 bunny）
+
+条目将几何式增长、要跑多进程多用户、还会有其他服务共用数据 —— 三个条件同时命中 README 自述的迁移前提。本轮只做地基，**不动任何业务代码**。
+
+**决策（ADR 落在 `docs/MySQL 迁移计划.md`）**：MySQL 8 · 多个编辑账号（含审计）· 应用是唯一写者、其他服务走 API · FULLTEXT + ngram 做中文搜索 · 媒体最终迁对象存储 · **一次切换，不做双写**。
+
+**为什么不做双写**：双写会造出第二个事实源，正是 `known-pitfalls` 里「两个落点」与「`--patch` 漏字段」的同一类问题。
+
+**P1 交付**：`lib/db.ts`（连接池，刻意不带 `server-only` 以便 `.mjs` 脚本 import）、`db/migrations/0001_init.sql`（13 张表）、`scripts/db-migrate.mjs`、`next.config.ts` 外部化 `mysql2`、`.env.example` 增 `MYSQL_URL`、`tests/db.test.mjs`。
+
+**schema 为什么不沿用「单表 + data JSON」**：那是为 55 条优化的。可筛选的多值字段（标签 / 场景 / 平台 / 替代品）拆成子表并各自建索引；`search_text` 冗余可搜文本供 FULLTEXT 使用，因为 MySQL 的 FULLTEXT 不能跨表。
+
+**三个实测发现，都写进了计划文档第七章**：
+
+1. **InnoDB FULLTEXT 看不到本事务刚插入的行** —— 同一事务内 `INSERT` 后 `MATCH` 查不到，提交后才命中。写入路径不能假设「写完立刻可搜」。
+2. **`ngram_token_size=2` 下单字查询必然为空** —— `MATCH AGAINST('图')` 返回 0 行，中文单字搜索必须应用层 `LIKE` 兜底。这是产品级约束，不是 bug。
+3. **连接池会让 Node 进程不退出** —— `node --test` 跑完会永久挂起，`tests/db.test.mjs` 用 `after()` 收尾。
+
+**行号守卫又拦了一次**：把 `serverExternalPackages` 插在 `next.config.ts` 开头，`npm run check` 立刻报 2 处行号漂移（`docs/优化改进报告.md` 引用的 `:28` / `:30`）。改为追加到配置对象末尾，改动只增加尾部行，引用不再漂移。
+
+**验证**：`npm run db:migrate` 连跑两次（第二次全 skip，幂等）· 13 张表齐、`items.search_text` 为 FULLTEXT · `npm run test:db` 5/5 · `npm run check` 161 项（156 过 / 5 跳过 / 0 失败）· 无 `MYSQL_URL` 时数据库测试整组跳过，`npm test` 不因缺库变红。
+
+**本地环境**：系统服务 `MySQL84` 因权限无法启动，改用隔离实例（`%LOCALAPPDATA%\Ashare\mysql-data`，端口 3307，不注册服务、不动系统 datadir、不占默认 3306）。
+
+**下一期**：P2 补齐面向规模的 schema，P3 做 ETL 与逐字段 `db:verify`（diff 必须为 0，否则不许切换）。
+
+## 2026-10-04 · 补齐许可证并在详情页展示（分支 bunny）
+
+上一轮把 35 条目录的 `license` 全部回填（18 条），但暴露两个问题：字段只存在后台表单、前台一个字都不展示；另有 10 条该补的没补。本轮处理两件事。
+
+**回填 7 条，18 → 25**
+
+| 条目 | SPDX | 依据 |
+|---|---|---|
+| audacity | `GPL-3.0` | 仓库 LICENSE.txt 原文 |
+| thunderbird | `MPL-2.0` | 仓库 LICENSE 与正文第 4 段 |
+| kicad | `GPL-3.0` | KiCad 官方镜像 API |
+| freecad | `LGPL-2.1` | FreeCAD 仓库 API |
+| dbeaver | `Apache-2.0` | DBeaver 仓库 API |
+| libreoffice | `MPL-2.0 OR LGPL-3.0-or-later` | 官方许可页 |
+| mineradio | `GPL-3.0` | 正文第 4 段 + 仓库 |
+
+**LibreOffice 差点填错，值得单说**：GitHub API 报 `GPL-3.0`（它取了仓库里 COPYING 那一份），但官方许可是 **MPLv2 与 LGPLv3+ 双许可**。直接用 API 的单值会丢掉「可闭源」这个对读者最关键的信息。
+
+**仍留空 10 条**：4 条专有（obsidian / figma / wps / geogebra 的非商业免费）本就无 SPDX 可写；另 6 条（inkscape / blender / texstudio / jasp / rstudio / zotero）仓库里没有 LICENSE 文件，查不到权威来源，按「不猜」原则留空。
+
+**展示：新增 `lib/license-info.ts` + `components/LicenseNote.tsx`**
+
+只给 `source === "opensource"` 显示。专有软件没有 SPDX 标识可写，非商业免费的 GeoGebra 是自家许可——给它们挂一个「未知」比不显示更糟，读者会以为是核验过但漏了。
+
+行内不加「许可证：」前缀：天平图标已经说明了这是什么，重复一遍是噪音。
+
+映射表把 SPDX 翻成一句人话（只回答「能不能闭源商用」），分三档：宽松（MIT/Apache/BSD）、弱 copyleft（LGPL/MPL，改动需开源但整体可闭源）、强 copyleft（GPL/AGPL，分发需开源）。AGPL 单独措辞——不是「用了就犯规」，而是「让用户联网访问」才触发义务，这两种情况必须分开说。
+
+支持双许可 `A OR B`（取更宽松的那个）；`AND` 与 `WITH` 不推断——都需要逐个读原文才能判断，一条通用提示语会给出错误的宽松/严格结论。
+
+**一个位置错误**
+
+许可证行最初挂在「其他渠道」区块里，结果只有官网一条渠道的条目（VS Code / DBeaver / LibreOffice）完全不显示。**信息不该依附于「其他渠道」是否存在**，已提到页面里独立渲染。
+
+**测试 12 项，其中一条是交叉核对**
+
+「运行库里每条 license 都必须有对应展示文案」——这条立刻抓到两个缺口：LGPL-2.1 的简写形式没在表里、LibreOffice 的双许可无法解析。这类失配（数据正常但页面静默不显示）只有靠交叉核对才发现。
+
+顺带修了 `tests/seed.test.mjs`：我自写的 SPDX 正则不支持 `OR`，把 LibreOffice 判成非法。改为把表达式交给 `describeLicense` 判定，不自己写正则。
+
+**验证**：`npm run check` 125 全过（新增 12）· `npm run verify:report` 66 条引用 0 问题 · `seed:drift` 0 不一致 · 实机验证 8 个开源条目显示正确（含双许可与三档措辞）、5 个专有/未核验条目确认不显示。
+
+## 2026-10-04 · 详情页新增「详细教程」区块（分支 bunny）
+
+在「上手步骤」和「同类替代」之间插入详细教程，支持 Markdown 正文与 PDF / 网页 / 插图 / 链接四类配套资料。
+
+**为什么加**：上手步骤回答「怎么开始」，但读者真正卡住的是步骤之外的具体问题 —— 某个参数怎么写、某个报错怎么处理。新增区块正好补上这一段，且不改动既有「先回答该不该用」的叙事顺序。
+
+**Markdown 为什么自己解析**（`lib/markdown.ts`）：教程正文由后台表单录入，属于半可控输入。引三方库要拖进一整套 HTML 清洗，用 `dangerouslySetInnerHTML` 拼字符串则把清洗责任全交给正则 —— 嵌套标签、属性里的引号、转义边界，正则都覆盖不全。改为**解析成 AST 交给 React 渲染**，不解析的字符一律当纯文本，根本没有注入面。代价是只支持明确子集：标题、段落、列表、围栏代码块、引用、水平线、表格，以及行内代码 / 粗体 / 斜体 / 链接 / 图片。
+
+**链接白名单比语法更重要**：行内链接与图片都过 `safeHref` / `safeImageSrc`，只收 https 与上传流程生成的站内 `/media/` 路径。实测 `javascript:alert(1)`、`data:text/html`、`<img onerror>`、`<iframe>` 全部降级为纯文本，不产出任何可点或可执行节点。
+
+**踩到的两个真bug**（都是测试先发现的）：
+
+1. 链接正则里的 `[^)]+` 会在 `javascript:alert(1)` 处提前截断，残留的 `)` 漏进正文；同时它也表达不了 URL 里合法的成对括号（维基类链接很常见）。改为按括号配平截取。
+2. 未闭合的 ``` 围栏会一路读到文末，把整篇剩余内容吞进代码块——而我原来的注释恰好声称「不吞掉后面的内容」。改为遇到空行即收尾。
+
+**顺带发现并修掉的工具链问题**：新增的 `lib/guide.ts` / `lib/markdown.ts` 之间有运行时导入，而 `node --test` 靠类型擦除直接跑 `.ts`，相对导入必须带 `.ts` 后缀才能被 Node 解析——项目里原本靠「不跨模块导入运行时值」绕开（见 `lib/click-analytics.ts` 注释）。开启 `allowImportingTsExtensions`（`noEmit` 已开，是官方支持的组合）后无需复制白名单，`npm run typecheck` 无回归。
+
+**监控接入**：教程正文与资料里的外链一并纳入 `stale-links` 探活。核验日期是全条目共用的一个，只探 `links` 会让教程链接烂掉却始终显示「新鲜」；`content:audit` 也新增「详细教程」内容债项（权重 2）。
+
+**验证**：`npm run check` 113 项全过（新增 `tests/guide.test.mjs` 17 项）· `npm run verify:report` 66 条引用 0 问题 · 实机 curl 确认区块顺序为「上手步骤 → 详细教程 → 同类替代」，目录 / 表格 / 代码块正常渲染、无残留 Markdown 标记 · 无教程的老条目不渲染该区块（存量数据零迁移）。
+
+> 注：`data/software.ts` 里 LibreOffice 的 `license: "MPL-2.0 OR LGPL-3.0-or-later"` 会让 `tests/seed.test.mjs` 的 SPDX 校验失败 —— 该校验只认单个标识与 `AND`，不认合法的 `OR` 表达式。与本次改动无关，留给许可证回填的任务一并处理。
+
+## 2026-10-04 · 修复防盗链在本地开发时全站 403（分支 bunny）
+
+启动应用做实机验证时发现：curl 带同站 Referer 请求图标返回 403。
+
+**根因**：`hotlinkOptionsFromEnv()` 只读 `NEXT_PUBLIC_SITE_URL`（`lib/hotlink.ts:89`），而 `.env.local` 里没配这个变量 —— `siteHost` 为空，`decideHotlink` 的同站判断（`lib/hotlink.ts:77`）直接失效。结果**本地开发时首屏所有图标都是 403**。
+
+**为什么前几轮没发现**：那轮我是在 `SESSION_SECRET=... npm run start` 下手工构造了 `NEXT_PUBLIC_SITE_URL` 才做的六项验证，而真实开发流程是 `npm run dev` + `.env.local`。**验的环境不是实际使用的环境，等于没验。**
+
+**修法**：新增 `requestHost()`（`lib/hotlink.ts:119-131`），拿请求自身的 host 作兜底 ——「谁在访问我」本来不需要任何配置。两个路由改为「配置缺失时用 requestHost 补上」（`app/icons/[slug]/route.ts:17-19`、`app/media/[...path]/route.ts:19-21`）。`x-forwarded-host` 只在 `TRUST_PROXY=1` 时采纳，与 `lib/guard.ts` 对 XFF 的既有约定一致。
+
+**顺带验证**：伪装 Referer（`evilashare.example`、`ashare.example.evil.com`）仍 403；伪造 `X-Forwarded-Host` 不被采纳；同站子域名（`sub.localhost:3000`）放行（子域名本就是自己人）。
+
+**顺带被报告防线拦住**：修完代码后 `npm run check` 报 9 处行号漂移 —— 正是上一轮建的 `verify-report-refs` 起作用。新增 `requestHost` 使 `lib/hotlink.ts` 之后 24 行全部下移（110→134、112→136、115→139…），报告与预期表已同步。这也再次说明：改了被报告引用的代码，必须同步更新行号，否则 `npm run check` 会拦。
+
+**验证**：`npm run check` 96 全过 · `npm run verify:report` 62 条引用 0 问题 · 实机 curl 六项全部符合预期。
+
+## 2026-10-04 · 在真实 GitHub Actions 上验证（分支 bunny）
+
+上一轮只做了 YAML 语法检查，这轮真跑。远程 `huisheng66/Ashare`，分支已推送。
+
+**成功路径（run 37139362789，`workflow_dispatch` 手动触发）**
+
+51 个链接、**异常 0 个、35/35 条全部可达**，「巡检外链」「保留巡检报告」成功，「失败摘要」正确跳过。比本地干净：本地那 3 个异常（inkscape / jasp 的 Cloudflare 403、texstudio 的代理超时）在 runner 上**全部 200**。
+
+**这修正了此前的判断** —— 那 3 个不是站点问题，是本机网络环境的产物（代理隧道 + Cloudflare 对本机 IP 的拦截）。`--flaky-ok` 仍保留，作为将来 runner 换 IP 时的防护，但不必再把它当成「站点在拦自动化」。
+
+**失败路径（run 37140011070，注入不可解析域名后 push 触发）**
+
+先造了个假失败：注入死链后 CI 报的是 `success`。查下来是**注入方式错了** —— 改的是种子的 `officialUrl`，而 `seedToItem` 里 `links` 优先于 `officialUrl`，那 17 条有 `links` 的条目根本不看 `officialUrl`。改对位置后重跑：
+
+- 「巡检外链」→ **failure**（死链检出，退出码经 `set +e` + `${PIPESTATUS[0]}` 正确传递）
+- 「保留巡检报告」→ **success**（`if: always()` 生效，失败时工件仍上传，已下载核对内容完整）
+- 「失败摘要」→ **success**（`::error` 告警正常输出）
+
+**顺带确认的两件事**
+
+- `workflow_dispatch` 只能从默认分支触发是**过时说法**：`gh workflow run link-watch.yml --ref bunny` 直接成功，GitHub 用的是该 ref 上的工作流文件。因此不必为了手动触发而先合并到 main。
+- `push` 的 paths 过滤生效：改 `data/software.ts` 即触发，改 `README.md` 不会。
+
+**顺带发现的一处易错点**（已写进坑位库）：往种子里注入测试数据时，改 `officialUrl` 可能无效 —— **有 `links` 的条目以 `links.official` 为准**，`officialUrl` 只在缺 `links` 时才作为兜底。造测试数据前要先确认目标条目属于哪种形态。
+
+测试分支 `_ci-fail-test` 已删除，本地已回到 bunny。
+
+## 2026-10-04 · 外链巡检接入 CI（分支 bunny）
+
+上一轮做的是脚本，这轮接进 GitHub Actions。过程中发现并修掉三个真问题。
+
+**`.github/workflows/link-watch.yml`**
+
+- 每天 04:17 跑（刻意避开整点的调度拥堵），另支持 `workflow_dispatch` 手动触发，带 `days` 参数可临时改门槛。
+- 改了 `data/software.ts`、`data/samples.ts`、`lib/stale.ts`、`lib/links.ts` 等链接相关文件时立即触发，不用等明天。
+- 报告用 `tee` 一次产出：失败时 step 标为 failed，但 `if: always()` 的上传步骤仍会执行，报告不丢。
+- **不跑 `npm ci`** —— 巡检只用 `node:` 内置模块与仓库脚本，省掉安装时间，也让它不受 lockfile 变动影响。
+
+**三个必须适配 CI 的问题**
+
+1. **CI 上没有运行库。** `data/store/` 已 gitignore，克隆后只有种子。新增 `--source seed` 从 `data/software.ts` + `data/samples.ts` 读目录，并显式禁止在此模式下回写（种子由仓库管理，不该被运行库数据改写）。
+2. **`--check-all`：CI 该探全站，而不是只查过期的。** 链接昨天还正常、今天挂了，只看「过期」是发现不了的。**门槛决定「什么时候必须复验」，不限制「能查什么」。**
+3. **`--flaky-ok`：误报不能长期让流水线变红。** inkscape / jasp 的 Cloudflare 403 与 texstudio 的代理超时会让 CI 天天红，人就开始习惯性忽略，真死链反而被淹没。加此开关后 `--strict` 只对非误报判失败，输出里照样提示这些域名。
+
+**Bug 1：`github.com` 网页端在 CI 上全部超时**
+
+首次实跑 7 个异常，其中 6 个是 GitHub 链接超时 —— 网页端被网络策略拦住。`check-links.mjs` 早有「改用 `api.github.com` 代验同一仓库」的能力，但我没在新脚本里复用。已把 `githubApiOf` 抽到 `scripts/_shared.mjs` 由两者共用（消除重复实现），异常从 7 个降到 1 个（仅剩 inkscape 的已知误报）。
+
+**Bug 2：`--source seed` 漏掉半数条目 —— 「全站巡检」名不副实**
+
+探活数出只有 19 个条目、34 个链接，而运行库有 51 个链接。根因：**种子是 `SeedSoftware` 形态，官网在 `officialUrl` 而非 `links.official`**，30 条里只有 18 条填了 `links`。直接读种子，那 17 条条目的外链被静默漏掉 —— 而巡检报告仍显示一切正常。
+
+已改为先过 `seedToItem()` 转换，转换后链接数 51 = 运行库 51。新增测试锁住这个坑（断言转换后每条有 `officialUrl` 的都带上 `links.official`）。
+
+**Bug 3：参数校验顺序**
+
+`--strict` 的「需要配合 --check」校验写在 `--check-all` 联动 `args.check` 之前，于是 `--check-all --strict` 这个合法组合被判成非法、退出码 1。**参数校验的顺序本身就是逻辑**，已调整为先联动再校验。
+
+**验证**：`npm run check` 93 全过（新增 3）· 种子转换后链接数 51 与运行库一致 · 实机跑通完整 CI 命令（`--source seed --check-all --strict --flaky-ok`）· 已知误报被正确豁免 · GitHub 链接代验后异常从 7 降到 1。
+
+## 2026-10-04 · 外链巡检脚本 stale-links（分支 bunny）
+
+上一轮回填了 `linksCheckedAt`，但没有「谁该复验了」的问法。目录站是死链重灾区 —— 官网改版、下载页迁移很常见，这次把复验流程补上。
+
+**`scripts/stale-links.mjs`**
+
+- `npm run stale-links` 列出超过阈值（默认 90 天）没核验的条目，一并显示天数与涉及域名，便于估工作量。
+- `--check` 探活、`--update` 回写、`--days N` 改阈值、`--all` 看全量、`--json` 机器可读、`--strict` 有待复验项时非零退出（CI 用）。
+- **`--update` 必须配合 `--check`**，否则拒绝执行：没探活就刷新日期等于伪造核验记录。
+- 抓取复用 `_shared.mjs` 的 `safeFetch`（SSRF 防护），HEAD 被拒改用 GET。
+
+**关键约束：只回写「全部链接都可达」的条目**
+
+实测两种情况都不回写：
+
+- 单链接全失效 → 「没有全部可达的条目，核验日期未改动」
+- 一个正常 + 一个失效（部分可达）→ 同样不回写
+
+理由是把失效链接的核验日期刷成今天，会让下一轮巡检以为它刚查过，**死链被永久掩盖** —— 这比过期本身更危险。回写后同步 SHA-256 旁车，并提示仍需同步种子（`linksCheckedAt` 也在两个落点里）。
+
+**`lib/stale.ts` 的一个易错点**
+
+**缺字段不等于新鲜。** 若把 `undefined` 当「没过期」，从未核验的条目会永远不出现在报告里 —— 而它们恰恰最该核。四个原因分开：已过期 / 从未核验 / 日期格式非法 / 新鲜。
+
+日期格式非法要单独成类，因为它会让按天数排序的统计失真。判定比正则多一步：**`2026-13-45` 形状对但日期不存在**，`Date.UTC` 会把越界月日进位成别的日期，所以只过正则不够，还要回读校验年月日。`2026-02-29` 判非法（2026 非闰年）、`2024-02-29` 判合法。
+
+未来日期按「刚核验过」处理：时区或手填可能造成轻微偏移，不该因此报成过期。
+
+**验证**：`npm run check` 90 全过（新增 12）· 实机验证过期/从未核验/格式非法三种检出 · 探活回写 3 条成功 · 两种失败场景均正确「不回写」· 运行库已还原且 SHA-256 匹配。
+
+## 2026-10-03 · 回填 license / version / linksCheckedAt（分支 bunny）
+
+上一轮把三个字段加进了数据模型，但存量 35 条全是空的。这轮按「有据可依才填」的原则回填。
+
+**核验方式**
+
+- **链接**：`check-links --all` 跑全量 51 个，48 可达。3 个异常（texstudio 超时、inkscape 与 jasp 的 403）与 09-28 记录完全一致，均为已知误报（代理隧道 / Cloudflare 拦自动化），站点本身正常。
+- **许可证**：GitHub API 的 `license.spdx_id` 优先；返回 `NOASSERTION` 或 404 时**直读上游 LICENSE / COPYING 原文**。原文确认：GIMP、Krita、Octave = GPL-3.0，QGIS = GPL-2.0，Jupyter = BSD-3-Clause，VS Code = MIT，Git = GPL-2.0-only（COPYING 明确「只认 v2」）。其余按此前已核验的结论填入。
+- **版本**：`releases/latest` 的 tag，排除预发布。Git v2.56.0、Python 3.15.0（FTP 目录实证）、Krita 5.3.4（官网）、Audacity 4.0.1（官网）等 14 条。**预发布与已停更仓库不采用** —— Python 的 `v3.15.0rc3`、KDE/krita 的 `v42.0-beta2` 均已排除。
+- **查不到权威来源的一律留空**，不用记忆或推测填。16 条因此留空（geogebra、obsidian、figma、wps 等专有软件本就无开源许可证）。
+
+**回填结果**：`license` 18 条、`version` 14 条、`linksCheckedAt` 35 条（全站 51 个链接今天都探活过；该字段记的是核验日期，不以「有版本号」为前提）。
+
+**语义规则抓到一处真实数据错误**
+
+上一轮新加的「来源 × 类型」矩阵在试运行阶段就拦下了 **yt-dlp 标 `opensource` + `script`** 的非法组合。它是 Unlicense（公开领域）的开源项目，正文第三段也这么写，「脚本」只是形态描述。已把 `kind` 改为 `opensource`（运行库与种子同步）。这正是把 GeoGebra 教训写成机器规则的价值。
+
+**本轮最重要的发现：漂移检测的失明是静默的**
+
+1. 草稿里给无版本号的条目写了空字符串，运行库存下 `""`、种子是 `undefined` —— `seed-drift` 报 6 处不一致。空字符串与缺省语义相同，已统一清理（6 处）并同步 SHA-256。
+2. 补 `linksCheckedAt` 到种子时，脚本**连续三次静默地什么都没做**，一度以为已同步完成。根因有三：shell 把正则里的 `$` 吞成字面量；用「已处理输出」判重会误判；**仓库文件是 CRLF 行尾，`$` 前留着 `\r`，`slug: "x",$` 永远不匹配**。改成写脚本文件 + 按条目切片 + 兼容 `\r` 后才真正插入 35 行。
+3. 插入后 `seed-drift` 仍报「0 不一致」—— **这次是假的**。上一轮加字段时只把 `license`/`version` 加进 COMPARE 清单，漏了 `linksCheckedAt`，于是运行库 35 条都有值、种子全空，脚本依然报 0。**漏一个字段名，漂移检测就对该字段完全失明，而且不报错。**
+
+修复：`COMPARE` 补上 `linksCheckedAt`；`SeedSoftware` 补上该字段（类型也漏了，`tsc` 报 TS2353）。新增两条测试 —— 一条校验种子里的 SPDX 与日期格式；另一条**从 `seed-drift.mjs` 源码里解析 COMPARE 清单并断言覆盖全部可透传字段**，专门守住「清单与类型脱节」这类静默失效。已用「临时删掉清单里的字段名」验证该测试确实会失败。
+
+**验证**：`npm run check` 78 全过（新增 2）· typecheck 通过 · `seed:drift` 0 不一致（已独立核验两侧覆盖均为 18/14/35，非假 0）· `content:audit` 缺口未上升。构建在本轮末尾被环境因素中断（SIGTERM），此前同一批改动的构建已通过。
+
+## 2026-10-03 · 后台新增点击数据页（分支 bunny）
+
+上一轮把点击统计写进了 `clicks.jsonl`，但只能命令行看。这轮补上 `/admin/clicks`。
+
+**读侧改造**
+
+- `clickSummary()` 原本 `readFile` 整份 JSONL 再 split。JSONL 每天只追加、永不压缩，理论上无上限——后台画一张图不该把全部历史读进内存。改为 `scanClicks()`：**只读文件尾部 8 MiB**，另设 20 万行上限；超限时在页面上如实说明跳过了多少条，**不把部分数据说成全量**。
+- 从尾部截断时首行可能只有半条 JSON。单独标记 `firstPartial` 跳过它，否则会混进「损坏行」计数，让统计看起来像有丢数据。
+- 分天按北京时间（`en-CA`），与 `formatDate` 一致，避免服务端时区让趋势图错位一天。
+
+**展示层聚合（`lib/click-analytics.ts`）**
+
+- 原始数据是 (slug, channel, time) 三元组，直接渲染会得到一堆重复条目的行。折成「每条目一行 + 渠道拆分」，并与目录合并补出名称、类型、场景与来源徽章。
+- **已删除的条目仍保留历史点击**，标注「已删除条目」——删条目不该让点击历史凭空消失，顺便也能提示该清理这个 slug。
+- 白名单外的渠道 id 一律丢弃：统计只接受 `official`/`homepage`/`github`/`disk`，出现别的值只可能是脏数据或旧版本残留。
+- 占比以总量为分母，因此各行占比之和恒为 1（测试守住这条）。同量按 slug 排序，渲染顺序稳定。
+- 趋势图**补齐没有点击的日期**：直接跳过空日期会让连续 7 天看起来只有 3 天。柱状条用纯 CSS 绘制，没有引入图表库（后台一个页面不值得加 200KB 依赖），逐条带 `sr-only` 读屏文案。
+
+**一处设计与工具链的冲突**
+
+- `click-analytics.ts` 需要在运行时用到 `isChannelId`（值，不能被类型擦除）。但测试用 `node --test` 靠类型擦除直接跑 `.ts`，相对导入必须带 `.ts` 扩展名；而 tsconfig 未开 `allowImportingTsExtensions`，带扩展名会让 `tsc --noEmit` 报 TS5097。**两边都要满足，只能让这份白名单就地定义。**
+- 代价是 `lib/click-analytics.ts` 与 `lib/links.ts` 各有一份渠道列表。同步由 `tests/click-analytics.test.mjs` 里「两个模块的渠道集合必须一致」守住——这是两份列表唯一的保证关系，改一处必须改另一处。
+
+**验证**：`npm run check` 76 全过（新增 10 项）· build 成功 · 实机验证未登录 307 跳转、已登录 200、四个板块渲染、占比之和为 1、已删除条目标注、脏数据丢弃、趋势 14 天连续、空状态给出下一步。
+
+## 2026-10-03 · 防盗链、外链规范化与数据范式（分支 bunny）
+
+三个方向一起做：把「图片被外站盗用」「外链跳转不可控」「同一语义写多处」这三类问题从根上收口。
+
+**防盗链（`lib/hotlink.ts`）**
+
+- `/media` 与 `/icons` 此前对所有来源照常返回图片。任意站点都能把预览图当免费图床。
+- 判定为**白名单放行 + 其余拒绝**，不是拉黑已知站点：站点自己的图片数量有限、可防盗，爬虫与分享流量不可枚举、不该误伤。放行四类——无 Referer（地址栏直开、分享、部分 App 内置浏览器、爬虫抓 og:image）、同站及其子域名、`ASSET_REFERRER_ALLOWLIST` 显式名单、`ASSET_HOTLINK_PROTECTION=0` 全关。
+- 拒绝返回 403 而非 404：文件确实存在，假装不存在只会让排障变难。响应带 `no-store`（否则 403 会被长缓存缓存住）与 `X-Robots-Tag: noindex`。
+- 判定放在读盘之前，被拒请求不消耗磁盘 IO 与 ETag 计算。
+- `next.config.ts` 为两条路径补 `Cross-Origin-Resource-Policy: same-origin`——Referer 会被浏览器策略裁剪，CORP 是浏览器侧的第二道拒绝。
+- 实机验证六项：无 Referer 200 / 同站 200 / 跨站 403 / `ashare.example.evil.com` 后缀伪装 403 / CORP 头正确 / 路径穿越 404。已实测拦住 `evilashare.example`、`ashare.example.evil.com`。
+
+**外链规范化（`lib/links.ts` + `components/OutboundLink.tsx`）**
+
+- 存量数据用命名槽位（`official`/`github`/`homepage`/`disk`）表达渠道，这四个字段在「主 CTA」「渠道列表」「镜像说明」三处各自判断了一遍，新增一种渠道要改三处。现在摊平成有序的 `LinkChannel[]`，读取侧统一，**存储结构不变**，35 条存量数据零迁移。
+- 收口三件事：`target`/`rel` 一律新标签 + `noopener noreferrer`（主 CTA 另加 `nofollow sponsored`）；域名等宽可见；点击自动上报（`mousedown` 而非 `click`，按住拖走也算跳转发生了）。
+- 镜像行加「镜像」角标，`sr-only` 提示改为「（第三方镜像域名，非官方，请核对）」——这是外链最容易出事的地方。
+- **无说明的镜像不予展示**（`isVerifiedMirror`）：无法核验的镜像与盗版网盘只有一线之隔。
+- 删掉 `lib/items.ts` 的 `primaryLink`，与新的 `primaryChannel` 构成双事实源，已消除。
+
+**外链点击统计（`lib/click-store.ts`）**
+
+- 目录站的价值在于「跳出去」，此前完全不知道哪些条目的哪些渠道被点。
+- **JSONL 追加写，不走 `JsonStore` 的读改写事务**：那会让每次点击都串行等锁，而点击是高频、低价值、允许极小概率丢失的事件。
+- **只存 slug + 渠道 + 时间，不存 IP 与 UA**。存 IP 会把这份数据变成第二份用户数据，隐私成本远高于收益。
+- 内存缓冲 5 秒或 200 条才落盘；定时器 `unref` 不拖住进程退出；失败只记日志不抛出。
+- Server Action `recordOutboundClick` 只接受白名单 slug 与渠道 id，按 IP 限速 60 次/分钟。
+
+**数据范式（`lib/semantics.ts` + `lib/derive.ts`）**
+
+- **`source` 与 `kind` 的矛盾根治**。此前两者独立填写、前台徽章只认 `source`，于是出现 GeoGebra 那类问题：种子标 `source: "opensource"` → 推导成 `kind: "opensource"` → 前台挂出「开源」徽章，但它仓库 `license` 为 null（源码公开、许可闭源），实为非商业免费。现写成矩阵（`official` → `app`/`script`，`opensource` → `opensource`/`app`，`discount` → `app`），后台 `saveItem` 与 `ingest` 脚本共用同一份定义，从人肉判断改为机器拦截。标为 `opensource` 却没有 GitHub 链接时 `--strict` 会拦下。
+- 图标三套机制（`iconImage` 上传图 / `icon.simpleIcon` 本地 svg / `icon.letter` 字母块）的回退顺序此前内嵌在 `SoftwareIcon` 里，抽成 `resolveIcon` 纯函数供 ingest 与测试复用。`scenes[0]` 主场景约定同样收进 `primaryScene`——它此前只散落在审计脚本注释里。
+- 新增三个可选字段 `license`（SPDX）、`version`、`linksCheckedAt`（YYYY-MM-DD）。「来源可核验」需要结构化字段支撑，不能只写在正文文字里。同步接入 `seedToItem` 透传、`seed-drift` 比对（漏进比对就会对该字段失明）、后台表单与 `ingest` 校验——**只加类型不加脚本，新字段就永远存不进运行库**。
+
+**一处回归及其教训**
+
+- `validateSemantics` 最初包含「至少归属一个场景 / 平台」，导致 `tests/admin-actions.test.mjs` 两个子测试失败。用 `git stash` 对比确认是本轮引入而非环境问题后，定位到根因：那些测试构造的 FormData 不带 `scenes`。
+- 修正方式是把**单字段必填**移出语义层——那本就该由 `saveItem` 与 ingest 各自的既有校验负责。语义层只管**跨字段**一致性，重复校验会让同一问题在两处以不同措辞报错。
+- 测试数 46 → 66（新增 `tests/hotlink.test.mjs` 7 项、`tests/data-model.test.mjs` 13 项）。
+
+**验证**：`npm run check` 66 全过 · `npm run build` 成功 · `seed:drift` 0 不一致 · `content:audit` 缺口未上升（仍为 10/35）· 防盗链 6 项实机验证 · 点击统计落盘与聚合实测（含确认不存 IP）· ingest `--strict` 与非 strict 两种路径均按预期分级。
+
 ## 2026-09-29 · 全站界面重做「纸与墨」
 
 按新规范 [claudedesign.md](./claudedesign.md) 重做所有页面，旧的 DESIGN.md 不再作为依据。

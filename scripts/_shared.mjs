@@ -12,6 +12,28 @@ import process from "node:process";
 
 const CATALOG_PATH = path.join("data", "store", "catalog.json");
 
+/** 运行库在哪。P4 之后权威位置是 MySQL，data/store/catalog.json 只是冻结的历史快照。 */
+export function isDbMode() {
+  return Boolean(process.env.MYSQL_URL?.trim());
+}
+
+/**
+ * 借一个直连（不是连接池）执行一组查询。
+ *
+ * 脚本用直连而不是池：池会留下句柄让进程不退出，而脚本读完就该结束。
+ * 用完立即结束连接。
+ */
+export async function withDb(work) {
+  const mysql = (await import("mysql2/promise")).default;
+  const { connectionOptions } = await import("../lib/db.ts");
+  const conn = await mysql.createConnection(connectionOptions());
+  try {
+    return await work(conn);
+  } finally {
+    await conn.end();
+  }
+}
+
 /**
  * 通用参数解析。spec 里每个 flag 一种取值方式：
  *   bool   开关（--zip）
@@ -51,12 +73,26 @@ export function parseFlags(argv, spec) {
   return args;
 }
 
+/**
+ * 读运行库。
+ *
+ * **有 MYSQL_URL 就读库**：P4 之后应用只写 MySQL，data/store/catalog.json 成了冻结的快照。
+ * 继续读它会让 content-audit / stale-links 报出与应用完全不符的数字 —— 这种错最难发现，
+ * 因为脚本「跑得好好的」。
+ *
+ * 没配 MYSQL_URL 时才回落 JSON，并且**明确告警**，不静默。
+ */
 export async function readCatalog(cwd = process.cwd()) {
+  if (isDbMode()) {
+    const { loadCatalog } = await import("../lib/catalog-persist.ts");
+    return withDb((conn) => loadCatalog(conn));
+  }
+  console.error("[scripts] 未配置 MYSQL_URL，回落到 data/store/catalog.json（冻结的历史快照，可能与线上不一致）");
   const file = path.join(cwd, CATALOG_PATH);
   try {
     return JSON.parse(await fs.readFile(file, "utf8"));
   } catch (error) {
-    if (error.code === "ENOENT") throw new Error("data/store/catalog.json 不存在。先启动一次应用生成运行库。");
+    if (error.code === "ENOENT") throw new Error("data/store/catalog.json 不存在。先启动一次应用生成运行库，或配置 MYSQL_URL。");
     throw error;
   }
 }
@@ -116,6 +152,36 @@ async function assertReachable(hostname, allowPrivate) {
   }
   const blocked = records.find((record) => isPrivateAddress(record.address));
   if (blocked) throw new Error(`拒绝请求：${hostname} 解析到私有地址 ${blocked.address}`);
+}
+
+/** github.com 网页端在本机与 CI 上常被网络策略拦住（超时），api.github.com 通常可达。 */
+const GIT_HOSTS = new Set(["github.com", "www.github.com"]);
+
+/**
+ * github.com 的仓库页 → 同仓库的 API 地址；非 github 或路径不完整时返回 undefined。
+ * 探活脚本用它做代验：网页端超时不代表仓库不存在。
+ *
+ * 路径里带 `blob/<分支>/<文件>`（README 精确地址）时，改为查**该文件**的 API：
+ * 只验仓库存在是不够的 —— `README_ZH.md` 拼错时仓库 API 照样 200，
+ * 死链会被判成可达。文件级代验才能真的发现「仓库在、文件不在」。
+ * 仓库根页（无文件路径）仍走仓库级 API。
+ */
+export function githubApiOf(url) {
+  try {
+    const parsed = new URL(url);
+    if (!GIT_HOSTS.has(parsed.hostname)) return undefined;
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    const [owner, repo, kind, branch, ...rest] = parts;
+    if (!owner || !repo) return undefined;
+    const name = repo.replace(/\.git$/, "");
+    if (kind === "blob" && branch && rest.length) {
+      const file = decodeURIComponent(rest.join("/"));
+      return `https://api.github.com/repos/${owner}/${name}/contents/${file}?ref=${encodeURIComponent(branch)}`;
+    }
+    return `https://api.github.com/repos/${owner}/${name}`;
+  } catch {
+    return undefined;
+  }
 }
 
 /**

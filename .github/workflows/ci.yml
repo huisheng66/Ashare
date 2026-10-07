@@ -20,4 +20,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      # 优化改进报告里的「文件:行号」引用必须与当前代码一致。代码一改，
+      # 行号就漂移，报告里每一条按图索骥的指引都会指错地方 —— 而且它不会
+      # 报错，只会让读报告的人白跑一趟。0 成本挡掉这类静默失效。
+      - run: npm run verify:report
       - run: npm run build
