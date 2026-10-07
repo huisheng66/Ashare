@@ -43,6 +43,10 @@ const redirected = (promise, expected) => assert.rejects(promise, (error) => typ
 test("admin actions preserve data across validation, disk failures, and concurrent saves", async (t) => {
   const originalDirectory = process.cwd();
   const originalSecret = process.env.SESSION_SECRET;
+  // 这组测试靠 chdir 到临时目录里的 JSON 文件做隔离，必须显式锁定驱动，
+  // 免得开发者环境里的 STORE_DRIVER=mysql 把它变成需要数据库的集成测试。
+  const originalDriver = process.env.STORE_DRIVER;
+  process.env.STORE_DRIVER = "json";
   const dir = await mkdtemp(path.join(tmpdir(), "ashare-actions-test-"));
   const jar = new Map();
   let cookieOptions;
@@ -56,6 +60,8 @@ test("admin actions preserve data across validation, disk failures, and concurre
     process.chdir(originalDirectory);
     if (originalSecret === undefined) delete process.env.SESSION_SECRET;
     else process.env.SESSION_SECRET = originalSecret;
+    if (originalDriver === undefined) delete process.env.STORE_DRIVER;
+    else process.env.STORE_DRIVER = originalDriver;
     hooks.deregister();
     delete globalThis.__ashareCookieJar;
     const resolved = path.resolve(dir);
@@ -70,7 +76,7 @@ test("admin actions preserve data across validation, disk failures, and concurre
   await t.test("unauthenticated mutations are rejected", async () => {
     await redirected(actions.saveItem(form("first")), "/admin/login");
     assert.equal(existsSync(path.join(dir, "data", "store", "catalog.json")), false);
-    await auth.startSession();
+    await auth.startSession("env-admin", "admin");
   });
 
   await t.test("renaming cannot overwrite another slug", async () => {

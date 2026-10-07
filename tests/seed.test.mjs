@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { software as seed } from "../data/software.ts";
-import { seedToItem } from "../lib/seed.ts";
+import { SEED_DRIFT_FIELDS, SEED_SYNC_FIELDS, seedToItem } from "../lib/seed.ts";
 import { formatSha256, isValidSha256, isVerifiedMirror, linkChannels, mirrorChecksum, primaryChannel } from "../lib/links.ts";
 import { describeSourceKind, isValidSourceKind } from "../lib/semantics.ts";
 
@@ -126,66 +126,30 @@ test("种子里的许可证与核验日期格式合法", async () => {
 test("漂移检测的字段清单覆盖全部可透传字段", async () => {
   // 背景：加 linksCheckedAt 时只把它加进了类型与种子，忘了加进 seed-drift 的
   // COMPARE 清单，于是运行库 35 条都有值、种子全空，脚本却报「0 不一致」。
-  // **漂移检测的失明是静默的，不会报错** —— 只能靠这条测试兜住。
+  // **漂移检测的失明是静默的，不会报错** —— 只能靠这类测试兜住。
+  //
+  // 清单本身已不再手写（guide 就是漏在旧的手写清单里的），改由 lib/seed.ts 的登记表提供。
+  // 这条测试保证脚本真的取了登记表，而不是又悄悄写回一份。
   const { readFile } = await import("node:fs/promises");
   const script = await readFile(new URL("../scripts/seed-drift.mjs", import.meta.url), "utf8");
-  const match = /const COMPARE = \[([\s\S]*?)\]/.exec(script);
-  assert.ok(match, "seed-drift.mjs 里应能找到 COMPARE 数组");
-
-  const compared = new Set(
-    match[1]
-      .split(",")
-      .map((s) => s.trim().replace(/^["']|["']$/g, ""))
-      .filter(Boolean),
-  );
-  // 凡是 Software 上存在、且种子允许写入的可选字段，都必须被比对。
-  for (const field of ["license", "version", "linksCheckedAt"]) {
-    assert.ok(compared.has(field), `seed-drift 的 COMPARE 漏了 ${field}，该字段的漂移将无法被发现`);
+  assert.match(script, /const COMPARE = SEED_DRIFT_FIELDS/, "seed-drift 必须从登记表取比对字段");
+  for (const field of ["license", "version", "linksCheckedAt", "guide"]) {
+    assert.ok(SEED_DRIFT_FIELDS.includes(field), `漂移比对漏了 ${field}，该字段的漂移将无法被发现`);
   }
 });
 
 test("seed-sync 的同步字段覆盖漂移检测的全部字段", async () => {
   // 背景：seed-sync 早期只同步 guide，于是改了 body / summary 会被静默忽略——
   // 运行库留旧值，seed:drift 报出不一致，而 seed-sync 又说「已是最新」，
-  // 两个脚本互相甩锅，只能靠人肉比对JSON 才发现。
+  // 两个脚本互相甩锅，只能靠人肉比对 JSON 才发现。
   //
-  // 这条测试锁住两个脚本的字段清单必须一致：**漂移能查出来的，同步就必须能修。**
+  // 锁住不变量：**漂移能查出来的，同步就必须能修。**
   const { readFile } = await import("node:fs/promises");
-  const drift = await readFile(new URL("../scripts/seed-drift.mjs", import.meta.url), "utf8");
   const sync = await readFile(new URL("../scripts/seed-sync.mjs", import.meta.url), "utf8");
-
-  const driftMatch = /const COMPARE = \[([\s\S]*?)\]/.exec(drift);
-  const syncMatch = /const SYNCED_FIELDS = \[([\s\S]*?)\]/.exec(sync);
-  assert.ok(driftMatch, "seed-drift.mjs 里应能找到 COMPARE 数组");
-  assert.ok(syncMatch, "seed-sync.mjs 里应能找到 SYNCED_FIELDS 数组");
-
-  const toSet = (body) =>
-    new Set(
-      body.split(",")
-        .map((s) => s.trim().replace(/^["']|["']$/g, ""))
-        .filter(Boolean),
-    );
-
-  const compared = toSet(driftMatch[1]);
-  const synced = toSet(syncMatch[1]);
-
-  // price 有意不同步：它是商业信息，可能由后台按谈判结果维护，
-  // 种子里的值只是录入时的快照，合法地与运行库不同。
-  //
-  // license 与 kind 曾被列在这里，判断是错的，两者已移入 SYNCED_FIELDS：
-  //   - license 是项目自身的客观属性，后台无从手工裁定；
-  //   - kind 需要在种子里显式覆盖推导值（如 n8n 是 fair-code，
-  //     不能让 seedToItem 按 source 推成 "opensource"），
-  //     不同步的话种子里的修正永远传不到运行库。
-  const intentionallyManual = new Set(["price"]);
-
-  const missing = [...compared].filter((f) => !synced.has(f) && !intentionallyManual.has(f));
-
-  assert.deepEqual(
-    missing,
-    [],
-    `这些字段漂移检查会报，但 seed-sync 不同步，修不掉：${missing.join(", ")}`,
-  );
+  assert.match(sync, /const SYNCED_FIELDS = SEED_SYNC_FIELDS/, "seed-sync 必须从登记表取同步字段");
+  for (const field of SEED_SYNC_FIELDS) {
+    assert.ok(SEED_DRIFT_FIELDS.includes(field), `同步会写 ${field}，漂移检查却看不见它`);
+  }
 });
 
 test("镜像必须附说明，且永不作主 CTA", () => {
