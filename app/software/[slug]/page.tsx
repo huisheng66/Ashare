@@ -11,6 +11,7 @@ import { GuideSection } from "@/components/GuideSection";
 import { hostOf, ItemLinks, otherLinkCount } from "@/components/ItemLinks";
 import { LicenseNote } from "@/components/LicenseNote";
 import { OutboundLink } from "@/components/OutboundLink";
+import { RichText } from "@/components/RichText";
 import { SectionHeading } from "@/components/SectionHeading";
 import { FeaturedMark, SoftwareCard } from "@/components/SoftwareCard";
 import { SoftwareIcon } from "@/components/SoftwareIcon";
@@ -19,6 +20,7 @@ import { TagList } from "@/components/TagList";
 import { Button } from "@/components/ui/button";
 import { scenes } from "@/data/scenes";
 import { alternativesOf, getSoftware } from "@/lib/catalog";
+import { splitBodyColumns } from "@/lib/bodyColumns";
 import { formatDate, kindLabel, platformLabel, toCatalogItem } from "@/lib/items";
 import { primaryChannel } from "@/lib/links";
 import { absoluteSiteUrl } from "@/lib/site";
@@ -101,6 +103,7 @@ export default async function SoftwarePage({ params }: Props) {
     .split(/\n+/)
     .map((text) => text.trim())
     .filter(Boolean);
+  const bodyColumns = splitBodyColumns(paragraphs, 2);
 
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
@@ -117,7 +120,7 @@ export default async function SoftwarePage({ params }: Props) {
   }).replace(/</g, "\\u003c");
 
   return (
-    <div className="shell pb-20 pt-6 sm:pt-8">
+    <div className="shell-wide pb-20 pt-6 sm:pt-8">
       <script
         type="application/ld+json"
         nonce={nonce}
@@ -132,7 +135,10 @@ export default async function SoftwarePage({ params }: Props) {
         ]}
       />
 
-      <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:grid-rows-[auto_1fr] lg:gap-x-14">
+      {/* 三栏：正文 / 获取卡 / 场景与标签。
+          主栏在宽屏下再分两列（见下方 .item-prose 的双栏规则），
+          这样 1440px 里的空间是被内容填满的，而不是把字拉成长行。 */}
+      <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:grid-rows-[auto_1fr] lg:gap-x-14 xl:grid-cols-[minmax(0,1fr)_380px] xl:gap-x-16">
         <header className="min-w-0 lg:col-start-1 lg:row-start-1">
           <div className="flex items-start gap-5">
             <SoftwareIcon item={{ name: item.name, icon: item.icon, iconImage: item.iconImage }} size={80} />
@@ -152,7 +158,9 @@ export default async function SoftwarePage({ params }: Props) {
               </div>
             </div>
           </div>
-          <p className="mt-6 max-w-[40em] text-[17px] leading-[1.75] text-muted-foreground">{item.summary}</p>
+          {/* summary 是导语，行宽比正文可以稍宽（读者还在扫读阶段），
+              但仍设 34em 上限：超过这个长度就不是导语了。 */}
+          <p className="mt-6 max-w-[34em] text-[17px] leading-[1.75] text-muted-foreground">{item.summary}</p>
           {item.tags.length ? (
             <div className="mt-5">
               <TagList tags={item.tags} />
@@ -216,7 +224,10 @@ export default async function SoftwarePage({ params }: Props) {
 
             <p className="mt-3 flex gap-2.5 rounded-xl bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
               <ShieldCheck className="mt-px size-4 shrink-0" aria-hidden="true" />
-              <span>本站不托管安装包。请只用上面列出的渠道，不要下载「绿色版」或修改包。</span>
+              <span>
+                优先用上面列出的官方渠道。镜像里的安装包可对照下方 SHA-256 自行核验；
+                不要下载「绿色版」或被修改过的包。
+              </span>
             </p>
 
             <Link
@@ -265,12 +276,36 @@ export default async function SoftwarePage({ params }: Props) {
           {paragraphs.length ? (
             <section aria-labelledby="about-title">
               <SectionHeading id="about-title" title="详细介绍" />
-              <div className="mt-5 max-w-[40em] space-y-4">
-                {paragraphs.map((text, index) => (
-                  <p key={index} className="text-[15px] leading-[1.85]">
-                    {text}
-                  </p>
-                ))}
+              {/* 双栏只在 xl（1280px+）起效：每栏约 28 个汉字，仍在中文舒适行宽里。
+                  窄屏用 max-width 把每栏压回满宽，两个 div 自然堆成单栏，
+                  段落顺序仍是原来的上下顺序（grid 不改变 DOM 顺序），
+                  读屏与键盘导航都不会乱。不用 CSS 隐藏内容 ——
+                  隐藏的段落对读屏软件依然存在，会让朗读顺序变成「先跳到第二栏」。*/}
+              <div
+                className={
+                  bodyColumns.length > 1
+                    ? "mt-5 grid gap-x-12 gap-y-4 xl:grid-cols-2"
+                    : "mt-5 max-w-[42em] space-y-4"
+                }
+              >
+                {bodyColumns.length > 1
+                  ? bodyColumns.map((column, ci) => (
+                      // max-w 只在 xl 以下起作用：分栏成立时（xl 起）
+                      // 由grid 决定列宽，这里给个上限防止窄屏堆叠后行长失控。
+                      // 42em 约 42 个汉字，是中文长行的舒适上限。
+                      <div key={ci} className="max-w-[42em] space-y-4 xl:max-w-none">
+                        {column.map((text, pi) => (
+                          <p key={pi} className="text-[15px] leading-[1.85]">
+                            <RichText text={text} />
+                          </p>
+                        ))}
+                      </div>
+                    ))
+                  : paragraphs.map((text, index) => (
+                      <p key={index} className="text-[15px] leading-[1.85]">
+                        <RichText text={text} />
+                      </p>
+                    ))}
               </div>
             </section>
           ) : null}
@@ -278,7 +313,9 @@ export default async function SoftwarePage({ params }: Props) {
           {item.tutorial.length ? (
             <section aria-labelledby="steps-title">
               <SectionHeading id="steps-title" title="上手步骤" />
-              <ol className="mt-5 max-w-[40em] border-t border-border">
+              {/* 步骤不改双栏：每步是一个带序号的整块，拆到两栏会让
+                  「01」和「02」分居左右，读起来失去顺序感。 */}
+              <ol className="mt-5 border-t border-border xl:max-w-[46em]">
                 {item.tutorial.map((step, index) => (
                   <li key={step} className="flex gap-4 border-b border-border py-4 text-[15px] leading-[1.75]">
                     <span className="w-6 shrink-0 pt-0.5 font-mono text-[13px] text-muted-foreground tabular-nums" aria-hidden="true">
@@ -302,7 +339,7 @@ export default async function SoftwarePage({ params }: Props) {
                 title="同类替代"
                 description="同一需求下可以先试这些，尤其是不想买商业许可的时候。"
               />
-              <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {alts.map((alt) => (
                   <li key={alt.slug} className="flex *:flex-1">
                     <SoftwareCard item={toCatalogItem(alt)} />
