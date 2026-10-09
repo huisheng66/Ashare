@@ -15,6 +15,8 @@ import { toCatalogItem } from "../lib/items.ts";
 import { normalizeItems } from "../lib/normalize.ts";
 import { seedToItem } from "../lib/seed.ts";
 
+import { mysqlSkip } from "./_mysql-skip.mjs";
+
 /**
  * SQL 读路径 vs 内存实现的一致性测试。
  *
@@ -24,7 +26,7 @@ import { seedToItem } from "../lib/seed.ts";
  * 打隔离库 MYSQL_TEST_URL；没设就整组跳过。
  */
 
-const skip = process.env.MYSQL_TEST_URL ? false : "未设置 MYSQL_TEST_URL：跳过 SQL 读路径一致性测试";
+const { skip } = await mysqlSkip("MYSQL_TEST_URL", "SQL 读路径一致性测试");
 if (process.env.MYSQL_TEST_URL) process.env.MYSQL_URL = process.env.MYSQL_TEST_URL;
 
 const PAGE = 60;

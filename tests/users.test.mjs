@@ -8,6 +8,8 @@ import { closePool, connectionOptions, query } from "../lib/db.ts";
 import * as store from "../lib/store-sql.ts";
 import { can, canSetStatus, isRole, permissionsOf, ROLE_LABEL, STATUS_LABEL, toPublicUser, USERNAME_PATTERN } from "../lib/users.ts";
 
+import { mysqlSkip } from "./_mysql-skip.mjs";
+
 /**
  * P7 账号与权限闸门。
  *
@@ -15,7 +17,7 @@ import { can, canSetStatus, isRole, permissionsOf, ROLE_LABEL, STATUS_LABEL, toP
  * 再测账号存储。账号表与目录无关，数据库部分没设 MYSQL_TEST_URL 时跳过。
  */
 
-const skip = process.env.MYSQL_TEST_URL ? false : "未设置 MYSQL_TEST_URL：跳过账号存储测试";
+const { skip } = await mysqlSkip("MYSQL_TEST_URL", "账号存储测试");
 if (process.env.MYSQL_TEST_URL) process.env.MYSQL_URL = process.env.MYSQL_TEST_URL;
 
 before(async () => {

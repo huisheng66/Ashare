@@ -13,6 +13,8 @@ import { closePool, connectionOptions, query } from "../lib/db.ts";
 import { normalizeItems } from "../lib/normalize.ts";
 import { seedToItem } from "../lib/seed.ts";
 
+import { mysqlSkip } from "./_mysql-skip.mjs";
+
 /**
  * SQL 搜索的闸门。
  *
@@ -23,7 +25,7 @@ import { seedToItem } from "../lib/seed.ts";
  * 打隔离库 MYSQL_TEST_URL；没设就整组跳过。
  */
 
-const skip = process.env.MYSQL_TEST_URL ? false : "未设置 MYSQL_TEST_URL：跳过 SQL 搜索测试";
+const { skip } = await mysqlSkip("MYSQL_TEST_URL", "SQL 搜索测试");
 if (process.env.MYSQL_TEST_URL) process.env.MYSQL_URL = process.env.MYSQL_TEST_URL;
 
 const PAGE = 60;

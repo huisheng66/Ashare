@@ -13,6 +13,8 @@ import { normalizeItems } from "../lib/normalize.ts";
 import { seedToItem } from "../lib/seed.ts";
 import * as store from "../lib/store-sql.ts";
 
+import { mysqlSkip } from "./_mysql-skip.mjs";
+
 /**
  * P6 写路径闸门。
  *
@@ -24,7 +26,7 @@ import * as store from "../lib/store-sql.ts";
  * 打隔离库 MYSQL_TEST_URL；没设就整组跳过。
  */
 
-const skip = process.env.MYSQL_TEST_URL ? false : "未设置 MYSQL_TEST_URL：跳过写路径测试";
+const { skip } = await mysqlSkip("MYSQL_TEST_URL", "写路径测试");
 if (process.env.MYSQL_TEST_URL) process.env.MYSQL_URL = process.env.MYSQL_TEST_URL;
 
 const FALLBACK = new Date("2026-01-01T00:00:00.000Z");
