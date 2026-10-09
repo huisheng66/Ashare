@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { authenticate, currentUser, endSession, startSession } from "@/lib/auth";
+import { authenticate, currentUser, endSession, hashPassword, startSession } from "@/lib/auth";
 import { getClientIp, guardLogin, isBlocked, recordLoginFailure } from "@/lib/guard";
 import { isValidSha256 } from "@/lib/links";
 import { auditSummary, diffFields } from "@/lib/audit";
@@ -12,12 +12,15 @@ import {
   deleteItem as deleteCatalogItem,
   getItem as getCatalogItem,
   getSubmissions,
+  getUser,
   recordAudit,
+  deleteUser,
   saveItem as saveCatalogItem,
   setItemStatus as setCatalogItemStatus,
   updateBlocks,
   updateFeedback,
   updateSubmissions,
+  upsertUser,
 } from "@/lib/store";
 import { imageExtension, isHttpUrl, ITEM_KINDS, MAX_UPLOAD, mediaParts, PLATFORMS, PUBLISH_STATUSES, SLUG_PATTERN, SOURCE_KINDS } from "@/lib/input-validation";
 import { scenes } from "@/data/scenes";
@@ -25,7 +28,7 @@ import type { ItemKind, Platform, PublishStatus, SceneId, Software, SourceKind }
 import { GUIDE_LIMITS, normalizeGuide, parseGuideLines, validateGuide } from "@/lib/guide";
 import { putMedia as putMediaObject, removeMedia as removeMediaKey } from "@/lib/media-storage";
 import { validateSemantics } from "@/lib/semantics";
-import { can, canSetStatus, STATUS_LABEL, type Role } from "@/lib/users";
+import { can, canSetStatus, isRole, ROLE_LABEL, STATUS_LABEL, USERNAME_PATTERN, type Role } from "@/lib/users";
 
 /** 已登录且未被封禁即可。页面级守卫用它；写操作请用 requirePermission。 */
 export async function requireAdmin(): Promise<void> {
@@ -365,4 +368,170 @@ export async function convertSubmission(fd: FormData): Promise<void> {
   if (!submission) redirect("/admin/inbox");
   const params = new URLSearchParams({ name: submission.name, kind: submission.kind, url: submission.url, note: submission.need });
   redirect(`/admin/items/new?${params}`);
+}
+
+// ---------------------------------------------------------------------------
+// 账号管理（P7b）
+//
+// 权限统一走 requirePermission("users")：只有管理员能进，普通编辑连页面都打不开。
+// 规则与 scripts/user-manage.mjs 保持一致 —— 同一件事有两个入口时，规则必须只有一处
+// 定义，否则命令行改出来的账号和界面上改出来的会不一样。
+// ---------------------------------------------------------------------------
+
+/** 与 user-manage.mjs 同一个下限：口令太短的 scrypt 哈希也没意义。 */
+const MIN_PASSWORD = 12;
+const MAX_PASSWORD = 1024;
+
+/** 表单里的 displayName 上限，与数据库列宽对齐，避免超长被静默截断。 */
+const MAX_DISPLAY_NAME = 64;
+
+function accountError(code: string): never {
+  redirect("/admin/users?e=" + code);
+}
+
+/**
+ * 管理员不能把自己锁在门外。
+ *
+ * 三种自伤都要挡住：停用自己（下次登录就没账号了）、删除自己（立刻失去账号管理能力）、
+ * 给自己降级（把唯一的管理员降成编辑后，没人能把权限改回来了）。
+ *
+ * 只挡「自己」，不挡「最后一个管理员」——那需要数一下当前有几个启用中的管理员，
+ * 由调用方决定；这里先守住最直接的三种。
+ */
+function guardSelf(actor: string, target: string, action: "disable" | "remove" | "demote"): void {
+  if (actor !== target) return;
+  if (action === "disable") accountError("self-disable");
+  if (action === "remove") accountError("self-remove");
+  accountError("self-demote");
+}
+
+export async function createUser(fd: FormData): Promise<void> {
+  await requirePermission("users");
+  const username = str(fd, "username").toLowerCase();
+  const displayName = str(fd, "displayName") || username;
+  const role = str(fd, "role") || "editor";
+  const password = text(fd, "password");
+
+  if (!USERNAME_PATTERN.test(username)) accountError("bad-username");
+  if (!isRole(role)) accountError("bad-role");
+  if (password.length < MIN_PASSWORD || password.length > MAX_PASSWORD) accountError("bad-password");
+  if (displayName.length > MAX_DISPLAY_NAME) accountError("bad-name");
+
+  // 先查再写：upsertUser 会覆盖同名账号，不能拿它当「新建」用。
+  if (await getUser(username)) accountError("exists");
+
+  await upsertUser({
+    username,
+    displayName,
+    // 口令明文只活在这一行；hashPassword 内部用 scrypt + 随机盐。
+    passwordHash: hashPassword(password),
+    role,
+    disabled: false,
+    createdAt: new Date().toISOString(),
+  });
+  await recordAudit({
+    at: new Date().toISOString(),
+    actor: (await currentUser())?.username ?? "unknown",
+    action: "create",
+    slug: "user:" + username,
+    summary: "新建账号 " + username + "（" + ROLE_LABEL[role] + "）",
+    fields: ["role"],
+  });
+  revalidatePath("/admin/users");
+  redirect("/admin/users?ok=created");
+}
+
+export async function setUserPassword(fd: FormData): Promise<void> {
+  const actor = await requirePermission("users");
+  const username = str(fd, "username").toLowerCase();
+  const password = text(fd, "password");
+  if (!USERNAME_PATTERN.test(username)) accountError("bad-username");
+  if (password.length < MIN_PASSWORD || password.length > MAX_PASSWORD) accountError("bad-password");
+
+  const record = await getUser(username);
+  if (!record) accountError("missing");
+  record.passwordHash = hashPassword(password);
+  await upsertUser(record);
+  await recordAudit({
+    at: new Date().toISOString(),
+    actor: actor.username,
+    action: "update",
+    slug: "user:" + username,
+    summary: "重置 " + username + " 的口令",
+    fields: ["passwordHash"],
+  });
+  revalidatePath("/admin/users");
+  // 不回显任何口令，也不带它进 URL。
+  redirect("/admin/users?ok=password");
+}
+
+export async function setUserEnabled(fd: FormData): Promise<void> {
+  const actor = await requirePermission("users");
+  const username = str(fd, "username").toLowerCase();
+  const enabled = str(fd, "enabled") === "1";
+  if (!USERNAME_PATTERN.test(username)) accountError("bad-username");
+  // 停用自己等于把自己锁在门外；重新启用自己没有意义，同样挡掉。
+  if (!enabled) guardSelf(actor.username, username, "disable");
+
+  const record = await getUser(username);
+  if (!record) accountError("missing");
+  if (record.disabled === !enabled) redirect("/admin/users");
+  record.disabled = !enabled;
+  await upsertUser(record);
+  await recordAudit({
+    at: new Date().toISOString(),
+    actor: actor.username,
+    action: "update",
+    slug: "user:" + username,
+    summary: (enabled ? "启用 " : "停用 ") + username,
+    fields: ["disabled"],
+  });
+  revalidatePath("/admin/users");
+  redirect("/admin/users?ok=" + (enabled ? "enabled" : "disabled"));
+}
+
+export async function setUserRole(fd: FormData): Promise<void> {
+  const actor = await requirePermission("users");
+  const username = str(fd, "username").toLowerCase();
+  const role = str(fd, "role");
+  if (!USERNAME_PATTERN.test(username)) accountError("bad-username");
+  if (!isRole(role)) accountError("bad-role");
+  if (role === "editor") guardSelf(actor.username, username, "demote");
+
+  const record = await getUser(username);
+  if (!record) accountError("missing");
+  if (record.role === role) redirect("/admin/users");
+  record.role = role;
+  await upsertUser(record);
+  await recordAudit({
+    at: new Date().toISOString(),
+    actor: actor.username,
+    action: "update",
+    slug: "user:" + username,
+    summary: username + " 改为" + ROLE_LABEL[role],
+    fields: ["role"],
+  });
+  revalidatePath("/admin/users");
+  redirect("/admin/users?ok=role");
+}
+
+export async function removeUser(fd: FormData): Promise<void> {
+  const actor = await requirePermission("users");
+  const username = str(fd, "username").toLowerCase();
+  if (!USERNAME_PATTERN.test(username)) accountError("bad-username");
+  guardSelf(actor.username, username, "remove");
+
+  const record = await getUser(username);
+  if (!record) accountError("missing");
+  await deleteUser(username);
+  await recordAudit({
+    at: new Date().toISOString(),
+    actor: actor.username,
+    action: "delete",
+    slug: "user:" + username,
+    summary: "删除账号 " + username,
+    fields: [],
+  });
+  revalidatePath("/admin/users");
+  redirect("/admin/users?ok=removed");
 }
