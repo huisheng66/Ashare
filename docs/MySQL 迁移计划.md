@@ -243,6 +243,10 @@ Get-Process mysqld | Stop-Process -Force
   ```
 
   本机隔离实例没有 my.cnf，用 root 执行一次 `SET GLOBAL innodb_ft_server_stopword_table='ashare/ft_stopwords'`（重启后需重设）。
+  **重启 MySQL 后照这两步恢复**（实测：重启后 `npm run test:db` 会有2~3 项报错，形态很像代码 bug，其实是配置回退）：
+  1. `SET GLOBAL innodb_ft_server_stopword_table='ashare/ft_stopwords';` —— 全局变量不写进 my.cnf，重启即丢
+  2. `npm run db:reindex` —— 停用词表是**创建索引时**绑定的，只改变量不重建索引，token 仍按旧表生成
+  `npm run db:reindex -- --check` 可随时核对当前生效的停用词表。
   **顺序很重要**：索引创建时就绑定停用词表，所以要先设变量、再建索引；已经建过的跑 `npm run db:reindex` 重建。`npm run db:reindex -- --check` 可随时核对配置。
 - **后台账号**：`npm run user -- list | add <账号> --name "显示名" --role admin|editor | passwd <账号> | disable <账号> | enable <账号> | remove <账号>`。
   口令一律交互式隐藏输入，不走命令行参数（否则会留在 shell 历史与进程列表里）。

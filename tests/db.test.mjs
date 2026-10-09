@@ -3,6 +3,8 @@ import { after, test } from "node:test";
 
 import { closePool, query, queryOne, withTransaction } from "../lib/db.ts";
 
+import { mysqlSkip } from "./_mysql-skip.mjs";
+
 /**
  * 数据库集成测试。
  *
@@ -12,7 +14,7 @@ import { closePool, query, queryOne, withTransaction } from "../lib/db.ts";
  * 所有写操作都在事务里做完后主动回滚，测试不往库里留数据。
  */
 
-const skip = process.env.MYSQL_URL && process.env.MYSQL_URL.trim() ? false : "未设置 MYSQL_URL：跳过数据库集成测试";
+const { skip } = await mysqlSkip("MYSQL_URL", "数据库集成测试");
 
 const EXPECTED_TABLES = [
   "audit_log", "clicks", "feedback", "ft_stopwords", "ip_blocks", "item_alternatives", "item_guide_resources",

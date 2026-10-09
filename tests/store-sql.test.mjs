@@ -6,6 +6,8 @@ import mysql from "mysql2/promise";
 
 import { closePool, connectionOptions, query } from "../lib/db.ts";
 
+import { mysqlSkip } from "./_mysql-skip.mjs";
+
 /**
  * SQL 运行库（lib/store-sql.ts）的契约测试。
  *
@@ -16,7 +18,7 @@ import { closePool, connectionOptions, query } from "../lib/db.ts";
  * 建成之后再改环境变量不会生效。
  */
 
-const skip = process.env.MYSQL_TEST_URL ? false : "未设置 MYSQL_TEST_URL：跳过 SQL 运行库契约测试";
+const { skip } = await mysqlSkip("MYSQL_TEST_URL", "SQL 运行库契约测试");
 if (process.env.MYSQL_TEST_URL) process.env.MYSQL_URL = process.env.MYSQL_TEST_URL;
 
 const store = skip ? null : await import("../lib/store-sql.ts");

@@ -3,6 +3,8 @@ import { test } from "node:test";
 
 import mysql from "mysql2/promise";
 
+import { mysqlSkip } from "./_mysql-skip.mjs";
+
 /**
  * P9 最小权限的边界闸门。
  *
@@ -11,13 +13,17 @@ import mysql from "mysql2/promise";
  * 这些断言失败意味着「应用是唯一写者、其他服务只读目录」这条约束已经破了。
  *
  * 需要 MYSQL_MIGRATE_URL 与 MYSQL_RO_URL；没配则整组跳过（npm test 不依赖数据库）。
+ *
+ * 连不上也算跳过并写明原因：配了 URL 但数据库没起时，原来报的是 before hook 失败
+ * （hookFailed + ECONNREFUSED），看不出是环境没就绪还是权限边界真被破了 —— 而这两种处置相反。
  */
 const URLS = {
   app: process.env.MYSQL_URL,
   migrate: process.env.MYSQL_MIGRATE_URL,
   ro: process.env.MYSQL_RO_URL,
 };
-const skip = URLS.migrate && URLS.ro ? false : "未配置 MYSQL_MIGRATE_URL / MYSQL_RO_URL：跳过权限边界测试";
+const { skip: unreachable } = await mysqlSkip("MYSQL_MIGRATE_URL", "权限边界测试");
+const skip = URLS.migrate && URLS.ro ? unreachable : "未配置 MYSQL_MIGRATE_URL / MYSQL_RO_URL：跳过权限边界测试";
 
 /** mysql2 拒绝访问是 1142；表不存在是 1146。 */
 const DENIED = 1142;
