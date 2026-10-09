@@ -11,8 +11,10 @@ import { auditSummary, diffFields } from "@/lib/audit";
 import {
   deleteItem as deleteCatalogItem,
   getItem as getCatalogItem,
+  getItemForEdit,
   getSubmissions,
   getUser,
+  getRevisionAt,
   recordAudit,
   deleteUser,
   saveItem as saveCatalogItem,
@@ -543,4 +545,50 @@ export async function removeUser(fd: FormData): Promise<void> {
   });
   revalidatePath("/admin/users");
   redirect("/admin/users?ok=removed");
+}
+
+/**
+ * 回滚到某个历史版本。
+ *
+ * **刻意走saveItem 这条正常通道，而不是直接改数据库。** 理由有两条：
+ *  1. 回滚本身也是一次编辑，它会像任何编辑一样记入历史链 —— 于是「回滚」这个动作
+ *     可被追溯，且不会抹掉中间那些版本。直接改库会把 v3到 v7 悄悄抹平。
+ *  2. saveItem 带乐观锁（expectedVersion）。若这条期间别人改过，直接改库会把
+ *     他的改动无声覆盖；走正常通道会被挡下并提示「刚被别人改过」。
+ *
+ * 所以「回滚」的实际语义是：**把那一版的内容作为一次新编辑保存**，并在摘要里
+ * 注明来源版本。历史因此是只增不减的 —— 这一点比「时间倒流」更重要：
+ * 丢掉的那几版本身也是信息。
+ */
+export async function rollbackItem(fd: FormData): Promise<void> {
+  const actor = await requirePermission("publish");
+  const slug = str(fd, "slug");
+  const rowVersion = Number(fd.get("version"));
+  if (!SLUG_PATTERN.test(slug) || !Number.isInteger(rowVersion) || rowVersion < 1) {
+    redirect("/admin?e=invalid");
+  }
+  const current = await getItemForEdit(slug);
+  if (!current) redirect("/admin?e=missing");
+  const target = await getRevisionAt(slug, rowVersion);
+  if (!target) redirect(`/admin/items/${slug}?e=no-history`);
+
+  // 状态不跟着回滚：发布与否是当下的决定，不是内容的一部分 ——
+  // 把自己下架的条目「回滚」回来却变成已发布，那不是回滚，是意外发布。
+  const outcome = await saveCatalogItem(
+    {
+      ...target,
+      slug,
+      createdAt: current.item.createdAt,
+      updatedAt: current.item.updatedAt,
+      status: current.item.status,
+    },
+    {
+      expectedVersion: current.rowVersion,
+      actor: actor.username,
+      summary: "回滚到第 " + rowVersion + " 版",
+    },
+  );
+  if (outcome === "conflict") redirect(`/admin/items/${slug}?e=conflict`);
+  revalidatePath("/", "layout");
+  redirect(`/admin/items/${slug}?restored=${rowVersion}`);
 }

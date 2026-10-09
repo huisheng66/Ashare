@@ -236,3 +236,83 @@ test("不传 actor 时不生成历史（ETL 批量导入不该污染历史）", 
 
   await query("DELETE FROM items WHERE slug = ?", [batchSlug]);
 });
+/**
+ * 回滚：内容回去，但历史只增不减。
+ *
+ * 复刻 `rollbackItem` 的核心逻辑（把目标版内容作为一次新编辑保存），
+ * 因为真正要守的性质在这里而不是 action 里。
+ *
+ * **回滚不是「时间倒流」** —— 中间那些版本仍然留着。丢掉的那几版本身也是信息：
+ * 有人可能想知道「那条错误描述存在了多久」。
+ */
+test("回滚到旧版本：内容回去，中间版本不被抹掉", { skip }, async () => {
+  const S = "rollback-probe";
+  await query("DELETE FROM item_revisions WHERE slug = ?", [S]);
+  await query("DELETE FROM items WHERE slug = ?", [S]);
+
+  const seed = { ...base, slug: S, name: "回滚探针", summary: "V1 摘要", body: "V1 正文。" };
+  await saveItem({ ...seed }, { actor: "alice", summary: "创建" });
+  await saveItem({ ...seed, summary: "V2 摘要", body: "V2 正文。" }, { actor: "bob", summary: "改成 V2" });
+  await saveItem(
+    { ...seed, summary: "V3 摘要（写错了）", body: "V3 正文。\n\n多出来的一段。" },
+    { actor: "bob", summary: "写错了" },
+  );
+
+  const before = await getItem(S, { publishedOnly: false });
+  assert.equal(before.summary, "V3 摘要（写错了）");
+
+  // 回滚：取 v2 的内容，当作一次新编辑保存
+  const target = await loadRevisionAt(S, 2);
+  assert.equal(target.summary, "V2 摘要");
+  const rv = Number((await query("SELECT row_version FROM items WHERE slug = ?", [S]))[0].row_version);
+  assert.equal(
+    await saveItem(
+      { ...target, slug: S, createdAt: before.createdAt, updatedAt: before.updatedAt, status: before.status },
+      { expectedVersion: rv, actor: "alice", summary: "回滚到第 2 版" },
+    ),
+    "updated",
+  );
+
+  const after = await getItem(S, { publishedOnly: false });
+  assert.equal(after.summary, "V2 摘要", "内容应回到 V2");
+  assert.equal(after.body.includes("多出来的一段"), false, "V3 多出来的正文应被移除");
+
+  // 关键：v3 仍然可还原 —— 历史只增不减。
+  const revisions = await listRevisions(S);
+  assert.equal(revisions.length, 4, "回滚后应有 4 版（v1~v3 + 回滚那条）");
+  assert.ok(revisions.some((r) => r.summary === "写错了"), "V3 那次改动不该被抹掉");
+  const v3 = await loadRevisionAt(S, 3);
+  assert.equal(v3.summary, "V3 摘要（写错了）", "V3 仍能还原出来");
+
+  await query("DELETE FROM item_revisions WHERE slug = ?", [S]);
+  await query("DELETE FROM items WHERE slug = ?", [S]);
+});
+
+test("回滚不改变发布状态（避免意外发布）", { skip }, async () => {
+  const S = "rollback-status-probe";
+  await query("DELETE FROM item_revisions WHERE slug = ?", [S]);
+  await query("DELETE FROM items WHERE slug = ?", [S]);
+
+  const seed = { ...base, slug: S, name: "状态探针", status: "published" };
+  await saveItem({ ...seed }, { actor: "alice", summary: "创建（已发布）" });
+  // 第二版改成草稿
+  await saveItem({ ...seed, status: "draft" }, { actor: "bob", summary: "撤下" });
+
+  const before = await getItem(S, { publishedOnly: false });
+  assert.equal(before.status, "draft", "现在是草稿");
+
+  // 回滚到 v1（它是 published），但状态不该被带回 published ——
+  // 发布与否是当下的决定，跟内容版本无关。
+  const target = await loadRevisionAt(S, 1);
+  const rv = Number((await query("SELECT row_version FROM items WHERE slug = ?", [S]))[0].row_version);
+  await saveItem(
+    { ...target, slug: S, status: before.status, createdAt: before.createdAt, updatedAt: before.updatedAt },
+    { expectedVersion: rv, actor: "alice", summary: "回滚到第 1 版" },
+  );
+
+  const after = await getItem(S, { publishedOnly: false });
+  assert.equal(after.status, "draft", "回滚不该把条目意外变回已发布");
+
+  await query("DELETE FROM item_revisions WHERE slug = ?", [S]);
+  await query("DELETE FROM items WHERE slug = ?", [S]);
+});

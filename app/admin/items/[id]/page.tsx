@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, ChevronLeft, CircleAlert, Info } from "lucide-react";
 
+import { ItemHistory } from "../history";
+
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { DraftKeeper } from "@/components/DraftKeeper";
 import { Field } from "@/components/form-field";
@@ -27,6 +29,8 @@ type Props = {
     kind?: string;
     url?: string;
     note?: string;
+    /** 刚回滚到的版本号（成功提示用）。 */
+    restored?: string;
   }>;
 };
 
@@ -107,6 +111,8 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
     kind: prefillKind,
     url: prefillUrl,
     note: prefillNote,
+    restored,
+    e: historyError,
   } = await searchParams;
   const isNew = id === "new";
   // 编辑表单要带上 row_version，提交时做乐观锁比对（并发编辑不再静默覆盖）。
@@ -575,6 +581,15 @@ export default async function ItemFormPage({ params, searchParams }: Props) {
           </div>
         </Section>
       </div>
+
+      {item ? (
+        <ItemHistory
+          slug={item.slug}
+          currentVersion={rowVersion}
+          restored={restored}
+          error={historyError}
+        />
+      ) : null}
 
       <div className="glass sticky bottom-0 z-10 -mx-5 mt-8 border-t border-border px-5 py-3 sm:-mx-8 sm:px-8">
         <div className="flex flex-wrap items-center gap-3">
