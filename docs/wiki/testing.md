@@ -3,7 +3,7 @@
 ## 怎么跑
 
 ```bash
-npm test          # 全部回归测试（node:test，tests/*.test.mjs，27 个文件）
+npm test          # 全部回归测试（node:test，tests/*.test.mjs，28 个文件）
 npm run check     # 提交前完整检查：ESLint + next typegen & tsc + npm test
 npm run test:db   # 数据库集成测试（--test-concurrency=1 串行：db / store-sql / catalog-sql / search-sql / write-path / users / grants）
 ```
@@ -11,7 +11,7 @@ npm run test:db   # 数据库集成测试（--test-concurrency=1 串行：db / s
 - 测试使用**临时目录**，不写入业务目录。
 - `tests/admin-actions.test.mjs` 显式设 `STORE_DRIVER=json` 做隔离，免得开发者环境的 MySQL 把单元测试变成集成测试——这也是 JSON 驱动保留的原因之一。
 
-## 测试矩阵（27 个文件）
+## 测试矩阵（28 个文件）
 
 ### 数据与存储
 
@@ -43,6 +43,7 @@ npm run test:db   # 数据库集成测试（--test-concurrency=1 串行：db / s
 | `hotlink.test.mjs` | 防盗链判定，**含 `evilashare.example` 后缀伪装用例** |
 | `security.test.mjs` / `proxy.test.mjs` | CSP、`/admin` 方法白名单、cookie 属性 |
 | `admin-actions.test.mjs` | 后台权限守卫 |
+| `user-actions.test.mjs` | 账号管理：**三条自伤防线**（不能停用/删除/降级自己）+ 编辑角色越权 |
 | `s3.test.mjs` | SigV4 签名串字面量断言 + 请求形态往返（**未对真实 bucket 验签**——那要用 `media:check`） |
 
 ### 其余

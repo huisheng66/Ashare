@@ -50,9 +50,19 @@ published → *      需要 publish 权限（编辑不能把已上线条目撤�
 
 `ClicksPage` 展示：总点击、被点击条目数、最常走的渠道、14 天趋势、渠道构成与条目明细（含渠道拆分与占比）。条目已删除时仍保留历史点击并标注「已删除条目」，便于发现该清理的 slug。
 
+## 账号管理：`/admin/users`
+
+`/admin/users` 是**只有管理员能进**的页面（门禁是 `requirePermission("users")`，编辑角色在这一行被重定向）。它提供账号列表、角色调整、启用停用、重置口令与删除，并显式列出**角色权限矩阵**——只有两个角色但不说清就会变成「凭感觉授权」。
+
+- **三条自伤防线**：不能停用/删除/降级自己。前端按钮禁用只省一次点击，真正的拦截在 action 里——误操作一次就可能把唯一的账号管理能力弄丢，且没人能改回来。
+- **导航按权限过滤**：`AdminTabs` 只对管理员显示「账号」标签。给编辑显示一个点进去会被重定向的标签更糟，它看起来是个能用的入口。
+- **口令用表单明文输入**：命令行那套隐藏输入在 HTTP 表单里做不到。风险靠别的方式补——`autocomplete="new-password"` 让浏览器不保存不 autofill，提交后立刻 revalidate，页面不回显、不进 URL。
+- **引导账号是虚拟的**：`env-admin` 只存在于 `lib/auth.ts` 的常量里，账号表里没有。用户用它登录后在列表里看不到自己，页面上显式说明了这一点。
+- 与命令行 `npm run user` 共用同一套规则（口令下限 12、用户名规则），两者都从 `lib/users.ts` 取，不各写一份。
+
 ## 审计日志（`audit_log`）
 
-`AuditAction` 四类：`create` / `update` / `delete` / `status`。每次保存记录操作者、动作、变更字段清单与一句话摘要（`auditSummary`），由 `lib/store-sql.ts` 写入。
+`AuditAction` 四类：`create` / `update` / `delete` / `status`。每次保存记录操作者、动作、变更字段清单与一句话摘要（`auditSummary`），由 `lib/store-sql.ts` 写入。账号管理的五次改动同样入审计表（`slug` 写作 `user:<账号名>`）。
 
 ## Server Action 清单（图谱实测，12+ 个）
 
@@ -61,6 +71,7 @@ published → *      需要 publish 权限（编辑不能把已上线条目撤�
 | `login` / `logout` | `app/admin/actions.ts` | 会话 |
 | `saveItem` / `setItemStatus` / `deleteItem` | 同上 | 条目主写入链 |
 | `markFeedbackRead` / `deleteFeedback` / `deleteSubmission` / `unblockIp` / `convertSubmission` | 同上 | inbox 管理 |
+| `createUser` / `setUserPassword` / `setUserEnabled` / `setUserRole` / `removeUser` | 同上 | 账号管理（需 `users` 权限） |
 | `submitSubmission` | `app/submit/actions.ts` | 公开投稿 |
 | `submitFeedback` | `app/feedback/actions.ts` | 公开反馈 |
 | `recordOutboundClick` | `app/track/actions.ts` | 点击记录（刻意不 requireAdmin） |

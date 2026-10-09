@@ -19,7 +19,7 @@
 | 命令 | 用途 |
 |---|---|
 | `npm run admin:password` | 隐藏输入生成 `ADMIN_PASSWORD_HASH`（scrypt） |
-| `npm run user` | 账号管理（增删改查、角色分配） |
+| `npm run user` | 账号管理（增删改查、角色分配）—— 后台也能做，见 `/admin/users` |
 
 ### 数据库
 

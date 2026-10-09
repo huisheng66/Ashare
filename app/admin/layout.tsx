@@ -3,8 +3,9 @@ import { ArrowUpRight, LogOut } from "lucide-react";
 
 import { AdminTabs } from "@/components/AdminTabs";
 import { Button } from "@/components/ui/button";
-import { hasValidSession } from "@/lib/auth";
+import { currentUser } from "@/lib/auth";
 import { getFeedback } from "@/lib/store";
+import { ROLE_LABEL } from "@/lib/users";
 import { logout } from "./actions";
 
 export const metadata = {
@@ -17,8 +18,8 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const authed = await hasValidSession();
-  const unread = authed ? (await getFeedback()).filter((f) => !f.read).length : 0;
+  const user = await currentUser();
+  const unread = user ? (await getFeedback()).filter((f) => !f.read).length : 0;
 
   return (
     <div className="flex-1">
@@ -28,10 +29,14 @@ export default async function AdminLayout({
             <span className="size-1.5 rounded-[2px] bg-brand" aria-hidden="true" />
             管理后台
           </p>
-          {authed ? (
+          {user ? (
             <>
-              <AdminTabs unread={unread} />
+              {/* role 传给标签栏：「账号」只对管理员显示。 */}
+              <AdminTabs unread={unread} role={user.role} />
               <div className="ml-auto flex items-center gap-1">
+                <span className="text-xs text-muted-foreground">
+                  {user.displayName} · {ROLE_LABEL[user.role]}
+                </span>
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/">
                     查看前台
