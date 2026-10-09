@@ -20,6 +20,9 @@ const EXPECTED_TABLES = [
   "audit_log", "clicks", "feedback", "ft_stopwords", "ip_blocks", "item_alternatives", "item_guide_resources",
   "item_links", "item_platforms", "item_previews", "item_scenes", "item_tags",
   "items", "schema_migrations", "submissions", "users",
+  // P7b-b 的内容级历史。新增迁移时**必须**在这里加一行：
+  // 这个断言的全部价值就是「迁移漏建表时立刻发现」。
+  "item_revisions",
 ];
 
 const INSERT_ITEM = [
@@ -41,7 +44,13 @@ test("迁移：0001 已应用且表齐全", { skip }, async () => {
   for (const table of EXPECTED_TABLES) assert.ok(names.has(table), "缺表：" + table);
 
   const applied = await query("SELECT version FROM schema_migrations ORDER BY version");
-  assert.deepEqual(applied.map((row) => row.version), ["0001_init", "0002_search-stopwords", "0003_audit-log", "0004_users", "0005_list-indexes"]);
+  // 新增迁移时**必须**在这里加一行。这个清单的作用和上面的表清单一样：
+  // 「迁移文件写了但没应用」是最容易被忽略的错 —— 文件在那儿，db:migrate 报成功，
+  // 但表没建，运行时才发现。
+  assert.deepEqual(applied.map((row) => row.version), [
+    "0001_init", "0002_search-stopwords", "0003_audit-log", "0004_users",
+    "0005_list-indexes", "0006_item-revisions",
+  ]);
 });
 
 test("索引：列表排序各有匹配的复合索引（规模验证的产物）", { skip }, async () => {

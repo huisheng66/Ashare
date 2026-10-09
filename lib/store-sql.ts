@@ -16,8 +16,9 @@ import {
   replaceItemChildren,
   updateItemRowVersioned,
 } from "./catalog-persist.ts";
-import { toBundle } from "./catalog-rows.ts";
+import { fromBundle, toBundle, type ItemBundle } from "./catalog-rows.ts";
 import { getPool, withWriteTransaction } from "./db.ts";
+import { changedFields, deltaBetween, replay, snapshotOf, type Revision } from "./item-revisions.ts";
 
 /**
  * MySQL 运行库实现（STORE_DRIVER=mysql）。
@@ -267,7 +268,14 @@ function isDuplicateKey(error: unknown): boolean {
  */
 export async function saveItem(
   item: Software,
-  options: { expectedVersion?: number; sortIndex?: number; renameFrom?: string } = {},
+  options: {
+    expectedVersion?: number;
+    sortIndex?: number;
+    renameFrom?: string;
+    /** 记历史用：谁在改。缺省不记（ETL 批量导入不该生成历史）。 */
+    actor?: string;
+    summary?: string;
+  } = {},
 ): Promise<SaveOutcome> {
   return withWriteTransaction(async (conn) => {
     // 改名：先按旧 slug 带版本条件地改 slug，再更新其余字段。
@@ -291,6 +299,47 @@ export async function saveItem(
         return "conflict";
       }
       await replaceItemChildren(conn, source.id, bundle);
+      /**
+       * 改名的历史记在**新 slug** 下，但基线要按**旧 slug** 找 —— 那条历史链
+       * 是这个条目的前世。若按新 slug 找基线，查不到就会写成完整快照，
+       * 于是「改名前的样子」永远查不到了。旧 slug 的历史不删：
+       * 它回答的是「改名前长什么样」，删掉那个问题就没人能回答了。
+       *
+       * **注意这里必须把旧链一起搬过来。** 只写一条 delta 的话，新 slug 的链
+       * 自己就没有基线，`replayBaseline(newSlug)` 会直接抛「缺少基线快照」——
+       * 也就是说改过名的条目，其历史根本打不开。现在把旧链原样复制到新 slug 下，
+       * 再追加这版改名记录：新链自洽，旧链也留着，两边都能读。
+       */
+      if (options.actor) {
+        const carried = await replayBaseline(conn, options.renameFrom);
+        if (carried) {
+          await copyRevisions(conn, options.renameFrom, item.slug);
+          const payload = deltaBetween(carried, bundle);
+          await insertRevision(conn, {
+            slug: item.slug,
+            rowVersion: source.rowVersion + 1,
+            kind: payload.kind,
+            actor: options.actor,
+            action: "create",
+            summary: options.summary ?? ("由 " + options.renameFrom + " 改名而来"),
+            fields: changedFields(payload),
+            payload,
+          });
+        } else {
+          //旧链不存在（从没记过历史）：写完整快照，让新 slug 至少有基线。
+          const payload = snapshotOf(bundle);
+          await insertRevision(conn, {
+            slug: item.slug,
+            rowVersion: source.rowVersion + 1,
+            kind: "snapshot",
+            actor: options.actor,
+            action: "create",
+            summary: options.summary ?? ("由 " + options.renameFrom + " 改名而来"),
+            fields: changedFields(payload),
+            payload,
+          });
+        }
+      }
       return "updated";
     }
 
@@ -298,7 +347,23 @@ export async function saveItem(
     if (!existing) {
       // 并发新建同一个 slug 时，唯一索引会让其中一个抛 ER_DUP_ENTRY —— 那就是冲突。
       try {
-        await insertItem(conn, toBundle(item, options.sortIndex ?? (await nextFrontSortIndex(conn))));
+        const bundle = toBundle(item, options.sortIndex ?? (await nextFrontSortIndex(conn)));
+        await insertItem(conn, bundle);
+        if (options.actor) {
+          // 首版必须存完整快照 —— 后面所有差异都要靠它重放。
+          const payload = snapshotOf(bundle);
+          await insertRevision(conn, {
+            slug: item.slug,
+            rowVersion: 1,
+            kind: "snapshot",
+            actor: options.actor,
+            action: "create",
+            summary: options.summary ?? "创建条目",
+            fields: changedFields(payload),
+            payload,
+          });
+          await pruneRevisions(conn, item.slug);
+        }
         return "created";
       } catch (error) {
         if (isDuplicateKey(error)) return "conflict";
@@ -313,18 +378,58 @@ export async function saveItem(
       return "conflict";
     }
     await replaceItemChildren(conn, existing.id, bundle);
+    if (options.actor) await recordRevision(conn, {
+      slug: item.slug,
+      rowVersion: existing.rowVersion + 1,
+      actor: options.actor,
+      action: "update",
+      summary: options.summary ?? "",
+      bundle,
+    });
     return "updated";
   });
 }
 
-export async function deleteItem(slug: string): Promise<boolean> {
-  return withWriteTransaction((conn) => deleteItemBySlug(conn, slug));
+/**
+ * 删除条目。
+ *
+ * 历史**不跟着删**：条目没了，但「它什么时候下架的、下架前长什么样」要能回答。
+ * 所以只记一条 action='delete' 的空差异，不存内容（内容已在历史链里）。
+ */
+export async function deleteItem(
+  slug: string,
+  options: { actor?: string } = {},
+): Promise<boolean> {
+  return withWriteTransaction(async (conn) => {
+    const existing = await readItemIdAndVersion(conn, slug, { forUpdate: true });
+    if (!existing) return false;
+    const removed = await deleteItemBySlug(conn, slug);
+    if (removed && options.actor) {
+      await recordRevision(conn, {
+        slug,
+        // 删除不递增 row_version，所以历史里占用的版本号就是删除前那版 +0。
+        // 用一个明确的较大值避免与既有版本冲突：这一条只表达「发生过删除」。
+        rowVersion: existing.rowVersion + 1,
+        actor: options.actor,
+        action: "delete",
+        summary: "删除条目",
+      });
+    }
+    return removed;
+  });
 }
 
+/**
+ * 改发布状态。
+ *
+ * **必须记历史**：它会递增 row_version。若只改 items 而不记历史，
+ * 历史里的版本号就会与实际断开 —— 之后重放会算错版本，界面上「回到第 N 版」
+ * 拿到的是错的内容。状态变更本身也是内容的一部分（草稿/待审核/已发布）。
+ */
 export async function setItemStatus(
   slug: string,
   status: Software["status"],
-  options: { expectedVersion?: number } = {},
+  options: { expectedVersion?: number; actor?: string; sortIndex?: number } = {},
 ): Promise<SaveOutcome> {
   return withWriteTransaction(async (conn) => {
     const existing = await readItemIdAndVersion(conn, slug, { forUpdate: true });
@@ -335,6 +440,20 @@ export async function setItemStatus(
       new Date(),
       slug,
     ]);
+    if (options.actor) {
+      const item = await loadItem(conn, slug, { publishedOnly: false });
+      if (item) {
+        const bundle = toBundle(item, options.sortIndex ?? (await currentSortIndex(conn, slug)) ?? 0);
+        await recordRevision(conn, {
+          slug,
+          rowVersion: existing.rowVersion + 1,
+          actor: options.actor,
+          action: "status",
+          summary: "状态改为 " + status,
+          bundle,
+        });
+      }
+    }
     return "updated";
   });
 }
@@ -461,4 +580,225 @@ export async function deleteUser(username: string): Promise<boolean> {
 
 export async function touchUserLogin(username: string): Promise<void> {
   await getPool().query("UPDATE users SET last_login_at = ? WHERE username = ?", [new Date(), username]);
+}
+
+// ---------------------------------------------------------------------------
+// 内容级历史（P7b-b）
+//
+// 历史与条目写在**同一个事务**里：否则会出现「条目已改但历史没记」的窗口 ——
+// 那种情况下历史不再是真相，只是看起来像真相。
+// ---------------------------------------------------------------------------
+
+/** 保留策略：一条历史链上最近留这么多版，或这么长时间内的（满足其一即可）。 */
+const REVISIONS_KEEP_VERSIONS = 20;
+const REVISIONS_KEEP_DAYS = 90;
+
+/** 兜底上限，防止异常情况下无上限增长。 */
+const REVISIONS_HARD_CAP = 50000;
+
+/**
+ * 记一版历史，并在记完后顺带清理。
+ *
+ * 基线来源是「这条 slug 已有的最新一版重放结果」—— 不是读当前 items 表：
+ * 用当前表当基准会把并发写覆盖掉，且 ETL 批量导入时拿不到正确的上一版。
+ * 查不到基线就写完整快照，保证后面永远有重放的起点。
+ */
+async function recordRevision(
+  conn: PoolConnection,
+  input: {
+    slug: string;
+    rowVersion: number;
+    actor: string;
+    action: "create" | "update" | "delete" | "status";
+    summary: string;
+    bundle?: ItemBundle;
+  },
+): Promise<void> {
+  // 差异的基准 = 该slug 已有历史的重放结果。
+  const baseline = await replayBaseline(conn, input.slug);
+
+  if (!input.bundle) {
+    // 删除：只记「删了」这一事实，没有内容可存。
+    await insertRevision(conn, {
+      slug: input.slug,
+      rowVersion: input.rowVersion,
+      kind: "delta",
+      actor: input.actor,
+      action: input.action,
+      summary: input.summary || "删除条目",
+      fields: [],
+      payload: { kind: "delta", columns: {} },
+    });
+    return;
+  }
+
+  const payload = baseline ? deltaBetween(baseline, input.bundle) : snapshotOf(input.bundle);
+  await insertRevision(conn, {
+    slug: input.slug,
+    rowVersion: input.rowVersion,
+    kind: payload.kind,
+    actor: input.actor,
+    action: input.action,
+    summary: input.summary,
+    fields: changedFields(payload),
+    payload,
+  });
+  await pruneRevisions(conn, input.slug);
+}
+
+/**
+ * 某 slug 已有历史的重放结果；没有历史则返回 undefined（表示需要写基线）。
+ *
+ * @param upToVersion 只重放到这一版；不给就是重放到最新。
+ */
+async function replayBaseline(
+  conn: PoolConnection,
+  slug: string,
+  upToVersion?: number,
+): Promise<ItemBundle | undefined> {
+  const [rows] = await conn.query<RowDataPacket[]>(
+    "SELECT row_version, kind, actor, action, summary, fields, payload, created_at"
+      + " FROM item_revisions WHERE slug = ?" + (upToVersion === undefined ? "" : " AND row_version <= ?")
+      + " ORDER BY row_version ASC",
+    upToVersion === undefined ? [slug] : [slug, upToVersion],
+  );
+  if (!rows.length) return undefined;
+  return replay(
+    rows.map((row) => ({
+      rowVersion: Number(row.row_version),
+      kind: row.kind,
+      actor: row.actor,
+      action: row.action,
+      summary: row.summary,
+      fields: typeof row.fields === "string" ? JSON.parse(row.fields) : row.fields,
+      at: new Date(row.created_at).toISOString(),
+      payload: typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload,
+    })),
+  );
+}
+
+async function insertRevision(
+  conn: PoolConnection,
+  input: {
+    slug: string;
+    rowVersion: number;
+    kind: "snapshot" | "delta";
+    actor: string;
+    action: string;
+    summary: string;
+    fields: string[];
+    payload: unknown;
+  },
+): Promise<void> {
+  await conn.query(
+    "INSERT INTO item_revisions (slug, row_version, kind, actor, action, summary, fields, payload, created_at)"
+      + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [
+      input.slug,
+      input.rowVersion,
+      input.kind,
+      input.actor,
+      input.action,
+      input.summary.slice(0, 300),
+      JSON.stringify(input.fields),
+      JSON.stringify(input.payload),
+      new Date(),
+    ],
+  );
+}
+
+/**
+ * 顺带清理，只在写入时做。
+ *
+ * **「最近 N 版」与「N 天内」是或的关系，不是二选一。** 二选一的话，
+ * 一个半年没动过、今天被改了一次的条目，会因为「不在最近 20 版里」而把整段历史清空 ——
+ * 而那段历史可能正是想查的。
+ *
+ * 首版（kind='snapshot'）永不删除：它是没有基线就重放不出任何版本的唯一凭据。
+ */
+async function pruneRevisions(conn: PoolConnection, slug: string): Promise<void> {
+  const cutoff = new Date(Date.now() - REVISIONS_KEEP_DAYS * 86400000);
+  const [rows] = await conn.query<RowDataPacket[]>(
+    "SELECT id, kind, created_at FROM item_revisions WHERE slug = ? ORDER BY row_version DESC",
+    [slug],
+  );
+  if (rows.length <= REVISIONS_KEEP_VERSIONS && rows.every((row) => new Date(row.created_at) >= cutoff)) return;
+
+  const keep = new Set<number>();
+  for (const [index, row] of rows.entries()) {
+    const withinCount = index < REVISIONS_KEEP_VERSIONS;
+    const withinTime = new Date(row.created_at) >= cutoff;
+    if ((withinCount || withinTime) && row.kind !== "snapshot") keep.add(Number(row.id));
+  }
+  // 全局上限：超了就把最老的非基线丢掉，直到回到上限内。
+  let overflow = rows.length - keep.size - REVISIONS_HARD_CAP;
+  if (overflow > 0) {
+    for (const row of rows.slice().reverse()) {
+      if (overflow <= 0) break;
+      const id = Number(row.id);
+      if (keep.has(id) || row.kind === "snapshot") continue;
+      keep.delete(id);
+      overflow -= 1;
+    }
+  }
+  if (!keep.size) return;
+  const ids = rows.map((row) => Number(row.id)).filter((id) => !keep.has(id));
+  if (!ids.length) return;
+  await conn.query("DELETE FROM item_revisions WHERE id IN (" + ids.map(() => "?").join(", ") + ")", ids);
+}
+
+/**
+ * 把一条 slug 的整条历史链原样复制到另一个 slug 下。
+ *
+ * 改名时用：让新 slug 的历史链**自洽**（有自己的基线），同时旧 slug 的链也留着 ——
+ * 「改名前长什么样」与「改名后长什么样」都能查，且互不影响。
+ */
+async function copyRevisions(conn: PoolConnection, from: string, to: string): Promise<void> {
+  const [rows] = await conn.query<RowDataPacket[]>(
+    "SELECT row_version, kind, actor, action, summary, fields, payload, created_at"
+      + " FROM item_revisions WHERE slug = ? ORDER BY row_version ASC",
+    [from],
+  );
+  for (const row of rows) {
+    await conn.query(
+      "INSERT INTO item_revisions (slug, row_version, kind, actor, action, summary, fields, payload, created_at)"
+        + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        to,
+        row.row_version,
+        row.kind,
+        row.actor,
+        row.action,
+        row.summary,
+        typeof row.fields === "string" ? row.fields : JSON.stringify(row.fields),
+        typeof row.payload === "string" ? row.payload : JSON.stringify(row.payload),
+        row.created_at,
+      ],
+    );
+  }
+}
+
+/** 某条目的全部历史版本，新的在前。给后台历史面板用。 */
+export async function listRevisions(slug: string): Promise<Revision[]> {
+  const [rows] = await getPool().query<RowDataPacket[]>(
+    "SELECT row_version, kind, actor, action, summary, fields, payload, created_at"
+      + " FROM item_revisions WHERE slug = ? ORDER BY row_version DESC",
+    [slug],
+  );
+  return rows.map((row) => ({
+    rowVersion: Number(row.row_version),
+    kind: row.kind,
+    actor: row.actor,
+    action: row.action,
+    summary: row.summary,
+    fields: typeof row.fields === "string" ? JSON.parse(row.fields) : row.fields,
+    at: new Date(row.created_at).toISOString(),
+    payload: typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload,
+  }));
+}
+
+/** 还原到指定版本；不给版本号就是当前内容。 */
+export async function loadRevisionAt(slug: string, rowVersion?: number): Promise<Software | undefined> {
+  const bundle = await withConnection((conn) => replayBaseline(conn, slug, rowVersion));
+  return bundle ? fromBundle(bundle) : undefined;
 }

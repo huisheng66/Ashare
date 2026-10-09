@@ -263,14 +263,21 @@ export async function saveItem(fd: FormData): Promise<void> {
 
     // 单条原子写 + row_version 乐观锁：不再「读全量、改一条、写全量」。
     // 改名走 renameFrom，在同一个事务里完成，避免「先删后插」中途失败丢条目。
+    //
+    // actor 与 summary 一起传进去：内容级历史（P7b-b）必须与条目写在**同一个事务**里，
+    // 否则会出现「条目已改但历史没记」的窗口 —— 那时历史不再是真相，只是看起来像。
+    // 摘要在这里算好（原本要等 outcome 才知道 create/update，但 outcome 在保存之后才有，
+    // 而 fields 只依赖 existing 与 draft），所以改用 existing 判定新建还是更新。
+    const action = existing ? "update" : "create";
+    const fields = diffFields(existing, draft);
     const outcome = await saveCatalogItem(draft, {
       renameFrom: original || undefined,
       expectedVersion,
+      actor: actor.username,
+      summary: auditSummary(action, draft.name, fields),
     });
     if (outcome === "conflict") bad("这个条目刚被别人改过，请刷新页面后重试");
 
-    const action = outcome === "created" ? "create" : "update";
-    const fields = diffFields(existing, draft);
     await recordAudit({
       at: now,
       actor: actor.username,
@@ -299,7 +306,8 @@ export async function setItemStatus(fd: FormData): Promise<void> {
   const before = await getCatalogItem(slug, { publishedOnly: false });
   if (!before) redirect("/admin?e=missing");
   if (!canSetStatus(actor.role, before.status, status)) redirect("/admin?e=forbidden");
-  const outcome = await setCatalogItemStatus(slug, status);
+  // actor 传进去：内容级历史要记「谁改的状态」，且必须与状态变更同一事务。
+  const outcome = await setCatalogItemStatus(slug, status, { actor: actor.username });
   if (outcome === "conflict") redirect("/admin?e=missing");
   await recordAudit({
     at: new Date().toISOString(),
@@ -317,7 +325,8 @@ export async function deleteItem(fd: FormData): Promise<void> {
   const actor = await requirePermission("publish");
   const slug = str(fd, "slug");
   const before = await getCatalogItem(slug, { publishedOnly: false });
-  const removed = await deleteCatalogItem(slug);
+  // 历史不跟着删：条目没了，但「什么时候下架的、下架前长什么样」要能回答。
+  const removed = await deleteCatalogItem(slug, { actor: actor.username });
   if (removed) {
     await recordAudit({
       at: new Date().toISOString(),
