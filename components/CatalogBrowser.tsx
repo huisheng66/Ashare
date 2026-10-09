@@ -12,10 +12,62 @@ import { SoftwareRow } from "@/components/SoftwareRow";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { sceneById } from "@/data/scenes";
 import type { CatalogCounts, CatalogItem } from "@/data/types";
 import { activeFilterCount, catalogFiltersFromURL, catalogHref, clearCatalogFilters } from "@/lib/catalog-query";
 import { kindLabel, platformLabel } from "@/lib/items";
+
+/**
+ * 切换中的占位。形状照着真实卡片 / 行做，加载结束时视觉上不会「跳一下」。
+ *
+ * 只在**已经有内容之后**的切换里显示：首次进入时页面本来就没有内容，
+ * 那时显示骨架反而是多余的 —— 页面上什么都不闪才是对的。
+ */
+function GridSkeleton({ rows }: { rows: number }) {
+  return (
+    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
+      {Array.from({ length: rows }, (_, index) => (
+        <li key={index} className="flex *:flex-1">
+          <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-border bg-card p-5">
+            <div className="flex items-start gap-3.5">
+              <Skeleton className="size-12 shrink-0 rounded-[26%] motion-reduce:animate-none" />
+              <div className="min-w-0 flex-1 space-y-2 pt-1">
+                <Skeleton className="h-4 w-2/3 motion-reduce:animate-none" />
+                <Skeleton className="h-3 w-1/2 motion-reduce:animate-none" />
+              </div>
+            </div>
+            <div className="mt-4 mb-5 space-y-2">
+              <Skeleton className="h-3.5 w-full motion-reduce:animate-none" />
+              <Skeleton className="h-3.5 w-4/5 motion-reduce:animate-none" />
+            </div>
+            <div className="mt-auto flex items-center gap-2.5 border-t border-border pt-4">
+              <Skeleton className="h-5 w-14 rounded-full motion-reduce:animate-none" />
+              <Skeleton className="h-3.5 w-20 motion-reduce:animate-none" />
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function RowSkeleton({ rows }: { rows: number }) {
+  return (
+    <ul className="flex flex-col gap-2.5" aria-hidden="true">
+      {Array.from({ length: rows }, (_, index) => (
+        <li key={index} className="flex items-center gap-3.5 rounded-2xl border border-border bg-card px-5 py-4">
+          <Skeleton className="size-11 shrink-0 rounded-[26%] motion-reduce:animate-none" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-4 w-1/3 motion-reduce:animate-none" />
+            <Skeleton className="h-3 w-2/3 motion-reduce:animate-none" />
+          </div>
+          <Skeleton className="h-5 w-16 shrink-0 rounded-full motion-reduce:animate-none" />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /** 网格 / 列表切换：分段控件，状态写在 URL 里。 */
 export function ViewSwitch({
@@ -192,41 +244,49 @@ export function CatalogBrowser({
           </ul>
         ) : null}
 
-        <div className={`mt-5 transition-opacity duration-150 ${isPending ? "opacity-60" : ""}`}>
-          {items.length ? (
-            view === "grid" ? (
-              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {items.map((item) => (
-                  <li key={item.slug} className="flex *:flex-1">
-                    <SoftwareCard item={item} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <ul className="flex flex-col gap-2.5">
-                {items.map((item) => (
-                  <li key={item.slug}>
-                    <SoftwareRow item={item} />
-                  </li>
-                ))}
-              </ul>
-            )
+        {/* 切换中：用骨架替换内容，而不是把旧内容变淡再抽走。
+            变淡的问题是**旧内容还在原地等着被抽走**，用户会盯着「即将消失的东西」；
+            骨架明确表示「正在取新的」，形状还照着真实卡片做，加载完不会跳版。
+            首次进入（还没有内容）不显示骨架 —— 那时页面本来就空，不是加载中。 */}
+        {isPending && items.length ? (
+          view === "grid" ? (
+            <GridSkeleton rows={Math.min(items.length, 6)} />
           ) : (
-            <EmptyState
-              icon={SearchX}
-              title={filterCount ? "没有符合这些条件的工具" : "目录正在整理"}
-              actions={
-                <Button asChild variant="outline">
-                  <Link href={filterCount ? resetHref : "/submit"} scroll={false}>
-                    {filterCount ? "清除筛选" : "推荐一款工具"}
-                  </Link>
-                </Button>
-              }
-            >
-              {filterCount ? "去掉一两个条件试试，或清除筛选重新浏览。" : "可以推荐你正在用的工具，帮我们把目录补全。"}
-            </EmptyState>
-          )}
-        </div>
+            <RowSkeleton rows={Math.min(items.length, 8)} />
+          )
+        ) : items.length ? (
+          view === "grid" ? (
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {items.map((item) => (
+                <li key={item.slug} className="flex *:flex-1">
+                  <SoftwareCard item={item} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <ul className="flex flex-col gap-2.5">
+              {items.map((item) => (
+                <li key={item.slug}>
+                  <SoftwareRow item={item} />
+                </li>
+              ))}
+            </ul>
+          )
+        ) : (
+          <EmptyState
+            icon={SearchX}
+            title={filterCount ? "没有符合这些条件的工具" : "目录正在整理"}
+            actions={
+              <Button asChild variant="outline">
+                <Link href={filterCount ? resetHref : "/submit"} scroll={false}>
+                  {filterCount ? "清除筛选" : "推荐一款工具"}
+                </Link>
+              </Button>
+            }
+          >
+            {filterCount ? "去掉一两个条件试试，或清除筛选重新浏览。" : "可以推荐你正在用的工具，帮我们把目录补全。"}
+          </EmptyState>
+        )}
 
         {pageCount > 1 ? (
           <nav aria-label="分页" className="mt-8 flex flex-wrap items-center justify-center gap-3">
