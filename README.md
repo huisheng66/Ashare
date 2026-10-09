@@ -2,7 +2,7 @@
 
 按使用场景找软件与工具的目录站。收录三类**合法、可核验来源**的条目：厂商正式版应用（含免费档/优惠入口）、脚本小工具、开源项目。不托管安装包，**不收录破解版、修改版、序列号与盗版网盘包**；网盘链接仅限作者/项目方的已核验合法镜像。
 
-产品定义见 [PRODUCT.md](./PRODUCT.md)，视觉规范见 [claudedesign.md](./claudedesign.md)（取代旧的 DESIGN.md），改动记录见 [CHANGELOG.md](./CHANGELOG.md)，早期规划 [next.md](./next.md) 已标为历史。
+产品定义见 [PRODUCT.md](./PRODUCT.md)，视觉规范见 [claudedesign.md](./claudedesign.md)（取代旧的 DESIGN.md），改动记录见 [CHANGELOG.md](./CHANGELOG.md)，早期规划 [next.md](./next.md) 已标为历史。项目 Wiki 见 [docs/wiki/](./docs/wiki/Home.md)——结构化的架构 / 数据 / 前后台 / 安全 / 运维 / 测试说明。
 
 ## 技术栈
 
