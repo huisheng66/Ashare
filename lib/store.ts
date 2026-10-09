@@ -2,6 +2,7 @@ import "server-only";
 
 import type { FeedbackEntry, Software, Submission } from "@/data/types";
 import type { AuditRecord } from "./audit.ts";
+import type { Revision } from "./item-revisions.ts";
 import type { PublicUser, UserRecord } from "./users.ts";
 import * as json from "./store-json.ts";
 import * as sql from "./store-sql.ts";
@@ -118,6 +119,21 @@ export async function getItem(
 /** 编辑表单用：带上行版本号，提交时做乐观锁比对。 */
 export async function getItemForEdit(slug: string): Promise<{ item: Software; rowVersion: number } | undefined> {
   return mysqlDriver() ? sql.getItemForEdit(slug) : json.getItemForEdit(slug);
+}
+
+/**
+ * 取某个历史版本的内容。
+ *
+ * JSON 驱动没有历史（那边靠git），所以返回 undefined —— 调用方据此提示「该驱动下无历史」，
+ * 而不是假装没有历史。
+ */
+export async function getRevisionAt(slug: string, rowVersion: number): Promise<Software | undefined> {
+  return mysqlDriver() ? sql.loadRevisionAt(slug, rowVersion) : undefined;
+}
+
+/** 某条目的全部历史版本，新的在前。JSON 驱动下永远为空数组。 */
+export async function listRevisions(slug: string): Promise<Revision[]> {
+  return mysqlDriver() ? sql.listRevisions(slug) : [];
 }
 
 export async function recordAudit(entry: AuditRecord): Promise<void> {

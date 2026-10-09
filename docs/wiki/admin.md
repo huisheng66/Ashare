@@ -75,3 +75,21 @@ published → *      需要 publish 权限（编辑不能把已上线条目撤�
 | `submitSubmission` | `app/submit/actions.ts` | 公开投稿 |
 | `submitFeedback` | `app/feedback/actions.ts` | 公开反馈 |
 | `recordOutboundClick` | `app/track/actions.ts` | 点击记录（刻意不 requireAdmin） |
+
+## 改动历史：条目编辑页内嵌
+
+条目编辑页底部有「改动历史」面板（`app/admin/items/history.tsx`服务端容器 +
+`components/HistoryPanel.tsx` 客户端面板）。列出版本号、动作、摘要、操作者、时间，
+以及这一版改了哪些字段（列名译成中文，认不出的原样显示）。「查看这一版」展开该版完整内容。
+
+**回滚的语义是「作为一次新编辑保存」，不是「时间倒流」**：
+
+- 走 `saveItem` 正常通道而不是直接改库 —— 这样回滚本身也进历史链，中间版本不被抹平。
+  **丢掉的那几版本身也是信息**：那条错误描述存在了多久，本身就是要查的问题。
+- 走正常通道还自带乐观锁：若期间别人改过，会被挡下并提示「刚被别人改过」，
+  而不是无声覆盖。
+- **发布状态不随回滚改变**：把自己下架的条目回滚回来却变成已发布，那是意外发布。
+  状态是当下的决定，不是内容版本的一部分。
+- 需要 `publish` 权限而非 `edit`：「回到哪个版本」更接近发布决策。
+
+`item_revisions` 的底层形态见 [data-and-storage](./data-and-storage.md)。
