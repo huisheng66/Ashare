@@ -14,7 +14,7 @@
     "backup": "node --env-file-if-exists=.env.local scripts/backup.mjs",
     "db:grants": "node --env-file-if-exists=.env.local scripts/db-grants.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/db-migrate.mjs",
-    "test:db": "node --env-file-if-exists=.env.local --test --test-concurrency=1 tests/db.test.mjs tests/store-sql.test.mjs tests/catalog-sql.test.mjs tests/search-sql.test.mjs tests/write-path.test.mjs tests/users.test.mjs tests/grants.test.mjs",
+    "test:db": "node --env-file-if-exists=.env.local --test --test-concurrency=1 tests/db.test.mjs tests/store-sql.test.mjs tests/catalog-sql.test.mjs tests/search-sql.test.mjs tests/write-path.test.mjs tests/users.test.mjs tests/grants.test.mjs tests/revisions-db.test.mjs",
     "db:import": "node --env-file-if-exists=.env.local scripts/db-import-json.mjs",
     "db:reindex": "node --env-file-if-exists=.env.local scripts/db-reindex.mjs",
     "user": "node --env-file-if-exists=.env.local scripts/user-manage.mjs",

@@ -84,19 +84,26 @@ export type SaveOutcome = "created" | "updated" | "conflict";
  */
 export async function saveItem(
   item: Software,
-  options: { expectedVersion?: number; sortIndex?: number; renameFrom?: string } = {},
+  options: {
+    expectedVersion?: number;
+    sortIndex?: number;
+    renameFrom?: string;
+    /** 记内容级历史用；缺省不记（ETL 批量导入不该生成历史）。 */
+    actor?: string;
+    summary?: string;
+  } = {},
 ): Promise<SaveOutcome> {
   return mysqlDriver() ? sql.saveItem(item, options) : json.saveItem(item, options);
 }
 
-export async function deleteItem(slug: string): Promise<boolean> {
-  return mysqlDriver() ? sql.deleteItem(slug) : json.deleteItem(slug);
+export async function deleteItem(slug: string, options: { actor?: string } = {}): Promise<boolean> {
+  return mysqlDriver() ? sql.deleteItem(slug, options) : json.deleteItem(slug);
 }
 
 export async function setItemStatus(
   slug: string,
   status: Software["status"],
-  options: { expectedVersion?: number } = {},
+  options: { expectedVersion?: number; actor?: string; sortIndex?: number } = {},
 ): Promise<SaveOutcome> {
   return mysqlDriver() ? sql.setItemStatus(slug, status, options) : json.setItemStatus(slug, status);
 }
