@@ -1,11 +1,10 @@
-import { CircleCheck, CircleAlert, RotateCcw } from "lucide-react";
+
+import { CircleAlert, CircleCheck } from "lucide-react";
 
 import { HistoryPanel, type RevisionRow } from "@/components/HistoryPanel";
-import { Button } from "@/components/ui/button";
 import { currentUser } from "@/lib/auth";
 import { getRevisionAt, listRevisions } from "@/lib/store";
 import { can } from "@/lib/users";
-import { rollbackItem } from "../actions";
 
 /**
  * 条目改动历史（服务端容器）。
@@ -89,25 +88,10 @@ export async function ItemHistory({
       ) : null}
 
       <HistoryPanel
+        slug={slug}
         revisions={rows}
         canRollback={canRollback}
         currentVersion={currentVersion}
-        renderRollback={(rowVersion) => (
-          <form action={rollbackItem} className="contents">
-            <input type="hidden" name="slug" value={slug} />
-            <input type="hidden" name="version" value={rowVersion} />
-            <Button
-              type="submit"
-              size="sm"
-              variant="ghost"
-              className="text-muted-foreground hover:text-destructive"
-              formNoValidate
-            >
-              <RotateCcw />
-              回滚到这一版
-            </Button>
-          </form>
-        )}
       />
     </>
   );

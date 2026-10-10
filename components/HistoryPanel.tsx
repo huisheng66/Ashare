@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, History, UserRound } from "lucide-react";
+import { ChevronDown, History, RotateCcw, UserRound } from "lucide-react";
 
+import { rollbackItem } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/items";
 import { STATUS_LABEL } from "@/lib/users";
@@ -30,25 +31,23 @@ export type RevisionRow = {
 };
 
 /**
- * 条目历史面板（客户端）。
+ * 条目改动历史面板（客户端）。
  *
  * 做成客户端而不是纯服务端：点「查看」要展开某一版的完整内容，不该每次都往返服务器
- * —— 历史最多20 版，一次全传也不大，但展开交互需要即时反馈。
+ * —— 历史最多 20 版，一次全传也不大，但展开交互需要即时反馈。
  *
- * **回滚按钮只对有 publish 权限的人显示，且要二次确认。** 它会覆盖当前内容
- * （作为一次新编辑保存），所以不能和「查看」一样轻率。
+ * **回滚表单在本文件里直接 import server action**（见 RollbackForm 的说明）。
  */
 export function HistoryPanel({
+  slug,
   revisions,
   canRollback,
   currentVersion,
-  renderRollback,
 }: {
+  slug: string;
   revisions: RevisionRow[];
   canRollback: boolean;
   currentVersion?: number;
-  /** 服务端渲染好的回滚表单（它要用 server action，客户端组件不能 import）。 */
-  renderRollback: (rowVersion: number) => React.ReactNode;
 }) {
   if (!revisions.length) {
     return (
@@ -79,10 +78,10 @@ export function HistoryPanel({
           {revisions.map((revision) => (
             <RevisionItem
               key={revision.rowVersion}
+              slug={slug}
               revision={revision}
               canRollback={canRollback}
               isCurrent={revision.rowVersion === currentVersion}
-              renderRollback={renderRollback}
             />
           ))}
         </ul>
@@ -97,15 +96,15 @@ export function HistoryPanel({
 }
 
 function RevisionItem({
+  slug,
   revision,
   canRollback,
   isCurrent,
-  renderRollback,
 }: {
+  slug: string;
   revision: RevisionRow;
   canRollback: boolean;
   isCurrent: boolean;
-  renderRollback: (rowVersion: number) => React.ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -151,12 +150,9 @@ function RevisionItem({
           <ChevronDown className={expanded ? "rotate-180" : undefined} />
           {expanded ? "收起" : "查看这一版"}
         </Button>
-        {/*
-          回滚按钮由服务端作为 renderRollback 传进来 —— 它要用 server action，
-          而客户端组件不能 import server action。传函数式节点是最直接的办法：
-          服务端把它渲染好的表单元素交给客户端组件摆到该位置。
-        */}
-        {canRollback && !isCurrent ? renderRollback(revision.rowVersion) : null}
+        {canRollback && !isCurrent ? (
+          <RollbackForm slug={slug} rowVersion={revision.rowVersion} />
+        ) : null}
       </div>
 
       {expanded ? (
@@ -165,6 +161,39 @@ function RevisionItem({
         </div>
       ) : null}
     </li>
+  );
+}
+
+/**
+ * 回滚表单。
+ *
+ * **直接 import server action**，不靠服务端传函数进来。
+ *
+ * 早先的方案是让服务端渲染好表单、把 renderRollback 当 prop 传给客户端组件 ——
+ * 类型检查、lint、`npm run build` **全都通过**，但真实渲染时 React 直接抛
+ * 「Functions cannot be passed directly to Client Components」，条目编辑页打不开。
+ *
+ * 教训值得留着：**跨服务端/客户端边界时，构建通过不代表渲染能过。**
+ * 函数是不可序列化的 prop，编译期查不出来，只有真跑一次才暴露。
+ *
+ * 客户端组件 import server action 是 Next.js 的既定能力，
+ * 本项目的 FeedbackForm / SubmitForm 就是这么做的。
+ */
+function RollbackForm({ slug, rowVersion }: { slug: string; rowVersion: number }) {
+  return (
+    <form action={rollbackItem} className="contents">
+      <input type="hidden" name="slug" value={slug} />
+      <input type="hidden" name="version" value={rowVersion} />
+      <Button
+        type="submit"
+        size="sm"
+        variant="ghost"
+        className="text-muted-foreground hover:text-destructive"
+      >
+        <RotateCcw />
+        回滚到这一版
+      </Button>
+    </form>
   );
 }
 
