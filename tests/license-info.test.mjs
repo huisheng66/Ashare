@@ -67,10 +67,15 @@ test("whitespace around the identifier is tolerated", () => {
 });
 
 test("every license recorded in the catalog has a human-readable summary", async () => {
-  // 防止以后新增条目时页面静默不显示：映射表漏一个键，LicenseNote 就返回 null，
+  // 防止以后新增条目时页面静默不显示：映射表漏一个键，LicenseNote就返回 null，
   // 而数据侧一切正常 —— 这类失配只有靠交叉核对才发现。
-  const { readFile } = await import("node:fs/promises");
-  const catalog = JSON.parse(await readFile(new URL("../data/store/catalog.json", import.meta.url), "utf8"));
+  //
+  // 用种子（data/software.ts + samples.ts）而不是 data/store/catalog.json：
+  // 后者已 gitignore，CI 上没有，读它会让这条测试在 CI 上必然 ENOENT 失败。
+  // 与 catalog-rows.test.mjs 取数方式保持一致。
+  const { samples } = await import("../data/samples.ts");
+  const { software: seed } = await import("../data/software.ts");
+  const catalog = [...seed, ...samples];
 
   const missing = [];
   const seen = new Set();
