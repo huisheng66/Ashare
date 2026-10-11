@@ -26,7 +26,7 @@ export type InlineNode =
   | { type: "image"; src: string; alt: string };
 
 export type BlockNode =
-  | { type: "heading"; level: 2 | 3 | 4; children: InlineNode[]; id: string }
+  | { type: "heading"; level: 1 | 2 | 3 | 4; children: InlineNode[]; id: string }
   | { type: "paragraph"; children: InlineNode[] }
   | { type: "list"; ordered: boolean; items: InlineNode[][] }
   | { type: "code"; lang?: string; value: string }
@@ -178,7 +178,14 @@ export function parseInline(source: string): InlineNode[] {
   return nodes;
 }
 
-const HEADING = /^(#{2,4})\s+(.*)$/;
+/**
+ * ATX 标题，1~4 级。
+ *
+ * 原来只认 2~4 级，理由是「一级标题留给页面本身的标题层级」。
+ * 放宽是为了文档树场景：那里没有页面标题之外的层级可用，文档自己就该有一个 h1。
+ * 教程正文从 `##` 起，所以对既有内容无影响（`markdownOutline` 本来就不收 h1）。
+ */
+const HEADING = /^(#{1,4})\s+(.*)$/;
 const UNORDERED = /^[-*]\s+(.*)$/;
 const ORDERED = /^\d+[.)]\s+(.*)$/;
 const QUOTE = /^>\s?(.*)$/;
@@ -233,8 +240,7 @@ function parseBlocks(source: string): BlockNode[] {
 
     const heading = HEADING.exec(line);
     if (heading) {
-      // 一级标题留给页面本身的标题层级，教程内从 h2 起。
-      const level = Math.min(heading[1].length, 4) as 2 | 3 | 4;
+      const level = Math.min(heading[1].length, 4) as 1 | 2 | 3 | 4;
       const children = parseInline(heading[2].trim());
       blocks.push({ type: "heading", level, children, id: uniqueId(inlineText(children), level) });
       index += 1;
@@ -276,15 +282,30 @@ function parseBlocks(source: string): BlockNode[] {
       continue;
     }
 
-    const unordered = UNORDERED.exec(line);
-    const ordered = ORDERED.exec(line);
+    // 列表分派要对剥掉缩进后的行做判断：否则 `  - 乙` 这种顶格写法的续行
+    // 会因为前导空格失配，被当成普通段落，`- ` 直接漏进正文。
+    //只剥 1~4 格：再多就该算另一种内容（缩进代码块），不该被当成列表项。
+    const dedentedLine = line.replace(/^ {1,4}(?=\S)/, "");
+    const unordered = UNORDERED.exec(dedentedLine);
+    const ordered = ORDERED.exec(dedentedLine);
     if (unordered || ordered) {
       const isOrdered = Boolean(ordered);
       const pattern = isOrdered ? ORDERED : UNORDERED;
       const items: InlineNode[][] = [];
       // 同型列表才算一项；列表里夹一段普通文字说明它结束了。
+      //
+      // 缩进不打断列表：`  - 二级项` 仍是同一列表的延续，只要剥掉缩进。
+      // 原来这里让缩进项直接失配 break，于是它会掉出列表、被当成普通段落，
+      // 渲染出带 `- ` 前缀的正文。当前 55篇教程没有缩进写法，
+      // 但后台表单允许手写 markdown，编辑很容易带进来。
+      //
+      // 空行仍然终止列表（Markdown 的 loose list 语义），空行后的缩进子项
+      // 会被当成一个新列表而不是子项 —— 内容不丢，只是没有嵌套层级。
+      // 要支持真嵌套得把 items 换成树结构，即实现半个 CommonMark，收益不抵成本。
       while (index < lines.length) {
-        const item = pattern.exec(lines[index]);
+        const current = lines[index];
+        const dedented = current.replace(/^ {1,4}(?=\S)/, "");
+        const item = pattern.exec(dedented);
         if (!item) break;
         items.push(parseInline(item[1]));
         index += 1;
@@ -330,8 +351,8 @@ export function parseMarkdown(source: string): BlockNode[] {
 export function markdownOutline(blocks: readonly BlockNode[]): Outline[] {
   const outline: Outline[] = [];
   for (const block of blocks) {
-    // h4 是实现细节，不进目录。
-    if (block.type !== "heading" || block.level === 4) continue;
+    // h1 是页面标题本身（它在标题栏已经显示），h4 是实现细节，都不进目录。
+    if (block.type !== "heading" || block.level === 1 || block.level === 4) continue;
     outline.push({ id: block.id, text: inlineText(block.children), level: block.level });
   }
   return outline;

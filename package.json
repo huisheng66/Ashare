@@ -22,6 +22,7 @@
     "scale:check": "node --env-file-if-exists=.env.local scripts/scale-check.mjs",
     "test:store": "node --env-file-if-exists=.env.local --test tests/store-sql.test.mjs",
     "content:audit": "node --env-file-if-exists=.env.local scripts/content-audit.mjs",
+    "audit:guides": "node --experimental-strip-types scripts/audit-guides.mjs",
     "smoke:detail": "node --env-file-if-exists=.env.local scripts/smoke-detail.mjs",
     "seed:drift": "node --env-file-if-exists=.env.local scripts/seed-drift.mjs",
     "seed:sync": "node --env-file-if-exists=.env.local scripts/seed-sync.mjs",

@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { anchorSlug, inlineText, markdownOutline, parseInline, parseMarkdown, safeHref, safeImageSrc } from "../lib/markdown.ts";
 import { formatGuideLines, guideImages, guideUrls, isGuideEmpty, isGuideKind, normalizeGuide, parseGuideLines, validateGuide } from "../lib/guide.ts";
+import { guideToc, pickCurrentSection } from "../lib/guide-toc.ts";
 
 const MEDIA = "/media/vscode/0123456789abcdef.png";
 const types = (nodes) => nodes.map((n) => n.type);
@@ -92,6 +93,50 @@ test("outline only lists h2 and h3", () => {
     { id: "二", text: "二", level: 2 },
   ]);
   assert.deepEqual(markdownOutline(parseMarkdown("")), []);
+});
+
+test("h1 parses as a heading but stays out of the outline", () => {
+  // 文档树场景（docs/wiki）里文档自己需要一个 h1；教程正文仍从 ## 起。
+  // 两者能共存，靠的是 outline 不收 h1 —— 页面标题栏已经显示过它了。
+  const blocks = parseMarkdown("# 文档标题\n\n正文\n\n## 第一节");
+  assert.deepEqual(blocks.map((b) => b.type), ["heading", "paragraph", "heading"]);
+  assert.equal(blocks[0].level, 1);
+  assert.equal(blocks[0].id, "文档标题");
+  assert.deepEqual(markdownOutline(blocks), [{ id: "第一节", text: "第一节", level: 2 }]);
+  // 五级及以上不认：h5 往下会让目录层级失去意义。
+  assert.equal(parseMarkdown("##### 太深")[0].type, "paragraph");
+});
+
+test("indented list items stay in the list instead of becoming paragraphs", () => {
+  // 后台表单是手写 markdown，编辑很容易带进缩进。缩进项掉出列表会渲染成
+  // 带 `- ` 前缀的正文，读者看到的是「- 」而不是圆点符号。
+  const blocks = parseMarkdown(["- 甲", "  - 甲一", "  - 甲二", "", "段落尾巴"].join("\n"));
+  assert.deepEqual(blocks.map((b) => b.type), ["list", "paragraph"]);
+  assert.deepEqual(blocks[0].items.map((i) => i[0].value), ["甲", "甲一", "甲二"]);
+  assert.equal(blocks[1].children[0].value, "段落尾巴");
+
+  // 空行终止当前列表（Markdown 的 loose list 语义），但空行后的缩进子项
+  // 仍会被识别成一个新列表 —— 内容不丢，只是没有嵌套层级。
+  assert.deepEqual(
+    parseMarkdown(["- 甲", "", "  - 甲一"].join("\n")).map((b) => b.type),
+    ["list", "list"],
+  );
+  // 缩进超过 4 格不算列表项：当缩进代码块处理，不与列表混淆。
+  assert.deepEqual(
+    parseMarkdown(["- 甲", "", "     - 甲一"].join("\n")).map((b) => b.type),
+    ["list", "paragraph"],
+  );
+  // 缩进的普通文字仍归段落，不能被误当成列表项。
+  assert.deepEqual(
+    parseMarkdown(["- 甲", "", "  普通文字"].join("\n")).map((b) => b.type),
+    ["list", "paragraph"],
+  );
+
+  // 缩进不能把有序列表和无序列表混成一项。
+  assert.deepEqual(
+    parseMarkdown(["1. 甲", "  - 乙"].join("\n")).map((b) => b.type),
+    ["list", "list"],
+  );
 });
 
 test("lists, quotes, rules and fenced code parse as blocks", () => {
@@ -313,4 +358,56 @@ test("种子教程代码块里的反斜杠转义不被 TS 模板字符串吞掉"
       }
     }
   }
+});
+
+test("guideToc returns h2/h3 sections in document order", () => {
+  const guide = {
+    intro: "",
+    markdown: "# 标题\n\n导语。\n\n## 装\n\n### Windows\n\n## 用\n\n### 日常\n\n#### 太细",
+    resources: [],
+  };
+  assert.deepEqual(guideToc(guide), [
+    { id: "装", title: "装", level: 2 },
+    { id: "windows", title: "Windows", level: 3 },
+    { id: "用", title: "用", level: 2 },
+    { id: "日常", title: "日常", level: 3 },
+  ]);
+  // 空教程与无markdown 都不能抛，目录就是空的 —— 组件按长度决定要不要渲染。
+  assert.deepEqual(guideToc(undefined), []);
+  assert.deepEqual(guideToc({ intro: "", markdown: "   ", resources: [] }), []);
+  assert.deepEqual(guideToc({ intro: "", markdown: "只有段落没有标题", resources: [] }), []);
+});
+
+test("guideToc reads real seed guides without throwing", async () => {
+  // 真实数据回归：55 篇教程的正文形态各不相同（有无标题、标题层级、代码块），
+  // 这里只保证「都能算出目录且锚点非空」，不锁定具体内容。
+  const { software } = await import("../data/software.ts");
+  const withGuide = software.filter((s) => s.guide?.markdown?.trim());
+  assert.ok(withGuide.length > 0, "种子数据里应有带教程的条目");
+  for (const item of withGuide) {
+    const sections = guideToc(item.guide);
+    for (const section of sections) {
+      assert.ok(section.id.length > 0, `${item.slug} 有空锚点`);
+      assert.ok(section.level === 2 || section.level === 3);
+    }
+    // 锚点必须唯一，否则目录第二条会跳到第一节。
+    const ids = sections.map((s) => s.id);
+    assert.equal(new Set(ids).size, ids.length, `${item.slug} 锚点重复`);
+  }
+});
+
+test("pickCurrentSection takes the topmost visible heading, not the last", () => {
+  const sections = [
+    { id: "a", title: "A", level: 2 },
+    { id: "b", title: "B", level: 3 },
+    { id: "c", title: "C", level: 2 },
+  ];
+  // 同时相交多条时，取文档顺序最靠上的 —— 那是读者刚翻过去的那一节。
+  // 取最后一条会在长章节里明显滞后（标题已进视口，人还在上一节里）。
+  assert.equal(pickCurrentSection(sections, new Set(["b", "c"])), "b");
+  assert.equal(pickCurrentSection(sections, new Set(["a", "b", "c"])), "a");
+  assert.equal(pickCurrentSection(sections, new Set(["c"])), "c");
+  // 都不相交时保持原样，不该把高亮清空 —— 读者在两节之间的空隙里。
+  assert.equal(pickCurrentSection(sections, new Set()), undefined);
+  assert.equal(pickCurrentSection([], new Set(["a"])), undefined);
 });

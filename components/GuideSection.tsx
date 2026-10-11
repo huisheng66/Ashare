@@ -2,8 +2,10 @@ import Image from "next/image";
 import { FileText, Globe, ImageIcon, Link2, NotebookText } from "lucide-react";
 
 import { SectionHeading } from "@/components/SectionHeading";
+import { GuideToc } from "@/components/GuideToc";
 import type { Guide, GuideResourceKind } from "@/data/types";
-import { markdownOutline, parseInline, parseMarkdown, type BlockNode, type InlineNode } from "@/lib/markdown";
+import { guideToc } from "@/lib/guide-toc";
+import { parseInline, parseMarkdown, type BlockNode, type InlineNode } from "@/lib/markdown";
 
 /**
  * 详细教程区块：目录 + Markdown 正文 + 配套资源。
@@ -106,6 +108,7 @@ function Inline({ nodes }: { nodes: readonly InlineNode[] }) {
 }
 
 const HEADING_CLASS = {
+  1: "mt-8 text-[24px] font-bold tracking-[-0.01em]",
   2: "mt-8 text-[19px] font-bold",
   3: "mt-6 text-[17px] font-semibold",
   4: "mt-5 text-[15px] font-semibold",
@@ -114,7 +117,7 @@ const HEADING_CLASS = {
 function Block({ block }: { block: BlockNode }) {
   switch (block.type) {
     case "heading": {
-      const Tag = `h${block.level}` as "h2" | "h3" | "h4";
+      const Tag = `h${block.level}` as "h1" | "h2" | "h3" | "h4";
       return (
         <Tag id={block.id} className={`scroll-mt-24 leading-snug ${HEADING_CLASS[block.level]}`}>
           <Inline nodes={block.children} />
@@ -209,7 +212,7 @@ function Note({ note }: { note: string }) {
 
 export function GuideSection({ guide }: { guide: Guide }) {
   const blocks = guide.markdown?.trim() ? parseMarkdown(guide.markdown) : [];
-  const outline = markdownOutline(blocks);
+  const sections = guideToc(guide);
   const resources = guide.resources ?? [];
 
   return (
@@ -221,27 +224,21 @@ export function GuideSection({ guide }: { guide: Guide }) {
       />
 
       {/* 目录在宽屏下与导语并排：两者都是短文本，
-          上下堆叠会在左侧留出一条空白带，而这块空白换成目录刚好互补。 */}
-      {guide.intro || (outline.length > 2) ? (
+          上下堆叠会在左侧留出一条空白带，而这块空白换成目录刚好互补。
+          两节以下不占版面做目录，读者滑过去比点目录快。 */}
+      {guide.intro || sections.length > 2 ? (
         <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_260px] xl:gap-x-12">
           {guide.intro ? (
             <p className="text-[15px] leading-[1.85] text-muted-foreground xl:max-w-[42em]">{guide.intro}</p>
           ) : null}
 
-          {/* 两节以下不占版面做目录，读者滑过去比点目录快。 */}
-          {outline.length > 2 ? (
-            <nav aria-label="教程目录" className="rounded-2xl border border-border bg-card p-4 xl:order-2">
-              <p className="text-xs font-medium text-muted-foreground">目录</p>
-              <ol className="mt-2.5 space-y-1.5">
-                {outline.map((entry) => (
-                  <li key={entry.id} className={entry.level === 3 ? "pl-4" : ""}>
-                    <AnchorLink href={`#${entry.id}`}>
-                      <span className="text-[14px] leading-relaxed">{entry.text}</span>
-                    </AnchorLink>
-                  </li>
-                ))}
-              </ol>
-            </nav>
+          {sections.length > 2 ? (
+            <div className="xl:order-2">
+              {/*窄屏时目录贴在正文上方；宽屏时靠 sticky 常驻右侧。 */}
+              <div className="rounded-2xl border border-border bg-card p-4 xl:sticky xl:top-24 xl:border-0 xl:bg-transparent xl:p-0">
+                <GuideToc sections={sections} />
+              </div>
+            </div>
           ) : null}
         </div>
       ) : null}
@@ -258,6 +255,7 @@ export function GuideSection({ guide }: { guide: Guide }) {
         </div>
       ) : null}
 
+      {/* 配套资料与教程正文的阅读节奏不同，放最后 */}
       {resources.length ? (
         <>
           <h3 className="mt-9 text-sm font-semibold">配套资料</h3>
