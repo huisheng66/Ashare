@@ -223,37 +223,54 @@ export function GuideSection({ guide }: { guide: Guide }) {
         description="上手步骤之外的具体做法：常见场景怎么配、命令怎么写、报错怎么处理。"
       />
 
-      {/* 目录在宽屏下与导语并排：两者都是短文本，
-          上下堆叠会在左侧留出一条空白带，而这块空白换成目录刚好互补。
-          两节以下不占版面做目录，读者滑过去比点目录快。 */}
-      {guide.intro || sections.length > 2 ? (
-        <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_260px] xl:gap-x-12">
-          {guide.intro ? (
-            <p className="text-[15px] leading-[1.85] text-muted-foreground xl:max-w-[42em]">{guide.intro}</p>
-          ) : null}
+      {/* 目录常驻左侧一栏，教程正文与导语在右侧一栏。
+          目录不与导语并排，是因为长教程的目录能有二十多行，
+          并排会把导语挤成右侧一小块空白，而正文起点又回到最左边，
+          与目录左缘错开一栏，读起来像两个区域而不是一套。
+          左栏目录 + 右栏正文对齐后，视线有一条稳定的左基线：
+          目录条与正文标题都从同一条竖线开始。
 
-          {sections.length > 2 ? (
-            <div className="xl:order-2">
-              {/*窄屏时目录贴在正文上方；宽屏时靠 sticky 常驻右侧。 */}
-              <div className="rounded-2xl border border-border bg-card p-4 xl:sticky xl:top-24 xl:border-0 xl:bg-transparent xl:p-0">
-                <GuideToc sections={sections} />
+          两节以下不占版面做目录，读者滑过去比点目录快。 */}
+      {sections.length > 2 ? (
+        <div className="mt-5 grid grid-cols-1 gap-6 xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-x-10">
+          <div className="rounded-2xl border border-border bg-card p-4 xl:sticky xl:top-24 xl:self-start xl:border-0 xl:bg-transparent xl:p-0">
+            <GuideToc sections={sections} />
+          </div>
+
+          <div className="min-w-0">
+            {guide.intro ? (
+              <p className="max-w-[42em] text-[15px] leading-[1.85] text-muted-foreground">{guide.intro}</p>
+            ) : null}
+
+            {/* 教程正文保持单栏：里面有代码块、表格与步骤清单，
+                拆成两栏会让代码和它对应的说明文字分到不同栏，比窄栏更难读。
+                行宽52em（约 52 个汉字）略高于正文上限，换来的是代码不折行、
+                表格列不被挤—— 这里选择保结构完整。 */}
+            {blocks.length ? (
+              <div className={guide.intro ? "mt-6" : "mt-5"}>
+                <div className="max-w-[52em]">
+                  {blocks.map((block, index) => (
+                    <Block key={index} block={block} />
+                  ))}
+                </div>
               </div>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <>
+          {guide.intro ? (
+            <p className="mt-5 max-w-[42em] text-[15px] leading-[1.85] text-muted-foreground">{guide.intro}</p>
+          ) : null}
+          {blocks.length ? (
+            <div className="mt-6 max-w-[52em]">
+              {blocks.map((block, index) => (
+                <Block key={index} block={block} />
+              ))}
             </div>
           ) : null}
-        </div>
-      ) : null}
-
-      {/* 教程正文保持单栏：里面有代码块、表格与步骤清单，
-          拆成两栏会让代码和它对应的说明文字分到不同栏，比窄栏更难读。
-          行宽 46em（约 46 个汉字）略高于正文上限，换来的是代码不折行、
-          表格列不被挤——这里选择保结构完整，让出的空间给上面的目录区。 */}
-      {blocks.length ? (
-        <div className="mt-6 max-w-[52em]">
-          {blocks.map((block, index) => (
-            <Block key={index} block={block} />
-          ))}
-        </div>
-      ) : null}
+        </>
+      )}
 
       {/* 配套资料与教程正文的阅读节奏不同，放最后 */}
       {resources.length ? (

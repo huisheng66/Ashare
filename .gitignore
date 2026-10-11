@@ -59,3 +59,7 @@ backups/
 #   graph.db.zst 约 1.1MB 压缩图谱 · artifact.json 记录 commit 与节点数 · .gitattributes 工具自动生成
 # 需要与团队共享图谱时，删掉下面这行并提交。
 .codebase-memory/
+
+# graphify 图谱产物：每个源文件都会生成一份 wiki md，加缓存共 100+ 文件。
+# 纯本地产物，且可以从代码重新生成，不入库。
+graphify-out/

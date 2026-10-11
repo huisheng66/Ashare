@@ -30,7 +30,7 @@
 - `lib/derive.ts` / `lib/bodyColumns.ts`：正文中文行宽分栏。
 - `lib/license-info.ts`：SPDX 许可证 → 中文说明，只对 `opensource` 条目展示。
 - `lib/markdown.ts`：**自研 Markdown 子集解析器**（358 行，package.json 无任何 markdown 依赖）。入口 `parseMarkdown` 仅 4 行，实际解析在 `parseBlocks` 与 `parseInline`。渲染为结构化块而不是 HTML 字符串——安全边界就在这。
-- `lib/guide.ts`：教程资源的行格式解析与校验（`parseGuideLines` → `isGuideKind`），消费方只有后台 `saveItem` 与前端 `GuideSection` 组件（331 行）。
+- `lib/guide.ts`：教程资源的行格式解析与校验（`parseGuideLines` → `isGuideKind`），消费方只有后台 `saveItem` 与前端 `GuideSection` 组件（348 行）。
 - `lib/guide-toc.ts`：从教程正文抽章节树（`guideToc`）与滚动高亮选节规则（`pickCurrentSection`）。两者都是纯函数，所以能直接跑node 测试。
 
 ## 主要业务组件
@@ -38,7 +38,7 @@
 - **导航骨架**：`SiteHeader`（260 行，导航常量来源）/ `SiteFooter` / `Logo`。
 - **目录与搜索**：`CatalogBrowser`（222 行，图谱 26 边的核心交互组件）/ `FilterPanel` / `SearchPanel` / `SceneBrowser` / `SceneGrid` / `SceneIcon`。
 - **条目展示**：`SoftwareCard` / `SoftwareRow` / `SoftwareIcon` / `SourceBadge`（来源徽章，颜色不单独表达来源类型——无障碍要求）/ `TagList` / `PlatformList` / `LicenseNote` / `RichText` / `GuideSection` / `Breadcrumb`。
-- **教程阅读**：`GuideToc`（客户端，wiki 式章节树 + IntersectionObserver 滚动高亮）。不引三方markdown 库与文档站，是有意的取舍：教程挂在软件条目下，章节树解决「这篇有多长、我要读哪节」，多页拆分要动数据库，收益不抵成本。
+- **教程阅读**：`GuideToc`（客户端，wiki 式章节树 + IntersectionObserver 滚动高亮）。不引三方 markdown 库与文档站，是有意的取舍：教程挂在软件条目下，章节树解决「这篇有多长、我要读哪节」，多页拆分要动数据库，收益不抵成本。目录宽屏下占左侧 240px 常驻（`xl:self-start` 不可省，否则 sticky 失效），与正文同栏起。
 - **外链**：`OutboundLink`（156 行）+ `ItemLinks`——点击经由 `/track` 记录后跳转。
 - **表单**：`SubmitForm` / `FeedbackForm` / `DraftKeeper`（后台表单草稿暂存）。
 
