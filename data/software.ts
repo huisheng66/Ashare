@@ -7118,4 +7118,40 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       color: "#3C4043",
     },
   },
+  {
+    slug: "rawtherapee",
+    license: "GPL-3.0",
+    version: "5.13",
+    linksCheckedAt: "2026-10-12",
+    name: "RawTherapee",
+    nameZh: "RawTherapee",
+    aliases: ["rawtherapee", "raw 处理", "raw 显影", "胶片模拟", "手工暗房"],
+    kind: "opensource",
+    source: "opensource",
+    tags: ["raw", "摄影后期", "胶片模拟", "降噪", "开源"],
+    summary: "开源 RAW 显影工具，算法比同类更激进（去马赛克、AI 降噪、多曝光合成），一图一档不做批量管理；适合愿意为单张好照片调参数的人。",
+    scenes: ["photo"],
+    platforms: ["windows", "macos", "linux"],
+    body: "RawTherapee 是一个免费开源的 RAW 显影软件，界面像传统暗房软件：一棵左侧的工具树，点开某个工具右侧出参数，工具按「基础 → 色调 → 细节 → 特效」分层排好。它的定位是把手工暗房的做法搬到屏幕上——同一张 RAW 你可以来回试不同冲印配方。\n它在算法上比同类激进，这是它最实在的差异。去除马赛克（去色度噪点）在同类里普遍偏保守，它下手更重、能把彩噪压得很干净；降噪用的机器学习模型可以在官方模型之外自己训练；亮度降噪和细节保留能分开控制，拍高 ISO 又要留头发丝的场合比 Lightroom 更灵活。它还自带全景拼接、焦点堆栈、多重曝光合成这几个「顺手做掉」的活，不用切别的软件。\n代价是它不做批量管理。没有胶片库那样的浏览与批处理视图，参数主要靠「保存/载入处理配方」（.proc 文件）复用，一次处理几千张的流程会很别扭。性能上也比 darktable 重，5.13 版要求 macOS 26 或更新的 macOS 才给 Universal 包，Windows 和 Linux 的包按架构分开（x86_64 与 arm64），arm64 Windows 还是实验性支持。机器学习降噪模型首次使用要下载，离线环境下用不了那部分功能。\n许可证是 GPL v3，官网 https://rawtherapee.com/ 与 GitHub release 页都能下载，Windows、macOS、Linux 都有对应构建，仓库在 https://github.com/RawTherapee/RawTherapee。当前版本 5.13（2026-07-26），仓库保持活跃。",
+    officialUrl: "https://rawtherapee.com/",
+    officialLabel: "rawtherapee.com",
+    links: {
+      official: "https://rawtherapee.com/",
+      github: "https://github.com/RawTherapee/RawTherapee",
+    },
+    whoFor: "愿意为单张照片慢慢调参数、把降噪与细节分离控制当作刚需的人；或者需要全景拼接、焦点堆栈这类合成操作、不想再开第二个软件的人。",
+    whoNot: "要按文件夹批量套参数处理几千张的；或者要照片管理和人脸识别式浏览的——它只管显影，不管管照片。",
+    installTips: [
+      "从官网或 GitHub release 下载对应系统的包；macOS 的 Universal 包要求 macOS 26 或更新，Windows 按 x86_64 或 arm64 选。",
+      "首次打开先在偏好设置里指定默认的输入目录和输出目录，之后导入会快很多。",
+      "导入 RAW 后从左侧「基础」开始：曝光、白平衡、对比度定大关系，再逐层往下调。",
+      "调出满意的配方后在曲线上右键存成 .proc 文件，下次套用只需载入它。",
+      "机器学习降噪要联网下载官方模型，离线环境请关掉相关工具用传统降噪。"
+    ],
+    alternatives: ["darktable"],
+    icon: {
+      letter: "R",
+      color: "#3A6B7C"
+    }
+  },
 ];
