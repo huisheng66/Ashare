@@ -144,3 +144,13 @@
 82. **同步种子时手抄字段比脚本转换危险得多。** 第三条改用「草稿 JSON → 程序化生成 TS 字面量 → 插入数组末尾」的流程，字段映射一次写死（`tutorial`→`installTips`、`links.official`→`officialUrl`、丢弃 `status`/`previews`），比逐字段手抄少一整类错误。**注意种子文件是 CRLF 换行**，按 `\n];\n` 找数组结尾会找不到，得先 `replace(/\n/g,'\r\n')`。
 
 83. **release 的文件名里可能直接写着「别用这个」。** LosslessCut 的 macOS universal 包叫 `..._DONT-USE-THIS-FILE.pkg`，Windows ARM64 的 `.appx` 同样。这类信息只出现在 release 资产名里，不看资产列表就会照着链接装上一个坏包。**收窄平台的条目必须逐个看资产名。**
+
+84. **上游仓库不在白名单域名时，填官方镜像并说明。** Kdenlive 的上游在 KDE 自建的 GitLab（`invent.kde.org`），不在 `github.com`/`gitlab.com`/`gitee.com`/`codeberg.org` 白名单里。正确做法是 `links.github` 填官方镜像（`github.com/KDE/kdenlive`），**同时在正文写明「上游在 invent.kde.org，GitHub 是镜像」**——不写清楚读者会去镜像仓库提 issue。硬红线的意图是「链接要可核验」，不是「不许提上游」。
+
+85. **版本号要取自真正提供二进制的那个地方。** Kdenlive 的 GitHub 仓库没有 release 资产（走 KDE 自己的发布流程），版本号得从 `download.kde.org/stable/kdenlive/` 的目录名读。反过来 LosslessCut 的坑在资产名里（`DONT-USE-THIS-FILE`）。**平台的资产和版本号，都以「读者实际下载的那个源」为准。**
+
+86. **自托管方案的平台只填服务端平台。** Immich 是 Docker 服务端方案，手机 App 配服务器用——把windows/macos 也填进 `platforms` 会让读者以为装个桌面版就能用。`platforms` 的语义是「这个软件能直接跑在什么系统上」，服务端方案只有 linux（或其他服务端系统）。
+
+87. **`--strict` 会拦 Markdown 加粗，别去改校验器。** immich 草稿正文里写了 `**没有云端试用**`，被 `body 含 Markdown 加粗` 拦下。这条拦得对——页面不解析 Markdown，写了就是原样显示。历史 29 条条目有同样问题是存量债，新条目不要继承。
+
+88. **生成 TS 字面量不要「先 stringify 再正则改格式」。** 这个做法失败了两次：正则 `\[([^\]]*)\]` 会被 `installTips` 里含 `]` 的文本打断；嵌套的 `links`/`icon` 因为走 `JSON.stringify` 的键序，重排后 `rest.links.official` 已经不存在，写出 `official: undefined`（而 `seed:drift` 只报「icon 与 links 为空」，不报「字段值是 undefined」，得自己看）。**逐字段显式序列化，每行一个 `name: value`，嵌套对象单独处理。**

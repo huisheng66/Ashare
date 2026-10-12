@@ -1,5 +1,38 @@
 # 变更记录
 
+## 2026-10-12 · 第二批 3 条：Kdenlive / Immich / rawtherapee（main）
+
+继续补「摄影与录像」场景，从 3 条到 5 条。选题过程中排除了两个候选：
+
+- **Olive**（9.1k star）**最后提交 2024-12**，已停更两年，不收。
+- **OpenShot 与 HandBrake** 的 GitHub `license` 字段是 `NOASSERTION`，
+  按坑位48 的判据需要人工确认主程序许可，成本高于收益，本批跳过。
+
+**Kdenlive**（5.8k star，GPL-3.0，26.08.1）：KDE 的多轨剪辑器。**上游仓库
+在 KDE 自建的 GitLab（invent.kde.org），不在 GitHub 白名单内**，
+`links.github` 因此填官方镜像 `github.com/KDE/kdenlive`，并在正文写明
+「上游在 invent.kde.org、GitHub 是镜像」——不写清楚读者会去错误的仓库提 issue。
+三平台资产逐个核对过（Windows 有安装版与 portable 版、macOS 按架构给 dmg、
+Linux 给 AppImage），版本号取自 KDE 下载站实际存在的包而非 GitHub releases
+（该仓库走 KDE 自己的发布流程，GitHub 上没有 release 资产）。
+
+**Immich**（116k star，AGPL-3.0，v3.3.1）：自托管相册，替代 Google Photos。
+**平台只填 linux**——它是服务端方案，客户端 App 不构成「平台支持」。
+正文写清了AGPL 的对外服务义务，这是与普通开源不同的一条法务边界。
+
+**rawtherapee** 同批收录（见上）。
+
+**新脚本 `sync-seed.mjs`**：草稿 JSON → 种子的字段映射一次写死
+（`tutorial`↔`installTips`、`links.official`↔`officialUrl`、丢弃
+`status`/`previews`/`platforms` 之外的种子不接受字段），替代手抄。
+第一版用「整体 JSON.stringify 后正则改格式」的做法失败了两次：
+正则被 `installTips` 里含 `]` 的内容打断，嵌套的 `links`/`icon` 直接被写成
+`official: undefined`。改为逐字段显式序列化后稳定。
+
+**验证**：check 270 项 0 失败 · `seed:drift` 0 条不一致 · 三条 `smoke:detail`
+正常 · 实机均 200。`--strict` 拦下了 immich 正文里的 Markdown 加粗，
+说明严格校验在正常发挥作用（29 条历史条目仍有同类问题，属存量内容债）。
+
 ## 2026-10-12 · 新增 darktable，开「摄影与录像」场景（main）
 
 空场景开栏的第一条。目录此前 55 条里没有摄影方向的条目，
