@@ -1750,6 +1750,10 @@ Krita 的图层栈比同类软件更复杂，因为它同时支持**绘画图层
     tags: ["统计","假设检验","可视化","教学","开源"],
     source: "opensource",
     officialUrl: "https://jasp-stats.org/download/",
+    links: {
+      official: "https://jasp-stats.org/download/",
+      github: "https://github.com/jasp-stats/jasp-desktop",
+    },
     officialLabel: "jasp-stats.org",
     whoFor: "要做 t 检验、方差、回归等常见分析，不想先写代码。",
     whoNot: "已经在用 Python / R 做流水线，或要做生产级 BI 看板。",
@@ -1949,6 +1953,10 @@ ggsave("output/boxplot.png", p, width = 6, height = 4, dpi = 300)
     tags: ["数值计算","矩阵运算","MATLAB 替代","绘图","免费"],
     source: "opensource",
     officialUrl: "https://octave.org/download",
+    links: {
+      official: "https://octave.org/download",
+      github: "https://github.com/gnu-octave/octave",
+    },
     officialLabel: "octave.org",
     whoFor: "要跑矩阵、绘图、数值作业，没有 MATLAB 许可。",
     whoNot: "必须使用某个 MATLAB 独家工具箱，或只要电子表格。",
@@ -2078,6 +2086,10 @@ end
     tags: ["notebook","数据探索","教学演示","Python","可复现"],
     source: "opensource",
     officialUrl: "https://jupyter.org/install",
+    links: {
+      official: "https://jupyter.org/install",
+      github: "https://github.com/jupyter/notebook",
+    },
     officialLabel: "jupyter.org",
     whoFor: "分析要边写边看图，或要交可运行的笔记作业。",
     whoNot: "只写长期项目代码，普通编辑器可能更合适。",

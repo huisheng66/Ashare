@@ -178,3 +178,13 @@
 99. **`alternatives` 留空可以在场景凑齐后回头补。** 新收的一批当时目录里没有同类可挂，留空是对的（见坑位 81）；等同一场景攒到 5～8 条、链完整了，再回头互相挂。**互指的对象是「任务链上的不同环节」，不是「功能相似的竞品」** —— 录屏与剪辑互指有用，剪辑与无损截取互指也有用，因为读者是在对比后想跳过去验证。挂完 `alternatives` 要实机确认链接真渲染出来（`curl` 页面 grep `href="/software/`），不只看 `seed:drift`。
 
 100. **找种子条目块的边界，用「下一个 slug 行」而不是「下一个 `},`」。** 后者会把 `icon` / `links` 这类嵌套对象的结尾当成块尾。这已经是第三次在这类文本处理上栽跟头（三次分别是 `sync-seed.mjs` 的块尾、手写补字段脚本、批量脚本），**同一类问题第二次出现就该写成可复用脚本并在注释里写清原因** —— `patch-fields.mjs` 的文件头注释就是为此留的。
+
+101. **「看起来该有的仓库名」经常不存在。** `jasp-stats/jasp` 与 `octave/octave` 都返回 404，实际分别是 `jasp-stats/jasp-desktop`（桌面客户端）与 `gnu-octave/octave`（GNU 组织下）。**404 的正确反应是查组织仓库列表**（`gh api orgs/<org>/repos`），而不是猜另一个名字。注意一个项目常有多个仓库：JASP 同组织下还有 `jasp-js`（网页版前端库），挂错读者就拿不到安装包。
+
+102. **`--patch` 之前先读回目标条目。** 草稿是按「这几条都缺这个字段」的假设写的，实际运行库里可能已经有了一部分（本次 n8n 的 GitHub 链接本就存在）。直接写会覆盖掉已有内容（`--patch` 是整体替换而非追加），而且白跑一轮。**顺序：读回运行库 → 比对草稿 → 只写真正缺的。**
+
+103. **写库前确认数据库真的在跑，`ingest` 的回落不会报错。** mysqld 挂掉时 `ingest-item.mjs` 只打一行「未配置 MYSQL_URL，回落到 data/store/catalog.json」并**继续把结果写进 JSON 快照**，退出码仍是 0。上面那批提示（body 为空等）就是回落的表现——运行库里明明有正文。**每次写库前先 `netstat -ano | grep 3307` 确认端口在听**，或直接看输出里有没有「回落」二字。
+
+104. **`mysqldump` 不认 `mysql://` URL，且应用账号没有 PROCESS/SHOW VIEW 权限。** Node 驱动用的 `mysql://user:pass@host:3307/db` 格式 mysqldump 会当成 `localhost:3306` 而报 10061连不上；`scripts/backup.mjs` 用应用账号跑会撞 `Access denied ... PROCESS privilege` 与 `SHOW VIEW command denied`。**能用的是 `MYSQL_MIGRATE_URL` 里的账号，且必须显式给 `-h -P -u` 与 `--no-tablespaces`**，密码走 `MYSQL_PWD` 环境变量。
+
+105. **起mysqld 前先看它是不是已经在跑。** 数据目录里 `ibdata1` 明明可写却报 `must be writable`，通常是有另一个 mysqld 占着同一个 datadir（不是权限问题）。`netstat -ano | grep 3307` 有 LISTENING 就是已在运行，**不要再起第二个**，否则新进程抢不到数据文件。

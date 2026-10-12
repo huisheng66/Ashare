@@ -1,6 +1,30 @@
 # 变更记录
 
-## 变更记录
+## 2026-10-12 · 补 jasp / jupyter / octave 的 GitHub 仓库链接（main）
+
+这3 条是开源条目却没挂GitHub 链接，读者在详情页看不到源码入口，
+也无法判断项目是否还在维护。仓库都用 `gh api` 逐个核验过元数据，
+写入前统一设`linksCheckedAt: "2026-10-12"`。
+
+| 条目 | 仓库 | 星数 | 许可证 | 最近推送 |
+| --- | --- | --- | --- | --- |
+| JASP | `jasp-stats/jasp-desktop` | 1,005 | AGPL-3.0 | 2026-10-11 |
+| Jupyter Notebook | `jupyter/notebook` | 13,431 | BSD-3-Clause | 2026-10-05 |
+| GNU Octave | `gnu-octave/octave` | 663 | GPL-3.0 | 2026-10-02 |
+
+**JASP 的仓库名不是 `jasp`**：`jasp-stats/jasp` 返回 404，实际仓库是
+`jasp-stats/jasp-desktop`。这是官方桌面客户端的仓库；同组织下还有一个
+`jasp-stats/jasp-js`，那是给网页版用的前端库，挂错会让读者拿不到安装包。
+Octave 的组织名也不是 `octave/octave`，而是 GNU 下的 `gnu-octave/octave`。
+
+**n8n 的 GitHub 链接运行库里本来就有**，核验后无需改动 —— 草稿里那条
+是按「其他三条都缺」顺手写的，读回运行库才发现已存在。
+教训：`--patch` 之前先读回目标条目，确认哪些字段是真的缺，
+否则会写出一份与运行库内容重复的草稿，白跑一轮。
+
+**新增脚本 `add-links.mjs`**：`patch-fields.mjs` 只能替换**已存在**的字段行，
+而 `links` 是可选字段，多数条目压根没写，需要在 `officialUrl` 之后插入。
+两个脚本分工明确：改已有字段用 patch-fields，加可选结构用 add-links。
 
 ## 变更记录
 
