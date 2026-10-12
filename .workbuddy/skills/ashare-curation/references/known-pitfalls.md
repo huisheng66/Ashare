@@ -188,3 +188,15 @@
 104. **`mysqldump` 不认 `mysql://` URL，且应用账号没有 PROCESS/SHOW VIEW 权限。** Node 驱动用的 `mysql://user:pass@host:3307/db` 格式 mysqldump 会当成 `localhost:3306` 而报 10061连不上；`scripts/backup.mjs` 用应用账号跑会撞 `Access denied ... PROCESS privilege` 与 `SHOW VIEW command denied`。**能用的是 `MYSQL_MIGRATE_URL` 里的账号，且必须显式给 `-h -P -u` 与 `--no-tablespaces`**，密码走 `MYSQL_PWD` 环境变量。
 
 105. **起mysqld 前先看它是不是已经在跑。** 数据目录里 `ibdata1` 明明可写却报 `must be writable`，通常是有另一个 mysqld 占着同一个 datadir（不是权限问题）。`netstat -ano | grep 3307` 有 LISTENING 就是已在运行，**不要再起第二个**，否则新进程抢不到数据文件。
+
+106. **许可证会变，凭印象填的旧值比不填更危险。** TeXstudio 在库里记的是 `GPL-2.0-or-later`，实际仓库 `COPYING` 早已是 GPL-3.0 全文（2018 年的提交标题就是 "readme, changelog, license"），GitHub 检测也一致。**更麻烦的是项目自己没同步干净**：部分源文件头还写着 "version 2 or later" 旧模板。结论：以许可证文件为准，并在正文写明两处不一致，别让读者以为是自己看错了。补老条目的正文时，顺手把 license 也用 `gh api repos/<r> --jq .license.spdx_id` 复核一遍。
+
+107. **`Software.tutorial` 与 `SeedSoftware.installTips` 是同一个字段的两个名字。** 草稿写 `installTips` 会被 `ingest-item.mjs` 静默丢弃——不在 `Software` 类型里，连提示都没有，运行库里旧的 tutorial 原封不动。**写运行库用 tutorial，写种子用 installTips**，同步脚本里要放映射表（`sync-body.mjs` 的 `FIELD_MAP`）。
+
+108. **改种子条目时，「已有字段」可能长在 slug 行之前。** vscode 与 git 都把 `license` 放在条目最前面、`slug` 之前。按「slug 行之后」查找已有字段会漏掉它，插出一个重复属性，`tsc` 报 TS1117。**查找范围必须是整个条目块**：从 slug 行向上找到 2 空格缩进的 `{` 作为块首。
+
+109. **条目开头的 `  {` 必须带缩进判断，不能只判 trim()。** `guide.resources` 数组里的对象是 8 空格 `{`，trim 后同样是 `{`，会把块尾提前到 resources 内部——body/tags 就这么插进了 resources 里，**语法合法、TS 不报错，只有 seed:drift 看得出来**。同理数组收尾 `];` 也要判 0 缩进。
+
+110. **模板字符串的收尾是「行尾的 `\`,`」，不是单独一行。** 判断 markdown 是否结束，用 `line.trim().endsWith("\`,")`；用 `=== "\`,"` 会把 texstudio 那种「...变慢。`,」形态漏掉，inTpl 一直不退出，块尾跑到几千行之外。
+
+111. **多行数组字段替换必须配平到 `],`。** 只替换字段首行、把原来的后续行留下，会得到两段重复的 `installTips`，直接语法错误。判断依据：字段行 trim 后以 `[` 结尾才是多行数组。

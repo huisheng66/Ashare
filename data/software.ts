@@ -5,7 +5,7 @@ export const software: SeedSoftware[] = [
   {
     license: "MIT",
     slug: "vscode",
-    linksCheckedAt: "2026-10-03",
+    linksCheckedAt: "2026-10-12",
     name: "Visual Studio Code",
     nameZh: "VS Code",
     aliases: ["vscode", "vs code", "代码编辑器"],
@@ -14,14 +14,14 @@ export const software: SeedSoftware[] = [
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     officialUrl: "https://code.visualstudio.com/",
+    links: {
+      official: "https://code.visualstudio.com/",
+      github: "https://github.com/microsoft/vscode",
+    },
     officialLabel: "code.visualstudio.com",
     whoFor: "需要一个编辑器覆盖多种语言，并且愿意装扩展。",
     whoNot: "只改几行配置，或不想维护扩展；已经在用完整 IDE 工作流也可以不换。",
-    installTips: [
-      "只从 code.visualstudio.com 下载，不要用第三方「增强包」。",
-      "第一次打开先装语言包和你正在用的语言扩展，不必一次装齐。",
-      "Git 要单独安装，编辑器不会自带完整 Git。",
-    ],
+    installTips: ["从 code.visualstudio.com 下载，不要用第三方「增强包」或绿色修改版。", "第一次打开先装语言包和你正在用的语言扩展，不必一次装齐。", "Git 要单独安装，编辑器不会自带完整 Git。", "如果介意内置遥测与商标条款，可以用 VSCodium，它是去掉这些内容的同源构建。"],
     guide: {
       intro: "以「配置优先级」为主线，说明 VS Code 的用户设置、工作区设置与语言特定设置如何互相覆盖，并给出排查设置不生效的方法。",
       markdown: `## 设置放在哪里
@@ -109,6 +109,8 @@ VS Code 的配置是一个 JSON 文件。命令行面板（\`Ctrl\`+\`Shift\`+\`
     alternatives: ["git"],
     featured: true,
     icon: { letter: "V", color: "#007ACC", simpleIcon: "visualstudiocode" },
+    tags: ["代码编辑器", "扩展", "调试", "开源"],
+    body: "Visual Studio Code 是一个跨平台的代码编辑器，Windows、macOS、Linux 都有，内核是 Electron。它的定位很明确：不追求开箱即用的完整 IDE，而是把「装扩展」当成主要的扩展手段。写脚本、改配置、前端页面，多数语言的工作流都能靠官方或社区扩展补齐到够用，启动比重型 IDE 快，这是它被广泛采用的原因。\n调试与终端的整合是它区别于纯文本编辑器的地方。装对应语言扩展后可以直接在编辑器里设断点、单步、看变量，不必切回命令行；内置终端省掉一个窗口；Git 面板把 diff、暂存、提交做成了可视化操作，但底层仍是 Git 命令，概念没变。设置分成用户、工作区、语言三层 JSON，后者优先级高，这个覆盖顺序是配置不生效时第一个要查的地方。\n有两个常见误解要拆开。第一，MIT 许可证只覆盖源码，微软官方的发行版在源码之外还带商标条款、一份专有的遥测实现和连接到自家扩展市场的默认配置；介意这些的话可以用 VSCodium，它是去掉商标与遥测的同源构建，扩展市场换成 Open VSX。第二，它基于 Electron，同样功能下内存占用高于原生编辑器，开很大的文件或大量项目时会感觉到，这与它快启动的优点是同一枚硬币的两面。\n许可证为 MIT，源码在 GitHub 的 microsoft/vscode，星数近二十万，是目前最活跃的编辑器项目之一。安装包只从 code.visualstudio.com 下载，第三方「绿色修改版」既不是官方构建，也可能夹带别的东西。",
   },
   {
     license: "GPL-2.0-only",
@@ -672,7 +674,7 @@ SELECT * FROM users WHERE created_at >= '2026-10-01';
   {
     slug: "zotero",
     license: "AGPL-3.0",
-    linksCheckedAt: "2026-10-03",
+    linksCheckedAt: "2026-10-12",
     name: "Zotero",
     aliases: ["文献管理", "论文引用"],
     summary: "抓文献、生引用、插到 Word 或 Markdown 里。",
@@ -680,14 +682,14 @@ SELECT * FROM users WHERE created_at >= '2026-10-01';
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     officialUrl: "https://www.zotero.org/download/",
+    links: {
+      official: "https://www.zotero.org/download/",
+      github: "https://github.com/zotero/zotero",
+    },
     officialLabel: "zotero.org",
     whoFor: "写长文或论文，需要管参考文献和引用格式。",
     whoNot: "只写短通知、不引用文献。",
-    installTips: [
-      "装桌面端后再装浏览器插件，才能一键抓条目。",
-      "写 Word 时再装官方 Word 插件。",
-      "附件和库尽量放在你能备份的目录。",
-    ],
+    installTips: ["桌面端之外还要装浏览器连接器（Zotero Connector），否则抓取网页文献这一步没法用。", "官方同步只有 300MB 免费空间，放 PDF 很快会满；大库建议用 WebDAV 或只用本地存储。", "引用样式如果内置列表里没有，去 Zotero Style Repository 搜期刊名，装 .csl 文件即可。", "卸载前先确认库文件位置（「编辑 → 首选项 → 高级 → 文件和文件夹」），数据默认在个人目录下，重装不会自动找回。"],
     guide: {
       intro: "从「加什么、怎么存、怎么不重复」三件事出发，讲清 Zotero 条目与附件的存放差异、重复检测的真实判据，以及 Word 引文插件的工作方式。",
       markdown: `## 条目与附件是两回事
@@ -786,6 +788,8 @@ Zotero 靠**标题、DOI、ISBN** 判断重复。这三个字段相同或都缺�
     alternatives: ["obsidian", "pandoc"],
     featured: true,
     icon: { letter: "Z", color: "#CC2936" },
+    tags: ["文献管理", "论文引用", "参考文献", "开源"],
+    body: "Zotero 是文献管理工具，用来收集、组织、标注和引用研究资料。它最省事的一环是浏览器连接器：在期刊页面、书店页面或知网页面上点一下，标题、作者、期刊、年份、DOI 这些元数据就被抓进库里，PDF 也一并存下。手工录入书目是文献管理里最枯燥的部分，这一步自动化之后，攒库的成本才真正降下来。\n引用是它的第二个核心。库里选中条目，在 Word 或 LibreOffice 的插件里插入引文，文末参考文献表自动生成；换期刊投稿时改一下样式文件，全书的引用格式和条目顺序一起重排，不用逐条手改。引用格式走 CSL 标准，内置样式覆盖主流期刊，缺的可以去样式库搜期刊名装 .csl 文件。笔记与 PDF 标注挂在条目下，写综述时能直接定位到当初划的那一句。\n要区分清楚哪部分是免费的。桌面客户端是开源软件，许可证 AGPL-3.0，源码在 GitHub 的 zotero/zotero；但官方同步服务只有 300MB 免费额度，PDF 存多了必然超，超出要订阅。替代方案是配 WebDAV，或者只用本地库与群组库。另外 Zotero 这个名字是注册商标，衍生分发不能沿用。数据默认存在个人目录下，卸载不会删库，但重装后要在首选项里指回原来的数据目录。\n同类里它的取舍是「够用的自动化 + 开放的数据」。比 Obsidian 强在元数据抓取与引用生成，那是文献工作流的刚需；比 EndNote 强在不要钱且数据不被锁在专有格式里。代价是它的组织逻辑偏书目而非笔记，如果你真正想要的是一个互联的知识网络而不是一份引用清单，它给不了。",
   },
   {
     slug: "obsidian",
@@ -888,8 +892,8 @@ status: draft
   },
   {
     slug: "texstudio",
-    license: "GPL-2.0-or-later",
-    linksCheckedAt: "2026-10-03",
+    license: "GPL-3.0",
+    linksCheckedAt: "2026-10-12",
     name: "TeXstudio",
     aliases: ["latex", "tex", "论文排版"],
     summary: "写 LaTeX 的编辑器，公式和论文模板常用它。",
@@ -900,19 +904,15 @@ status: draft
     officialLabel: "texstudio.org",
     links: {
       official: "https://www.texstudio.org/",
+      github: "https://github.com/texstudio-org/texstudio",
       disk: "https://pan.quark.cn/s/6ee5d2df3b7b",
-      diskNote:
-        "夸克网盘上的固定版本副本，4.9.8 Windows 安装包（官方签名版）。文件取自 texstudio-org/texstudio 官方 Release 附件。校验值可信：虽然本地算的是 SHA-256（上游只提供 SHA1），但与上游 hashes.txt 中同名文件的记录逐字一致。网盘里是固定版本的快照，上游发新版不会自动更新。",
-      diskFile: "texstudio-4.9.8-win-qt6-signed.exe",
+      diskNote: "夸克网盘上的固定版本副本，4.9.8 Windows 安装包（官方签名版）。文件取自 texstudio-org/texstudio 官方 Release 附件。校验值可信：虽然本地算的是 SHA-256（上游只提供 SHA1），但与上游 hashes.txt 中同名文件的记录逐字一致。网盘里是固定版本的快照，上游发新版不会自动更新。",
       diskSha256: "243d64e65bbefff706c92b58fb1a56b6e024fbb1fb11dffc623e59c18b0ab397",
+      diskFile: "texstudio-4.9.8-win-qt6-signed.exe",
     },
     whoFor: "要排公式、用会议或期刊 LaTeX 模板。",
     whoNot: "只写短文档、不需要精确排版，用普通文档软件即可。",
-    installTips: [
-      "编辑器之外还要装 TeX 发行版，例如 Windows 的 MiKTeX 或 TeX Live。",
-      "先能编译一篇最小文档，再导入模板。",
-      "中文稿件确认发行版带了 CJK 字体支持。",
-    ],
+    installTips: ["编辑器只负责写与编译，排版引擎要另外装：TeX Live（全平台）或 MiKTeX（Windows 为主）。", "中文文档用 XeLaTeX 编译，配合 ctex 宏包；用 pdfLaTeX 会遇到字体与编码问题。", "在「选项 → 构建 → 默认编译器」里把 XeLaTeX 设为默认，之后按 F5 即可，不必每次手动切。", "安装后第一次编译如果找不到 pdflatex，检查排版引擎的 bin 目录是否在 PATH 里。"],
     guide: {
       intro: "从编译器配置讲到补全、快捷键与项目结构，讲清TeXstudio 这套跨平台 LaTeX IDE 到底该怎么配。",
       markdown: `## 它是什么：从 TeXworks 分叉出来的编辑器
@@ -989,6 +989,8 @@ TeXstudio 最早是 TeXworks 的一个分支，如今是独立维护的跨平台
     },
     alternatives: ["pandoc", "libreoffice"],
     icon: { letter: "T", color: "#008080" },
+    tags: ["LaTeX", "论文排版", "公式编辑", "开源"],
+    body: "TeXstudio 是一个专门写 LaTeX 的编辑器，跨平台，基于 Qt。它解决的是「写源码 + 编译 + 看 PDF」这个循环里的摩擦：左边写 .tex，右边直接显示编译出来的 PDF，在 PDF 上双击某个词，光标跳到对应源码行；反过来编译报错时点错误信息也能跳回去。这一个双向跳转省掉的是在编辑器、命令行、PDF 阅读器三个窗口之间来回切的时间。\n它把编译流程收成了一个按钮。默认配置下按 F5 就能依次完成编译和刷新，顶部菜单可以切 pdfLaTeX、XeLaTeX、LuaLaTeX，换引擎不用改命令行。语法高亮认得常见宏包的命令和环境，命令补全在你打反斜杠时弹出候选，配合几百个可点选的数学符号面板，排公式主要靠点而不是靠记。左侧还有结构视图，按章节和标签列出全文大纲，长文档里跳节比滚动快得多。\n要提前知道它不做什么。TeXstudio 不是所见即所得编辑器，你始终在看源码，排版效果要等编译；它也不自带排版引擎，LaTeX 本身（TeX Live 或 MiKTeX）要另外安装，它只负责调用。中文文档这条链更容易绊住人：用 pdfLaTeX 配 CJK 会踩字体和编码的坑，实际可行路线是 XeLaTeX 加 ctex 宏包，并且要在「选项 → 构建」里把默认编译器改成 XeLaTeX，否则每次都得手动切。\n许可证是 GPL-3.0，Windows、macOS、Linux 都有安装包，源码在 GitHub 的 texstudio-org/texstudio。有一处对不上要说明：仓库里的 COPYING 文件是 GPL-3.0 全文（2018 年 7 月那次变更的提交标题就是 license），但部分源文件的头注释仍写着「version 2 of the License, or at your option any later version」这个旧模板。以许可证文件为准，实际交付的授权是 GPL-3.0。",
   },
   {
     license: "GPL-3.0",

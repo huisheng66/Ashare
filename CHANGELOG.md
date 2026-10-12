@@ -1,5 +1,26 @@
 # 变更记录
 
+## 2026-10-12 · texstudio / zotero / vscode 补正文、标签与安装提示（main）
+
+三条都只有 whoFor / whoNot 一句话，详情页没有「详细介绍」，搜索正文命中为零。
+按 audit 的建议先做「文档」场景这三条。仓库元数据用 `gh api` 核验。
+
+**TeXstudio 的许可证从 GPL-2.0-or-later 修正为 GPL-3.0。** 原值是凭早期印象填的。
+实际证据：仓库 `COPYING` 是 GPL-3.0 全文（2018-07-15 那次变更的提交标题就是
+"readme, changelog, license"），GitHub 的 license 检测同样是 GPL-3.0。
+**但部分源文件的头注释仍写着「version 2 of the License, or at your option
+any later version」这个旧模板** —— 项目升级了 COPYING 却没同步源头注释。
+以许可证文件为准记 GPL-3.0，并把两处不一致写进正文，读者自己排发行版时看得懂。
+
+**Zotero 与 VS Code 补上了 GitHub 链接**（此前只有官网）。Zotero 的许可证
+AGPL-3.0 已由 `COPYING` 首段确认无误（"distributes the Zotero source code
+under the GNU Affero General Public License, version 3"），顺带在正文点明
+两件常被问的事：官方同步只有 300MB 免费、Zotero 是注册商标。
+VS Code 则拆了两个常见误解：MIT 只覆盖源码，官方发行版另带商标与遥测条款
+（介意可用 VSCodium）；以及 Electron 带来的内存代价。
+
+`content:audit` 的「详细介绍」缺口从 7 降到 4。
+
 ## 2026-10-12 · 补 jasp / jupyter / octave 的 GitHub 仓库链接（main）
 
 这3 条是开源条目却没挂GitHub 链接，读者在详情页看不到源码入口，
