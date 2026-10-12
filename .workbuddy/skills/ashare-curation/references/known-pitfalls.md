@@ -154,3 +154,9 @@
 87. **`--strict` 会拦 Markdown 加粗，别去改校验器。** immich 草稿正文里写了 `**没有云端试用**`，被 `body 含 Markdown 加粗` 拦下。这条拦得对——页面不解析 Markdown，写了就是原样显示。历史 29 条条目有同样问题是存量债，新条目不要继承。
 
 88. **生成 TS 字面量不要「先 stringify 再正则改格式」。** 这个做法失败了两次：正则 `\[([^\]]*)\]` 会被 `installTips` 里含 `]` 的文本打断；嵌套的 `links`/`icon` 因为走 `JSON.stringify` 的键序，重排后 `rest.links.official` 已经不存在，写出 `official: undefined`（而 `seed:drift` 只报「icon 与 links 为空」，不报「字段值是 undefined」，得自己看）。**逐字段显式序列化，每行一个 `name: value`，嵌套对象单独处理。**
+
+89. **`api.github.com` 未认证只有 60 次/小时，一个批次就会用完。** 核验一条要打3～5 个请求（repo / license / releases / contents），选题时还会顺带查候选，一批 3 条 + 5 个候选轻松超过 60。表现为某次 `curl` 返回空对象或 `undefined`，`JSON.parse` 后 `j.full_name` 是 undefined——**看起来像「仓库不存在」，实际是限流**。先看 `api.github.com/rate_limit` 的 `remaining`。限流期间不要降级核验标准（那等于写入未核验条目），等重置或改用网页端HTML。
+
+90. **LICENSE 原文里常有「为什么少了某个功能」的答案。** HandBrake 选不到 fdk-aac 编码器，看起来像功能缺失或安装问题，实际是 LICENSE 明写它与 GPLv2 不兼容、官方构建不能包含。**GitHub 的 `license` 字段给 `NOASSERTION` 时不要直接跳过，去读仓库根目录的 LICENSE / COPYING 原文**——这类许可摩擦往往正是读者最需要知道的信息。
+
+91. **Markdown 加粗这道闸容易反复踩。** 写正文时顺手打`**关键点**` 很自然，`--strict` 会拦（immich 与 handbrake 各拦一次）。别去放宽校验器——页面确实不解析 Markdown，写了就是原样显示。**写正文时直接不用任何 Markdown 标记。**

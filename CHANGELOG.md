@@ -1,12 +1,37 @@
 # 变更记录
 
+## 2026-10-12 · 第三批：OBS Studio / HandBrake（main）
+
+摄影与录像场景 5 → 7 条，补齐「录屏」与「转码」两个环节。
+至此该场景的任务链完整了：录（OBS）→ 剪（Kdenlive）→ 无损截取（LosslessCut）
+→ 转码分发（HandBrake），显影（darktable / RawTherapee）与相册（Immich）另成两条线。
+
+**OBS Studio**（77.3k star，GPL-2.0，32.2.2）：正文写了两条别处少见的
+不可替代能力 —— 分场景录制（长视频按场景自动切文件，省掉后期剪）
+与多平台同时推流。以及新手必踩的坑：默认抓显示器而非窗口，
+录浏览器被遮挡就录进遮挡物。
+
+**HandBrake**（24.6k star，1.11.2）：GitHub 的 `license` 字段是 `NOASSERTION`，
+按坑位48 的判据人工读了 LICENSE 原文才收录 —— 主体 GPLv2，但**AAC 库
+fdk-aac 的许可与 GPLv2 不兼容，官方构建默认不含它**，
+这解释了为什么在 HandBrake 里选不到 fdk-aac 编码器。这条写进了正文，
+否则读者会以为是功能缺失或自己装坏了。
+
+**第三批的第三条（ExifTool）暂缓**：连续核验把未认证的
+`api.github.com` 60 次/小时限额用尽，要等限流恢复。
+未核验的条目不写进库 —— 这是 skill 的来源核验红线。
+
+**验证**：check 270 项 0 失败 · `seed:drift` 0 条不一致 · 两条 `smoke:detail`
+正常 · 实机均 200。
+
 ## 2026-10-12 · 第二批 3 条：Kdenlive / Immich / rawtherapee（main）
 
 继续补「摄影与录像」场景，从 3 条到 5 条。选题过程中排除了两个候选：
 
 - **Olive**（9.1k star）**最后提交 2024-12**，已停更两年，不收。
-- **OpenShot 与 HandBrake** 的 GitHub `license` 字段是 `NOASSERTION`，
-  按坑位48 的判据需要人工确认主程序许可，成本高于收益，本批跳过。
+- **OpenShot** 的 GitHub `license` 字段是 `NOASSERTION`，按坑位 48 的判据
+  需要人工确认主程序许可，本批跳过。**HandBrake 当时也跳过了，
+  第三批补上**——人工读完 LICENSE 发现它有值得写的许可细节。
 
 **Kdenlive**（5.8k star，GPL-3.0，26.08.1）：KDE 的多轨剪辑器。**上游仓库
 在 KDE 自建的 GitLab（invent.kde.org），不在 GitHub 白名单内**，
