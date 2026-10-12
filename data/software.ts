@@ -7190,7 +7190,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       "切完点「导出」，保持原始容器与编码参数（Copy 模式）就是无损；这一步别改成重新编码。",
       "批量处理走命令行：lossless-cut-cli 输入文件 -f 00:01:00 -t 00:02:00 -o 输出文件。",
     ],
-    alternatives: [],
+    alternatives: ["kdenlive","obs-studio"],
     icon: {
       letter: "L",
       color: "#2E7D6B",
@@ -7227,7 +7227,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       "导出前到「项目设置 → 编码」里选预设并先渲染一段短的试手——默认设置的渲染比预期慢。",
       "界面乱的时候记住项目设置页可恢复默认，改坏了不必重装。",
     ],
-    alternatives: [],
+    alternatives: ["obs-studio","lossless-cut","handbrake"],
     icon: {
       letter: "K",
       color: "#1D5B8F",
@@ -7265,7 +7265,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       "首次全量导入后去设置里跑一次「重建机器学习」，人脸与地点识别才会生效。",
       "对外分享前想清楚授权边界：AGPL-3.0 要求你对外提供服务时公开你改过的源码。",
     ],
-    alternatives: [],
+    alternatives: ["darktable","rawtherapee","exiftool"],
     icon: {
       letter: "I",
       color: "#4250AF",
@@ -7303,7 +7303,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       "直播在设置 → 推流里逐个添加 RTMP 服务，同一场景可以同时推多个目标。",
       "编码器优先选硬件编码（NVIDIA 为 NVENC、Intel 为 QSV、AMD 为 AMF），软件编码 x264 会吃满 CPU。",
     ],
-    alternatives: ["lossless-cut"],
+    alternatives: ["kdenlive","handbrake"],
     icon: {
       letter: "O",
       color: "#302E31",
