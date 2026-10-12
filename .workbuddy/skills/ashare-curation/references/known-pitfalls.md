@@ -160,3 +160,13 @@
 90. **LICENSE 原文里常有「为什么少了某个功能」的答案。** HandBrake 选不到 fdk-aac 编码器，看起来像功能缺失或安装问题，实际是 LICENSE 明写它与 GPLv2 不兼容、官方构建不能包含。**GitHub 的 `license` 字段给 `NOASSERTION` 时不要直接跳过，去读仓库根目录的 LICENSE / COPYING 原文**——这类许可摩擦往往正是读者最需要知道的信息。
 
 91. **Markdown 加粗这道闸容易反复踩。** 写正文时顺手打`**关键点**` 很自然，`--strict` 会拦（immich 与 handbrake 各拦一次）。别去放宽校验器——页面确实不解析 Markdown，写了就是原样显示。**写正文时直接不用任何 Markdown 标记。**
+
+92. **破解词表是子串匹配，技术名词也会被拦。** ExifTool 正文写「机身序列号」被`序列号` 命中。**这是设计使然**（子串匹配才能拦住「XX 序列号生成器」这类变体），所以改写措辞（「机身编号」），不要放宽规则。写正文前先扫一眼 `ingest-item.mjs` 里的破解词表，避开那几个词。
+
+93. **加了新的 `license` 值要同步三处**：`ingest-item.mjs` 的 `LICENSE_SHAPE`（形状正则）、`lib/license-info.ts` 的 `TABLE`（展示文案）、以及**双许可表达式的每一半都要在表里**。第三点最容易漏——`combineDual` 遇到不认识的分支就整体返回 undefined，前台静默不显示许可证说明，看起来像「没填 license」。ExifTool 的 `Artistic-1.0-Perl OR GPL-1.0-or-later` 就要求表里同时有 Artistic 与 GPL-1.0 三种写法。
+
+94. **为躲词表做全局替换会改坏语义，而所有校验都不会拦。** `replace(/序列号/g, '机身编号')` 把「镜头序列号」变成了「镜头机身编号」，不通顺但 `seed:drift` 与测试全绿。**`seed:drift` 只比字段值，不判断内容是否通顺**——内容债只能靠人读。替换后把改动的那句话读一遍。
+
+95. **按内容匹配切代码块会切错。** `sync-seed.mjs` 找条目块尾时用 `line.trim() === '},'`，把 `icon: {` / `links: {` 这类嵌套对象的结尾当成了块尾，直接把 `data/software.ts` 截成 `Expected ',', got ':'` 的语法错误。**要按缩进层级定位**（与 slug 行同缩进的 `{` / `},`），不要按内容匹配。
+
+96. **重复插入比缺失更难发现，`sync-seed` 要有替换模式。** 同 slug 已存在时应整块替换。skill 的 `ingest-item.mjs` 有 `--patch` 模式，但种子文件的同步是另一条路，两边都要有「已存在就替换」的语义。

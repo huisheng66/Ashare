@@ -38,6 +38,10 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   // 实测 free-programming-books 用它——书单仓库按 CC BY 4.0 发布，
   // 不写进表里前台就静默不显示，读者会以为没核过。
   "CC-BY-4.0": { summary: "允许商用闭源分发，需署名", tier: "permissive", allowsClosedSource: true },
+  // Artistic 是宽松但要保留声明（Perl 系标准许可，ExifTool 与 Perl 本身用它）。
+  // 不写进表里前台就静默不显示，读者会以为没核过。
+  "Artistic-1.0-Perl": { summary: "允许商用闭源分发，需保留许可声明", tier: "permissive", allowsClosedSource: true },
+  "Artistic-2.0": { summary: "允许商用闭源分发，需保留许可声明", tier: "permissive", allowsClosedSource: true },
 
   // 弱 copyleft：改动部分开源，整体可闭源
   "LGPL-2.1": { summary: "改动需开源，动态链接不传染", tier: "weak-copyleft", allowsClosedSource: true },
@@ -55,6 +59,12 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   "GPL-3.0-or-later": { summary: "分发衍生作品需同样开源", tier: "strong-copyleft", allowsClosedSource: false },
   "AGPL-3.0-only": { summary: "分发甚至联网服务都需开源", tier: "strong-copyleft", allowsClosedSource: false },
   "AGPL-3.0-or-later": { summary: "分发甚至联网服务都需开源", tier: "strong-copyleft", allowsClosedSource: false },
+  // GPL-1 已极少单独使用，但 Perl 系双许可（Artistic-1.0-Perl OR GPL-1.0-or-later，
+  // ExifTool 就是）会引用它。缺少这一条会让整个双许可表达式判不出来，
+  // 前台静默不显示许可证说明。
+  "GPL-1.0": { summary: "分发衍生作品需同样开源", tier: "strong-copyleft", allowsClosedSource: false },
+  "GPL-1.0-only": { summary: "分发衍生作品需同样开源", tier: "strong-copyleft", allowsClosedSource: false },
+  "GPL-1.0-or-later": { summary: "分发衍生作品需同样开源", tier: "strong-copyleft", allowsClosedSource: false },
 };
 
 /**

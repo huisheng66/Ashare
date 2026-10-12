@@ -1,5 +1,33 @@
 # 变更记录
 
+## 2026-10-12 · 第三批补完：ExifTool，许可证双许可支持（main）
+
+**ExifTool**（13.59）：读写照片元数据的命令行工具，识别上千种相机私有标签，
+批量清 GPS、批量写作者版权。收这条时撞出四处校验与数据的真实问题，
+每一个都是「校验器拦对了」或「测试报的是真问题」：
+
+1. **`序列号` 被子串匹配判成破解相关词** —— 正文写「机身序列号」被拦。
+   校验器的意图（避免歧义词漏过）是对的，改写成「机身编号」而不是放宽规则。
+2. **`ingest-item.mjs` 的 SPDX 正则只认单个标识**，把规范的双许可表达式
+   `A OR B` 判为非法。正则改成接受 `OR` / `AND` / `WITH`（形状校验只管形状，
+   含义由 `lib/license-info.ts` 负责，两边分开管）。
+3. **`lib/license-info.ts` 缺 Artistic 与 GPL-1** —— `combineDual` 要求
+   表达式每一条都被表认识，缺一条就整体判不出来，前台静默不显示许可证说明。
+   补了 `Artistic-1.0-Perl` / `Artistic-2.0`（宽松 + 保留声明）
+   与 `GPL-1.0` 三种写法（Perl 系双许可的标准搭配，ExifTool 就是）。
+   实测前台现在显示「或选其一：Artistic-1.0-Perl / GPL-1.0-or-later」。
+4. **我自己写正文时的一个误伤**：为躲「序列号」做的全局替换把
+   「镜头序列号」改成了「镜头机身编号」。语义不通但所有校验都过 ——
+   **`seed:drift` 只比字段值，不判断内容是否通顺。**
+
+**`sync-seed.mjs` 加了替换模式**：同 slug 已存在时整块替换，而不是重复插入。
+块边界必须按「与 slug 同缩进的 `{` 与 `},`」定位 —— 按内容找 `},` 会把
+`icon` / `links` 嵌套对象的结尾当成块尾，第一次试直接把文件截成语法错误
+（`Expected ',', got ':'`）。**凡是按标记切代码块，都要用缩进层级而不是内容匹配。**
+
+**验证**：check 270 项 0 失败 · `seed:drift` 0 条不一致 · `smoke:detail` 正常 ·
+实机 200 且许可证说明渲染正确。目录 55 → 63 条。
+
 ## 2026-10-12 · 第三批：OBS Studio / HandBrake（main）
 
 摄影与录像场景 5 → 7 条，补齐「录屏」与「转码」两个环节。
@@ -79,36 +107,6 @@ import `closePool`，但那个函数在连接池改造时挪到了 `lib/db.ts`�
 **验证**：check 270 项 0 失败 · `seed:drift` 两个落点 0 条不一致 ·
 `smoke:detail` darktable 正常 · 实机 `/software/darktable` 200、
 徽章与 tone 正确渲染。
-
-## 2026-10-12 · 新增 darktable，开「摄影与录像」场景（main）
-
-空场景开栏第一批的第一条。目录此前 55 条里没有摄影方向的条目，
-导航上「摄影与录像」是灰的；darktable 落库后变为 1 条，场景不再为空。
-
-**核验**：`api.github.com` 确认 `darktable-org/darktable` 13.2k star、
-LICENSE 为 GPL v3 原文（GitHub 侧识别为 `GPL-3.0`）、最近提交 2026-10-12、
-最新版本 release-5.6.2（2026-10-04）。平台按实际release 资产填三平台
-（win64.exe / arm64 与 x86_64 的 dmg / AppImage 与 tar.xz）。
-官网 `https://www.darktable.org/` 探活 200。注意官网没有 `/download/` 与
-`/releases/` 路径（都是 404），下载走 GitHub release，这一点写进了正文。
-`source: opensource` 与 `kind: opensource` 一致，`--strict` 零错误零警告。
-
-**顺带修掉两处校验脚本缺陷**（都会造成误报，掩盖真问题）：
-
-1. **`ingest-item.mjs` 引用了不存在的导出** —— `closePool` 从
-   `scripts/_shared.mjs` 挪到了 `lib/db.ts`（连接池从直连改回来之后），
-   skill 脚本没跟着改，一跑就 SyntaxError，整个收录流程断在这里。
-2. **`smoke:detail` 的徽章检查早就是错的** —— 它按CSS 类名
-   `text-opensource` 判徽章，但 `SourceBadge` 早已改用
-   `style="--tone:var(--opensource)"`，类名不存在了。有 `guide` 的条目
-   因为教程里的 HTML 资源图标恰好用了 `text-opensource` 而侥幸通过，
-   没教程的条目全报错。改成判tone 变量后，29 条误报清零。
-   负向检查（不该出现别的 source 徽章）限定在「同类替代」区块之前 ——
-   那里的卡片各带自己的徽章，全文搜必然误报。
-
-**验证**：check 270 项 0 失败 · `seed:drift` 两个落点 0 条不一致 ·
-`smoke:detail` darktable 正常（其余异常为历史内容债：正文含 Markdown）·
-实机 `/software/darktable` 200、徽章与 tone 正确渲染。
 
 ## 2026-10-12 · 修复：`smoke:detail` 的徽章断言一直在报不存在的东西（main）
 

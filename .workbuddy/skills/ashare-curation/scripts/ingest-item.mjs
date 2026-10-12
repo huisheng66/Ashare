@@ -66,8 +66,11 @@ const SOURCE_KIND_MATRIX = {
 };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
-// SPDX 标识的常见形态：GPL-3.0-only、MIT、Apache-2.0、MPL-2.0、LicenseRef-…
-const LICENSE_SHAPE = /^[A-Za-z0-9.+-]+(\s+AND\s+[A-Za-z0-9.+-]+)*$/;
+// SPDX 标识的形态：单个标识（GPL-3.0-only、MIT、Apache-2.0），
+// 或表达式（A OR B / A AND B / A WITH B）。
+// 注意这里只校验**形状**——项目里的 lib/license-info.ts 才管**含义**，
+// 双许可（A OR B）前端会取对使用者最宽松的那一支，两边要分开管。
+const LICENSE_SHAPE = /^[A-Za-z0-9.+-]+(\s+(OR|AND|WITH)\s+[A-Za-z0-9.+-]+)*$/;
 
 const USAGE = "用法: node .workbuddy/skills/ashare-curation/scripts/ingest-item.mjs --file <草稿.json> [--dry-run] [--allow-http] [--patch] [--strict]";
 
