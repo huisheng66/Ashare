@@ -23,7 +23,8 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { getItem, saveItem } from "../../../../lib/store-sql.ts";
-import { closePool, parseFlags, readCatalog } from "../../../../scripts/_shared.mjs";
+import { closePool } from "../../../../lib/db.ts";
+import { parseFlags, readCatalog } from "../../../../scripts/_shared.mjs";
 
 const ROOT = process.cwd();
 

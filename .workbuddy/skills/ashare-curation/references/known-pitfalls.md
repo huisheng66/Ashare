@@ -128,3 +128,13 @@
 74. **验证环境必须等于使用环境，否则等于没验。** 防盗链的六项验证是手工构造 `SESSION_SECRET=... NEXT_PUBLIC_SITE_URL=... npm run start` 跑出来的，而真实开发流程是 `npm run dev` + `.env.local`（后者没有 `NEXT_PUBLIC_SITE_URL`）。结果 **`siteHost` 为空 → 同站判断失效 → 本地开发时首屏所有图标 403**，而当时的验证全是绿的。修法是新增 `requestHost()` 拿请求自身的 host 兜底 ——「谁在访问我」不需要任何配置。**凭手工构造的环境变量验过的代码，等于没验。**
 75. **`getSiteUrl()` 在未配域名时返回 undefined 对 SEO 正确，对防盗链错误。** 两个模块共用「站点地址」这一个概念，但需求相反：SEO 要避免把 localhost 写进索引（所以宁缺勿滥），防盗链要的是「谁在访问我」（所以必须有值）。别因为看到 A 处返回 undefined 就以为 B 处也该返回 undefined。
 76. **`x-forwarded-host` 是客户端可伪造的。** 本场景不是安全关键（伪造它最多让伪造值等于 own，而真正的跨站请求其 referer 域不会因此变成 own），但仍按 `lib/guard.ts` 对 XFF 的既有约定收紧：只在 `TRUST_PROXY=1` 时采纳。
+
+## 2026-10-12 摄影场景开栏（darktable）新增
+
+77. **skill 脚本会随项目代码漂移，跑之前先确认导出还在。** `ingest-item.mjs` 从 `scripts/_shared.mjs` import `closePool`，但那个函数在连接池改造时挪到了 `lib/db.ts`，脚本没跟着改——一跑就 `SyntaxError: does not provide an export named 'closePool'`，整个收录流程断在第5 步。**报错发生在 import 阶段，连 `--dry-run` 都进不去，看起来像脚本坏了而不是导入路径过期。** 遇到「脚本起不来」先怀疑导入路径。
+
+78. **`smoke:detail` 的徽章检查要判 tone 变量，不是 CSS 类名。** `SourceBadge` 早已从 `text-opensource` 改成 `style="--tone:var(--opensource)"`，脚本还在搜旧类名。**这个误报有个恶劣性质：条目「有没有出问题」和「有没有 `guide`」相关**——`GuideSection` 的资源图标恰好用 `text-opensource`（html 类型），所以有教程的条目侥幸通过，没教程的全报错。看起来像随机失败，实际是「查了个不存在的东西」。断言渲染结果前先 `curl` 一遍看真实 DOM。
+
+79. **负向断言要限定在页面主体内。** 「不该出现别的 source 徽章」这类检查全文搜必然误报：详情页底部的「同类替代」区块里每张卡片各带自己条目的徽章。凡是要断言「某元素不存在」的检查，先把范围切到该元素所在区块之前。
+
+80. **`SeedSoftware` 不接受 `status` 与 `previews`。** 草稿按 `Software` 写全字段，同步种子时这两个会报 TS2353（类型只认 `Software` 的子集）。种子里的等价物是 `installTips`（↔ `tutorial`）、`officialUrl` + `officialLabel`（无 `status` 时缺省即已发布）、图片字段在种子里压根不存在。

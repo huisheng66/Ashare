@@ -1,5 +1,35 @@
 # 变更记录
 
+## 2026-10-12 · 新增 darktable，开「摄影与录像」场景（main）
+
+空场景开栏第一批的第一条。目录此前 55 条里没有摄影方向的条目，
+导航上「摄影与录像」是灰的；darktable 落库后变为 1 条，场景不再为空。
+
+**核验**：`api.github.com` 确认 `darktable-org/darktable` 13.2k star、
+LICENSE 为 GPL v3 原文（GitHub 侧识别为 `GPL-3.0`）、最近提交 2026-10-12、
+最新版本 release-5.6.2（2026-10-04）。平台按实际release 资产填三平台
+（win64.exe / arm64 与 x86_64 的 dmg / AppImage 与 tar.xz）。
+官网 `https://www.darktable.org/` 探活 200。注意官网没有 `/download/` 与
+`/releases/` 路径（都是 404），下载走 GitHub release，这一点写进了正文。
+`source: opensource` 与 `kind: opensource` 一致，`--strict` 零错误零警告。
+
+**顺带修掉两处校验脚本缺陷**（都会造成误报，掩盖真问题）：
+
+1. **`ingest-item.mjs` 引用了不存在的导出** —— `closePool` 从
+   `scripts/_shared.mjs` 挪到了 `lib/db.ts`（连接池从直连改回来之后），
+   skill 脚本没跟着改，一跑就 SyntaxError，整个收录流程断在这里。
+2. **`smoke:detail` 的徽章检查早就是错的** —— 它按CSS 类名
+   `text-opensource` 判徽章，但 `SourceBadge` 早已改用
+   `style="--tone:var(--opensource)"`，类名不存在了。有 `guide` 的条目
+   因为教程里的 HTML 资源图标恰好用了 `text-opensource` 而侥幸通过，
+   没教程的条目全报错。改成判tone 变量后，29 条误报清零。
+   负向检查（不该出现别的 source 徽章）限定在「同类替代」区块之前 ——
+   那里的卡片各带自己的徽章，全文搜必然误报。
+
+**验证**：check 270 项 0 失败 · `seed:drift` 两个落点 0 条不一致 ·
+`smoke:detail` darktable 正常（其余异常为历史内容债：正文含 Markdown）·
+实机 `/software/darktable` 200、徽章与 tone 正确渲染。
+
 ## 2026-10-10 · 修复：条目编辑页打不开（main，问题编号 419379393）
 
 后台条目编辑页整页渲染失败。根因是 React 拒绝把**函数当 prop** 传给客户端组件
