@@ -7350,7 +7350,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
 
   {
     slug: "exiftool",
-    license: "Artistic-1.0-Perl OR GPL-1.0-or-later",
+    license: "GPL-3.0",
     version: "13.59",
     linksCheckedAt: "2026-10-12",
     name: "ExifTool",
@@ -7362,7 +7362,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
     summary: "读写照片元数据的命令行工具，识别几千种相机的私有标签，能批量清 GPS、批量写版权与作者；代价是命令行操作，改错了没有撤销。",
     scenes: ["photo", "code"],
     platforms: ["windows", "macos", "linux"],
-    body: "ExifTool 是用来读写照片元数据的命令行工具，也是这个领域事实上的标准：相机厂商的私有标签它能读出上千种，很多软件读不出来的拍摄参数（快门次数、镜头编号、机身编号）它都能读，也能批量改。\n它最常见的用途是清理隐私：一次递归命令就能把整棵目录里所有图片的 GPS 坐标、机型、机身编号删干净，发图之前必做的一步。另一头是写信息——批量给几千张照片填上作者、版权与说明，摄影师交付原片时用得很多。它还能按元数据筛选文件，比如「只拷出所有 EXIF 里有 GPS 的照片」，这类活图形界面做不了。\n代价是它是命令行工具，没有界面，所有操作靠参数组合，也因此没有撤销。改之前先备份：加 -overwrite_original 是原地改不加备份，不加这个参数默认生成 _original 副本，这是更安全的做法。它默认不改文件本身的内容，只改元数据；需要真正重写文件时得显式指定操作，而且大文件重写耗时。Windows 用户要注意它需要 Perl 环境（官网提供打包了 Perl 的独立 exe，下载那个版本就不用自己装）。\n许可证是「与 Perl 本身相同的条款」，即 Artistic License 或 GPL 二选一（SPDX 双许可），license 字段写的是 SPDX 双许可表达式，两条任选其一，官网 https://exiftool.org/ 提供下载与完整文档，Windows、macOS、Linux 都能跑。版本 13.59，官网的 history 页面有逐版变更记录。",
+    body: "ExifTool 是用来读写照片元数据的命令行工具，也是这个领域事实上的标准：相机厂商的私有标签它能读出上千种，很多软件读不出来的拍摄参数（快门次数、镜头编号、机身编号）它都能读，也能批量改。\n它最常见的用途是清理隐私：一次递归命令就能把整棵目录里所有图片的 GPS 坐标、机型、机身编号删干净，发图之前必做的一步。另一头是写信息——批量给几千张照片填上作者、版权与说明，摄影师交付原片时用得很多。它还能按元数据筛选文件，比如「只拷出所有 EXIF 里有 GPS 的照片」，这类活图形界面做不了。\n代价是它是命令行工具，没有界面，所有操作靠参数组合，也因此没有撤销。改之前先备份：加 -overwrite_original 是原地改不加备份，不加这个参数默认生成 _original 副本，这是更安全的做法。它默认不改文件本身的内容，只改元数据；需要真正重写文件时得显式指定操作，而且大文件重写耗时。Windows 用户要注意它需要 Perl 环境（官网提供打包了 Perl 的独立 exe，下载那个版本就不用自己装）。\n许可证有一处需要注意：仓库根目录的 LICENSE 文件是 GPL v3 原文，README 里却写「与 Perl 本身相同的条款」（Artistic License 或 GPL 二选一）。两者不一致，这里以许可证文件为准记为 GPL-3.0。实际使用上这不影响你——它是工具不是库，条款分歧只在二次分发时才起作用，官网 https://exiftool.org/ 提供下载与完整文档，Windows、macOS、Linux 都能跑。版本 13.59，官网的 history 页面有逐版变更记录。",
     officialUrl: "https://exiftool.org/",
     officialLabel: "exiftool.org",
     links: {
