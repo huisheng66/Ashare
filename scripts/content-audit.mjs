@@ -28,7 +28,22 @@ const CHECKS = [
   // 许可证与核验日期是机器可校验的结构化字段。缺了它们，读者与后来的维护者
   // 只能从正文里猜，而正文无法校验。这两项此前是监控盲区：stale-links 只看
   // linksCheckedAt 是否过期，content:audit 完全不提，都没人报缺失。
-  { key: "license", label: "许可证", weight: 3, empty: (item) => !item.license?.trim() },
+  //
+  // 许可证只要求**OSI 开源条目**填。两层排除，都与 components/LicenseNote.tsx
+  // 的设计对齐：
+  //   1. source 不是 opensource —— 专有软件（Obsidian、Figma、WPS）没有 SPDX
+  //      标识可写，GeoGebra 是自家非商业许可、SPDX 里没有对应项。
+  //   2. kind 是 app —— 源码公开但**不是** OSI 开源许可（n8n 的 fair-code
+  //      Sustainable Use License 就是这类）。tests/license-info.test.mjs 明确把
+  //      "Proprietary" 列为「应返回 undefined」的值，说明设计上反对给这类许可
+  //      编一个 SPDX 标识；硬填 LicenseRef- 只会让前台依然不显示、还多一个
+  //      假的结构化字段。这类条目的许可状态由正文第 4 段承担。
+  {
+    key: "license",
+    label: "许可证",
+    weight: 3,
+    empty: (item) => item.source === "opensource" && item.kind !== "app" && !item.license?.trim(),
+  },
   { key: "linksCheckedAt", label: "链接核验", weight: 2, empty: (item) => !item.linksCheckedAt?.trim() },
   { key: "previews", label: "预览图", weight: 1, empty: (item) => !item.previews?.length },
   { key: "tutorial", label: "使用教程", weight: 1, empty: (item) => !item.tutorial?.length },

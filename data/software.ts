@@ -1847,7 +1847,7 @@ for (v in c("score", "mood", "sleep")) {
   {
     slug: "rstudio",
     license: "AGPL-3.0",
-    linksCheckedAt: "2026-10-03",
+    linksCheckedAt: "2026-10-12",
     name: "RStudio",
     nameZh: "Posit Desktop",
     aliases: ["r 语言", "rstudio", "posit"],
@@ -1856,14 +1856,14 @@ for (v in c("score", "mood", "sleep")) {
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     officialUrl: "https://posit.co/download/rstudio-desktop/",
+    links: {
+      official: "https://posit.co/download/rstudio-desktop/",
+      github: "https://github.com/rstudio/rstudio",
+    },
     officialLabel: "posit.co",
     whoFor: "课程或论文用 R，需要脚本、图表和包管理在一个窗口。",
     whoNot: "完全不想写代码，只想点选，先看 JASP。",
-    installTips: [
-      "先装 R（cran.r-project.org），再装 RStudio Desktop Open Source。",
-      "两个都要从官方渠道下。",
-      "国内如 CRAN 慢，可在 R 里换镜像。",
-    ],
+    installTips: ["先装 R（cran.r-project.org），再装 RStudio Desktop，顺序不能反。", "两个都要从官方渠道下，发行版仓库里的版本常偏旧。", "国内如 CRAN 慢，可在 R 里换镜像源。", "每个课题建一个 Project，工作目录与环境变量会跟着项目走。"],
     guide: {
       intro: "用 Project 管项目、renv 锁依赖、Quarto 出报告，串起 RStudio 从「能跑脚本」到「可复现协作」的完整链路。",
       markdown: `## 一切从 Project 开始，而不是从脚本开始
@@ -1941,6 +1941,8 @@ ggsave("output/boxplot.png", p, width = 6, height = 4, dpi = 300)
     },
     alternatives: ["jasp", "jupyter"],
     icon: { letter: "R", color: "#75AADB", simpleIcon: "rstudio" },
+    tags: ["R 语言", "统计", "IDE", "开源"],
+    body: "RStudio Desktop 是写 R 的集成环境，现在由 Posit 维护，名称也已从 RStudio 改为 Posit Desktop（开源版仍常被叫作 RStudio）。它把四件事放进一个窗口：脚本编辑器、控制台、环境变量与历史、文件与绘图面板。对用 R 做统计或数据分析的人，这四件事本来分散在终端、编辑器、文件管理器之间，合到一起之后「改一行、跑一下、看图、再改」的循环明显变短。\n它的价值主要在工程化而不是语言本身。项目（Project）机制把工作目录、打开的文件、环境变量绑在一起，切换课题不用重新设路径；R Markdown 与后来的 Quarto 让代码、结果、文字排在同一份文档里，论文与报告可以直接从分析过程生成；包管理、调试器、Git 面板也都是为「把分析做成可复现的东西」服务的。想少写代码只看结果，JASP 更合适；要在浏览器里跑，Jupyter 更合适。\n安装顺序有个坑：必须先装 R 本身（cran.r-project.org），再装 RStudio，反了打不开。两个都要从官方渠道下，发行版仓库里的 rstudio 有时版本偏旧。国内访问 CRAN 慢，可以在 R 里 options(repos=...) 换清华或中科大的镜像，装包时注意有些包需要编译工具链。\n许可证是 AGPL-3.0。仓库 COPYING 写得很直接：除非你与 Posit 签了商业许可，RStudio 按 AGPLv3 授权给你。也就是说 Posit 同时提供商业版，网络服务场景用开源版要留意 AGPL 的 copyleft 要求。源码在 GitHub 的 rstudio/rstudio，星标约 5,084。Windows、macOS、Linux 都有构建。",
   },
   {
     license: "GPL-3.0",
@@ -2307,7 +2309,7 @@ SetVisibleInView(b, 1, true)
   {
     slug: "libreoffice",
     license: "MPL-2.0 OR LGPL-3.0-or-later",
-    linksCheckedAt: "2026-10-03",
+    linksCheckedAt: "2026-10-12",
     name: "LibreOffice",
     aliases: ["writer", "calc", "office 替代", "文档"],
     summary: "开源办公套件：文档、表格、演示，能开常见 Office 文件。",
@@ -2315,14 +2317,14 @@ SetVisibleInView(b, 1, true)
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     officialUrl: "https://www.libreoffice.org/download/download-libreoffice/",
+    links: {
+      official: "https://www.libreoffice.org/download/download-libreoffice/",
+      github: "https://github.com/LibreOffice/core",
+    },
     officialLabel: "libreoffice.org",
     whoFor: "要离线改文档和表格，不想订 Microsoft 365。",
     whoNot: "必须使用仅在 Microsoft 365 里的协作功能或宏生态。",
-    installTips: [
-      "从 libreoffice.org 下稳定版。",
-      "复杂 PPT 或带宏的 Excel 可能有差异，交稿前用对方软件打开检查。",
-      "默认可另存为 .docx / .xlsx，按接收方要求选。",
-    ],
+    installTips: ["从 libreoffice.org 下稳定版，别用第三方镜像。", "复杂 PPT 或带宏的 Excel 可能有差异，交稿前用对方软件打开检查。", "默认可另存为 .docx / .xlsx，按接收方要求选。", "默认保存格式建议保持 .odt / .ods，需要交付时再导出。"],
     guide: {
       intro: "讲清 ODF 与 MS 格式的兼容边界、字体替换的排版陷阱、宏与 PDF 导出流程，解决「文档发出去版式全乱」的问题。",
       markdown: `## 格式兼容的真实边界
@@ -2415,10 +2417,12 @@ soffice --headless --convert-to "csv:Text - txt - csv (StarCalc):44,34,76" data.
     alternatives: ["wps", "obsidian"],
     featured: true,
     icon: { letter: "L", color: "#18A303", simpleIcon: "libreoffice" },
+    tags: ["办公套件", "开源", "文档兼容", "pdf"],
+    body: "LibreOffice 是开源办公套件，Writer 管文档、Calc 管表格、Impress 管演示，另有 Draw 与 Base。它能打开并保存 .docx / .xlsx / .pptx，也能导出 PDF。对多数人它解决的是「不订 Microsoft 365 也能把 Office 文件改完」：格式能对上大部分，日常改个段落、调个公式、换个页边距不需要另找软件。\n兼容性的边界要提前知道。简单到中等复杂度的文档基本无损，但复杂 PPT 动画、带 VBA 宏的 Excel、SmartArt 以及某些老模板会出错位或丢内容——不是打不开，是打开后样子不对。稳妥做法是交稿前用对方实际使用的软件再打开核对一遍。另外它的默认格式是开放文档格式（.odt / .ods / .odp），这个格式本身是优势：不绑定单一厂商，长期可读性比专有格式好。\n想参与开发的话有个坑：GitHub 上的 LibreOffice/core 是只读镜像，提交走 Gerrit（gerrit.libreoffice.org），而且仓库描述里明确写了别直接下载 zip、要用 dev-www.libreoffice.org 的构建包。找源码可以，提 PR 要去对地方。\n许可证是 MPL-2.0，项目同时要求贡献者按 MPL-2.0 与 LGPL-3.0+ 双许可授权（官方许可证页原文：license your code to us jointly under both the Mozilla Public License v2 and the GNU Lesser GPL v3+ licenses），所以交付给用户的二进制按 MPL-2.0。Windows、macOS、Linux 都有安装包。",
   },
   {
     slug: "wps",
-    linksCheckedAt: "2026-10-03",
+    linksCheckedAt: "2026-10-12",
     name: "WPS Office",
     aliases: ["wps", "金山"],
     summary: "国内常用办公套件，兼容常见 Office 格式，个人基础功能免费。",
@@ -2427,13 +2431,13 @@ soffice --headless --convert-to "csv:Text - txt - csv (StarCalc):44,34,76" data.
     source: "official",
     price: "基础免费",
     officialUrl: "https://www.wps.cn/",
+    links: {
+      official: "https://www.wps.cn/",
+    },
     officialLabel: "wps.cn",
     whoFor: "主要在国内环境交 .docx / .xlsx，需要高兼容。",
     whoNot: "不想要广告和账号体系，或需要完全开源。可看 LibreOffice。",
-    installTips: [
-      "从 wps.cn 官方站下载，安装时取消不需要的附加组件。",
-      "个人版和商业授权不是一回事，按使用场景看条款。",
-    ],
+    installTips: ["从 wps.cn 官方站下载，安装时取消不需要的附加组件。", "个人版和商业授权不是一回事，按使用场景看条款。", "交稿前用对方指定的软件打开核对一遍复杂格式。", "广告与登录提示在设置里能关掉一部分，但关不干净。"],
     guide: {
       intro: "拆清 WPS 免费版与会员的功能边界，讲透 docx 兼容、字体替换与 PDF 编辑的坑，帮你判断哪些钱该花、哪些坑能绕。",
       markdown: `## 先分清会员边界
@@ -2507,6 +2511,8 @@ WPS 的 PDF 工具箱是它最实用的增值功能之一：修改文字图片�
     },
     alternatives: ["libreoffice"],
     icon: { letter: "W", color: "#C53929" },
+    tags: ["办公套件", "文档兼容", "pdf", "免费"],
+    body: "WPS Office 是金山办公的办公套件，含文字、表格、演示三个主组件，另有 PDF 工具。它解决的核心问题不是「能不能做文档」，而是「在国内的文档往来里少出意外」：对方发来的 .docx 带着 tracked changes、表格里嵌着复杂合并单元格、页眉页脚挂着公司模板，这些在开源办公软件里最容易错位的细节，是 WPS 投入最多的地方。个人基础功能免费，这是它装机量大的直接原因。\n与 Microsoft Office 的关系要说清楚：它兼容 Office 格式，但不是 Office。复杂文档双向转换仍可能错位——尤其是带宏的 Excel、SmartArt、以及多年迭代下来的老模板。常见做法是日常用它，交稿前用对方指定的软件打开核对一遍，别默认「看起来一样就是一样」。广告与账号体系是免费版的代价，弹窗和登录提示可以在设置里关掉一部分，但关不干净。\n它不是开源软件。这是它与 LibreOffice 的根本差别，也决定了适用场景：公司统一部署、需要签采购合同、或者对数据出境与账号体系有合规要求时，闭源商业软件的授权条款反而是明确的一方；反过来，如果你在意的是「软件本身可审查、格式不被单一厂商绑定」，那 LibreOffice 更合适。两者不是谁替代谁，是不同约束下的选择。\n许可证为专有商业许可，个人版与商业授权条款不同，具体以 wps.cn 的最终用户许可协议为准。Windows、macOS、Linux 都有客户端，移动端与在线文档另算。",
   },
   {
     license: "AGPL-3.0-or-later",
@@ -3120,7 +3126,7 @@ doc.saveAs("plate.step")
   {
     license: "GPL-2.0",
     slug: "qgis",
-    linksCheckedAt: "2026-10-03",
+    linksCheckedAt: "2026-10-12",
     name: "QGIS",
     aliases: ["gis", "地图", "地理信息"],
     summary: "开源地理信息桌面软件，看图层、做专题图。",
@@ -3128,14 +3134,14 @@ doc.saveAs("plate.step")
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     officialUrl: "https://qgis.org/download/",
+    links: {
+      official: "https://qgis.org/download/",
+      github: "https://github.com/qgis/QGIS",
+    },
     officialLabel: "qgis.org",
     whoFor: "要处理地图图层、做空间分析和出图。",
     whoNot: "只需要在网页上看一眼地图。",
-    installTips: [
-      "从 qgis.org 选长期发布版（LTR）更稳。",
-      "坐标系先确认，再叠图层。",
-      "大数据量图层不要一上来做全局渲染。",
-    ],
+    installTips: ["从 qgis.org 选长期发布版（LTR）更稳，可与最新版共存。", "先确认每个图层的坐标系（CRS），再叠图层。", "大数据量图层不要一上来做全局渲染，先缩到范围再刷新。", "想要底图或批量处理能力，去插件库里找 QuickMapServices 与 Processing。"],
     guide: {
       intro: "从图层与坐标系的区别讲起，讲到投影 CRS 怎么选、栅格与矢量各自的坑，以及用 Processing 批处理与插件安装的实际流程。",
       markdown: `## 图层 vs 数据源
@@ -3208,6 +3214,8 @@ qgis_process run gdal:cliprasterbymasklayer --INPUT=dem.tif --MASK=boundary.gpkg
     },
     alternatives: ["python"],
     icon: { letter: "Q", color: "#589632", simpleIcon: "qgis" },
+    tags: ["GIS", "地图", "空间分析", "开源"],
+    body: "QGIS 是开源的地理信息系统桌面软件，做的是把图层叠在一起看、分析、出图。它能读 shapefile、GeoJSON、GeoPackage、PostGIS 数据库，也能连 WMS、WMTS、XYZ 瓦片服务；矢量与栅格图层、标注、符号化都在一个画布里完成，最后导出成图片或可直接打印的地图布局。日常用途从「把几个省的边界和点位叠起来看一眼」到「做缓冲分析、字段计算、地形剖面」都覆盖。\n它与「在网页上看地图」是两回事。网页地图给你的是现成的底图和检索，QGIS 给你的是图层控制权：每个图层用什么符号、按哪个字段分级、标签放哪、坐标系怎么转，都能定。这也是它的门槛所在——上手前需要先接受一套概念：图层、要素、属性表、坐标系。坐标系尤其容易绊人：两个图层的 CRS 不一致时叠加会偏，报错却不明显，往往是图层对不上位置而不是数据坏了。\n版本选择上，qgis.org 同时提供最新版与长期发布版（LTR）。生产环境与教学用 LTR 更稳，插件生态对 LTR 的支持也更及时；想试新功能再装最新版，两者可共存。插件是它的另一半能力：QuickMapServices 提供底图、Processing 把 GDAL 与 GRASS 的一堆工具包进图形界面，很多「QGIS 能做吗」的答案其实在插件里。\n许可证是 GPL-2.0（仓库 COPYING 与 GitHub 检测一致），源码在 GitHub 的 qgis/QGIS，星标约 1.45 万，更新活跃。Windows、macOS、Linux 都有安装包。",
   },
   {
     license: "GPL-2.0",
@@ -5199,7 +5207,7 @@ README 开头就警告了：**MarkItDown 的 I/O 权限就是当前进程的权�
   },
   {
     slug: "n8n",
-    linksCheckedAt: "2026-10-06",
+    linksCheckedAt: "2026-10-12",
     // fair-code 不是 OSI 开源：Sustainable Use License禁止把n8n 本身
     // 做成竞品对外服务。不写kind 就会被seedToItem() 按 source 推成
     // "opensource"，前台挂出「开源」徽章 —— 与正文里「不是 OSI 意义上的
@@ -5214,7 +5222,7 @@ README 开头就警告了：**MarkItDown 的 I/O 权限就是当前进程的权�
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     tags: ["自动化", "工作流", "低代码", "自托管", "Docker"],
-    body: "n8n 是一个用来搭 AI 智能体和工作流的平台。它的形态是**可视化画布 + 自定义代码**的组合：简单步骤拖拽，复杂逻辑直接写 JavaScript、Python 或引入 npm 包。\n**核心卖点是不锁定模型供应商。** 它接 OpenAI、Anthropic、Google 或开源模型，换 provider 不用改架构。对不想被某一家模型绑死的人来说这是关键。\n它的能力线是「从原型到生产」：多步 AI 工作流、逻辑分支、工具调用、**人工审批环节**、完整的可观测性。企业侧有基于角色的访问控制、审计日志、敏感数据处理支持。\n生态规模是它最实的优势：1500+ 集成，加上 9000+ 工作流模板。集成不是「导入配置」那种脆弱粘贴，通常是官方维护的节点。\n部署两种：一条安装脚本（需要 Docker），或者手动 Docker；也可以用官方的 n8n Cloud。\n**但有一件事必须说清楚：n8n 不是 OSI 意义上的开源软件。** 它的许可证是 fair-code 模式下的 **Sustainable Use License** 加上 n8n Enterprise License。官方自己列的三点是：源码始终可见、可自托管部署、可扩展（能加自己的节点和功能）。这三条是 fair-code 的定义，**它不等于 MIT/Apache 那种可以随便拿去改改再发布的许可证**。商业使用、嵌入到产品里对外提供服务这类场景，要自己去读 LICENSE.md 确认边界，必要时联系官方买企业许可。评估「能不能用」之前先看许可，这是选型里最容易事后翻车的一步。\n名字的来历也挺有意思：n8n = \"nodemation\"（Node-View + Node.js + automation），但作者觉得太长不适合命令行，最后取了 n8n。发音是 n-eight-n。",
+    body: "n8n 是一个用来搭 AI 智能体和工作流的平台。它的形态是可视化画布 + 自定义代码的组合：简单步骤拖拽，复杂逻辑直接写 JavaScript、Python 或引入 npm 包。\n核心卖点是不锁定模型供应商。 它接 OpenAI、Anthropic、Google 或开源模型，换 provider 不用改架构。对不想被某一家模型绑死的人来说这是关键。\n它的能力线是「从原型到生产」：多步 AI 工作流、逻辑分支、工具调用、人工审批环节、完整的可观测性。企业侧有基于角色的访问控制、审计日志、敏感数据处理支持。\n生态规模是它最实的优势：1500+ 集成，加上 9000+ 工作流模板。集成不是「导入配置」那种脆弱粘贴，通常是官方维护的节点。\n部署两种：一条安装脚本（需要 Docker），或者手动 Docker；也可以用官方的 n8n Cloud。\n但有一件事必须说清楚：n8n 不是 OSI 意义上的开源软件。 它的许可证是 fair-code 模式下的 Sustainable Use License 加上 n8n Enterprise License。官方自己列的三点是：源码始终可见、可自托管部署、可扩展（能加自己的节点和功能）。这三条是 fair-code 的定义，它不等于 MIT/Apache 那种可以随便拿去改改再发布的许可证。商业使用、嵌入到产品里对外提供服务这类场景，要自己去读 LICENSE.md 确认边界，必要时联系官方买企业许可。评估「能不能用」之前先看许可，这是选型里最容易事后翻车的一步。\n名字的来历也挺有意思：n8n = \"nodemation\"（Node-View + Node.js + automation），但作者觉得太长不适合命令行，最后取了 n8n。发音是 n-eight-n。",
     officialUrl: "https://n8n.io",
     officialLabel: "n8n.io",
     links: {
@@ -5233,7 +5241,7 @@ README 开头就警告了：**MarkItDown 的 I/O 权限就是当前进程的权�
     icon: {
       letter: "n",
       color: "#EA4B71",
-      simpleIcon: "workflow",
+      simpleIcon: "n8n",
     },
     guide: {
       intro: "从一条命令跑起来开始，讲清它强在哪、许可上要注意什么，以及怎么用模板起步。",
