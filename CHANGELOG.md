@@ -2,6 +2,28 @@
 
 ## 2026-10-12 · 新增 darktable，开「摄影与录像」场景（main）
 
+空场景开栏的第一条。目录此前 55 条里没有摄影方向的条目，
+导航上「摄影与录像」是灰的；darktable 落库后变为 1 条，场景不再为空。
+
+**核验**：`api.github.com` 确认 `darktable-org/darktable` 13.2k star、
+LICENSE 为 GPL v3 原文（GitHub 侧识别为 `GPL-3.0`）、最近提交 2026-10-12、
+最新版本 release-5.6.2（2026-10-04）。平台按实际 release 资产填三平台
+（win64.exe / arm64 与 x86_64 的 dmg / AppImage 与 tar.xz）。
+官网 `https://www.darktable.org/` 探活 200。注意官网没有 `/download/` 与
+`/releases/` 路径（都是 404），下载走 GitHub release，这一点写进了正文。
+`source: opensource` 与 `kind: opensource` 一致，`--strict` 零错误零警告。
+
+**顺带修掉 skill 脚本的导入漂移**：`ingest-item.mjs` 从 `scripts/_shared.mjs`
+import `closePool`，但那个函数在连接池改造时挪到了 `lib/db.ts`，脚本没跟着改
+——一跑就 `SyntaxError`，连 `--dry-run` 都进不去，整个收录流程断在第 5 步。
+看起来像脚本坏了，其实只是导入路径过期。
+
+**验证**：check 270 项 0 失败 · `seed:drift` 两个落点 0 条不一致 ·
+`smoke:detail` darktable 正常 · 实机 `/software/darktable` 200、
+徽章与 tone 正确渲染。
+
+## 2026-10-12 · 新增 darktable，开「摄影与录像」场景（main）
+
 空场景开栏第一批的第一条。目录此前 55 条里没有摄影方向的条目，
 导航上「摄影与录像」是灰的；darktable 落库后变为 1 条，场景不再为空。
 
@@ -29,6 +51,23 @@ LICENSE 为 GPL v3 原文（GitHub 侧识别为 `GPL-3.0`）、最近提交 2026
 **验证**：check 270 项 0 失败 · `seed:drift` 两个落点 0 条不一致 ·
 `smoke:detail` darktable 正常（其余异常为历史内容债：正文含 Markdown）·
 实机 `/software/darktable` 200、徽章与 tone 正确渲染。
+
+## 2026-10-12 · 修复：`smoke:detail` 的徽章断言一直在报不存在的东西（main）
+
+详情页冒烟脚本按CSS 类名 `text-opensource` 判「来源徽章是否渲染」，
+但 `SourceBadge` 早已改用 `style="--tone:var(--opensource)"`，那个类名
+在徽章上根本不存在。
+
+**误报的形态很有欺骗性**：条目「有没有问题」和「有没有 `guide`」相关 ——
+`GuideSection` 的资源图标恰好用 `text-opensource`（html 类型），所以有教程的
+条目侥幸通过，没教程的条目全报错。看着像随机失败，实际是**查了一个不存在的东西**。
+
+改成判 tone 变量后29 条误报清零。负向断言（不该出现别的 source 徽章）
+限定在「同类替代」区块之前 —— 那里每张替代卡片各带自己条目的徽章，
+全文搜必然误报。
+
+**教训**：断言渲染结果前先 `curl` 一遍看真实 DOM。脚本里的选择器也是代码，
+会随组件改造一起腐烂，而腐烂后报的是「业务有问题」。
 
 ## 2026-10-10 · 修复：条目编辑页打不开（main，问题编号 419379393）
 

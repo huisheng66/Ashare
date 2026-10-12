@@ -7154,4 +7154,40 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       color: "#3A6B7C"
     }
   },
+  {
+    slug: "lossless-cut",
+    license: "GPL-2.0-only",
+    version: "3.69.0",
+    linksCheckedAt: "2026-10-12",
+    name: "LosslessCut",
+    nameZh: "无损剪切",
+    aliases: ["losslesscut", "lossless cut", "无损剪切", "无损剪辑", "视频剪切", "视频裁剪"],
+    kind: "opensource",
+    source: "opensource",
+    tags: ["视频剪辑", "无损剪切", "ffmpeg", "批处理", "开源"],
+    summary: "基于 FFmpeg 的无损剪切与拼接工具，不重编码所以不损画质、速度接近复制文件；适合录屏和长视频里截片段，不适合做正式剪辑。",
+    scenes: ["photo"],
+    platforms: ["windows", "macos", "linux"],
+    body: "LosslessCut 是一个免费开源的视频剪切工具，做的事很专：把长视频里的某几段留下来，或切掉中间某一段。它不重编码，直接改容器或按关键帧切，画质一帧不损、速度接近复制文件——录一段两小时的屏幕录像再把中间无关的部分去掉，用它几秒钟就完事，剪映或 Premiere 做不到这个体量上的无损。\n它的实际能力比「剪切」多：逐帧步进定位关键帧、按时间段批量保留或移除、替换或合并片段、把任意容器转格式（走 FFmpeg 所以支持面很广）、提取音轨、改时间码、还有 3.69 版新增的「抽稀」——只保留关键帧把长视频压小。它还能用命令行批处理，一批文件套同一条剪切规则。\n代价要说清。它不是 NLE，没有时间线上的多轨编排、字幕轨、转场、关键帧动画，也没有音频混音台。切点只能落在关键帧上，两个关键帧之间的内容必然被丢弃（它会在剪切点附近关键帧不足时给出警告）。遇到 MP4 里关键帧间隔很长（长 GOP 录制）的情况，一刀下去可能要连带丢掉前后一秒多的内容。真要做成片，还得回到专业剪辑软件。\n还有一个安装坑要写在前面：Windows ARM64 版本的正式 release 里缺 ffmpeg.exe，作者自己在 release 说明里标了警告，让你改用 nightly 版。macOS 的 universal pkg 官方文件名里直接带 DONT-USE-THIS-FILE，选arm64 或 x64 的 dmg 才靠谱。\n许可证是 GPL v2 only（package.json 里写的是 GPL-2.0-only，不是 or-later），官网 https://losslesscut.app/ 与 GitHub release 页都有下载，Windows、macOS、Linux 都有构建，仓库在 https://github.com/mifi/lossless-cut。当前版本 3.69.0（2026-06-04），星标 4.4 万。",
+    officialUrl: "https://losslesscut.app/",
+    officialLabel: "losslesscut.app",
+    links: {
+      official: "https://losslesscut.app/",
+      github: "https://github.com/mifi/lossless-cut",
+    },
+    whoFor: "要处理录屏、课程录像、采访原片这类长视频，只需要截出几段、不想重编码损画质的人；或者需要用命令行批量处理片段的。",
+    whoNot: "要做多轨剪辑、加字幕轨、转场、音频混音的人——它不是剪辑软件；长 GOP 素材上对帧级精确有要求的人也不适合，切点只能落在关键帧。",
+    installTips: [
+      "从官网或 GitHub release 下载对应系统的包；macOS 选 arm64 或 x64 的 dmg，别用文件名带 DONT-USE-THIS-FILE 的 universal pkg。",
+      "Windows ARM64 设备请用 nightly 版，正式 release 缺 ffmpeg.exe，作者已在 release 说明里警告。",
+      "把视频拖进来，用左右方向键逐帧移动定位切点，注意时间线上标出的关键帧位置。",
+      "切完点「导出」，保持原始容器与编码参数（Copy 模式）就是无损；这一步别改成重新编码。",
+      "批量处理走命令行：lossless-cut-cli 输入文件 -f 00:01:00 -t 00:02:00 -o 输出文件。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#2E7D6B",
+    },
+  },
 ];

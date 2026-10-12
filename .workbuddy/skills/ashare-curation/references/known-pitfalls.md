@@ -138,3 +138,9 @@
 79. **负向断言要限定在页面主体内。** 「不该出现别的 source 徽章」这类检查全文搜必然误报：详情页底部的「同类替代」区块里每张卡片各带自己条目的徽章。凡是要断言「某元素不存在」的检查，先把范围切到该元素所在区块之前。
 
 80. **`SeedSoftware` 不接受 `status` 与 `previews`。** 草稿按 `Software` 写全字段，同步种子时这两个会报 TS2353（类型只认 `Software` 的子集）。种子里的等价物是 `installTips`（↔ `tutorial`）、`officialUrl` + `officialLabel`（无 `status` 时缺省即已发布）、图片字段在种子里压根不存在。
+
+81. **`alternatives` 填「看起来相关」的工具比留空更糟。** LosslessCut 所在目录里没有同类，硬塞了 `yt-dlp`（同属音视频处理）——但一个是下载工具一个是剪辑工具，读者点过去发现不对就是纯粹的浪费。**留空是诚实反映，留一个错的会主动误导。** 留空会让 `content:audit` 的缺口数字上升，那个数字上升是准确，不是退步。
+
+82. **同步种子时手抄字段比脚本转换危险得多。** 第三条改用「草稿 JSON → 程序化生成 TS 字面量 → 插入数组末尾」的流程，字段映射一次写死（`tutorial`→`installTips`、`links.official`→`officialUrl`、丢弃 `status`/`previews`），比逐字段手抄少一整类错误。**注意种子文件是 CRLF 换行**，按 `\n];\n` 找数组结尾会找不到，得先 `replace(/\n/g,'\r\n')`。
+
+83. **release 的文件名里可能直接写着「别用这个」。** LosslessCut 的 macOS universal 包叫 `..._DONT-USE-THIS-FILE.pkg`，Windows ARM64 的 `.appx` 同样。这类信息只出现在 release 资产名里，不看资产列表就会照着链接装上一个坏包。**收窄平台的条目必须逐个看资产名。**
