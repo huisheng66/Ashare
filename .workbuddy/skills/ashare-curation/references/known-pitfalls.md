@@ -208,3 +208,15 @@
 114. **`fmt()` 返回值别直接 spread。** 字符串字段 spread 会被逐字符拆成多行（`l` `i` `n` `k` `s`...），文件当场烂掉。统一 `[].concat(fmt(...))` 再展开。
 
 115. **回滚种子会连带撤掉同批已同步的其他条目。** 修一条的同步脚本时 `git checkout data/software.ts`，把同批 4 条的种子改动一起撤了，而运行库已经写进去了——`seed:drift` 立刻报 4 处不一致。**回滚前先确认这批还有没有别的条目没提交**，或者干脆重跑全部同步配置（幂等，`add-links.mjs` 与 `sync-body.mjs` 都能重复跑）。
+
+116. **Node 的 `spawnSync` 起 mysqldump 稳定报 EBUSY，bash 直跑同一个二进制却完全正常。** 最小 `node -e "spawnSync('C:/Program Files/MySQL/MySQL Server 8.4/bin/mysqldump',['--version'])"` 就能复现，`scripts/backup.mjs` 因此导不出库（指定 `MYSQLDUMP` 完整路径也一样）。**绕法：从 bash 手动导**——`MYSQL_PWD` 传密码 + `MYSQL_MIGRATE_URL` 的账号 + 显式 `-h127.0.0.1 -P3307 -u<user> --no-tablespaces`（坑位 104 的账号结论仍有效，只是失败形态从权限变成了 EBUSY），落到 `backups/manual-<时间戳>.sql`。
+
+117. **跑 scripts/ 下的任何脚本前先加载 .env.local，否则静默拿冻结快照算账。** `set -a && . ./.env.local && set +a && node scripts/xxx.mjs`。不加载时 `readCatalog` 只打一行「未配置 MYSQL_URL，回落到 data/store/catalog.json」就继续——P4 之后运行库的权威位置是 MySQL，`data/store/catalog.json` 是冻结快照。用快照跑 `content-audit` 会报出一堆假缺口，用 `node -e` 直读快照验证字段也会得到过期答案（本次：快照 55 条 vs 运行库 63 条）。**看到「回落」二字就当结果作废。**
+
+118. **`content-audit --json` 的字段标签是中文。** `missing` 数组里是「同类替代」「详细介绍」，`fieldStats[].label` 也是中文；没有 `alternatives` / `body` 这种英文 key。按英文过滤会得到 0 条，误判「没有缺口」。
+
+119. **正文里的 `**加粗**` 是受支持的，不是 Markdown 违规。** `components/RichText.tsx` + `lib/inlineText.ts` 故意解析 `**粗体**` 与 `` `行内代码` ``（注释原话：「强调意图是真实内容，不该靠删掉来修」），且有测试兜底。`ingest-item.mjs` 的 `MARKDOWN_HINTS` 曾把 `**` 当软提示、`smoke-detail.mjs` 曾把 `**` 当异常，**16 条按设计渲染的条目被误报**。没有解析器的只有标题（`#`）、列表（`-` / `1.`）、链接（`[]()`）三种。三处已对齐：ingest 提示、冒烟检查、audit 新增「正文格式」指标。改这类校验前先读 `lib/inlineText.ts` 的注释，那是前端能力的唯一权威。
+
+120. **冒烟探针必须先去行内标记、再忽略空白。** 两件事各有一次误报：探针直接取段落前 12 字，`**` 在渲染结果里已经变成 `<strong>` 标签，星号没了必然匹配不上；就算去过标记，`strip` 把每个标签换成一个空格，`一是**版本**` 的渲染文本是 `一是 版本`，跨加粗边界仍然差一个空格。正确做法：探针过 `inlineToPlainText`，再和渲染文本一起删掉所有空白后比较。
+
+121. **`icon.simpleIcon` 张冠李戴不报错，只有一行软提示。** voicestudio 的图标块写着 `simpleIcon: "audacity"`——指向另一个产品的图标名，文件又不存在，前端静默回落字母图标。**软提示也要逐条看**：给 A 产品配 B 产品的图标比字母图标更糟（读者认错品牌），要么删引用，要么给本条配自己的图标（`gh api repos/simple-icons/simple-icons/contents/icons/<name>.svg --jq '.content' | base64 -d`， obscure 项目大概率没有，那就删）。

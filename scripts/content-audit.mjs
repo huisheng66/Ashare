@@ -20,6 +20,12 @@ const USAGE = "用法: node scripts/content-audit.mjs [--top <条数>] [--scene 
 /** 每项给出缺失时的扣分：越影响「详情页能不能说服人」权重越高。 */
 const CHECKS = [
   { key: "body", label: "详细介绍", weight: 5, empty: (item) => !item.body?.trim() },
+  {
+    key: "bodyFormat",
+    label: "正文格式",
+    weight: 2,
+    empty: (item) => UNSUPPORTED_BODY_MARKDOWN.some((pattern) => pattern.test(item.body ?? "")),
+  },
   { key: "tags", label: "标签", weight: 3, empty: (item) => !item.tags?.length },
   { key: "whoFor", label: "适合", weight: 3, empty: (item) => !item.whoFor?.trim() },
   { key: "whoNot", label: "不适合", weight: 2, empty: (item) => !item.whoNot?.trim() },
@@ -53,6 +59,17 @@ const CHECKS = [
 ];
 
 const SCENE_MIN_STOCK = 3;
+
+// 正文里没有任何解析器的 Markdown 语法：标题、列表、链接。
+// **加粗** 与 `行内代码` 不算——components/RichText.tsx + lib/inlineText.ts
+// 故意支持这两种（强调意图是真实内容）。这项曾是监控盲区：冒烟报得出，
+// audit 完全不提，5 条带列表/链接的正文长期不在内容债数字里（2026-10-12 补）。
+const UNSUPPORTED_BODY_MARKDOWN = [
+  /^#{1,6}\s/m,
+  /^\s*[-*+]\s/m,
+  /^\s*\d+\.\s/m,
+  /\[[^\]\n]+\]\([^)\n]+\)/,
+];
 
 function parseArgs(argv) {
   const args = parseFlags(argv, { "--top": "number", "--scene": "value", "--json": "bool" });

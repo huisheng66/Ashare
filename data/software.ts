@@ -3663,11 +3663,10 @@ tuios list-options     # 所有可调项
       "装完先去 设置 → Performance & Device 看一眼当前算力设备（cuda / mps / cpu），这一栏能直接告诉你有没有真的在用显卡。",
       "第一次生成一定是最慢的（模型权重懒加载约 8 秒、CUDA 要编译内核），从第二次生成的耗时判断性能才有意义。",
     ],
-    alternatives: [],
+    alternatives: ["audacity"],
     icon: {
       letter: "V",
       color: "#5B4B8A",
-      simpleIcon: "audacity",
     },
     guide: {
       intro: "从四个工作区到引擎选择与硬件判断，讲清怎么把 VoiceStudio 装起来并跑通第一次合成。",

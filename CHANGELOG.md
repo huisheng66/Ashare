@@ -1,5 +1,44 @@
 # 变更记录
 
+## 2026-10-12 · music 场景补齐同类替代，修掉冒烟与 ingest 的 Markdown 误判（main）
+
+music 场景此前的 4 条全部没有「同类替代」，读者在详情页看不到任何引导。
+按「任务链上的不同环节，不是功能相似的竞品」的原则补挂：
+
+| 条目 | 环节 | 挂出 |
+| --- | --- | --- |
+| mineradio | 播放 / 发现 | musicbrainz-picard |
+| musicbrainz-picard | 标签整理 | audacity、mineradio |
+| audacity | 录音 / 剪辑 | voicestudio、musicbrainz-picard |
+| voicestudio | 语音生成 / 转录 | audacity |
+
+链路自洽：整理好的本地库用播放器听（picard → mineradio），剪辑导出的文件
+入库前补标签（audacity ↔ picard），录下的音转文字、生成的配音做后期
+（audacity ↔ voicestudio）。
+
+**顺手修掉两处图标缺陷。** voicestudio 的 `icon.simpleIcon` 写着
+`"audacity"`——指向另一个产品的图标名，而 `data/icons/audacity.svg` 并不存在，
+前端一直静默回落字母图标。已去掉这个错误引用；反过来给 audacity 条目补上了
+它自己的 simple-icon（simple-icons 仓库里有，`gh api` 取原文落盘）。
+给 A 产品配 B 产品的图标比字母图标更糟，读者会认错品牌。
+
+**三个校验脚本与前端设计脱节，本次对齐。** `components/RichText.tsx` +
+`lib/inlineText.ts` 本来就故意支持正文里的 `**加粗**` 与行内代码，
+`ingest-item.mjs` 却把 `**` 当软提示、`smoke-detail.mjs` 把 `**` 当异常，
+16 条按设计正常渲染的条目被冒烟误报。真正的违规只有标题、列表、链接这三种
+没有解析器的语法。改动：`ingest-item.mjs` 的 `MARKDOWN_HINTS` 去掉 `**`；
+`smoke-detail.mjs` 只拦不支持的语法，探针改为「先去行内标记、再忽略空白」
+比对（`strip` 把标签换成空格，加粗边界会注入空格，跨边界的探针必然误报）；
+`content-audit.mjs` 新增「正文格式」指标，把这笔长期不可见的欠账算进数字。
+
+**写入前的手动备份。** `npm run backup` 在本机 Node spawn 下稳定复现
+mysqldump EBUSY（bash 直跑同一二进制正常），改用 bash 手动导出，
+`backups/manual-20261012-151306.sql`。
+
+缺口变化：「同类替代」24 → 20；新增「正文格式」0 → 5（anydoc、firecrawl、
+markitdown、stremio-web、thealgorithms，下一批）；冒烟异常 16 → 5。
+`npm run check` 270 项 0 失败，`seed:drift` 0 条不一致。
+
 ## 2026-10-12 · texstudio / zotero / vscode 补正文、标签与安装提示（main）
 
 三条都只有 whoFor / whoNot 一句话，详情页没有「详细介绍」，搜索正文命中为零。

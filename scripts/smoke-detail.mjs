@@ -3,7 +3,19 @@
 import process from "node:process";
 
 import { readCatalog } from "./_shared.mjs";
+import { inlineToPlainText } from "../lib/inlineText.ts";
 const BASE = "http://127.0.0.1:3000";
+
+// 页面只支持两种行内语法：**加粗** 与 `行内代码`（components/RichText.tsx
+// → lib/inlineText.ts）。标题、列表、链接没有任何解析器，会原样显示在
+// 正文里——只有这些才算异常。曾把 ** 也当异常，16 条按设计渲染的条目被
+// 误报（2026-10-12：RichText 上线后冒烟没跟着改）。
+const UNSUPPORTED_MARKDOWN = [
+  [/^#{1,6}\s/m, "标题"],
+  [/^\s*[-*+]\s/m, "无序列表"],
+  [/^\s*\d+\.\s/m, "有序列表"],
+  [/\[[^\]\n]+\]\([^)\n]+\)/, "链接语法"],
+];
 
 const args = process.argv.slice(2);
 const slugs = args.filter((a) => !a.startsWith("--"));
@@ -14,6 +26,10 @@ const targets = slugs.length ? slugs : catalog.map((i) => i.slug);
 
 const strip = (html) => html.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]+>/g, " ");
 const norm = (text) => text.replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, "&").replace(/\s+/g, " ");
+// strip 把每个标签换成一个空格，**加粗** 与 `行内代码` 的边界因此多出空格
+// （原文 一是**版本** → 渲染文本 一是 版本）。探针跨边界时按忽略空白比对，
+// 否则带加粗的段落必然误报「未渲染」（2026-10-12：4 条踩中）。
+const squash = (text) => text.replace(/\s+/g, "");
 
 let failed = 0;
 for (const slug of targets) {
@@ -31,10 +47,14 @@ for (const slug of targets) {
   if (item.body?.trim()) {
     const paragraphs = item.body.split(/\n+/).filter((p) => p.trim());
     for (const [index, paragraph] of paragraphs.entries()) {
-      const probe = paragraph.slice(0, 12);
-      if (!text.includes(probe)) problems.push(`正文第 ${index + 1} 段未渲染（${probe}…）`);
+      // 页面会把 ** 与 ` 转成 <strong> / <code>，探针要先还原成纯文本再比，
+      // 否则以 ** 开头的段必然误报「未渲染」（星号在渲染结果里已经没了）。
+      const probe = inlineToPlainText(paragraph).slice(0, 12);
+      if (!squash(text).includes(squash(probe))) problems.push(`正文第 ${index + 1} 段未渲染（${probe}…）`);
     }
-    if (/\*\*|^#{1,6}\s/m.test(item.body)) problems.push("正文含 Markdown，会原样显示");
+    if (UNSUPPORTED_MARKDOWN.some(([pattern]) => pattern.test(item.body))) {
+      problems.push("正文含不支持的 Markdown（标题/列表/链接），会原样显示");
+    }
   }
   if (item.links?.official && !html.includes(item.links.official)) problems.push("官网链接未出现");
   if (item.links?.github && !html.includes(item.links.github)) problems.push("Git 链接未出现");

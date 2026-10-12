@@ -50,7 +50,7 @@ node .workbuddy/skills/ashare-curation/scripts/check-links.mjs --url <候选地�
 
 字段规格见 `references/item-fields.md`，范本见 `references/example-mineradio.md`。口吻遵守 PRODUCT.md：短句、具体、不煽；「适合 / 不适合」只谈任务和水平。
 
-正文四段式：① 是什么、解决什么 ② 核心特性，写具体行为 ③ 代价与风险 ④ 许可证与发布渠道。段落间空一行，不用 Markdown。
+正文四段式：① 是什么、解决什么 ② 核心特性，写具体行为 ③ 代价与风险 ④ 许可证与发布渠道。段落间空一行。标题、列表、链接语法没有任何解析器，会原样显示在页面上，不要用；`**加粗**` 与行内代码由 RichText 渲染，可以用（`lib/inlineText.ts` 的规则，有测试兜底）。
 
 **结构化字段**：核验到的许可证（SPDX，如 `GPL-3.0-only`）、版本号、链接核验日期要写进 `license` / `version` / `linksCheckedAt`，不要只写在正文里——写进正文就无法机器校验，也无法用于死链巡检。核验不到就留空，不要猜。
 
