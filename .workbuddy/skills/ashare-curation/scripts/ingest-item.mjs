@@ -240,6 +240,12 @@ async function main() {
   if (!Array.isArray(catalog)) throw new Error("运行库必须是条目数组");
 
   const knownSlugs = new Set(catalog.map((item) => item.slug));
+  // 同批新增的条目之间可以互挂 alternatives：把本批草稿的 slug 也算进已知集合。
+  // 否则三条新条目互相引用会被「不在目录中」拦下（2026-10-13 games 批次踩到）。
+  // 校验全部通过才会真正写入，所以批内引用不会产生悬空链接。
+  for (const draft of drafts) {
+    if (draft?.slug) knownSlugs.add(draft.slug);
+  }
   // --patch 先与库中条目合并再校验，避免局部更新漏掉必填字段或覆盖不想动的数据。
   const planned = [];
   for (const [index, draft] of drafts.entries()) {

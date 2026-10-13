@@ -1,5 +1,37 @@
 # 变更记录
 
+## 2026-10-13 · games 场景补库存：Sunshine / Moonlight / Heroic（main）
+
+回到收录主线。games 场景此前只有 anyps5 一条（薄场景，audit 的唯一建议动作），
+按「串流任务链 + 游戏库」收录三个 GitHub 活跃项目，场景补到 4 条：
+
+| 条目 | 仓库 | 许可证 | 版本 | 星数 |
+| --- | --- | --- | --- | --- |
+| Sunshine | `LizardByte/Sunshine` | GPL-3.0（LICENSE 原文） | 2026.914.233613 | 42,177 |
+| Moonlight | `moonlight-stream/moonlight-qt` | GPL-3.0（LICENSE 原文） | 6.2.0 | 19,078 |
+| Heroic Games Launcher | `Heroic-Games-Launcher/HeroicGamesLauncher` | GPL-3.0（COPYING 原文） | 2.22.3 | 12,382 |
+
+三个官网探活 0 异常；安装渠道与关键能力（AV1 / YUV 4:4:4 仅限 Sunshine、
+Heroic 的 Legendary / gogdl / Nile 三套商店实现）均以 README 为据。
+互挂：sunshine ↔ moonlight-qt（官方配套两端），heroic → 两者
+（游戏库管理是串流的上游环节）。Heroic 用 simple-icons 的自家品牌图标，
+另两条回落字母图标（simple-icons 无此二者）。
+
+**ingest 校验脚本修正：同批新条目互挂 alternatives 不再误拦。** knownSlugs
+原本只含已有目录，三条新条目互相引用会被「不在目录中」拦下。已把本批草稿的
+slug 计入已知集合——校验全部通过才会写入，批内引用不会产生悬空链接。
+
+**新工具 seed-append.mjs**：新条目整条插入种子用（sync-body.mjs 只会改已有
+条目的字段）。过程中连撞 SeedSoftware 的字段坑：类型里没有 status 也没有
+previews（后者在 samples.ts 能编译只因为那个数组无类型约束）；
+source / platforms / scenes 漏写被 seed:drift 揪出——且 drift 每条只报
+第一个不一致的字段，「共 3 处」修完还有下一轮，要跑到 0 为止。
+
+缺口变化：games 场景 1 → 4，薄场景清零；总条目 63 → 66。详细教程 8 → 11
+（三条新条目按「实测过才写」暂不写 guide）。同类替代维持 1（anyps5 仍无
+真实任务链邻居）。冒烟 66 页 0 异常，`npm run check` 270 项 0 失败，
+`seed:drift` 0 条不一致。
+
 ## 2026-10-13 · 19 条补齐同类替代，缺口 20 → 1（main）
 
 剩余 20 条缺「同类替代」的条目里，19 条按任务链挂上互链；anyps5 有意留空——

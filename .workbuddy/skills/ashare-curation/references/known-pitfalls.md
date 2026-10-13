@@ -236,3 +236,9 @@
 128. **`--strict` 对补字段批次再次值回票价：一轮揪出 9 个坏图标 + 1 篇过短正文。** 处置分三类：真品牌或生态标识（caddy、typescript、nvidia）下载补文件即可；张冠李戴（esp32-c3-adblock 挂 raspberry-pi，但 ESP32 是乐鑫的）换成自家品牌（espressif）；不存在或品牌不符（book、dumbbell、api、gnome-terminal、terminal）删引用回落字母。另外 yt-dlp 正文 177 字 < 200 字标准——**audit 的「详细介绍」只查非空，查不出过短**，全靠 strict 拦。还有：gnome-terminal 在 simple-icons 里叫 gnometerminal（无连字符），文件按精确名查找，别想当然。
 
 129. **编不出真实任务链就留空，别为清缺口硬挂。** anyps5 在 games 场景独苗，code/engineering 里也没有任务链邻居，硬挂 vscode/git 之类元工具就是撒谎。同类替代空着是软缺口，挂错关系是内容错误——后者更难被发现（渲染正常、卡片正常、只有懂行的人看得出来）。缺口的正确解法是补场景库存（收新的游戏工具），不是凑字段。
+
+130. **同批新增的条目互挂 alternatives 会被「不在目录中」误拦。** knownSlugs 建自已有目录，本批三条新条目互相引用时彼此都还「不存在」，--strict 下直接变错误。已修：把本批草稿的 slug 也计入已知集合——校验是全量先跑、全过才写，所以批内引用不会悬空。同理预期：引用「同批会写入」的 slug 是合法模式，别绕道分两批写。
+
+131. **新条目整条插种子，SeedSoftware 的字段比 Software 少：没有 status、没有 previews。** status 由 seedToItem 默认按 published 灌入；previews 在 samples.ts 出现过能编译，只因为那个数组没有类型约束——software.ts 是 `SeedSoftware[]`，对象字面量的超出属性检查（TS2353）会一个个撞给你看。写生成器前对着 types.ts 的 SeedSoftware 逐字段核对，source / scenes / platforms 这三个必填最容易漏。
+
+132. **seed:drift 每条只报第一个不一致的字段，「共 N 处」修完还有下一轮。** 漏写 source 报 3 处，修完变成漏写 platforms 报 3 处，再修还有 scenes——不是 drift 变卦，是它每条早退。要跑到「0 条」才算完，别把第一轮的报告当成全部问题清单。
