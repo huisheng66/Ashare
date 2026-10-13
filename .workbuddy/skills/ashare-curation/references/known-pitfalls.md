@@ -220,3 +220,11 @@
 120. **冒烟探针必须先去行内标记、再忽略空白。** 两件事各有一次误报：探针直接取段落前 12 字，`**` 在渲染结果里已经变成 `<strong>` 标签，星号没了必然匹配不上；就算去过标记，`strip` 把每个标签换成一个空格，`一是**版本**` 的渲染文本是 `一是 版本`，跨加粗边界仍然差一个空格。正确做法：探针过 `inlineToPlainText`，再和渲染文本一起删掉所有空白后比较。
 
 121. **`icon.simpleIcon` 张冠李戴不报错，只有一行软提示。** voicestudio 的图标块写着 `simpleIcon: "audacity"`——指向另一个产品的图标名，文件又不存在，前端静默回落字母图标。**软提示也要逐条看**：给 A 产品配 B 产品的图标比字母图标更糟（读者认错品牌），要么删引用，要么给本条配自己的图标（`gh api repos/simple-icons/simple-icons/contents/icons/<name>.svg --jq '.content' | base64 -d`， obscure 项目大概率没有，那就删）。
+
+122. **`gh api` 取 simple-icons 的 `.content` 是 base64，不能直接 grep。** `--jq '.content' | head -c 20 | grep svg` 永远不匹配——这次因此误判「markdown / stremio 图标都不存在」，差点把两个好图标判死刑。正确做法：`| base64 -d | head -c 100` 再找 `<svg`。另外 film.svg 在 simple-icons 里确实没有、stremio.svg 有：stremio-web 原本挂的 "film" 既是通用图标又不存在，已换自家品牌图标（pitfall 121 的又一例）。
+
+123. **机器重启后 mysqld 与 next dev 都会没，批次开工先确认两个都在。** 这次开工时 3307 没人听（ingest 会静默回落 JSON 快照，坑位 103），冒烟打 3000 直接 ECONNREFUSED。启动命令在 `docs/MySQL 迁移计划.md`：mysqld 是 `--datadir=%LOCALAPPDATA%\Ashare\mysql-data --port=3307 --bind-address=127.0.0.1 --mysqlx=0 --console` 后台跑（Windows 父子进程对，坑位 105）；dev 是 `npm run dev` 后台跑，就绪判据 `curl http://127.0.0.1:3000/` 返 200。**顺序：先起库再起 dev**，否则 dev 首屏请求会砸在没网的库上。
+
+124. **补字段的批次也值得带 `--strict`，它能揪出既存图标腐烂。** 这次五条只改正文，`--strict` 却报出 markitdown 的 `markdown.svg` 与 stremio-web 的 `film.svg` 不存在——非 strict 下这只是软提示里的一行，strict 直接升级成错误。补内容时顺手把这类既存缺陷修掉（下载真图标或换品牌图标），比留到下次撞上划算。
+
+125. **`sync-body.mjs` 替换字段前，先看字段是不是单独成行。** software.ts 有 20 条是 `body:` 单独一行、值在下一行的排版（samples.ts 没有这种）。旧脚本只换字段行，会把下一行的旧值留下——直接语法错误。之前几批没踩上纯属巧合（碰到的条目都排行内）。已修：字段行 trim 后恰好等于 `字段名:` 时连同下一行一起替换，多行数组/对象的栈配平逻辑不变。同类脚本 `patch-fields.mjs` 与 `add-links.mjs` 没有这个判断，用它们之前先确认目标字段是行内排版。

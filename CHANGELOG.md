@@ -1,5 +1,30 @@
 # 变更记录
 
+## 2026-10-13 · 清掉 5 条正文 Markdown 欠账，全站冒烟首次零异常（main）
+
+anydoc、firecrawl、markitdown、stremio-web、thealgorithms 五条的正文里混着
+列表块和一处链接语法——页面对这两种语法没有解析器，会原样显示。按「只改
+语法、不改事实」的原则把列表块改写为连贯段落，`**加粗**` 与行内代码保留，
+其余文字原样；thealgorithms 末尾的 `[DIRECTORY.md](url)` 改为括号内裸网址，
+导航信息不丢。
+
+**`--strict` 顺手揪出两条既存图标腐烂。** markitdown 挂着 `markdown.svg`、
+stremio-web 挂着 `film.svg`，两个文件都不存在，前端一直静默回落字母图标。
+markdown.svg 从 simple-icons 下载补上；film.svg 在 simple-icons 里不存在，
+但 stremio.svg 有——stremio-web 原本挂的 "film" 既是通用图标又不存在，
+换成自家品牌图标。（排查时先踩了个反向的坑：`gh api` 返回的 `.content` 是
+base64，直接 grep "svg" 永远不匹配，差点把两个好图标误判为不存在。）
+
+**修掉 `sync-body.mjs` 一个还没爆的雷。** software.ts 里有 20 条是 `body:`
+单独成行、值在下一行的排版，旧脚本只换字段行会把旧值留下，直接语法错误；
+之前几批没踩上只是巧合。已改为字段行恰好是 `body:` 时连同下一行一起替换，
+并用 git 条目的副本跑过 tsc 验证。
+
+缺口变化：「正文格式」5 → 0，「详细介绍 / 标签 / 适合 / 不适合 / 许可证 /
+链接核验」保持 0；冒烟异常从 16 → 5 → **0**（63 个详情页全绿）。
+`npm run check` 270 项 0 失败，`seed:drift` 0 条不一致。
+开工时 mysqld 与 dev 都已停（机器重启过），重新拉起后才做的备份与验证。
+
 ## 2026-10-12 · music 场景补齐同类替代，修掉冒烟与 ingest 的 Markdown 误判（main）
 
 music 场景此前的 4 条全部没有「同类替代」，读者在详情页看不到任何引导。
