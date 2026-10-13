@@ -3366,7 +3366,7 @@ openscad -D width=80 -D depth=50 -o custom.stl part.scad
       "装完先看 systemctl status caddy 有没有起来。装包会自动注册并启动 systemd 服务，不需要手动 run。",
       "证书要放在数据目录里，那个目录不能当缓存清——里面有私钥和 OCSP staple，清了要重新申请。",
     ],
-    alternatives: [],
+    alternatives: ["nodejs"],
     icon: {
       letter: "C",
       color: "#2D3142",
@@ -3525,11 +3525,10 @@ macOS 与 Windows 用 Homebrew / Chocolatey / Scoop 装的，配置文件位置�
       "Windows 与 FreeBSD/OpenBSD 走 GitHub Releases 的预编译二进制，别自己编译——从源码构建要 Go 1.26.6 以上。",
       "第一次用先跑 tuios --show-keys，它会盖一层键位提示在界面上，照着按几遍比读文档快。",
     ],
-    alternatives: [],
+    alternatives: ["vscode", "git"],
     icon: {
       letter: "T",
       color: "#4A4A6A",
-      simpleIcon: "gnome-terminal",
     },
     guide: {
       intro: "以「两个模式怎么切」和「会话为什么不会丢」为主线讲清最常用的操作，再说明 daemon 模式与布局模板怎么用。",
@@ -3823,7 +3822,7 @@ https://github.com/debpalash/VoiceStudio/blob/main/docs/install/agent.md
       "AMD 卡上先装 ROCm 版 PyTorch（pip install torch --index-url https://download.pytorch.org/whl/rocm7.0）再装 tilelang，运行时还需要主机侧装了 ROCm。",
       "源码构建、editable install、Docker、pip 提供的 CUDA 工具链、自定义 TVM checkout —— 这五种情况才需要看完整安装指南，装 PyPI 版的人不用看。",
     ],
-    alternatives: [],
+    alternatives: ["python", "jupyter"],
     icon: {
       letter: "T",
       color: "#1F6F6B",
@@ -4012,7 +4011,7 @@ CUDA、ROCm、Metal、LLVM（CPU），2026-09-30 起官方支持华为昇腾 950
       "在用 3.x 就先读 MIGRATION.md 再动，跨大版本有 API 变更。",
       "编辑器里把 Effect 的 LSP 配起来，错误通道的类型信息在 hover 里能省很多查文档的时间。",
     ],
-    alternatives: [],
+    alternatives: ["nodejs", "vscode"],
     icon: {
       letter: "E",
       color: "#3B4A8C",
@@ -4153,11 +4152,10 @@ Discord 是提问和交流的主场，官方核心团队在里面。Community Hu
       "手机用 passkey 访问必须在域名上配 HTTPS，.env 里改两行；官方有 Cloudflare Tunnel / Caddy / Traefik / nginx 四个方案。",
       "首次启动会一次性下载约 140MB 的动作媒体，先知道这件事免得以为卡住了。",
     ],
-    alternatives: [],
+    alternatives: ["immich", "esp32-c3-adblock"],
     icon: {
       letter: "G",
       color: "#2E7D5B",
-      simpleIcon: "dumbbell",
     },
     guide: {
       intro: "从 demo 试用到 Docker 部署，再到进阶规则怎么配，说明哪些配置项值得改、哪些别动。",
@@ -4320,11 +4318,11 @@ docker compose up -d
       "烧录前先 cp src/secrets.example.h src/secrets.h 改密码。默认密码是仓库里公开的值，固件只告警不阻止启动。",
       "装外壳时天线端要留空：C3 的 PCB 天线是 USB-C 口对面短边上的折线，不要埋进塑料或靠近金属，否则 RSSI 会掉。层高 0.2mm、约 15% 填充，不需要支撑。",
     ],
-    alternatives: [],
+    alternatives: ["immich", "opengym"],
     icon: {
       letter: "E",
       color: "#2B6CB0",
-      simpleIcon: "raspberry-pi",
+      simpleIcon: "espressif",
     },
     guide: {
       intro: "从烧录一次到之后只走 WiFi 更新，重点讲清 4MB flash 那个必须自己做的取舍。",
@@ -4685,11 +4683,10 @@ Linux 那一栏是官方自己标的问号。库函数和着色器的完成度�
       "默认主题跟随你终端的配色。想固定：yoinks --theme light 或 --theme dark；运行中按 ^t 循环切换。",
       "文件下到 ~/Downloads，完事会把路径打印到终端。",
     ],
-    alternatives: [],
+    alternatives: ["yt-dlp", "stremio-web"],
     icon: {
       letter: "Y",
       color: "#7B3FA0",
-      simpleIcon: "terminal",
     },
     guide: {
       intro: "从安装到交互界面的按键约定，再讲清它现在还不能做什么（roadmap 里的脚本化能力）。",
@@ -4826,7 +4823,7 @@ yoinks 会在首次运行时下载并执行第三方二进制（yt-dlp）。这�
       "要投屏用 Chromecast；键盘优先的播放器不放鼠标也能控制全部播放。",
       "想自己部署：docker build -t stremio-web . 然后 docker run -p 8080:8080 stremio-web。",
     ],
-    alternatives: [],
+    alternatives: ["yoinks"],
     icon: {
       letter: "S",
       color: "#7B5BF5",
@@ -4990,7 +4987,7 @@ GPL-2.0，版权归 Smart Code OOD（2017-2026）。
       "要 OCR 就装 markitdown-ocr 并传 llm_client——不传的话 OCR 会被静默跳过，命令照样成功但图片里的文字没了。",
       "转换不可信来源的文件时只调 convert_stream() 或 convert_local() 这类最窄的函数，别用宽接口。",
     ],
-    alternatives: [],
+    alternatives: ["anydoc", "firecrawl", "pandoc"],
     icon: {
       letter: "M",
       color: "#2B579A",
@@ -5236,7 +5233,7 @@ README 开头就警告了：**MarkItDown 的 I/O 权限就是当前进程的权�
       "用之前先读 LICENSE.md：它是 fair-code（Sustainable Use License），不是 MIT/Apache，商业与嵌入场景要自己确认边界。",
       "从模板起步比自己从零搭快得多——9000+ 工作流模板在 n8n.io/workflows。",
     ],
-    alternatives: [],
+    alternatives: ["openclaw"],
     icon: {
       letter: "n",
       color: "#EA4B71",
@@ -5367,11 +5364,10 @@ n8n 是 "nodemation" 的缩写：Node-View + Node.js + automation。作者觉得
       "仓库顶部的 APILayer 推广和它自家产品列表不是社区清单的一部分，看条目时注意区分。",
       "要提交新 API 的话看 CONTRIBUTING.md；清单是人工维护的，字段质量参差是正常的。",
     ],
-    alternatives: [],
+    alternatives: ["python", "jupyter"],
     icon: {
       letter: "P",
       color: "#2C6E49",
-      simpleIcon: "api",
     },
     guide: {
       intro: "讲清那三列元数据怎么用、怎么按认证方式筛、以及 MCP Servers 章节为什么和普通清单不一样。",
@@ -5522,11 +5518,10 @@ README 开头是 APILayer 的商业推广（它自家的 IPstack、Mediastack、
       "不只书：Cheat Sheets、Free Online Courses、Problem Sets、Programming Playgrounds 四个小节是自学路径的其他环节。",
       "要提交条目的话有中文版贡献指南（docs/CONTRIBUTING-zh.md），先读它再提 PR。",
     ],
-    alternatives: [],
+    alternatives: ["thealgorithms", "python", "vscode"],
     icon: {
       letter: "B",
       color: "#4A5D23",
-      simpleIcon: "book",
     },
     guide: {
       intro: "中文读者从哪个入口进、六个资源小节分别解决什么，以及怎么用搜索站而不是硬翻文件。",
@@ -5663,7 +5658,7 @@ README 开头是 APILayer 的商业推广（它自家的 IPstack、Mediastack、
       "想跑某个文件里的 doctest：python -m doctest <文件路径> -v。",
       "要提 PR 之前先搜一遍有没有同样的实现，重复实现不接受——但新解法、不同复杂度、不同表示是欢迎的。",
     ],
-    alternatives: [],
+    alternatives: ["free-programming-books", "python", "jupyter"],
     icon: {
       letter: "A",
       color: "#1F6F8B",
@@ -5821,7 +5816,7 @@ python -m doctest <文件路径> -v
       "接陌生用户之前先读安全指南和暴露运行手册；主会话的工具默认跑在宿主机上，除非你显式配置了沙箱。",
       "想关掉默认的每日版本检查和匿名功能统计，在配置里设 update.checkOnStart: false。",
     ],
-    alternatives: [],
+    alternatives: ["voicestudio", "firecrawl", "watermarksremover"],
     icon: {
       letter: "O",
       color: "#C4562A",
@@ -6051,7 +6046,7 @@ README 给了一张按目标索引的表，摘几条常用的：
       "本地装 CLI：firecrawl scrape https://firecrawl.dev，加 --only-main-content 只要正文。",
       "自托管前先读自托管指南：开源版是 AGPL-3.0 且不含云端那些额外功能，要准备 Redis、Playwright 和一组环境变量。",
     ],
-    alternatives: [],
+    alternatives: ["anydoc", "markitdown"],
     icon: {
       letter: "F",
       color: "#D1442A",
@@ -6257,7 +6252,7 @@ README 里有一节专门讲这个，原文意思是：Firecrawl 以 AGPL-3.0 �
       "安装时按需选功能——卸载的功能会停止加载并从界面消失，重装会恢复设置；只授予当前选择真正需要的权限。",
       "想自己构建：git clone 后跑 ./build.sh --dev（单独的 Developer变体），加 --install 可安装并启动。唯一依赖是 Xcode Command Line Tools。",
     ],
-    alternatives: [],
+    alternatives: ["tuios", "localsend"],
     icon: {
       letter: "V",
       color: "#4C8DFF",
@@ -6524,7 +6519,7 @@ README 里的原话：
       "先用 inspect_file.py 看清楚再动手：python3 service/scripts/inspect_file.py draft.md。确认干净后再跑 clean_file.py。",
       "Layer B 默认只打印提示词、不需要模型；要用本地 Ollama 需显式设置 WATERMARKS_REWRITE_BACKEND=ollama，且远程端点默认禁止。",
     ],
-    alternatives: [],
+    alternatives: ["openclaw"],
     icon: {
       letter: "W",
       color: "#2E7D6F",
@@ -6779,7 +6774,7 @@ curl -s "$WM/openapi.json"
       "要完全离线（含浏览器内）：装 @firecrawl/anydoc-wasm，或直接开https://firecrawl.github.io/anydoc/ 的演示页，文件不出本机。",
       "扫描版 PDF 默认会失败并报 NeedsOcr。确认可以上传后才加 --ocr hosted，并注意整份文档都会离开机器。",
     ],
-    alternatives: [],
+    alternatives: ["pandoc", "firecrawl", "markitdown"],
     icon: {
       letter: "A",
       color: "#B85C1E",

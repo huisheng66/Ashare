@@ -228,3 +228,11 @@
 124. **补字段的批次也值得带 `--strict`，它能揪出既存图标腐烂。** 这次五条只改正文，`--strict` 却报出 markitdown 的 `markdown.svg` 与 stremio-web 的 `film.svg` 不存在——非 strict 下这只是软提示里的一行，strict 直接升级成错误。补内容时顺手把这类既存缺陷修掉（下载真图标或换品牌图标），比留到下次撞上划算。
 
 125. **`sync-body.mjs` 替换字段前，先看字段是不是单独成行。** software.ts 有 20 条是 `body:` 单独一行、值在下一行的排版（samples.ts 没有这种）。旧脚本只换字段行，会把下一行的旧值留下——直接语法错误。之前几批没踩上纯属巧合（碰到的条目都排行内）。已修：字段行 trim 后恰好等于 `字段名:` 时连同下一行一起替换，多行数组/对象的栈配平逻辑不变。同类脚本 `patch-fields.mjs` 与 `add-links.mjs` 没有这个判断，用它们之前先确认目标字段是行内排版。
+
+126. **sync-body.mjs 的写盘在循环之后，一条抛错会让前面所有「替换」日志变成空话。** 18 条替换日志打完，第 19 条炸了（yt-dlp 不在 software.ts），种子一字未动——而日志看起来全部生效，`seed:drift` 才暴露真相。已修：单条失败跳过并继续、结尾统一写盘、显式列出失败项并置退出码 1。**以后以「种子已更新」这一行为准：没有它，前面打再多「替换」都等于没写。**
+
+127. **条目可能只在另一个种子里。** yt-dlp 在 data/samples.ts（第 1 条），sync-body.mjs 默认只处理 software.ts，报「种子里没有」。同步前先 `grep -l "slug: \"<slug>\"" data/software.ts data/samples.ts` 定位，再用 `SEED_FILE` 指过去。别看见「yt-dlp」在 software.ts 里出现几十次就以为条目在那——那些全是 yoinks 条目对它的引用。
+
+128. **`--strict` 对补字段批次再次值回票价：一轮揪出 9 个坏图标 + 1 篇过短正文。** 处置分三类：真品牌或生态标识（caddy、typescript、nvidia）下载补文件即可；张冠李戴（esp32-c3-adblock 挂 raspberry-pi，但 ESP32 是乐鑫的）换成自家品牌（espressif）；不存在或品牌不符（book、dumbbell、api、gnome-terminal、terminal）删引用回落字母。另外 yt-dlp 正文 177 字 < 200 字标准——**audit 的「详细介绍」只查非空，查不出过短**，全靠 strict 拦。还有：gnome-terminal 在 simple-icons 里叫 gnometerminal（无连字符），文件按精确名查找，别想当然。
+
+129. **编不出真实任务链就留空，别为清缺口硬挂。** anyps5 在 games 场景独苗，code/engineering 里也没有任务链邻居，硬挂 vscode/git 之类元工具就是撒谎。同类替代空着是软缺口，挂错关系是内容错误——后者更难被发现（渲染正常、卡片正常、只有懂行的人看得出来）。缺口的正确解法是补场景库存（收新的游戏工具），不是凑字段。

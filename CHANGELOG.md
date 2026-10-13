@@ -1,5 +1,38 @@
 # 变更记录
 
+## 2026-10-13 · 19 条补齐同类替代，缺口 20 → 1（main）
+
+剩余 20 条缺「同类替代」的条目里，19 条按任务链挂上互链；anyps5 有意留空——
+games 场景只有它一条，目录里没有任何真实的任务链邻居（它也和 code/engineering
+里其余条目接不上），硬挂等于撒谎。games 场景该做的是补库存，不是凑字段。
+
+几条主要链路：
+
+| 条目 | 挂出 | 链路含义 |
+| --- | --- | --- |
+| anydoc ↔ firecrawl ↔ markitdown | 互挂 | 转 Markdown 三兄弟：本地 Office 文件 / 网页 / 微软系文件，任务互补 |
+| free-programming-books ↔ thealgorithms | 互挂 | 学编程资源清单 → 算法实现练习集 |
+| openclaw → voicestudio, firecrawl, watermarksremover | 单向 | 本机 AI 助手的干活环节：语音 / 抓网页 / 清自己的输出标记 |
+| esp32-c3-adblock ↔ opengym，均 → immich | 自托管家族 | 网络层（DNS 拦截）、数据层（照片）、应用层（健身），同一拨人 |
+| yoinks ↔ yt-dlp ↔ stremio-web | yoinks↔yt-dlp 互挂 | 下载器与在线观看是媒体消费的两端 |
+| caddy → nodejs、effect → nodejs, vscode、tilelang → python, jupyter 等 | 单向 | 运行时与开发环境的任务链 |
+
+**`--strict` 又立功：一轮揪出 9 个坏图标。** caddy / typescript / nvidia 是
+真品牌或生态标识，从 simple-icons 下载补上；esp32-c3-adblock 挂的
+raspberry-pi 是张冠李戴（ESP32 是乐鑫的芯片），换成 simple-icons 里的
+espressif；book / dumbbell / api / gnome-terminal / terminal 五个在
+simple-icons 里不存在或品牌不符，删引用回落字母图标。
+**yt-dlp 的正文只有 177 字**，不足 200 字的完成标准（audit 的「详细介绍」
+只查非空，查不出过短）——只扩表述不编事实，补到 229 字。
+
+**修掉 `sync-body.mjs` 的第二个雷：写盘在循环之后。** 18 条「替换」日志
+打完，第 19 条（yt-dlp 在 samples.ts 不在 software.ts）抛错，整轮一行都
+没落盘——日志看起来全成功了。已改为单条失败跳过继续、结尾统一写盘并显式
+列出失败项。重跑后 `seed:drift` 0 条不一致。
+
+缺口变化：「同类替代」20 → 1（anyps5 有意保留）；冒烟 63 页 0 异常；
+`npm run check` 270 项 0 失败。
+
 ## 2026-10-13 · 清掉 5 条正文 Markdown 欠账，全站冒烟首次零异常（main）
 
 anydoc、firecrawl、markitdown、stremio-web、thealgorithms 五条的正文里混着
