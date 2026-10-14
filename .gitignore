@@ -63,3 +63,6 @@ backups/
 # graphify 图谱产物：每个源文件都会生成一份 wiki md，加缓存共 100+ 文件。
 # 纯本地产物，且可以从代码重新生成，不入库。
 graphify-out/
+
+# 收录素材暂存区：README/LICENSE 原文与草稿是外部内容 + 过程产物，不入库。
+data/inbox/

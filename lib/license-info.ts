@@ -38,6 +38,10 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   // 实测 free-programming-books 用它——书单仓库按 CC BY 4.0 发布，
   // 不写进表里前台就静默不显示，读者会以为没核过。
   "CC-BY-4.0": { summary: "允许商用闭源分发，需署名", tier: "permissive", allowsClosedSource: true },
+  // CC-BY-NC-SA 额外禁商用 + 要求相同方式共享，非宽松档——归 strong-copyleft
+  // （相同方式共享与 copyleft 同义；禁商用的细节由 summary 与 allowsClosedSource 表达）。
+  // 实测 hello-agents（Datawhale 教程仓库）用它——不进表前台静默不显示。
+  "CC-BY-NC-SA-4.0": { summary: "仅限非商业使用，需署名且衍生作品同方式共享", tier: "strong-copyleft", allowsClosedSource: false },
   // Artistic 是宽松但要保留声明（Perl 系标准许可，ExifTool 与 Perl 本身用它）。
   // 不写进表里前台就静默不显示，读者会以为没核过。
   "Artistic-1.0-Perl": { summary: "允许商用闭源分发，需保留许可声明", tier: "permissive", allowsClosedSource: true },

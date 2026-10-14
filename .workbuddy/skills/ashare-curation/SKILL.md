@@ -27,6 +27,30 @@ agent_created: true
 
 每一步都有一个闸门，过不去就停在这一步。
 
+### 快速通道（收录新条目的标准路径）
+
+收录一个项目需要的**素材**只有五样，`collect` 一键搞定：README 原文、
+LICENSE 原文、仓库元数据（星数 / 最近推送 / 最新版本）、许可证检测、
+simple-icons 图标。素材落在 `data/inbox/<slug>/`（不入 git）。
+
+```
+npm run collect -- keepassxreboot/keepassxc --slug keepassxc   # 一键采集素材
+node scripts/draft-from-inbox.mjs keepassxc                    # 素材 → draft.json
+#   自动填：slug/name/summary/license(按原文判读)/version/links/icon/linksCheckedAt
+#   人工补：scenes、platforms、tags、aliases、body(四段式，依据 README.md)、
+#           whoFor、whoNot、price、alternatives（编不出任务链就留空）
+ingest --file data/inbox/keepassxc/draft.json --dry-run --strict   # 预检
+ingest --file data/inbox/keepassxc/draft.json --strict             # 写运行库
+npm run seed:upsert data/inbox/keepassxc/draft.json                  # 写种子（整条 upsert）
+```
+
+硬红线与下方的核验规则**全部适用**——collect 只是替你取素材，判读责任不变：
+license 以 LICENSE.txt 原文为准（GitHub 检测仅参考，会误报 NOASSERTION）；
+正文与教程依据 README 写，不凭印象；icon 已自动落位 data/icons/。
+`seed:upsert` 对已有 slug 是**整条重建**，所以更新条目 = 改 draft 再跑一遍。
+
+下面的分步说明是背景规则与踩坑细节，逐条仍然有效。
+
 ### 1. 备份 → 快照存在
 
 `npm run backup`。运行库不在 git 里，写入前必须留快照。

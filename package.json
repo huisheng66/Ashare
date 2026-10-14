@@ -29,7 +29,10 @@
     "merge:guides": "node scripts/merge-guides.mjs",
     "add:trending": "node scripts/add-trending.mjs",
     "stale-links": "node --env-file-if-exists=.env.local scripts/stale-links.mjs",
-    "verify:report": "node scripts/verify-report-refs.mjs"
+    "verify:report": "node scripts/verify-report-refs.mjs",
+    "collect": "node --env-file-if-exists=.env.local scripts/collect-project.mjs",
+    "draft": "node --env-file-if-exists=.env.local scripts/draft-from-inbox.mjs",
+    "seed:upsert": "node --env-file-if-exists=.env.local scripts/sync-seed.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

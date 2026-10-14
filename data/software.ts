@@ -12190,7 +12190,37 @@ yarn dev:collector
     },
     license: "AGPL-3.0",
   },
-
-
-
+  {
+    license: "GPL-3.0",
+    version: "2.7.12",
+    slug: "keepassxc",
+    linksCheckedAt: "2026-10-14",
+    name: "keepassxc",
+    nameZh: "KeePassXC",
+    aliases: ["keepassxc", "keepass xc", "密码管理器", "开源密码库"],
+    kind: "opensource",
+    source: "opensource",
+    scenes: ["office", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    tags: ["密码管理", "密码生成", "TOTP", "开源"],
+    summary: "离线加密的密码管理器：账号、密码、TOTP 存进一个 KDBX 文件，浏览器集成与自动填充全在本地完成。",
+    body: "KeePassXC 是开源的离线密码管理器，把账号、密码、TOTP 令牌、附件和笔记存进一个加密的 KDBX 文件里。它解决的是「密码交给谁保管」——答案是不交给任何人：数据库文件离线存放，加密在本地完成，愿意的话自己把它同步到网盘或任意设备。\n具体能力都对着日常使用来：浏览器插件覆盖 Chrome、Firefox、Edge、Vivaldi、Brave、Tor 等主流浏览器，自动填充和 passkey 都走本地集成；内置密码生成器与 TOTP 令牌管理；支持 YubiKey / OnlyKey 挑战应答当第二把钥匙；Auto-Type 能往任意应用里填表单；可以从 1Password、Bitwarden、Proton Pass 和 CSV 导入存量密码；还有密码健康报告与 HIBP 泄露查询。另有命令行版 keepassxc-cli，无桌面环境也能操作数据库。\n代价要先知道：它没有官方云服务，多设备同步要自己搭——把数据库文件放进网盘或用 Syncthing 同步，版本冲突得手动处理；浏览器集成需要在插件里显式授权数据库连接，上手步骤比云端密码管理器多；换设备时必须带齐数据库文件、主密码和可能的密钥文件，没有任何找回通道，丢了就是真丢了。\n仓库 COPYING 为 GPL-3.0 全文，README 声明代码按 GPL-2 或 GPL-3 双许可；官网提供三平台安装包，Linux 另有发行版仓库。",
+    officialUrl: "https://keepassxc.org/",
+    officialLabel: "keepassxc.org",
+    links: {
+      official: "https://keepassxc.org/",
+      github: "https://github.com/keepassxreboot/keepassxc",
+    },
+    price: "免费",
+    installTips: [
+      "从官网下载对应系统安装包；Linux 也可用发行版仓库或 AppImage。",
+      "首次使用先创建数据库：设一个强主密码，有 YubiKey 的在这一步一并绑定。",
+      "浏览器装 KeePassXC 插件，回到应用里启用浏览器集成并授权该数据库。",
+      "存量密码用「数据库 → 导入」从 CSV、1Password 或 Bitwarden 迁移进来。",
+    ],
+    whoFor: "想把密码完全留在自己手里、不信任云端托管的人；需要离线可用、跟 KDBX 生态互通的人。",
+    whoNot: "想要官方多设备同步和找回机制的人——那是 Bitwarden 这类云服务的地盘，丢了主密码它也救不了你。",
+    alternatives: ["syncthing"],
+    icon: { letter: "K", color: "#0071e3", simpleIcon: "keepassxc" },
+  },
 ];

@@ -1,5 +1,50 @@
 # 变更记录
 
+## 2026-10-14 · 收录流程简化：collect / draft / seed:upsert 三件套（+KeePassXC，总条目 107）
+
+「收录一个项目需要收集什么」从此在项目里定义清楚，不再每批手写种子脚本：
+
+| 步骤 | 命令 | 做什么 |
+| --- | --- | --- |
+| ① 采集 | `npm run collect -- <owner/repo> --slug <slug>` | README 原文、LICENSE 原文、仓库元数据、许可证检测、simple-icons 图标，落 `data/inbox/<slug>/`（已 gitignore） |
+| ② 起草 | `npm run draft -- <slug>` | 素材 → draft.json：自动填 slug / name / summary / license（按原文判读）/ version / links / icon / linksCheckedAt，并列出待补清单 |
+| ③ 判断 | 人工补 draft.json | scenes、platforms、tags、aliases、body（四段式，依据 README）、whoFor / whoNot、price、alternatives——内容判断没有捷径 |
+| ④ 入库 | ingest `--dry-run --strict` → `--strict` | 与原流程相同的闸门 |
+| ⑤ 种子 | `npm run seed:upsert <draft>` | 整条 upsert：新条目追加、已有条目整条重建（替代仓库外的 seed-append / sync-body / add-links 三个脚本） |
+
+许可证判读内建在 ②：GitHub 检测仅作参考（会误报 NOASSERTION），以
+LICENSE 原文为准，兼容全文式与应用式两种写法；判不出的自定义许可留空。
+图标自动落位 `data/icons/`；draft.json 有防覆盖护栏（body 非空拒绝重生成）。
+注意 `seed:sync` 是另一个既有工具（种子 → 运行库），本套走的是 `seed:upsert`。
+
+**端到端验证：KeePassXC 入库（总条目 107）。** 密码管理器是目录真实缺口。
+GPL-3.0（COPYING 原文判读，GitHub 报 NOASSERTION）、v2.7.12、22.5k★；
+alternatives 挂 syncthing（KDBX 数据库跨设备同步的搭档），office/tools
+双场景。冒烟 0 异常。
+
+**顺带修一个既有测试失败：** hello-agents 的 CC-BY-NC-SA-4.0 缺展示文案，
+license-info 与 seed 两条测试红——已在 lib/license-info.ts 补上
+（禁商用 + 相同方式共享，allowsClosedSource: false）。
+
+## 2026-10-14 · Turnstile 人机验证：登录 / 反馈 / 推荐三表单接入
+
+按 Cloudflare Spin 流程接入 Turnstile。服务端 `lib/turnstile.ts` 走 siteverify，
+令牌单次有效、网络异常一律拒绝（fail-closed）；两项密钥（`TURNSTILE_SITE_KEY` +
+`TURNSTILE_SECRET_KEY`）必须同时配置才启用，半配置与未配置行为一致——本地开发
+和既有部署不受影响。前端 `components/Turnstile.tsx` 显式渲染官方窗口，令牌由回调
+直接写进非受控隐藏字段 `cf-turnstile-response`，组件零 React state（新版
+react-hooks/set-state-in-effect 规则也不允许 effect 里 setState）；被拒后由
+action 返回的 state 对象作为 resetKey 触发命令式重置换新令牌。
+
+验证时机刻意区分：登录在验口令**之前**（拦机器对口令的探测），公开表单在内容
+校验通过**之后**（格式错误不该烧掉用户刚解的验证）。登录表单同步改为
+useActionState 原地报错，不再走 ?e= 重定向往返；requireAdmin 带来的 ?e=blocked
+经 initialError 保留。`stale.test` 行号表随 actions.ts 增行同步 +7（187/191/215）。
+
+已知遗留：hello-agents 的 CC-BY-NC-SA-4.0 缺展示文案（license-info 与 seed 两条
+测试红，系 4ffce5b 入库时遗留，与本次无关）；Secret Key 待填入 .env.local 后
+端到端验证。
+
 ## 2026-10-14 · 合并远程 40 条自动收录并补全核验（66 → 106）
 
 `git push` 被拒后发现远程多了一个 ashare-bot 的提交（当天 14:53）：向
