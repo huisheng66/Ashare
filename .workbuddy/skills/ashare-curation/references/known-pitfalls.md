@@ -242,3 +242,9 @@
 131. **新条目整条插种子，SeedSoftware 的字段比 Software 少：没有 status、没有 previews。** status 由 seedToItem 默认按 published 灌入；previews 在 samples.ts 出现过能编译，只因为那个数组没有类型约束——software.ts 是 `SeedSoftware[]`，对象字面量的超出属性检查（TS2353）会一个个撞给你看。写生成器前对着 types.ts 的 SeedSoftware 逐字段核对，source / scenes / platforms 这三个必填最容易漏。
 
 132. **seed:drift 每条只报第一个不一致的字段，「共 N 处」修完还有下一轮。** 漏写 source 报 3 处，修完变成漏写 platforms 报 3 处，再修还有 scenes——不是 drift 变卦，是它每条早退。要跑到「0 条」才算完，别把第一轮的报告当成全部问题清单。
+
+133. **把种子条目转回 ingest 草稿时，最容易漏的就是 guide。** 转换器照着常用字段写映射，guide（含 intro/markdown/resources 三层结构）没映射，40 条入库后全部没有详细教程——drift 报 40 条不一致才暴露。转换器要对照 SeedSoftware 的完整字段清单逐项写，可选字段（guide/featured/kind/license/version/linksCheckedAt）一个都不能凭「大概率没有」跳过。
+
+134. **seed:drift 对 guide 的比较不对称：种子侧先过 normalizeGuide，DB 侧按原样。** 同步脚本写的就是归一化后的值，所以那条链路天然一致；但手写补丁直接灌原始 guide，会出现「内容一字不差却报 40 条不一致」的灵异现场。修法：入库前先过 `lib/guide.ts` 的 normalizeGuide。排查这类问题先做归一化再怀疑内容写错。
+
+135. **自动收录 bot 的批量提交不可直接灌库——测试绿了不等于能入库。** 实测一个声称「未凭印象编造」的 40 条提交：license 字段整体缺失、1 条教程带红线词「绿色版」、2 条 whoFor 带身份词、4 个图标文件缺失。npm run check 只能拦图标与种子结构；红线词与身份词要靠 ingest --strict，许可证要逐仓库查 LICENSE 原文（GitHub 的 spdx_id 会误报：llms-from-scratch 实为 Apache-2.0 却报 NOASSERTION）。合并后必须走完整收录流程再灌库。

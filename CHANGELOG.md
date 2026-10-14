@@ -1,5 +1,38 @@
 # 变更记录
 
+## 2026-10-14 · 合并远程 40 条自动收录并补全核验（66 → 106）
+
+`git push` 被拒后发现远程多了一个 ashare-bot 的提交（当天 14:53）：向
+software.ts 新增 40 条 AI/agent 方向项目（Ollama、Dify、LangChain、
+Transformers、vLLM、RAGFlow、PaddleOCR、Browser-Use、OpenHands、
+AnythingLLM、RustDesk 等），并删除 data/trending-incoming 下 20 个已入库的
+历史批次文件。合并策略：保留本地 61 条（含全部字段修复），按 slug 去重后
+追加远程的 40 条，种子 61 → 101。
+
+**bot 的提交不可直接灌库，核验发现四类问题：**
+
+1. **40 条全部没有 license 字段**——与提交说明「未凭印象编造」不符。
+   逐仓库查 LICENSE 原文后填了 36 条（MIT ×14、Apache-2.0 ×14、
+   AGPL-3.0 ×3、CC0-1.0 ×1、CC-BY-NC-SA-4.0 ×1、Apache-2.0 ×3 含
+   llms-from-scratch——GitHub 误报 NOASSERTION，实为 Apache-2.0）；
+   AutoGPT（双许可）、Dify / Open WebUI / LobeHub（自定义附加条件许可）
+   四家按 n8n 先例留空，由正文第 4 段承担。
+2. **rustdesk 教程含红线词「绿色版」**（后台按子串匹配拒收）——改为「便携版」。
+3. **2 条 whoFor 带身份词「学生」**（llms-from-scratch、ai-for-beginners）——
+   按只谈任务和水平的原则改写。
+4. **4 个图标文件缺失**——simple-icons 里全有，下载 ollama / langchain /
+   huggingface / rustdesk 四个 SVG。
+
+**修掉两个流程坑**：种子转草稿的转换器漏映射 guide 字段（40 条入库后全部
+没有详细教程，drift 报 40 处不一致才发现）；drift 对 guide 的比较不对称——
+种子侧过 normalizeGuide、DB 侧按原样，手写补丁必须先归一化再入库，否则
+「内容一模一样也报不一致」。
+
+缺口变化：总条目 66 → 106；同类替代 1 → 41（40 条新条目待挂）、许可证 0 → 4
+（四家自定义许可，诚实缺口）、详细教程维持 11（photo 场景 8 条实测后再写，
+新 3 条 games 同理）。薄场景维持清零。冒烟 106 页 0 异常，check 270 项
+0 失败，seed:drift 0 条不一致。
+
 ## 2026-10-13 · games 场景补库存：Sunshine / Moonlight / Heroic（main）
 
 回到收录主线。games 场景此前只有 anyps5 一条（薄场景，audit 的唯一建议动作），

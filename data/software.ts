@@ -7599,6 +7599,7 @@ README 里所有示例都钉在具体版本（\`2.2.3\`）。这不是保守：\
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "hermes-agent",
@@ -7707,6 +7708,7 @@ Add-MpPreference -ExclusionPath "$env:LOCALAPPDATA\\hermes\\bin"
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "rea",
@@ -7831,6 +7833,7 @@ REA 返回的每条边都标 \`EXTRACTED\`（源码里明写）或 \`INFERRED\`�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "autogpt",
@@ -8063,6 +8066,7 @@ Ollama 的定位是**让本地模型跑起来**，不是**把本地模型服务�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "transformers",
@@ -8200,6 +8204,7 @@ transformers chat Qwen/Qwen2.5-0.5B-Instruct
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "ponytail",
@@ -8295,6 +8300,7 @@ transformers chat Qwen/Qwen2.5-0.5B-Instruct
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "dify",
@@ -8644,6 +8650,7 @@ LangChain 演进很快，\`Chain\` 时代那批教程（\`LLMChain\`、\`Convers
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "moneyprinterturbo",
@@ -8756,6 +8763,7 @@ LangChain 演进很快，\`Chain\` 时代那批教程（\`LLMChain\`、\`Convers
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "graphify",
@@ -8899,6 +8907,7 @@ graphify install --project --platform codex
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "browser-use",
@@ -9044,6 +9053,7 @@ Python 库是 MIT、免费。但**模型推理和托管浏览器都要钱**—�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "caveman",
@@ -9175,6 +9185,7 @@ README 里有专门的 HONEST-NUMBERS 一节，值得先看。几个关键点：
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "tradingagents",
@@ -9329,6 +9340,7 @@ README 顶部有一句加粗：本框架为研究用途设计，交易表现取�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "llms-from-scratch",
@@ -9348,7 +9360,7 @@ README 顶部有一句加粗：本框架为研究用途设计，交易表现取�
       official: "https://amzn.to/4fqvn0D",
       github: "https://github.com/rasbt/LLMs-from-scratch",
     },
-    whoFor: "有 Python 基础、想真正理解注意力与 GPT 内部构造的学生与工程师；以及要给学生准备可动手教材的老师。",
+    whoFor: "有 Python 基础、想真正理解注意力与 GPT 内部构造的工程师与自学者；要找可动手教材备课的老师也用得上。",
     whoNot: "想三天内做出一个能用的 AI 应用的人——这里全是原理与手写实现；也不适合没有 Python 基础的人，README 把「扎实的 Python 功底」列为最重要的前提。",
     installTips: [
       "`git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git` 拉代码，按 ch02 → ch07 的章节顺序读 notebook，每章目录下的 `01_main-chapter-code/` 是主代码。",
@@ -9455,6 +9467,7 @@ PyTorch 这边：不要求精通，但熟悉基础有用。完全没碰过就先
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "claude-mem",
@@ -9589,6 +9602,7 @@ worker 启动时会打印一个 URL，那是实时的 memory stream web viewer�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "deep-live-cam",
@@ -9727,6 +9741,7 @@ README 把 CLI 参数一节标了 Unmaintained，但常用的还在：\`--mouth-
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "taste-skill",
@@ -9861,6 +9876,7 @@ README 里有一条 Disclaimer：Taste Skill 没有官方代币、代币或加�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "vllm",
@@ -9984,6 +10000,7 @@ vLLM 是生产组件，不是本地玩具。以下情况都不划算：
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "ragflow",
@@ -10090,6 +10107,7 @@ README 的 Docker 配置页明确标注 **macOS 目前不在支持列表**。别
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "paddleocr",
@@ -10190,6 +10208,7 @@ PP-OCRv6 分三档，不是越大越好：
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "openhands",
@@ -10285,6 +10304,7 @@ Canvas 连的是 Agent Server（一个 REST API，一台机器一个 host/port�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "crawl4ai",
@@ -10428,6 +10448,7 @@ BFS / DFS / best-first 三种策略，长任务有 \`resume_state\` 断点恢复
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "deer-flow",
@@ -10537,6 +10558,7 @@ InfoQuest 的 reader、网页搜索、图片搜索用的是 **30 秒 HTTP 连接
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "lobehub",
@@ -10766,6 +10788,7 @@ rtk run <cmd>                   # 原样执行，不过滤
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "archify",
@@ -10877,6 +10900,7 @@ the API checks Redis, and a cache miss queries PostgreSQL and fills the cache.
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "hello-agents",
@@ -10970,6 +10994,7 @@ README 写得很明确：**会 Python，知道怎么通过 API 调一次 LLM**�
         },
       ],
     },
+    license: "CC-BY-NC-SA-4.0",
   },
   {
     slug: "unsloth",
@@ -11082,6 +11107,7 @@ Linux / Mac 上先配一次 NVIDIA toolkit（官方脚本 \`install_nvidia_toolk
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "llamafactory",
@@ -11179,6 +11205,7 @@ README 用 NOTE 明确写：**除了它列出的那几个链接，其他网站�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "headroom",
@@ -11295,6 +11322,7 @@ headroom proxy --port 8787
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "ai-for-beginners",
@@ -11314,7 +11342,7 @@ headroom proxy --port 8787
       official: "https://github.com/microsoft/AI-For-Beginners",
       github: "https://github.com/microsoft/AI-For-Beginners",
     },
-    whoFor: "想系统补齐 AI 基础的学生和转行者：搞清神经网络为什么这样工作，能用 TensorFlow / PyTorch 写得出模型，而不是只会调 API。",
+    whoFor: "想系统补齐 AI 基础的初学者和转行者：搞清神经网络为什么这样工作，能用 TensorFlow / PyTorch 写得出模型，而不是只会调 API。",
     whoNot: "想学大模型应用（RAG、Agent、微调）的人——这门课停在经典深度学习；也不适合想快速上手做出产品的人。",
     installTips: [
       "仓库含 50+ 语言翻译，直接 clone 很大；用 sparse checkout：`git clone --filter=blob:none --sparse https://github.com/microsoft/AI-For-Beginners.git`，然后 `git sparse-checkout set --no-cone '/*' '!translations' '!translated_images'`（Windows CMD 用双引号）。",
@@ -11393,6 +11421,7 @@ README 顶部有 Binder 徽章，点进去直接在浏览器里运行 notebook�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "system-prompts-leaks",
@@ -11493,6 +11522,7 @@ README 的 **Most recent additions/changes** 表是这个仓库的索引，每�
         },
       ],
     },
+    license: "CC0-1.0",
   },
   {
     slug: "ai-engineering-from-scratch",
@@ -11606,6 +11636,7 @@ python3 scripts/project_test.py retrieval-evaluation-lab \\
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "strix",
@@ -11727,6 +11758,7 @@ strix view --host 0.0.0.0 --port 8080 --no-open   # 需要固定端口对外时
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "openmontage",
@@ -11832,6 +11864,7 @@ AGPL-3.0，改了要一并开源。它不是一个独立软件——**必须挂�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "mem0",
@@ -11953,6 +11986,7 @@ cd server && docker compose up -d   # 手动：起栈后走浏览器向导
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "anything-llm",
@@ -12068,6 +12102,7 @@ yarn dev:collector
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "rustdesk",
@@ -12089,11 +12124,7 @@ yarn dev:collector
     },
     whoFor: "需要远程访问自己设备的人：家里 NAS / 开发机的维护、帮家人处理电脑故障、TeamViewer 判定商用后的替代方案。",
     whoNot: "只想偶尔连一次且不在乎商用检测的人，或没有公网服务器也不打算折腾——用默认公共服务器即可，不必强行自建。",
-    installTips: [
-      "直接官网下载对应系统的安装包即可，Windows / macOS / Linux 都有现成构建，不需要自己编译 Rust。",
-      "客户端绿色版双击就能跑，控制端与被控端是同一个程序，两侧都装它。",
-      "要自建服务器请另行部署 rustdesk-server 的 hbbs 与 hbbr，客户端里填服务器地址与 key；只有windows/macOS/linux 官方二进制，别把它和客户端装在同一台机器上抢端口。",
-    ],
+    installTips: ["直接官网下载对应系统的安装包即可，Windows / macOS / Linux 都有现成构建，不需要自己编译 Rust。", "客户端便携版双击就能跑，控制端与被控端是同一个程序，两侧都装它。", "要自建服务器请另行部署 rustdesk-server 的 hbbs 与 hbbr，客户端里填服务器地址与 key；只有windows/macOS/linux 官方二进制，别把它和客户端装在同一台机器上抢端口。"],
     alternatives: [],
     icon: {
       letter: "R",
@@ -12157,6 +12188,7 @@ yarn dev:collector
         },
       ],
     },
+    license: "AGPL-3.0",
   },
 
 
