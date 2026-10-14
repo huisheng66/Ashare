@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import { submitSubmission, SubmissionState } from "@/app/submit/actions";
 import { Field, FormError, FormSuccess, hintId } from "@/components/form-field";
+import { Turnstile } from "@/components/Turnstile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,14 +26,16 @@ const kindOptions = [
   { value: "opensource", label: "开源项目" },
 ];
 
-export function SubmitForm() {
+/** siteKey 来自服务端，未配置 Turnstile 时整个验证不出现。 */
+export function SubmitForm({ siteKey }: { siteKey?: string }) {
   const [version, setVersion] = useState(0);
-  return <SubmissionFields key={version} onReset={() => setVersion((value) => value + 1)} />;
+  return <SubmissionFields key={version} siteKey={siteKey} onReset={() => setVersion((value) => value + 1)} />;
 }
 
-function SubmissionFields({ onReset }: { onReset: () => void }) {
+function SubmissionFields({ siteKey, onReset }: { siteKey?: string; onReset: () => void }) {
   const [values, setValues] = useState({ kind: "app", name: "", url: "", need: "" });
   const statusRef = useRef<HTMLHeadingElement>(null);
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(
     submitSubmission,
     initial,
@@ -40,6 +44,12 @@ function SubmissionFields({ onReset }: { onReset: () => void }) {
   useEffect(() => {
     if (state.ok) statusRef.current?.focus();
   }, [state.ok]);
+
+  // 通行证可能刚好在填表期间过期：这一页没有验证框，用户会看到「人机验证未通过」
+  // 却无从下手。刷新一次让服务端重新判断，验证框就会出现（已填内容由本组件状态保留）。
+  useEffect(() => {
+    if (state.code === "captcha" && !siteKey) router.refresh();
+  }, [state, siteKey, router]);
 
   if (state.ok) {
     return (
@@ -109,6 +119,7 @@ function SubmissionFields({ onReset }: { onReset: () => void }) {
             placeholder="例如：需要点选做 t 检验，不想先学 R"
           />
         </Field>
+        {siteKey ? <Turnstile siteKey={siteKey} action="submit" resetKey={!state.ok && state.message ? state : undefined} /> : null}
         <FormError message={state.message} />
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-border pt-6">
           <Button type="submit" size="lg" disabled={pending}>

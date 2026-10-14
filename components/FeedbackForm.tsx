@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import { submitFeedback, FeedbackState } from "@/app/feedback/actions";
 import { Field, FormError, FormSuccess, hintId } from "@/components/form-field";
+import { Turnstile } from "@/components/Turnstile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,20 +28,27 @@ const typeOptions = [
 
 type Prefill = { slug: string; name: string };
 
-/** prefill 来自详情页「信息有误？反馈」，预填关联条目。 */
-export function FeedbackForm({ prefill }: { prefill?: Prefill }) {
+/** prefill 来自详情页「信息有误？反馈」，预填关联条目。siteKey 来自服务端，未配置时整个验证不出现。 */
+export function FeedbackForm({ prefill, siteKey }: { prefill?: Prefill; siteKey?: string }) {
   const [version, setVersion] = useState(0);
-  return <FeedbackFields key={version} prefill={version ? undefined : prefill} onReset={() => setVersion((value) => value + 1)} />;
+  return <FeedbackFields key={version} prefill={version ? undefined : prefill} siteKey={siteKey} onReset={() => setVersion((value) => value + 1)} />;
 }
 
-function FeedbackFields({ prefill, onReset }: { prefill?: Prefill; onReset: () => void }) {
+function FeedbackFields({ prefill, siteKey, onReset }: { prefill?: Prefill; siteKey?: string; onReset: () => void }) {
   const [values, setValues] = useState({ type: "correction", slug: prefill?.slug ?? "", contact: "", content: "" });
   const statusRef = useRef<HTMLHeadingElement>(null);
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(submitFeedback, initial);
 
   useEffect(() => {
     if (state.ok) statusRef.current?.focus();
   }, [state.ok]);
+
+  // 通行证可能刚好在填表期间过期：这一页没有验证框，用户会看到「人机验证未通过」
+  // 却无从下手。刷新一次让服务端重新判断，验证框就会出现（已填内容由本组件状态保留）。
+  useEffect(() => {
+    if (state.code === "captcha" && !siteKey) router.refresh();
+  }, [state, siteKey, router]);
 
   if (state.ok) {
     return (
@@ -120,6 +129,7 @@ function FeedbackFields({ prefill, onReset }: { prefill?: Prefill; onReset: () =
             placeholder="例如：官网链接已经换成新域名了"
           />
         </Field>
+        {siteKey ? <Turnstile siteKey={siteKey} action="contact" resetKey={!state.ok && state.message ? state : undefined} /> : null}
         <FormError message={state.message} />
         <div className="border-t border-border pt-6">
           <Button type="submit" size="lg" disabled={pending}>

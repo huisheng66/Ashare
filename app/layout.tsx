@@ -4,9 +4,11 @@ import { getSiteUrl } from "@/lib/site";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader, type SceneNavItem } from "@/components/SiteHeader";
 import { ThemeProvider } from "@/components/theme-provider";
+import { VisitorCheck } from "@/components/VisitorCheck";
 import { Toaster } from "@/components/ui/sonner";
 import { scenes } from "@/data/scenes";
 import { catalogCounts } from "@/lib/catalog";
+import { turnstileRequired, turnstileSiteKey } from "@/lib/turnstile";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -27,8 +29,14 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [requestHeaders, counts] = await Promise.all([headers(), catalogCounts()]);
+  const [requestHeaders, counts, challenge] = await Promise.all([
+    headers(),
+    catalogCounts(),
+    turnstileRequired(),
+  ]);
   const nonce = requestHeaders.get("x-nonce") ?? undefined;
+  // 只有「已配置 Turnstile 且没有有效通行证」才挂首访检测，两者共用同一判断。
+  const visitorSiteKey = challenge ? turnstileSiteKey() : undefined;
   const sceneNav: SceneNavItem[] = scenes.map((scene) => ({
     id: scene.id,
     name: scene.name,
@@ -56,6 +64,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             {children}
           </main>
           <SiteFooter scenes={sceneNav} />
+          {visitorSiteKey ? <VisitorCheck siteKey={visitorSiteKey} /> : null}
           <Toaster position="top-center" richColors />
         </ThemeProvider>
       </body>

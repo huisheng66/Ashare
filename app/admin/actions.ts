@@ -31,6 +31,7 @@ import { GUIDE_LIMITS, normalizeGuide, parseGuideLines, validateGuide } from "@/
 import { putMedia as putMediaObject, removeMedia as removeMediaKey } from "@/lib/media-storage";
 import { validateSemantics } from "@/lib/semantics";
 import { can, canSetStatus, isRole, ROLE_LABEL, STATUS_LABEL, USERNAME_PATTERN, type Role } from "@/lib/users";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 /** 已登录且未被封禁即可。页面级守卫用它；写操作请用 requirePermission。 */
 export async function requireAdmin(): Promise<void> {
@@ -54,15 +55,23 @@ export async function requirePermission(
   return user;
 }
 
-export async function login(formData: FormData): Promise<void> {
+export type LoginError = "wrong" | "rate" | "blocked" | "captcha";
+export type LoginState = { error?: LoginError };
+
+export async function login(_prev: LoginState, fd: FormData): Promise<LoginState> {
   const ip = await getClientIp();
-  if (!(await guardLogin(ip))) redirect("/admin/login?e=rate");
-  const username = text(formData, "username");
-  const password = text(formData, "password");
+  if (!(await guardLogin(ip))) return { error: "rate" };
+  // 人机验证放在验口令之前：拦住机器对口令的探测，而不是等它猜对再拒。
+  // 令牌单次有效，失败后前端会重置 Turnstile 换新令牌。
+  // 这里**不认**首访通行证（lib/turnstile.ts 的 hasHumanPass）：通行证只证明
+  // 「最近有真人访问过本站」，拿它换一次免验证的登录尝试会把爆破成本降下来。
+  if (!(await verifyTurnstile(text(fd, "cf-turnstile-response"), "login"))) return { error: "captcha" };
+  const username = text(fd, "username");
+  const password = text(fd, "password");
   const identity = await authenticate(username, password);
   if (!identity) {
     await recordLoginFailure(ip);
-    redirect("/admin/login?e=wrong");
+    return { error: "wrong" };
   }
   await startSession(identity.username, identity.role);
   redirect("/admin");

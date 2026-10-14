@@ -19,14 +19,20 @@ export function proxy(request: NextRequest) {
 
   const isProd = process.env.NODE_ENV === "production";
   const nonce = btoa(crypto.randomUUID());
+  // Turnstile 的验证窗口是 challenges.cloudflare.com 的 iframe，脚本也从那里加载。
+  // 这里不放行的话，default-src 'self' 会把 iframe 拦掉（Cloudflare 报 300030，控件
+  // 只剩一片空白）。**不做条件放行**：中间件在 Edge 运行时里读到的 env 是构建期
+  // 内联的，运维构建后再配 Turnstile 会静默失效——宁可放行一个固定主机。
+  const turnstile = "https://challenges.cloudflare.com";
   const csp = [
     "default-src 'self'",
     // 开发模式 React/Turbopack 依赖 eval 做调试；生产不开 unsafe-eval
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isProd ? "" : " 'unsafe-eval'"}`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${turnstile}${isProd ? "" : " 'unsafe-eval'"}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data:",
     "font-src 'self'",
-    `connect-src 'self'${isProd ? "" : " ws: wss:"}`,
+    `connect-src 'self' ${turnstile}${isProd ? "" : " ws: wss:"}`,
+    `frame-src ${turnstile}`,
     "object-src 'none'",
     "frame-ancestors 'none'",
     "base-uri 'self'",

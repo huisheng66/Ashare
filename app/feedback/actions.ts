@@ -4,8 +4,10 @@ import { randomBytes } from "node:crypto";
 
 import { addFeedback } from "@/lib/store";
 import { getClientIp, guardPublicWrite } from "@/lib/guard";
+import { turnstileRequired, verifyTurnstile } from "@/lib/turnstile";
 
-export type FeedbackState = { ok: boolean; message?: string };
+/** code=captcha 时前端会刷新页面：通行证可能刚好在填表期间过期，得让验证框重新出现。 */
+export type FeedbackState = { ok: boolean; message?: string; code?: "captcha" };
 const TYPES = new Set(["correction", "issue", "other"]);
 
 export async function submitFeedback(_prev: FeedbackState, fd: FormData): Promise<FeedbackState> {
@@ -26,6 +28,11 @@ export async function submitFeedback(_prev: FeedbackState, fd: FormData): Promis
   }
   if (slug.length > 100 || contact.length > 200) {
     return { ok: false, message: "关联条目最多 100 字，联系方式最多 200 字。" };
+  }
+  // 内容校验通过后再消费 Turnstile 令牌：格式错误不该烧掉用户刚解的验证。
+  // 持有效通行证则免验——通行证是首访时拿的，同一判断与 feedback/page.tsx 一致。
+  if ((await turnstileRequired()) && !(await verifyTurnstile(text("cf-turnstile-response"), "contact"))) {
+    return { ok: false, message: "人机验证未通过，请等验证框刷新后再试。", code: "captcha" };
   }
   await addFeedback({
     id: randomBytes(8).toString("hex"),

@@ -4,6 +4,7 @@ import { Ban, ListChecks, Link2 } from "lucide-react";
 
 import { FormPage } from "@/components/FormPage";
 import { SubmitForm } from "@/components/SubmitForm";
+import { turnstileRequired, turnstileSiteKey } from "@/lib/turnstile";
 
 export const metadata: Metadata = {
   title: "推荐工具",
@@ -16,7 +17,9 @@ const points = [
   { icon: ListChecks, title: "提交后会怎样", text: "我们核对来源、许可和平台，补上适合与不适合，通过后才会进目录。" },
 ];
 
-export default function SubmitPage() {
+export default async function SubmitPage() {
+  // 手里有有效通行证就不放验证框——与 submitSubmission 里同一判断，两边必须一致。
+  const siteKey = (await turnstileRequired()) ? turnstileSiteKey() : undefined;
   return (
     <FormPage
       eyebrow="推荐"
@@ -33,7 +36,7 @@ export default function SubmitPage() {
         </>
       }
     >
-      <SubmitForm />
+      <SubmitForm siteKey={siteKey} />
     </FormPage>
   );
 }

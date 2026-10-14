@@ -5,6 +5,7 @@ import { FeedbackForm } from "@/components/FeedbackForm";
 import { FormPage } from "@/components/FormPage";
 import { getSoftware } from "@/lib/catalog";
 import { firstSearchParam, type PageSearchParams } from "@/lib/catalog-query";
+import { turnstileRequired, turnstileSiteKey } from "@/lib/turnstile";
 
 export const metadata: Metadata = {
   title: "反馈",
@@ -23,7 +24,9 @@ const points = [
 
 export default async function FeedbackPage({ searchParams }: Props) {
   const slug = firstSearchParam((await searchParams).item).trim().slice(0, 100);
-  const item = slug ? await getSoftware(slug) : undefined;
+  const [item, challenge] = await Promise.all([slug ? getSoftware(slug) : undefined, turnstileRequired()]);
+  // 手里有有效通行证就不放验证框——与 submitFeedback 里同一判断，两边必须一致。
+  const siteKey = challenge ? turnstileSiteKey() : undefined;
 
   return (
     <FormPage
@@ -32,7 +35,7 @@ export default async function FeedbackPage({ searchParams }: Props) {
       lead="目录靠大家一起校对。发现链接失效、介绍不准，或者页面本身有问题，都可以在这里说。"
       points={points}
     >
-      <FeedbackForm prefill={item ? { slug: item.slug, name: item.name } : undefined} />
+      <FeedbackForm prefill={item ? { slug: item.slug, name: item.name } : undefined} siteKey={siteKey} />
     </FormPage>
   );
 }

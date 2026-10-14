@@ -26,24 +26,69 @@ alternatives 挂 syncthing（KDBX 数据库跨设备同步的搭档），office/
 license-info 与 seed 两条测试红——已在 lib/license-info.ts 补上
 （禁商用 + 相同方式共享，allowsClosedSource: false）。
 
+## 2026-10-14 · Turnstile 首访软检测：通行证 5 小时，表单免重复验证
+
+没有通行证的访客，公开页会在右下角挂一个 `appearance=interaction-only` 的控件静默
+验证一次（真人完全看不见，需要交互才显形），通过后由服务端签发 5 小时通行证
+`ashare_human`（HMAC 签名、httpOnly、lax、path=/），期内表单不再显示验证框。新增
+`lib/turnstile.ts` 的通行证读写、`app/actions.ts` 的签发 action、
+`components/VisitorCheck.tsx`，根布局按需挂载。
+
+**刻意不拦内容**：它挡的是「写」而不是「读」。搜索引擎抓取、分享预览、无 JS 环境一概
+不受影响——内容站的第一价值是被搜到，首访墙会把这件事毁掉。这也是选软检测而非
+「先验后看」的原因（后者要按 UA 放行爬虫，而 UA 谁都能伪造）。
+
+几处刻意的取舍：
+
+- **后台登录始终现场验证**，不吃通行证。通行证只证明「最近有真人访问过本站」，
+  拿它换一次免验证的登录尝试等于把爆破成本降下来。
+- **页面与 action 共用同一判断** `turnstileRequired()`（已配置且无有效通行证）。两边
+  用不同规则会出现「页面不渲染验证框、服务端却要令牌」的死局。
+- **签发入口先限速**（`pass:<ip>` 5 次/10 分钟）：这个 action 谁都能调，每次都会替
+  调用方花一次 siteverify。
+- 通行证可能在填表期间过期：action 返回 `code=captcha`，前端据此刷新页面让验证框重新
+  出现，否则用户会看到「人机验证未通过」却找不到可解的框。刷新不丢草稿（实测 22 字
+  草稿完整保留）。
+- 角落容器用 `pointer-events-none`：控件不可见时不占点击热区，否则右下角页脚链接会被
+  一块透明区域吃掉。
+
+实测（有头 Chromium + CDP，全新配置 = 真实首访）：首访 1–3 秒内表单与角落各有一枚
+控件 → 通行证签发（78 字符，TTL 5.00 小时）→ 页面重渲染、多余验证框消失 → 反馈表单
+**不带任何令牌提交成功** → 后台登录仍出验证框 → 清 cookie 后恢复现场验证。
+
 ## 2026-10-14 · Turnstile 人机验证：登录 / 反馈 / 推荐三表单接入
 
-按 Cloudflare Spin 流程接入 Turnstile。服务端 `lib/turnstile.ts` 走 siteverify，
-令牌单次有效、网络异常一律拒绝（fail-closed）；两项密钥（`TURNSTILE_SITE_KEY` +
-`TURNSTILE_SECRET_KEY`）必须同时配置才启用，半配置与未配置行为一致——本地开发
-和既有部署不受影响。前端 `components/Turnstile.tsx` 显式渲染官方窗口，令牌由回调
-直接写进非受控隐藏字段 `cf-turnstile-response`，组件零 React state（新版
-react-hooks/set-state-in-effect 规则也不允许 effect 里 setState）；被拒后由
-action 返回的 state 对象作为 resetKey 触发命令式重置换新令牌。
+按 Cloudflare Spin 流程接入 Turnstile（组件已建好，走 existing-widget 路径）。
+服务端 `lib/turnstile.ts` 校验四项：siteverify success、action 与调用面一致、
+hostname 命中白名单、令牌未被本进程核销过；网络异常一律拒绝（fail-closed）。
+三项配置（`TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` + `TURNSTILE_HOSTNAMES`）
+必须齐备才算启用，任一缺失按未启用处理——本地开发与未配置部署不受影响。
 
-验证时机刻意区分：登录在验口令**之前**（拦机器对口令的探测），公开表单在内容
-校验通过**之后**（格式错误不该烧掉用户刚解的验证）。登录表单同步改为
-useActionState 原地报错，不再走 ?e= 重定向往返；requireAdmin 带来的 ?e=blocked
-经 initialError 保留。`stale.test` 行号表随 actions.ts 增行同步 +7（187/191/215）。
+前端 `components/Turnstile.tsx` 显式渲染官方窗口，**不自己放隐藏字段**：控件在表单内
+渲染时会注入同名的 `cf-turnstile-response`（官方 Next.js 参考实现读的就是它），两个
+同名字段只会让「服务端拿到哪一个」取决于 DOM 顺序。组件零 React state（新版
+react-hooks/set-state-in-effect 禁止 effect 里 setState），被拒后由 action 返回的
+state 对象作 resetKey 触发命令式重置换新令牌。
 
-已知遗留：hello-agents 的 CC-BY-NC-SA-4.0 缺展示文案（license-info 与 seed 两条
-测试红，系 4ffce5b 入库时遗留，与本次无关）；Secret Key 待填入 .env.local 后
-端到端验证。
+**CSP 是本次最大的坑。** Turnstile 窗口是 challenges.cloudflare.com 的 iframe，
+`proxy.ts` 的 `default-src 'self'` 在没有 frame-src 时把它一并拦掉，控件只渲染一片空白
+（Cloudflare 报 300030，浏览器则报本站 CSP 违规）。已放行 script-src / connect-src /
+frame-src 三处，且刻意不做 env 条件放行：中间件跑在 Edge 运行时，读到的 env 是构建期
+内联的，条件放行会静默失效。
+
+**「令牌单次有效」不可依赖。** 实测同一令牌直连（绕开本地代理）、加 remoteip 与
+idempotency_key 变体、间隔数分钟，siteverify 连回五次 success；而同一条链路上官方
+测试密钥 3x… 能正常返回 timeout-or-duplicate。因此加了进程内核销表
+（SlidingWindowLimiter，limit=1、窗口 300 秒 = 令牌有效期，键存 SHA-256 摘要不存原文），
+多副本各记一份——与 lib/guard.ts 的进程内限流同一取舍。
+
+端到端已验证（有头 Chromium + CDP 驱动真实表单，非模拟）：siteverify 直连
+success / hostname=localhost / action=contact；真实令牌表单提交成功；同一令牌重放被后端
+拒（「人机验证未通过」）。验证时机刻意区分：登录在验口令**之前**（拦机器对口令的探测），
+公开表单在内容校验通过**之后**（格式错误不该烧掉用户刚解的验证）。登录表单同步改为
+useActionState 原地报错，不再走 ?e= 重定向往返；requireAdmin 带来的 ?e=blocked 经
+initialError 保留。`stale.test` 行号表随 actions.ts 增行同步 +7（187/191/215），
+docs/优化改进报告.md 两处行号引用同步。
 
 ## 2026-10-14 · 合并远程 40 条自动收录并补全核验（66 → 106）
 
