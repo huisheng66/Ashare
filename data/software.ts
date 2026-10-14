@@ -7505,6 +7505,4660 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
     featured: false,
     icon: { letter: "H", color: "#7C3AED", simpleIcon: "heroicgameslauncher" },
   },
+  {
+    slug: "ecc",
+    linksCheckedAt: "2026-10-14",
+    name: "ECC",
+    nameZh: "ECC 编码代理工程系统",
+    aliases: ["ecc", "ecc-universal", "ecc-tools", "编码代理技能包", "agent harness"],
+    summary: "给 Claude Code、Codex 这类编码代理装上 plan→test→review→verify 的工程流程，含 71 个 agent、311 个 skill。适合想让代理按流程干活的人；代价是它会往你的配置里写 hooks 和规则，别叠加安装。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["编码代理", "Claude Code", "技能包", "开源"],
+    body: "ECC 不是一个新工具，而是一整套装在编码代理身上的工程流程：先规划、写测试、实现、换个上下文自审、验证、记住结论、再改进。README 把它写成一句话：plan -> test -> implement -> review -> verify -> remember -> improve。配套的 71 个 agent 覆盖规划、评审、构建修复、安全、架构，311 个 skill 覆盖 TDD、调研、安全、文档、前端、数据、ML、运维。\n它的价值在于把这些从「每次写一遍 prompt」变成「装一次」。真正要注意的是安装方式：同一个 harness 里只能选一种装法，官方明确点名要避开「Claude 插件 + 完整手动安装」的组合——skills、commands、hooks 会重复，表现是同一个命令出现两次、hook 触发两次。\n另外它对 Claude Code 支持最好，Codex 与 Kimi Code 有原生引导路径，Cursor、OpenCode、Gemini 等只是能力受限的适配层，README 自己让你先看支持矩阵再假设功能对等。付费的 ECC Pro 只是面向私有仓库的托管 GitHub App，仓库本身永久 MIT，两者不要混为一谈。",
+    officialUrl: "https://ecc.tools",
+    officialLabel: "ecc.tools",
+    links: {
+      official: "https://ecc.tools",
+      github: "https://github.com/affaan-m/ECC",
+    },
+    whoFor: "已经天天用 Claude Code / Codex，厌倦了每次手写同一套「先规划再改、改完写测试再自查」prompt 的人。",
+    whoNot: "只偶尔让代理改几行代码的人——整套 hooks 与规则带来的约束感远大于收益；或者指望在 Cursor、Zed 上和 Claude Code 功能完全对等的人。",
+    installTips: [
+      "引导式安装：`npx ecc-universal@2.2.3 setup`，需要 Node.js 18+；走 Claude 插件路径还要求 Git 和 Claude Code 2.1+ 都在 PATH 里。",
+      "同一个 harness 只选一种装法：官方插件命令 `/plugin marketplace add https://github.com/affaan-m/ECC` + `/plugin install ecc@ecc` 与引导式 setup 二选一，叠加会导致技能、命令、hook 重复。",
+      "装完在 Claude Code 里跑 `/plugin list` 确认 `ecc@ecc` 已启用；升级、换 scope、换 hook 档位都是重跑同一条 setup 命令。",
+      "只从 GitHub 仓库、`ecc-universal` / `ecc-agentshield` 两个 npm 包、GitHub App 和 ecc.tools 安装，第三方转载与镜像不受维护，可能带恶意代码。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "E",
+      color: "#4B3F72",
+    },
+    guide: {
+      intro: "按第一次安装会卡在哪讲：先确认 Node / Git / Claude Code 三个前置、只选一条安装路径、scope 与 hook 档位怎么选、以及已经装重复了该怎么救。",
+      markdown: `## 装之前先确认三件事
+
+ECC 的引导式安装会在动手前检查环境，缺一样就停：
+
+- **Node.js 18 或更高**（universal 包的硬要求）
+- **Git**
+- **Claude Code 2.1 或更高**，且 \`claude\` 在 PATH 里
+
+Windows 上先开 PowerShell，把 \`node --version\`、\`git --version\`、\`claude --version\` 各跑一遍，确认都有输出再往下走。任何一条找不到命令，就先修那个前置，不要硬跑 setup。
+
+## 只选一条安装路径
+
+同一个 harness 里**不要叠加两种装法**。官方点名要避开的组合是「Claude 插件 + 完整手动安装」——skills、commands、hooks 会被装两遍，症状是同一个命令出现两次、hook 触发两次。
+
+推荐路径：
+
+\`\`\`bash
+npx ecc-universal@2.2.3 setup
+\`\`\`
+
+它会先把官方 marketplace 和每个原生安装 scope 盘一遍，再让你选装到 \`user\` / \`project\` / \`local\` 哪个 scope，以及 hook 档位。个人自用选 **Global user** + **Standard** 即可。装完在 Claude Code 里跑 \`/plugin list\`，确认 \`ecc@ecc\` 是 enabled。
+
+想一次配好多个代理，用多 harness 向导：
+
+\`\`\`bash
+npx ecc-universal@2.2.3 install --guided --harness claude --harness codex --harness kimi
+\`\`\`
+
+不确定它会改什么，先加 \`--dry-run\` 看一遍再确认。
+
+## 版本别乱跟 latest
+
+README 里所有示例都钉在具体版本（\`2.2.3\`）。这不是保守：\`ecc-install\` 是包内的一个二进制名，**不是**单独发布的 npm 包，敲成 \`npx ecc-install --profile minimal\` 会装到别的东西上。要核对发布版本就跑 \`npm view ecc-universal version\`。
+
+包管理器换命令：pnpm 用 \`pnpm dlx\`、Yarn 2+ 用 \`yarn dlx\`、Bun 用 \`bunx\`。**Yarn Classic 1 没有 dlx**，只能用 npx 或先升级 Yarn。
+
+## 已经装重复了怎么救
+
+如果之前叠了两层，别手动删配置文件，直接走 README 的 Reset / Uninstall 一节整体重置，再按上面单一路径重装一次。装完重启会话才生效。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与安装入口",
+          url: "https://ecc.tools",
+          note: "引导式安装与各 harness 的支持状态入口。决定要不要投入之前先看它的 platform support 矩阵，别假设功能对等。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/affaan-m/ECC",
+          note: "含安装矩阵、Reset / Uninstall 步骤与官方来源清单。装重复了要照这一页恢复。",
+        },
+        {
+          kind: "html",
+          title: "ecc-universal 包版本页",
+          url: "https://www.npmjs.com/package/ecc-universal",
+          note: "核对当前发布版本号。README 的示例都钉版本，跟 latest 容易踩到未验证的改动。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "hermes-agent",
+    linksCheckedAt: "2026-10-14",
+    name: "hermes-agent",
+    nameZh: "Hermes Agent 自学习代理",
+    aliases: ["hermes", "hermes agent", "hermes-agent", "自学习 Agent", "终端 AI 代理"],
+    summary: "带学习闭环的终端 AI 代理：自己沉淀技能、跨会话检索记忆，还能常驻云主机从 Telegram 指挥。适合把代理当长工用的人；代价是一键脚本会顺带拉起 Python、Node、FFmpeg 一整套依赖。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI 代理", "终端工具", "记忆", "开源"],
+    body: "Hermes Agent 是 Nous Research 做的终端代理，主打「会自己变强」：任务结束后自动沉淀技能，使用过程中改进技能，周期性提示自己持久化知识，还能用 FTS5 检索过去的会话。它不是绑在你笔记本上的聊天框——支持 local、Docker、SSH、Singularity、Modal、Daytona、Vercel Sandbox 七种终端后端，可以跑在一台 5 美元的 VPS 上，你从 Telegram 跟它说话。\n两个入口要分清：`hermes` 开终端 TUI，`hermes gateway` 起消息网关（Telegram、Discord、Slack、WhatsApp、Signal、邮件），同一个网关进程全包。模型用 `hermes model` 切换，支持 Nous Portal、OpenRouter、OpenAI 和自建 endpoint，换模型不换代码。\n代价是安装比较重：脚本会委托 PM 装 Python 3.14、Node.js、npm、ripgrep、FFmpeg 和一堆 Python 依赖，缺 Git 时还会往工具目录里放一份 Windows 版 Git。Windows 上杀软常把自带的 uv.exe 判成木马（Astral 的 Rust 包管理器，误报），要放行整个 bin 目录而不是单个文件——uv 每次升级哈希都变。",
+    officialUrl: "https://hermes-agent.nousresearch.com",
+    officialLabel: "hermes-agent.nousresearch.com",
+    links: {
+      official: "https://hermes-agent.nousresearch.com",
+      github: "https://github.com/NousResearch/hermes-agent",
+    },
+    whoFor: "想让代理长期驻留、跨会话积累经验并远程指挥的人：定时任务、定时报告、夜间备份这类无人值守场景。",
+    whoNot: "只想本地问两句就走的人，装这一整套依赖不划算；也不适合不能接受代理在后台常驻并自动执行 cron 任务的机器。",
+    installTips: [
+      "Linux / macOS / WSL2：`curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash`；原生 Windows 用 PowerShell 跑 `iex (irm https://hermes-agent.nousresearch.com/install.ps1)`，不必再套 WSL。",
+      "装完先 `source ~/.bashrc`（或 `source ~/.zshrc`）再敲 `hermes`；原生 Windows 装在 `%LOCALAPPDATA%\\hermes`，WSL2 装在 `~/.hermes`。",
+      "Windows 杀软可能隔离 `uv.exe`——那是 Hermes 自带的 Astral uv，是误报。要给 `%LOCALAPPDATA%\\hermes\\bin` 整个目录加白名单，别按文件哈希加，因为升级后哈希会变。",
+      "Android / Termux 不要用桌面安装脚本，走仓库提供的签名 APT 源（aarch64，stable 与 canary 两个通道）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "H",
+      color: "#5B4E7A",
+    },
+    guide: {
+      intro: "按第一次上手会卡在哪讲：装完为什么命令找不到、终端与消息网关两个入口怎么选、模型怎么换、以及 Windows 上 uv.exe 被误杀怎么处理。",
+      markdown: `## 装完第一件事：刷新 shell
+
+一键脚本装完，\`hermes\` 常常还是「command not found」。原因不是没装上，而是 PATH 没进当前 shell：
+
+\`\`\`bash
+source ~/.bashrc    # zsh 用户用 source ~/.zshrc
+hermes              # 开始对话
+\`\`\`
+
+两条路径的目录不一样，排查时别找错地方：
+
+| 环境 | 安装位置 |
+| --- | --- |
+| Linux / macOS / WSL2 | \`~/.hermes\` |
+| 原生 Windows | \`%LOCALAPPDATA%\\hermes\` |
+| Termux | 走 APT 包，不用桌面脚本 |
+
+## 两个入口，别搞混
+
+Hermes 有两条起手式，**共用同一批斜杠命令**：
+
+- \`hermes\` —— 终端 TUI：多行编辑、斜杠命令补全、可打断并改向、流式工具输出。
+- \`hermes gateway\` —— 消息网关：起一个进程，Telegram / Discord / Slack / WhatsApp / Signal / 邮件全接。
+
+网关要两步：\`hermes gateway setup\` 配好平台，再 \`hermes gateway start\`，然后给机器人发消息。进去之后 \`/new\`、\`/reset\`、\`/model\`、\`/retry\`、\`/undo\`、\`/compress\`、\`/usage\` 这些命令两边通用，只有中断方式不同：终端是 Ctrl+C，消息端是 \`/stop\`。
+
+## 换模型不用改代码
+
+\`\`\`bash
+hermes model        # 选 provider 和模型
+hermes tools        # 选启用哪些工具
+hermes config set   # 改单个配置项
+hermes doctor       # 出问题先跑它
+\`\`\`
+
+支持 Nous Portal、OpenRouter、OpenAI 和自建 endpoint。不想一家家收 API Key（模型、搜索、生图、TTS、云浏览器），可以 \`hermes setup --portal\` 用 OAuth 登录 Nous Portal 一次搞定，随时 \`hermes portal info\` 看接了什么；网关是按后端开关的，不是全有或全无，仍可以自带 Key。
+
+## 无人值守任务
+
+内置 cron 调度器，结果可以投递到任意平台：日报、夜间备份、每周巡检，用自然语言写，跑完不用人盯。
+
+## Windows：uv.exe 被杀软隔离
+
+这是最常见的假故障。Hermes 自带 Astral 的 \`uv\` 管理 Python 环境，ML 引擎常把「未签名 + 会下载安装」的 Rust 二进制判为威胁。
+
+验证真伪：用 \`gh attestation verify\` 核对 GitHub 上的发布证明，再比对文件哈希。确认后给**整个目录**加白名单：
+
+\`\`\`powershell
+Add-MpPreference -ExclusionPath "$env:LOCALAPPDATA\\hermes\\bin"
+\`\`\`
+
+按文件哈希加会在下次升级时失效。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://hermes-agent.nousresearch.com/docs/",
+          note: "快速上手、CLI、配置、消息网关、安全、工具、技能、记忆、MCP、cron 各章都在这一页下。第一次装完照 Quickstart 走一遍。",
+        },
+        {
+          kind: "html",
+          title: "安装方法（含 Windows / Termux）",
+          url: "https://hermes-agent.nousresearch.com/docs/getting-started/installation",
+          note: "列出一键脚本之外的 MSIX 包与 Termux 签名 APT 源，以及各自的更新归属。选安装方式前先看这里。",
+        },
+        {
+          kind: "html",
+          title: "安全：命令审批 / 容器隔离",
+          url: "https://hermes-agent.nousresearch.com/docs/user-guide/security",
+          note: "讲 DM 配对、命令审批与容器隔离。打算让代理常驻并跑 cron 之前必读。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "rea",
+    linksCheckedAt: "2026-10-14",
+    name: "REA",
+    nameZh: "REA 逆向工程 MCP",
+    aliases: ["rea", "rea-agents", "reverse engineer anything", "逆向工程", "二进制分析"],
+    summary: "一个 MCP 服务，让编码代理去逆向原生二进制、Electron 应用、.NET 程序集和网站，每条结论都附证据。适合想复刻某个功能的人；代价是深度分析要自备 Hopper / Ghidra / IDA。",
+    scenes: ["code", "engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["逆向工程", "MCP", "二进制分析", "开源"],
+    body: "REA（Reverse Engineer Anything）把逆向工程的工具链接进编码代理。用法不是「你学逆向」，而是给代理一句「弄明白 Notes 里的搜索是怎么做的，给我证据，再给我的项目做一个」。代理通过 MCP 调 REA 去查目标，REA 返回结论加证据，代理据此追问、解释或写实现。\n它的覆盖很宽：原生二进制、Go 二进制、WASM、EVM 字节码、SQLite、Linux 崩溃记录、JavaScript / Electron、网站、HAR/SAZ 抓包、.NET 程序集、Android APK 与设备、Flutter、固件、pcap、逻辑信号、进程行为。每条边都带 EXTRACTED（源码里明写）或 INFERRED（REA 推出来）标签，你能分清哪些是读出来的、哪些是猜的——这一点比「代理自信地编一段」强得多。\n平台是最大的坑：**很多能力只在 Linux 上**。固件分析要 Binwalk/Unblob、抓包要 TShark、信号要 sigrok-cli、EVM 与崩溃分析要 pwntools，都写着 Linux 验证；进程捕获是 Linux/macOS；只有 Android APK、.NET、Flutter、静态 JS 这些能在 Windows 上跑。所以 Windows 用户买到的能力是不完整的，别按 README 那张表全量预期。\n另外 REA 要求 Node.js 22.19+ / 24.11+ / 26+，版本不够直接失败；分析大二进制时可能要调大 `REA_GHIDRA_STARTUP_TIMEOUT_MS` 或 `REA_HOPPER_STARTUP_TIMEOUT_MS`。",
+    officialUrl: "https://rea.tools",
+    officialLabel: "rea.tools",
+    links: {
+      official: "https://rea.tools",
+      github: "https://github.com/morluto/rea",
+    },
+    whoFor: "想知道某个闭源功能到底怎么实现、并要在自己项目里复刻的人；以及做二进制 / 移动端 / 固件分析的安全研究人员。",
+    whoNot: "Windows 为主且指望全功能的人（大量分析只在 Linux 验证过）；也不适合不愿意自备 Hopper / Ghidra / IDA 就想看原生伪代码的人。",
+    installTips: [
+      "需要 Node.js 22.x（>=22.19）、24.x（>=24.11）或 26+ 与 npm，装前先 `node --version` 确认，版本不够会直接失败。",
+      "`npx rea-agents setup` 会注册 MCP 并写入配套的工作流说明，同时备份既有配置；跑完必须重启你的 agent 才生效。",
+      "想在终端长期用就 `npm install --global rea-agents`，之后 `rea --help`；升级用 `rea update`，并重新跑 setup 刷新 agent 注册。",
+      "逆原生二进制要另配 Hopper / Ghidra / IDA 之一（setup 可在你同意后装 Hopper）；只做 JavaScript / Electron / .NET 静态分析不需要任何原生引擎。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#1F3A5F",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：Node 版本这条硬门槛、agent 与终端两种用法、原生分析为什么必须配 Hopper/Ghidra/IDA、以及「Windows 上哪些能力其实没有」这件事。",
+      markdown: `## 先过版本这一关
+
+REA 的要求写得非常死：**Node.js 22.x（>=22.19）、24.x（>=24.11）或 26+，外加 npm**。低于这些版本不是警告，是装不上。
+
+\`\`\`bash
+node --version
+\`\`\`
+
+## 两种用法
+
+**给代理用**（主力场景）：
+
+\`\`\`bash
+npx rea-agents setup
+\`\`\`
+
+向导让你选要接入哪些 agent（Claude Code、Codex、Cursor、Gemini CLI、Grok Build 等），列出将要改动什么，你确认后才写，并且会备份已有配置。**改完必须重启 agent**。之后直接说人话：
+
+\`\`\`text
+弄明白 Notes 应用里的搜索是怎么做的，给我证据，再给我的项目做一个类似的。
+\`\`\`
+
+**在终端用**：
+
+\`\`\`bash
+npx -y rea-agents@latest analyze-javascript-application /absolute/path/to/app --json
+\`\`\`
+
+这个命令吃的是**已解包**的 JavaScript / Electron 目录或 ASAR，返回模块、导入、Electron 边界和各自证据。路径要写绝对路径。
+
+想长期用就装成全局命令：
+
+\`\`\`bash
+npm install --global rea-agents
+rea --help
+\`\`\`
+
+## 原生分析要自备引擎
+
+这是最容易踩空的一层。REA 自己不实现反汇编，它调度你机器上已有的：
+
+| 目标 | 需要的引擎 |
+| --- | --- |
+| 原生二进制 | Hopper / Ghidra / IDA 三者之一 |
+| WASM | 自备 WABT 1.0.42 |
+| Android APK | headless JADX + 完整 JDK |
+
+**静态的 JavaScript 和 .NET 分析不需要任何原生引擎**，读文件即可，不运行目标程序。所以如果你只想看 Electron 应用或 .NET 程序集，这一层完全不用管。
+
+大二进制经常卡在引擎启动上，加长超时：
+
+\`\`\`bash
+REA_GHIDRA_STARTUP_TIMEOUT_MS=600000 rea ...
+\`\`\`
+
+## Windows 用户请注意
+
+那张「能分析什么」的表里，大量行是 Linux 限定：
+
+- 固件（Binwalk / Unblob）、抓包（TShark 4.x）、逻辑信号（sigrok-cli）、EVM 字节码、崩溃记录（pwntools）——**Linux**
+- 进程行为捕获（原生 PTY）——**Linux / macOS**
+- Android APK、.NET、Flutter、静态 JS——Windows 也能跑
+
+买之前先按自己的系统筛一遍，别按整张表预期。
+
+## 每条结论都带来源
+
+REA 返回的每条边都标 \`EXTRACTED\`（源码里明写）或 \`INFERRED\`（REA 推出来的）。看到 INFERRED 多的时候，结论要自己再验证一遍，不要直接当事实写进代码。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网：指南与案例",
+          url: "https://rea.tools/guides/",
+          note: "按目标分的图文指南（原生、JavaScript、浏览器等）。第一次用先挑和你目标最接近的一篇照着做。",
+        },
+        {
+          kind: "html",
+          title: "安装与 setup 说明",
+          url: "https://github.com/morluto/rea/blob/main/docs/installation.md",
+          note: "支持的 agent 列表、provider 配置、Hopper/Ghidra 安装与手动注册 MCP 的步骤。装不上时看这一页。",
+        },
+        {
+          kind: "html",
+          title: "真实案例：Notion / DX-Ball / TH04",
+          url: "https://rea.tools/showcase/",
+          note: "三个完整逆向案例，能看到 REA 实际输出长什么样。判断它值不值得装，看案例比看功能表有用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "autogpt",
+    linksCheckedAt: "2026-10-14",
+    name: "AutoGPT",
+    nameZh: "AutoGPT 自动化代理平台",
+    aliases: ["autogpt", "auto gpt", "agpt", "自动化代理", "AI 工作流"],
+    summary: "可视化的 AI 代理搭建与运行平台：拖块编排、定时与触发执行，也能自托管。适合让非技术同事自己搭流程的团队；注意平台部分是 Polyform Shield 协议，不能拿来卖成竞品托管服务。",
+    scenes: ["office", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI 代理", "工作流", "自动化", "开源"],
+    body: "今天的 AutoGPT 已经不是 2023 年那个跑在终端里的自主循环脚本，而是一个完整的平台：AutoPilot 把对话变成可运行的 agent，Build 是可视化块编辑器，Agents 看每次运行的成本与状态，Marketplace 提供现成 agent。agent 可以按需跑、按计划跑、或被触发跑，接了 45+ 个平台（Gmail、Slack、Notion、HubSpot、Jira、Salesforce 等）和数百个模型。\n两条路要分清：托管平台是付费的、按 agent 运行计费；自托管免许可费，但你自己出机器、出模型 Key、自己运维。README 把差异列成了表格，核心是「你要的是马上能用，还是数据与基础设施在自己手里」。\n两个坑：一是**许可不是统一的**——`autogpt_platform/` 是 Polyform Shield（个人与内部商用免费，但不能包装成竞品托管服务出售），`classic/` 及其余部分是 MIT。想拿它做二次分发或商业化，先看清这一条。二是**自托管目前没有一键安装包**：面向 Linux/macOS 的单容器安装器还没过发布门禁，现在只能照着 docs.agpt.co 手动部署，Windows 用户同样走手动指南。Docker 要求是 amd64 或 arm64 的 Linux 容器，安装器不负责替你装 Docker。",
+    officialUrl: "https://agpt.co",
+    officialLabel: "agpt.co",
+    links: {
+      official: "https://agpt.co",
+      github: "https://github.com/Significant-Gravitas/AutoGPT",
+    },
+    whoFor: "想让运营、销售、市场这类非技术同事自己搭「研究客户 / 出日报 / 起草回复」流程，并且要能定时或触发执行的团队。",
+    whoNot: "想把它再包装成托管服务卖的人（Polyform Shield 不允许）；或者没有 Docker 运维能力、又指望一键安装包的人——那个安装器还没发布。",
+    installTips: [
+      "托管版直接注册 platform.agpt.co；自托管目前只能照 docs.agpt.co 的手动指南部署，单容器安装器尚未过发布门禁。",
+      "自托管要求机器上已有运行中的 Docker 守护进程，且是 amd64 或 arm64 的 Linux 容器；安装器不负责装 Docker，也不从源码构建。",
+      "Windows 用户不要用单容器安装器那条路，继续走手动自托管指南。",
+      "只想跑经典的单机 AutoGPT，看仓库里的 `classic/` 目录——它是 MIT 协议，和平台部分不是同一份许可。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#2F5D62",
+    },
+    guide: {
+      intro: "按第一次决策会卡在哪讲：托管还是自托管怎么选、许可条款哪里会咬人、自托管现在到底到哪一步了、以及 classic 与 platform 是什么关系。",
+      markdown: `## 先选托管还是自托管
+
+这是第一个岔路，后面所有步骤都不同：
+
+| | 托管平台 | 自托管 |
+| --- | --- | --- |
+| 门槛 | 公开注册 | 需要 Docker 与配置 |
+| 费用 | 套餐 + 按运行计费 | 无许可费，自付机器与模型 |
+| 模型 | 内置 | 自带 API Key |
+| 运维 | 官方负责 | 你自己负责 |
+| 数据 | 在 AutoGPT 这边 | 在你自己的基础设施上 |
+
+**判断标准只有一个：基础设施控制权重要，还是马上能用重要。** 两条路用的是同一个仓库，核心构建器与 agent 运行时两边都有。
+
+## 许可条款要提前看
+
+这一条很多人跳过，然后踩雷：
+
+| 组件 | 协议 | 含义 |
+| --- | --- | --- |
+| \`autogpt_platform/\` | Polyform Shield | 个人与内部商用免费，**不能作为竞品托管服务出售** |
+| \`classic/\` 及其余 | MIT | 宽松开源 |
+
+也就是说：公司内部搭流程自己用没问题；把它包装成一个对外售卖的同类平台，协议不允许。
+
+## 自托管目前的实际状态
+
+README 写得很直白：面向 Linux 与 macOS 的单容器发布安装器**要等下一个 appliance 版本**，在它过掉 documented release gates 之前，用手动自托管指南。
+
+那个安装器将来也只做一件事：连你本机已有的 Docker 守护进程，拉已发布的 appliance 镜像并按不可变 digest 运行。它**不会**替你装 Docker，也**不会**从源码构建。
+
+所以现在的自托管准备清单是：
+
+1. 一台 amd64 或 arm64 的机器
+2. Docker 守护进程已在运行，且是 Linux 容器模式
+3. 至少一家模型 provider 的 API Key
+4. Windows 用户：走手动指南，别等安装器
+
+## classic 是什么
+
+2023 年那个原始的独立 agent 还在仓库的 \`classic/\` 目录里，MIT 协议。它包括 Forge（用来构建 agent）和 agbenchmark（用来给 agent 跑基准）。
+
+如果你只是想跑一个单机自主 agent 玩玩或做研究，从 \`classic/\` 进去比部署整套平台轻得多。
+
+## 能自动化什么
+
+官方给的例子：每日简报、会议前研究客户、把 launch brief 变成各渠道草稿、事件分诊、起草客服回复、监控信息源并在有变化时返回结构化报告。这些共同点是「多步、要调外部系统、产出是草稿」。如果你的任务是「一步出结果」，用不上这个平台。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "自托管上手指南",
+          url: "https://docs.agpt.co/platform/getting-started",
+          note: "当前唯一可用的自托管路径，含 Docker 与配置步骤。决定自托管后从这里开始。",
+        },
+        {
+          kind: "html",
+          title: "定价与方案对比",
+          url: "https://agpt.co/pricing",
+          note: "托管平台按运行计费的具体档位。估算成本、对比自托管是否划算时看这里。",
+        },
+        {
+          kind: "html",
+          title: "Classic 子项目",
+          url: "https://github.com/Significant-Gravitas/AutoGPT/blob/master/classic/README.md",
+          note: "MIT 协议的原始单机 agent，含 Forge 与 agbenchmark。只想跑单机 agent 的话从这里进。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ollama",
+    linksCheckedAt: "2026-10-14",
+    name: "Ollama",
+    nameZh: "Ollama 本地模型运行器",
+    aliases: ["ollama", "本地大模型", "本地推理", "ollama run"],
+    summary: "一条命令在本机跑开源大模型，自带 REST 接口和 Python / JS SDK，还能直接接 Claude Code、Codex 等编码代理。适合想离线试模型的人；代价是模型文件动辄几 GB，速度完全看你本地硬件。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["本地大模型", "推理", "LLM", "开源"],
+    body: "Ollama 解决的是「跑一个开源模型」这件事的最后一公里：不用自己编译 llama.cpp、不用管权重格式，`ollama run gemma4` 就把模型拉下来跑起来，聊天直接进终端。它底层就是 llama.cpp。\n除了聊天，它现在已经往「本地模型中枢」的方向走：`ollama launch claude` 可以直接把本地模型接给 Claude Code 用，还支持 codex、copilot-cli、deepseek-harness、droid、opencode；`ollama launch openclaw` 则把它变成挂在 WhatsApp / Telegram / Slack 上的个人助手。也就是说它不只是个命令行玩具。\n对外接口是 REST，默认监听 11434，`POST /api/chat` 就能对话，Python 有 `pip install ollama`、JS 有 `npm i ollama`，Docker 有官方镜像 `ollama/ollama`。\n代价很直接：本地推理的天花板是你的显存和内存。几十亿参数的模型在笔记本上能跑，但和云端前沿模型不是一个量级；而且模型文件是几个 GB 起，磁盘和首次下载时间都要算进去。另外别指望它替你做服务化——并发、批处理、量化优化这些是 vLLM 那类引擎的活。",
+    officialUrl: "https://ollama.com",
+    officialLabel: "ollama.com",
+    links: {
+      official: "https://ollama.com",
+      github: "https://github.com/ollama/ollama",
+    },
+    whoFor: "想在本机离线试开源模型、做隐私敏感的小任务，或给本地编码代理配一个不花钱的模型后端的人。",
+    whoNot: "要的是最高质量回答或高并发服务的人——本地小模型质量有上限，服务化能力也不如专用推理引擎；也不适合磁盘紧张又想试多个模型的机器。",
+    installTips: [
+      "macOS 与 Linux：`curl -fsSL https://ollama.com/install.sh | sh`；Windows 用 PowerShell 跑 `irm https://ollama.com/install.ps1 | iex`，也可以直接下 Ollama.dmg / OllamaSetup.exe。",
+      "装完直接 `ollama run gemma4` 就能对话，模型会在首次运行时下载；可用模型清单在 ollama.com/library。",
+      "要接编码代理用 `ollama launch claude`，支持 claude、codex、copilot-cli、deepseek-harness、droid、opencode 多个集成。",
+      "服务默认监听 11434，REST 走 `http://localhost:11434/api/chat`；Python 用 `pip install ollama`，Node 用 `npm i ollama`，容器场景用官方镜像 `ollama/ollama`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#1B1B1B",
+      simpleIcon: "ollama",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：装完怎么确认起来了、模型怎么拉、端口和 SDK 怎么接、以及什么时候该换成专业推理引擎。",
+      markdown: `## 装完先跑一个模型
+
+三条系统的安装都是一行的：
+
+\`\`\`bash
+# macOS / Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows（PowerShell）
+irm https://ollama.com/install.ps1 | iex
+\`\`\`
+
+也可以直接下安装包：macOS 是 Ollama.dmg，Windows 是 OllamaSetup.exe。
+
+装完直接：
+
+\`\`\`bash
+ollama run gemma4
+\`\`\`
+
+第一次会先下载权重，**这一步慢是正常的**，几十亿参数的模型是 GB 级文件。想看有哪些模型可以去 ollama.com/library。
+
+## 它在 11434 上起了一个服务
+
+很多人以为 Ollama 只是个 CLI，其实它后台常驻一个服务，默认端口 11434：
+
+\`\`\`bash
+curl http://localhost:11434/api/chat -d '{
+  "model": "gemma4",
+  "messages": [{ "role": "user", "content": "Why is the sky blue?" }],
+  "stream": false
+}'
+\`\`\`
+
+Python 和 JS 都有官方库，不用说 HTTP：
+
+\`\`\`python
+from ollama import chat
+response = chat(model='gemma4', messages=[
+    {'role': 'user', 'content': 'Why is the sky blue?'},
+])
+print(response.message.content)
+\`\`\`
+
+\`\`\`javascript
+import ollama from "ollama";
+const response = await ollama.chat({
+  model: "gemma4",
+  messages: [{ role: "user", content: "Why is the sky blue?" }],
+});
+\`\`\`
+
+容器里用官方镜像 \`ollama/ollama\`，注意把 11434 暴露出来，否则别的容器连不上。
+
+## 接给编码代理
+
+不想把代码发给云端时，把它接给本地 agent：
+
+\`\`\`bash
+ollama launch claude      # Claude Code
+ollama launch openclaw    # 挂到 WhatsApp / Telegram / Slack 的个人助手
+\`\`\`
+
+支持的集成还包括 codex、copilot-cli、deepseek-harness、droid、opencode。
+
+## 什么时候不该用它
+
+Ollama 的定位是**让本地模型跑起来**，不是**把本地模型服务好**。它不做连续批处理、不做 PagedAttention 那类显存管理、也不做多卡并行。
+
+如果你的场景是「多个用户同时请求」「要榨干一张卡的吞吐」「要做生产级 SLA」，那是推理引擎（vLLM 一类）的活，Ollama 会在并发上撞墙。
+
+另一个现实约束：本地跑得动的是几十亿参数级别的小模型，回答质量与云端前沿模型有差距。拿它替代 Claude 或 GPT 做复杂推理任务，多半会失望。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "模型库",
+          url: "https://ollama.com/library",
+          note: "所有可直接 ollama run 的模型清单与各自尺寸。挑模型、估算磁盘占用前先看这里。",
+        },
+        {
+          kind: "html",
+          title: "REST API 文档",
+          url: "https://docs.ollama.com/api",
+          note: "chat / generate / embeddings 等全部端点与参数。要写自己的客户端时对着这一页调。",
+        },
+        {
+          kind: "html",
+          title: "Modelfile 参考",
+          url: "https://docs.ollama.com/modelfile",
+          note: "自定义系统提示、参数与模型组合的写法。想把某个模型固化成自己的默认配置时用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "transformers",
+    linksCheckedAt: "2026-10-14",
+    name: "Transformers",
+    nameZh: "Hugging Face Transformers",
+    aliases: ["transformers", "huggingface transformers", "hf transformers", "预训练模型库"],
+    summary: "Python 里跑预训练模型的通用层：一个 pipeline 覆盖文本、视觉、音频与多模态，Hub 上百万级 checkpoint 直接加载。适合要推理或微调的人；不适合想拿它拼神经网络积木的人——它刻意不做模块化抽象。",
+    scenes: ["code", "data"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["机器学习", "预训练模型", "PyTorch", "开源"],
+    body: "Transformers 是「模型定义层」：同一个模型定义被 Axolotl、Unsloth、DeepSpeed、FSDP、PyTorch-Lightning 这些训练框架，vLLM、SGLang、TGI 这些推理引擎，以及 llama.cpp、mlx 这些相邻库共用。你现在用的几乎所有开源模型，定义都在这一层。\n上手只要三个类，核心是 pipeline：`pipeline(task=\"text-generation\", model=\"Qwen/Qwen2.5-1.5B\")` 一句话就能生成，换成 `automatic-speech-recognition` + Whisper 就是语音识别，换成 `image-classification` + DINOv2 就是图像分类，接口一致。Hub 上有百万级 checkpoint 可直接拉。\nREADME 里最有价值的是「什么时候不该用 Transformers」那一节，值得照抄：它不是神经网络的积木盒——模型文件故意不做额外抽象，为的是研究者能快速迭代单个模型；训练 API 也是围绕它自己的 PyTorch 模型优化的，通用的机器学习循环该用 Accelerate。\n环境要求 Python 3.10+ 与 PyTorch 2.6+。装要用带 torch 的变体 `pip install \"transformers[torch]\"`，从源码装能拿最新改动但可能不稳定。另外它只负责模型本身，服务化、高并发这些不在它的职责里。",
+    officialUrl: "https://huggingface.co/transformers",
+    officialLabel: "huggingface.co",
+    links: {
+      official: "https://huggingface.co/transformers",
+      github: "https://github.com/huggingface/transformers",
+    },
+    whoFor: "要在 Python 里做推理或微调的研究者、算法工程师，以及需要换模型、换框架而不想重写代码的人。",
+    whoNot: "想要一套可自由拼装的神经网络积木、或要写通用训练循环的人——官方自己说该用 Accelerate；也别指望它做高并发服务，那是推理引擎的活。",
+    installTips: [
+      "需要 Python 3.10+ 与 PyTorch 2.6+，先用 venv 或 uv 建虚拟环境再装，不要直接装进系统 Python。",
+      "装带 PyTorch 的变体：`pip install \"transformers[torch]\"`（uv 用 `uv pip install \"transformers[torch]\"`）；要最新改动就从源码 `pip install '.[torch]'`，但可能不稳定。",
+      "首次 `pipeline(task=\"text-generation\", model=\"Qwen/Qwen2.5-1.5B\")` 会下载并缓存权重，磁盘要留够空间。",
+      "想在命令行直接和模型聊天，先起 `transformers serve`，再用 `transformers chat Qwen/Qwen2.5-0.5B-Instruct`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#FFD21E",
+      simpleIcon: "huggingface",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：环境与虚拟环境怎么搭、pipeline 这一个 API 怎么覆盖多模态、聊天和命令行怎么走、以及官方明说「别用它做什么」。",
+      markdown: `## 环境与安装
+
+要求 **Python 3.10+** 与 **PyTorch 2.6+**。先建虚拟环境，别污染系统 Python：
+
+\`\`\`bash
+python -m venv .my-env
+source .my-env/bin/activate
+pip install "transformers[torch]"
+\`\`\`
+
+用 uv 的话是 \`uv venv .my-env\` 加 \`uv pip install "transformers[torch]"\`。
+
+想要 main 分支的最新改动（比如刚支持的新架构）就从源码装：
+
+\`\`\`bash
+git clone https://github.com/huggingface/transformers.git
+cd transformers
+pip install '.[torch]'
+\`\`\`
+
+代价是**不稳定**，出问题直接去仓库开 issue。
+
+## pipeline 这一个 API 就够开始
+
+pipeline 处理预处理并返回对应输出，换 task 和 model 就换模态，代码形状不变：
+
+\`\`\`python
+from transformers import pipeline
+
+pipe = pipeline(task="text-generation", model="Qwen/Qwen2.5-1.5B")
+pipe("the secret to baking a really good cake is ")
+\`\`\`
+
+语音识别：
+
+\`\`\`python
+pipe = pipeline(task="automatic-speech-recognition", model="openai/whisper-large-v3")
+pipe("https://huggingface.co/datasets/Narsil/asr_dummy/resolve/main/mlk.flac")
+\`\`\`
+
+图像分类：
+
+\`\`\`python
+pipe = pipeline(task="image-classification", model="facebook/dinov2-small-imagenet1k-1-layer")
+pipe("https://huggingface.co/datasets/Narsil/image_dummy/raw/main/parrots.png")
+\`\`\`
+
+**第一次跑会下载权重并缓存**，之后复用。磁盘不够会在这里卡住。
+
+## 聊天：构造 chat 历史
+
+和生成接口完全一样，只是输入变成对话列表：
+
+\`\`\`python
+import torch
+from transformers import pipeline
+
+chat = [
+    {"role": "system", "content": "You are a sassy, wise-cracking robot."},
+    {"role": "user", "content": "Hey, can you tell me any fun things to do in New York?"},
+]
+pipe = pipeline(task="text-generation", model="meta-llama/Meta-Llama-3-8B-Instruct",
+                dtype=torch.bfloat16, device_map="auto")
+response = pipe(chat, max_new_tokens=512)
+\`\`\`
+
+不想写代码，命令行也行——前提是 \`transformers serve\` 已经在跑：
+
+\`\`\`bash
+transformers chat Qwen/Qwen2.5-0.5B-Instruct
+\`\`\`
+
+## 官方说：这些情况别用它
+
+这一节比功能列表更重要，原文两条：
+
+1. **它不是神经网络的模块化积木盒。** 模型文件故意不做额外抽象，为的是研究者能直接改单个模型，不用在抽象层里绕。
+2. **训练 API 是围绕它自己的 PyTorch 模型优化的。** 你要写通用机器学习循环，用 Accelerate。
+
+补一条实践结论：Transformers 负责「定义和跑模型」，不负责「服务」。要并发、要吞吐、要生产级接口，把模型交给 vLLM 这类推理引擎，它们直接吃 Transformers 的模型定义。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://huggingface.co/docs/transformers/index",
+          note: "安装、pipeline 教程、各模态与任务的完整指南。第一次用照 Quickstart 走。",
+        },
+        {
+          kind: "html",
+          title: "Hugging Face Hub 模型页",
+          url: "https://huggingface.co/models?library=transformers",
+          note: "可直接在 Hub 页面上试大多数模型。挑模型时先在这里试，比本地下载快。",
+        },
+        {
+          kind: "html",
+          title: "Accelerate 文档",
+          url: "https://huggingface.co/docs/accelerate",
+          note: "官方在「什么时候不该用 Transformers」里点名的替代：通用训练循环用这个。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ponytail",
+    linksCheckedAt: "2026-10-14",
+    name: "Ponytail",
+    nameZh: "Ponytail 极简编码技能",
+    aliases: ["ponytail", "ponytail skill", "极简代码", "少写代码", "YAGNI"],
+    summary: "一个 prompt，让编码代理先读完代码再动手、能复用就不新写：官方基准里代码量 -53%、时间 -41%、token -45%。适合被过度实现烦到的人；代价是它会坚持砍掉你认为必要的抽象。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["编码代理", "代码评审", "重构", "开源"],
+    body: "Ponytail 的全部内容就是一个 prompt（skills/ponytail/SKILL.md，另有给规则文件用的精简版 AGENTS.md），仓库其余部分只是把这个 prompt 塞进不同 agent 的适配层。它的立场很简单：最好的代码是没写出来的代码。\nREADME 举的例子很能说明问题：要一个日期选择器，不装的代理会引入一个日期选择器库或手搓整个日历（335 行）；装了之后代理先看仓库里已有的 `Input` 组件，再想到浏览器自带 date picker，拼起来 10 行。\n它不是无脑压 token。README 特意强调：规则从来不是「token 最少」，而是只写任务需要的，且**校验、错误处理、安全、可访问性永不砍头**。有分支、循环、解析器、金钱或安全逻辑的代码要留一个小测试；每条回复结尾要交代跳过了什么、没检查什么、有什么风险。\n命令有 `/ponytail lite|full|ultra|off` 调强度、`/ponytail-review` 审当前 diff、`/ponytail-audit` 审整个仓库、`/ponytail-debt` 收集 `shortcut:` 注释。代价有两点：一是它会写 `shortcut:` 注释标记刻意偷懒的地方（不想要就在 CLAUDE.md 里换词）；二是命令需要支持 skill 的宿主，纯规则文件适配的 Cursor / Windsurf / Cline 只能拿到常驻规则，没有命令。",
+    officialUrl: "https://ponytail.dev",
+    officialLabel: "ponytail.dev",
+    links: {
+      official: "https://ponytail.dev",
+      github: "https://github.com/DietrichGebert/ponytail",
+    },
+    whoFor: "被代理的过度实现搞烦的人：引一堆不必要的库、为每个需求新写一套抽象、diff 里一半是可以不存在的代码。",
+    whoNot: "需要大量样板代码的项目（严格的领域分层、必须的配置模板）——它的默认取向会和你的规范对着干；也不适合纯 Cursor / Cline 用户想要那几个命令的人，那边只加载规则。",
+    installTips: [
+      "Claude Code 里两条命令：`/plugin marketplace add DietrichGebert/ponytail`，再 `/plugin install ponytail@ponytail`。",
+      "Codex 用 `codex plugin marketplace add DietrichGebert/ponytail` + `codex plugin add ponytail@ponytail`，然后到 `/hooks` 信任它的两个生命周期 hook，并新开一个会话才生效。",
+      "不支持插件的 agent（Cursor、Copilot、Cline、Windsurf、Kiro 等）把仓库里的 `AGENTS.md` 拷进项目，或让 agent 安装 `skills/ponytail/SKILL.md`。",
+      "只从 `DietrichGebert/ponytail` 或 npm 的 `@dietrichgebert/ponytail` 装；项目从不发布 .exe / .dll，见到带这些文件的副本就是假的。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#3D3B30",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：它到底改了什么、四个命令分别什么时候用、为什么它写 shortcut 注释、以及纯规则文件模式下少了什么。",
+      markdown: `## 它其实只有一个 prompt
+
+理解这一点，后面所有行为都能推出来。核心文件是 \`skills/ponytail/SKILL.md\`，\`AGENTS.md\` 是给「只读规则文件」的 agent 用的精简版，仓库里其他东西只是把这份 prompt 装进不同 agent 的适配层。
+
+所以它不是插件、不是工具、不联网。**它改的是代理的表达取向。**
+
+## 四条行为准则
+
+- **先读懂再动手。** 它是「懒于解法，但绝不懒于读代码」——先读你的改动牵涉到的代码、追一遍真实流程，再决定怎么做。
+- **能复用就不新写。** 例：要日期选择器，先看仓库有没有 \`Input\`，再看浏览器原生 date picker，而不是引库或手搓日历。
+- **有些东西永远不砍。** 信任边界校验、数据丢失处理、安全、可访问性，不在削减范围。
+- **留痕。** 有分支 / 循环 / 解析器 / 金钱 / 安全逻辑的代码要留一个小测试；每次回复结尾交代跳过了什么、没检查什么、有什么风险。
+
+最后那条最实用：**看结尾那段，就知道它这次偷了什么懒。**
+
+## 四个命令
+
+| 命令 | 什么时候用 |
+| --- | --- |
+| \`/ponytail lite\\|full\\|ultra\\|off\` | 调强度，或关掉。不带参数：关着就打开，开着就报当前档位 |
+| \`/ponytail-review\` | 审当前 diff，像那个「出事会被叫醒」的高级工程师 |
+| \`/ponytail-audit\` | 同样的检查跑整个仓库，按重要性排序 |
+| \`/ponytail-debt\` | 把你欠下的 \`shortcut:\` 注释收进一本账 |
+
+\`review\` 和 \`audit\` 每一条发现都写清：代码在做什么、哪里会出问题、怎么修、不修会怎样。\`review\` 后面可以跟 \`uncommitted\`、\`staged\`、\`branch\` 或 PR 链接来收窄或放宽范围。
+
+## shortcut 注释是怎么回事
+
+它会在刻意偷懒的地方写 \`shortcut:\` 注释，记下这是捷径以及什么时候该回来收拾，然后 \`/ponytail-debt\` 把它们汇总成账本——目的是让「以后再说」不会变成「永远不说」。
+
+不想要这个词，在你项目的 \`CLAUDE.md\` 或 \`AGENTS.md\` 里说一声，然后跑 \`/ponytail-debt <你的词>\`。
+
+## 功能对等的边界
+
+命令需要**支持 skill 的宿主**：Claude Code、Codex、Devin CLI、OpenCode、Gemini、Antigravity CLI、Hermes Agent、Qoder、Grok Build 等都能用。
+
+但在纯指令适配层（Cursor 的规则文件、Windsurf、Cline、Copilot、Kiro）里，**只有常驻规则，没有命令**。Cursor 配了 hooks 的话能用 \`/ponytail\` 切换档位，但也仅此而已。
+
+别指望在这些环境里敲 \`/ponytail-audit\` 有反应。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "INSTALL.md：逐平台安装步骤",
+          url: "https://github.com/DietrichGebert/ponytail/blob/main/INSTALL.md",
+          note: "Copilot、Cursor、OpenCode、Gemini 等各自的安装与 hooks 配置。非 Claude/Codex 用户看这一页。",
+        },
+        {
+          kind: "markdown",
+          title: "核心 prompt（SKILL.md）",
+          url: "https://github.com/DietrichGebert/ponytail/blob/main/skills/ponytail/SKILL.md",
+          note: "全部行为都出自这一个文件。想判断它会不会和你的项目规范打架，直接读原文最快。",
+        },
+        {
+          kind: "html",
+          title: "官网：案例与基准",
+          url: "https://ponytail.dev/stories",
+          note: "用 Ponytail 做出来的实际案例与 before/after 对照。判断收益是否值得引入时看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "dify",
+    linksCheckedAt: "2026-10-14",
+    name: "Dify",
+    nameZh: "Dify LLM 应用开发平台",
+    aliases: ["dify", "dify.ai", "LLM 应用平台", "工作流", "RAG 平台"],
+    summary: "开源 LLM 应用平台：可视化工作流、RAG 管道、Agent、LLMOps 与后端 API 一套自带，能自托管也能用云。适合要把 Prompt 变成可交付应用的团队；注意社区版是基于 Apache 2.0 加附加条件的自有协议。",
+    scenes: ["code", "office"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["LLM 平台", "RAG", "工作流", "开源"],
+    body: "Dify 的定位是「LLM 应用开发平台」：你在可视化画布上把工作流搭出来，它帮你处理 RAG 管道（从 PDF、PPT 抽取到检索）、Agent（自带沙箱，能跑命令、装软件、处理文件）、模型管理、可观测性和对外 API。原型到生产不必换技术栈，这是它相比「自己用 LangChain 拼一套」的主要卖点。\n上手门槛比想象中低：2 核 CPU、4 GiB 内存起步，`cd docker && cp .env.example .env && docker compose up -d`，然后浏览器打开 localhost/install 做初始化。可观测性可以直接接 Opik、Langfuse、Arize Phoenix。\n要提前知道的是三件事。一是**许可**：仓库用的是 Dify Open Source License，基于 Apache 2.0 但带附加条件，不是纯粹的 Apache——商业二次分发前要读 LICENSE。二是**SSO、RBAC、企业支持 SLA 属于 Dify Enterprise**，社区版自托管没有，别指望自己配出来。三是它本质上是一整套服务（数据库、向量库、worker、web），资源占用和运维成本都高于「一个 Python 包」，个人只是想给几个文档做个问答的话，这套东西偏重。",
+    officialUrl: "https://dify.ai",
+    officialLabel: "dify.ai",
+    links: {
+      official: "https://dify.ai",
+      github: "https://github.com/langgenius/dify",
+    },
+    whoFor: "要把 Prompt / RAG / Agent 变成能交付给业务方用的应用，并且需要团队协作、日志与成本观测的团队。",
+    whoNot: "只想本地给几份文档做个问答的个人用户——整套服务太重；以及需要 SSO / RBAC 但不想付企业版费用的组织。",
+    installTips: [
+      "最低 2 核 CPU、4 GiB 内存，且要 Docker 与 Docker Compose v2.24.0 或更高版本，先确认版本再 `docker compose up -d`。",
+      "标准起法：`cd docker` → `cp .env.example .env` → `docker compose up -d`，然后浏览器打开 `http://localhost/install` 做初始化。",
+      "要 SSO、RBAC 和企业支持属于 Dify Enterprise 的范围，社区版自托管没有这些能力。",
+      "想改代码或做二次开发，走官方的「从源码部署」指南，不要直接在 compose 起来的容器里改。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#155EEF",
+    },
+    guide: {
+      intro: "按第一次部署会卡在哪讲：硬件与 Compose 版本这两个硬门槛、初始化在哪一步、云 / 社区版 / 企业版怎么选、以及它的协议到底有什么附加条件。",
+      markdown: `## 先把两道硬门槛过了
+
+官方给的最低配置很具体：**CPU >= 2 核，RAM >= 4 GiB**。这不是「推荐」，低于它起来之后会各种不稳定。
+
+第二道门槛是 **Docker Compose v2.24.0 或更高**。老版本的 compose 语法支持不全，报错往往出现在解析 compose 文件时。
+
+## 标准起法
+
+\`\`\`bash
+cd dify
+cd docker
+cp .env.example .env
+docker compose up -d
+\`\`\`
+
+四行，之后：
+
+\`\`\`text
+http://localhost/install
+\`\`\`
+
+在浏览器打开它走初始化。这一步很多人会去找 \`/\` 或 \`/signin\`，然后以为没起来——**初始化入口就是 /install**。
+
+装不上先看官方 FAQ（docs.dify.ai 的 getting-started/install-self-hosted/faqs），那页覆盖了绝大多数首装问题。
+
+## 三条路怎么选
+
+| | 适合谁 |
+| --- | --- |
+| **Dify Cloud** | 想先试、不想管服务器 |
+| **社区版自托管** | 要数据在自己环境里，能接受自己运维 |
+| **Dify Enterprise** | 组织需要自托管 + SSO + RBAC + 支持 SLA |
+
+成本结构不一样：Cloud 是套餐加额度限制；自托管没有许可费，但机器和模型 provider 的钱你自己出；Enterprise 要联系销售。
+
+## 协议有个附加条件
+
+README 写的是：**Dify Open Source License，基于 Apache 2.0 并带附加条件**。
+
+它不是纯 Apache 2.0。如果你打算做二次分发、SaaS 化或者嵌入自己的商业产品，先把仓库根目录的 LICENSE 读完再动手——这一条比任何技术选型都更早该确认。
+
+## 别指望社区版有 SSO
+
+LDAP、SSO、细粒度 RBAC、SCIM 这些企业身份能力，是自托管社区版与 Enterprise 的分界线之一。
+
+如果你的组织一上来就要求「用公司账号登录、按角色分权限」，那就不是装个社区版能解决的事，先去谈 Enterprise，别在社区版上自己糊一层认证。
+
+## 它是什么量级的系统
+
+Dify 不是「一个库」，是一整套服务：web、api、worker、数据库、向量库、文件存储。
+
+带来的好处是开箱就有 LLMOps——日志、标注、基于生产数据持续改进 prompt 与数据集；也自带 Backend-as-a-Service，所有能力都有对应 API，可以嵌进你自己的业务逻辑。
+
+代价就是你得按「运维一套服务」来对待它：备份、升级、资源监控一个都跑不掉。个人只想给几份 PDF 做问答，这套成本和收益不成比例。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "自托管安装文档",
+          url: "https://docs.dify.ai/getting-started/install-self-hosted",
+          note: "Docker Compose 步骤与环境变量说明，附 FAQ。装不上时的第一站。",
+        },
+        {
+          kind: "html",
+          title: "支持的模型 provider 列表",
+          url: "https://docs.dify.ai/getting-started/readme/model-providers",
+          note: "哪些推理服务商与自托管方案能接。选型前确认你手上的 Key 在不在列表里。",
+        },
+        {
+          kind: "html",
+          title: "版本与定价总览",
+          url: "https://dify.ai/pricing",
+          note: "Cloud / 社区版 / Enterprise 三者的能力边界与费用。判断要不要上企业版看这一页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "open-webui",
+    linksCheckedAt: "2026-10-14",
+    name: "Open WebUI",
+    nameZh: "Open WebUI 自建 AI 界面",
+    aliases: ["open webui", "openwebui", "ollama webui", "自建 ChatGPT 界面"],
+    summary: "自托管的 AI 聊天前端，接 Ollama 或任何 OpenAI 兼容接口，自带 RAG、多模型对比、RBAC 与插件。适合已经跑起本地模型、要给团队一个界面的场景；代价是功能密度极高，Docker 卷漏挂就会丢库。",
+    scenes: ["tools", "office"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI 界面", "自托管", "RAG", "开源"],
+    body: "Open WebUI 是给自己跑的模型配界面的那块拼图：后端可以是 Ollama，也可以是任何 OpenAI 兼容的 API——LMStudio、GroqCloud、Mistral、OpenRouter、vLLM 都行，把 API URL 指过去就能混着用。它自称「完全离线可运行」，对数据不出内网的场景是关键。\n功能密度是它最大的特点，也是最大的负担：本地 RAG（9 种向量库 + 多种抽取引擎，支持 BM25 + 向量的混合检索与重排）、网页搜索接入几十家 provider、多模型同屏对比、模型竞技场与 ELO 排行、语音视频通话、图像生成、Notes 工作区、Channels 协作空间、日历与定时自动化、插件（Filter / Action / Pipe / Tool / Skill）与 MCP / OpenAPI 工具服务器、用量与成本看板、LDAP 与 SCIM 2.0。\n这套东西对个人来说明显过载。真要给多人用，还要注意规模化：多 worker、多节点要在 Redis 支撑会话与 WebSocket 的前提下部署，数据库可选 SQLite（可加密）或 PostgreSQL。\n两个具体的坑：Docker 起容器**必须挂 `-v open-webui:/app/backend/data`，漏了数据库随容器一起没**；容器内端口是 8080，官方示例映射到宿主机 3000，别照着容器内的 8080 去访问。pip 安装路线要用 Python 3.11，版本不对会有兼容性问题。",
+    officialUrl: "https://openwebui.com",
+    officialLabel: "openwebui.com",
+    links: {
+      official: "https://openwebui.com",
+      github: "https://github.com/open-webui/open-webui",
+    },
+    whoFor: "已经在本机或内网跑起模型（Ollama / vLLM / LM Studio），需要一个像样的界面给团队用，且在意数据不出内网的人。",
+    whoNot: "只是自己一个人偶尔聊天的人——功能密度远超需要，维护成本不划算；也不适合没有 Docker 经验又不愿意处理卷与端口的人。",
+    installTips: [
+      "Docker 起法一定要带 `-v open-webui:/app/backend/data`，漏掉这个卷，数据库会随容器一起消失。",
+      "Ollama 在宿主机就加 `--add-host=host.docker.internal:host-gateway`；Ollama 在别的机器就改 `OLLAMA_BASE_URL` 指向那台服务器。",
+      "只用 OpenAI API 的话加 `-e OPENAI_API_KEY=...`；要 GPU 用 `:cuda` 镜像，且宿主机先装好 NVIDIA CUDA container toolkit。",
+      "不想用 Docker 可以 `pip install open-webui` 后 `open-webui serve`，但要用 Python 3.11，否则有兼容性问题；容器内端口是 8080。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#4A4A4A",
+    },
+    guide: {
+      intro: "按第一次部署会卡在哪讲：卷为什么会丢数据、Ollama 在容器内还是宿主机的两种接法、端口到底访问哪个、以及功能这么多该先开哪几个。",
+      markdown: `## 第一道坎：卷必须挂
+
+这是官方用 WARNING 标出来的：**漏了 \`-v\` 就会丢数据**。
+
+\`\`\`bash
+docker run -d -p 3000:8080 \\
+  --add-host=host.docker.internal:host-gateway \\
+  -v open-webui:/app/backend/data \\
+  --name open-webui --restart always \\
+  ghcr.io/open-webui/open-webui:main
+\`\`\`
+
+\`/app/backend/data\` 里是数据库。不挂卷，容器一删账号、会话、知识库全没了。
+
+## Ollama 在哪，决定了怎么写命令
+
+**Ollama 在同一台机器上**：容器里访问不到宿主机的 \`127.0.0.1:11434\`，必须加 \`--add-host=host.docker.internal:host-gateway\`。这是「双方都在线但永远报错」这类问题的第一嫌疑。
+
+**Ollama 在另一台服务器**：改用环境变量指过去。
+
+\`\`\`bash
+docker run -d -p 3000:8080 \\
+  -e OLLAMA_BASE_URL=https://example.com \\
+  -v open-webui:/app/backend/data \\
+  --name open-webui --restart always \\
+  ghcr.io/open-webui/open-webui:main
+\`\`\`
+
+**只用 OpenAI 兼容 API**：
+
+\`\`\`bash
+docker run -d -p 3000:8080 \\
+  -e OPENAI_API_KEY=your_secret_key \\
+  -v open-webui:/app/backend/data \\
+  --name open-webui --restart always \\
+  ghcr.io/open-webui/open-webui:main
+\`\`\`
+
+## 端口别搞反
+
+容器**内部**监听 8080，官方示例都把它映射到宿主机的 3000。
+
+- Docker 路线：浏览器开 \`http://localhost:3000\`
+- pip 路线（\`open-webui serve\`）：直接开 \`http://localhost:8080\`
+
+pip 路线还有一条硬要求：**Python 3.11**。用别的版本会遇到兼容问题。
+
+## 想把 Ollama 一起打包
+
+有 \`:ollama\` 标签的镜像，一个容器里塞了 Open WebUI 和 Ollama，一条命令搞定：
+
+\`\`\`bash
+# 有 GPU
+docker run -d -p 3000:8080 --gpus=all \\
+  -v ollama:/root/.ollama -v open-webui:/app/backend/data \\
+  --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
+
+# 纯 CPU
+docker run -d -p 3000:8080 \\
+  -v ollama:/root/.ollama -v open-webui:/app/backend/data \\
+  --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
+\`\`\`
+
+**注意这里有两个卷**，\`/root/.ollama\` 是模型权重（更大），别只挂一个。
+
+## 功能太多，先开这三个
+
+它的功能列表长得吓人：RAG、网页搜索、多模型对比、语音视频、图像生成、Notes、Channels、日历、自动化、插件、用量看板、LDAP/SCIM……
+
+第一次别全开，按这个顺序：
+
+1. **接上模型**（Ollama 或 OpenAI 兼容 API）——这是能不能用的前提
+2. **本地 RAG**：在聊天里用 \`#\` 命令加载文档或知识库，同一个 \`#\` 加 URL 可以把网页拉进对话
+3. **用量看板**：先看清 token 与成本，再决定要不要开放给多人
+
+多人用之前再补两件事：RBAC 与用户组（按人给权限），以及如果要横向扩展，Redis 支撑的会话与 WebSocket 是必需的，SQLite 也该换成 PostgreSQL。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方安装文档",
+          url: "https://docs.openwebui.com/getting-started/",
+          note: "Docker、Docker Compose、Kustomize、Helm 与非 Docker 原生安装都在这一页下。选安装方式从这里进。",
+        },
+        {
+          kind: "html",
+          title: "故障排查",
+          url: "https://docs.openwebui.com/troubleshooting/",
+          note: "专门覆盖「连不上 Ollama」这类首装问题，含 host.docker.internal 的成因与修法。",
+        },
+        {
+          kind: "html",
+          title: "功能总览",
+          url: "https://docs.openwebui.com/features",
+          note: "RAG、插件、MCP、自动化、RBAC 等全部能力的说明。想判断哪些该先开、哪些可以关，看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "langchain",
+    linksCheckedAt: "2026-10-14",
+    name: "LangChain",
+    nameZh: "LangChain 代理工程框架",
+    aliases: ["langchain", "langchain python", "langgraph", "AI 应用框架"],
+    summary: "Python 里搭 LLM 应用与代理的抽象层：模型、嵌入、向量库可随时替换。适合快速做原型又想留后路的团队；如果你要的是可控的复杂代理，官方自己会让你去看 LangGraph。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["LLM 框架", "代理", "RAG", "开源"],
+    body: "今天的 LangChain 已经不是 2023 年那个「链式调用」的库，官方一句话定位自己是 agent engineering platform：给你一套模型、嵌入、向量库、检索器、工具的统一接口，让你在这些东西之间换供应商时不用重写业务代码。\n上手只有两行：`uv add langchain`，然后 `from langchain.chat_models import init_chat_model` + `init_chat_model(\"openai:gpt-5.5\")`。JS / TS 项目有对等的 LangChain.js。\n要理解它的边界，得看清生态里的分工：LangChain 是通用抽象层；**LangGraph** 是低层编排框架，用来做可控的多步 agent 工作流；**Deep Agents** 是更高层的封装，自带规划、子代理、文件系统这些常见能力；**LangSmith** 负责评估、可观测性与部署。README 的 TIP 直接建议你：刚入门想做复杂任务的 agent，从 Deep Agents 开始。\n代价要讲清楚：抽象层是有成本的。它让你换模型容易，但也意味着调试时要穿透一层间接调用；版本演进快，早期教程里的 `Chain` 写法和现在推荐的写法已经不是一回事。如果你的需求就是「调一次模型、拼一段 prompt」，直接调 SDK 比引入框架轻得多——抽象层的收益要在「确实会换供应商、确实会多步编排」时才兑现。",
+    officialUrl: "https://docs.langchain.com/langchain",
+    officialLabel: "docs.langchain.com",
+    links: {
+      official: "https://docs.langchain.com/langchain",
+      github: "https://github.com/langchain-ai/langchain",
+    },
+    whoFor: "需要接多个模型 provider、向量库和工具，并且预期其中一两个以后会换掉的团队；以及要做多步检索与工具调用的应用。",
+    whoNot: "只是调一次 API 拼个 prompt 的人——直接调官方 SDK 更轻；也要小心照着旧教程写：早期 Chain 风格与现在的推荐写法差别很大。",
+    installTips: [
+      "用 `uv add langchain` 装（README 的 quickstart 就是这条），起手是 `from langchain.chat_models import init_chat_model`。",
+      "要可控的多步编排，分出去用 LangGraph；想要自带规划、子代理与文件系统的高层封装，看 Deep Agents。",
+      "评估、tracing 与调试接 LangSmith，部署长时有状态工作流用 LangSmith Deployment。",
+      "JS / TS 项目用 LangChain.js，不要指望 Python 版接口直接照搬。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#1C3C3C",
+      simpleIcon: "langchain",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：两行代码跑通之后，LangChain、LangGraph、Deep Agents、LangSmith 到底该用哪个，以及抽象层什么时候是负担。",
+      markdown: `## 先跑通最小例子
+
+\`\`\`bash
+uv add langchain
+\`\`\`
+
+\`\`\`python
+from langchain.chat_models import init_chat_model
+
+model = init_chat_model("openai:gpt-5.5")
+result = model.invoke("Hello, world!")
+\`\`\`
+
+这两行就是现在推荐的起手式。注意 \`init_chat_model\` 里的字符串是 \`provider:model\` 形式，换供应商就是换这个前缀——这正是整套抽象存在的理由。
+
+## 四个东西别搞混
+
+这是新人最常卡住的地方。生态里四个名字各有分工：
+
+| 组件 | 干什么 | 什么时候用 |
+| --- | --- | --- |
+| **LangChain** | 通用抽象层：模型、嵌入、向量库、工具 | 接外部系统、想保留替换余地 |
+| **LangGraph** | 低层编排：可控的多步 agent 工作流 | 流程复杂、需要精确控制每一步 |
+| **Deep Agents** | 高层封装：自带规划、子代理、文件系统 | 刚入门，想要常见能力开箱即用 |
+| **LangSmith** | 评估、可观测性、调试、部署 | 要上线、要看 trace、要跑评估 |
+
+README 的 TIP 说得很直接：**刚入门先看 Deep Agents**，它就是为了「agent 该有的常见能力」而做的高层包。
+
+## 抽象层值不值
+
+LangChain 卖的是「以后能换」：模型换、向量库换、工具换，业务代码不动。
+
+这个收益在两种情况下才兑现：
+
+1. 你**确实**会在多个 provider 之间摇摆或做 A/B
+2. 你的应用**确实**有多步检索、工具调用、状态流转
+
+反过来，如果你的需求就是「拼一段 prompt 调一次模型」，直接调官方 SDK 更轻——少一层间接调用，报错栈也短得多。
+
+## 旧教程是个坑
+
+LangChain 演进很快，\`Chain\` 时代那批教程（\`LLMChain\`、\`ConversationalRetrievalChain\` 之类）与现在的推荐写法已经不是一回事。
+
+照着 2023 年的博客抄，大概率会装上一堆废弃接口。判断方法：**以 docs.langchain.com 的当前 overview 为准**，博客只当思路参考。
+
+## 什么时候该上 LangSmith
+
+框架本身不提供生产可观测性。上线前要回答「这次回答为什么这么答」「token 花在哪」「改 prompt 有没有变好」，这三件事靠 LangSmith：trace、评估集、部署。
+
+如果你的项目只是脚本级别跑一跑，先别引入；一旦要给人用、要迭代 prompt，它就是必需的。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "概念总览",
+          url: "https://docs.langchain.com/oss/python/langchain/overview",
+          note: "当前推荐的心智模型与接口写法。避免照着旧教程写，以这一页为准。",
+        },
+        {
+          kind: "html",
+          title: "生态总览：LangChain / LangGraph / Deep Agents 怎么配合",
+          url: "https://docs.langchain.com/oss/python/concepts/products",
+          note: "四个产品的分工与选型。第一次决定该用哪个时看这一页。",
+        },
+        {
+          kind: "html",
+          title: "API 参考",
+          url: "https://reference.langchain.com/python",
+          note: "全部公开类、函数、类型的完整参考。写具体集成时对着查。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "moneyprinterturbo",
+    linksCheckedAt: "2026-10-14",
+    name: "MoneyPrinterTurbo",
+    nameZh: "MoneyPrinterTurbo AI 短视频生成",
+    aliases: ["moneyprinterturbo", "mpt", "AI 短视频", "一键成片", "自动剪辑"],
+    summary: "给一个主题就自动写脚本、配音、配素材、上字幕合成高清短视频，支持 9:16 / 16:9 / 1:1。适合批量做口播类短视频的人；代价是几乎每步都要接付费 API，成片质量取决于你选的模型与素材源。",
+    scenes: ["tools", "social"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI 视频", "短视频", "TTS", "开源"],
+    body: "MoneyPrinterTurbo 把「主题 → 成片」这条链路整个自动化：LLM 写脚本（可多语言）、TTS 配音、找素材、烧字幕、配背景音乐、剪辑合成一条做完。有 AI Agent、WebUI、API、CLI 四个入口，既能手动点，也能挂进自动化流程，还支持批量生成多条成片与任务历史。\n素材有三条路：Pexels / Pixabay / Coverr 的免费库存素材（要各自申请 API Key），或者文生视频——MiniMax H3、火山方舟 Seedance、WaveSpeed、OFox、MuAPI 都能接，也能走 OpenAI 兼容的文生图再转成动态片段。配音默认可以用 Edge TTS，**免费且不需要 API Key**，也有 Azure、ElevenLabs、 Gemini、MiniMax 等一堆可选。\n代价要说清楚：这不是「装上就能产出好内容」的工具。脚本模型、素材源、配音音色每一项的质量都直接进成片，用便宜模型和免费素材出来的东西，通常一眼能看出来；而且除了 Edge TTS，几乎每个环节都是按量付费的，批量跑之前先算一次成本。\n另外 README 里没有列出操作系统要求与依赖版本，部署前建议先按 WebUI 走通一条完整链路，确认 ffmpeg 之类的外部依赖齐了，再考虑接进自动化。",
+    officialUrl: "https://github.com/harry0703/MoneyPrinterTurbo",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/harry0703/MoneyPrinterTurbo",
+      github: "https://github.com/harry0703/MoneyPrinterTurbo",
+    },
+    whoFor: "要批量产出口播 / 解说类短视频（TikTok、YouTube Shorts、Instagram）的运营与内容团队，尤其是已经有稳定模型 Key 的人。",
+    whoNot: "指望零成本跑量的人——除 Edge TTS 外每个环节都按量付费；也不适合对画面原创性要求高的项目，库存素材拼出来的片子同质化很明显。",
+    installTips: [
+      "提供 WebUI、API、CLI、AI Agent 四种入口，先跑 WebUI 走通一条完整链路，再考虑接进自动化流程。",
+      "素材走 Pexels / Pixabay / Coverr 的免费库存图库，需要各自申请 API Key；配音默认用 Edge TTS，免费且不需要 Key。",
+      "脚本环节要自备大模型 Key，支持 Kimi、OpenAI、Claude、Gemini、DeepSeek、通义千问、Azure OpenAI、火山方舟、Grok、MiniMax、小米 MiMo 等，也兼容 Ollama、OneAPI、LiteLLM 等聚合网关。",
+      "画幅要在生成前定好：竖屏 9:16 是 1080×1920，横屏 16:9 是 1920×1080，方形 1:1 是 1080×1080，成片后再改很麻烦。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#16A34A",
+    },
+    guide: {
+      intro: "按第一次跑会卡在哪讲：四个入口选哪个、三个 API Key 分别在哪个环节、画幅为什么必须先定、以及怎么估算批量成本。",
+      markdown: `## 先走通一条，再谈批量
+
+它有四个入口：**AI Agent、WebUI、API、CLI**。
+
+第一次一定用 **WebUI**。原因是这条链路每一步（脚本 → 配音 → 素材 → 字幕 → 配乐 → 剪辑）都可能因为 Key 没配或依赖缺失而断掉，WebUI 能让你立刻看到断在哪一步。
+
+走通一条之后，再决定用 CLI 或 API 挂进定时任务，用批量功能一次出多条。
+
+## 三个环节，三种 Key
+
+这是最容易搞混的地方——三类外部服务各管一段：
+
+| 环节 | 选项 | 是否要 Key |
+| --- | --- | --- |
+| **脚本** | Kimi / OpenAI / Claude / Gemini / DeepSeek / 通义千问 / Azure OpenAI / 火山方舟 / Grok / MiniMax / 小米 MiMo | 要 |
+| **配音** | Edge TTS（默认）/ Azure Speech / SiliconFlow / Gemini / MiniMax / ElevenLabs 等 | Edge TTS **不要** |
+| **素材** | Pexels / Pixabay / Coverr（免费库存）或文生视频（MiniMax H3、Seedance、WaveSpeed、OFox、MuAPI） | 库存与文生视频都要 |
+
+脚本环节还有一条省钱路径：接 Ollama、OneAPI、LiteLLM、Groq、OpenRouter 这类本地或聚合网关，用便宜模型或本地模型写脚本。
+
+## 画幅先定，别事后改
+
+成片只有三种规格，生成时就得选：
+
+\`\`\`text
+竖屏 9:16  →  1080×1920
+横屏 16:9  →  1920×1080
+方形 1:1   →  1080×1080
+\`\`\`
+
+竖屏给 TikTok / Reels / Shorts，横屏给 YouTube 常规位，方形给信息流。事后裁剪会破坏字幕位置和画面构图，别指望后期救。
+
+字幕的字体、位置、颜色、大小、描边、背景都能单独调，这一项值得花时间——字幕样式对完播率的影响比换个模型大。
+
+## 素材：免费库存 vs 文生视频
+
+两条路的观感差别很大：
+
+- **Pexels / Pixabay / Coverr**：快、便宜（免费额度内）、但同质化严重，同一批素材在不同账号里反复出现。
+- **文生视频**：原创度高，按秒计费，生成慢且要等轮询，成本高一个量级。
+
+折中做法是混用：关键镜头用文生视频，过渡镜头用库存素材。项目支持上传自己的本地图片和视频，这一步能明显拉开和同类内容的差距。
+
+## 批量前先算一次成本
+
+批量生成多条成片是它的强项，但成本也按条数线性放大：
+
+\`\`\`text
+单条成本 ≈ 脚本 token + 配音字符/时长 + 素材（库存免费额度 or 文生视频秒数）
+\`\`\`
+
+先用最便宜的组合（免费库存 + Edge TTS + 便宜脚本模型）跑一条，估算出单条成本，再决定批量规模。别忘了文生视频是按秒算钱的，一条 30 秒的片子如果全部用 AI 生成素材，成本会远超预期。
+
+## 成片之后
+
+生成完可以一键发布到 TikTok、Instagram 和 YouTube Shorts。发布前建议先人工过一遍字幕错字——LLM 写脚本 + TTS 配音的链路里，专有名词读错是最常见的问题。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库（功能与配置说明）",
+          url: "https://github.com/harry0703/MoneyPrinterTurbo",
+          note: "功能清单、支持的模型服务与素材源、各入口的用法。配置 API Key 前先读一遍。",
+        },
+        {
+          kind: "html",
+          title: "版本发布记录",
+          url: "https://github.com/harry0703/MoneyPrinterTurbo/releases",
+          note: "最新发布包与改动。README 未列依赖版本，挑一个稳定 tag 比直接用 main 保险。",
+        },
+        {
+          kind: "html",
+          title: "生成样例展示",
+          url: "https://harry0703.github.io/mpt-assets/",
+          note: "项目实际生成的成片样例，含竖屏与横屏。判断输出质量上限，看样例比看功能表准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "graphify",
+    linksCheckedAt: "2026-10-14",
+    name: "Graphify",
+    nameZh: "Graphify 代码知识图谱",
+    aliases: ["graphify", "graphifyy", "代码知识图谱", "code graph", "AST 图谱"],
+    summary: "把代码库解析成可查询的知识图谱，让代理用 query / path / explain 代替 grep。代码部分走 tree-sitter 纯本地、不出机器；代价是文档与 PDF 那一路仍要调模型，且图要自己定期重建。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["代码分析", "知识图谱", "tree-sitter", "开源"],
+    body: "Graphify 的思路是：别让代理一遍遍 grep 文件，把仓库先解析成一张图，之后查询都在这张图上做。代码部分用 tree-sitter 做 AST 解析——确定性、不用 LLM、数据不出本机，覆盖约 40 种语言的调用、导入、继承、mixin 关系。\n它刻意不做向量索引：没有 embedding、没有向量库，是一张真的图，可以遍历。`graphify query\"...\"` 返回针对问题的子图，`graphify path A B` 追两个东西之间怎么连上，`graphify explain X` 解释一个概念。它还算 God nodes（最连接的概念）、用 Leiden 做社区划分，并把 `# NOTE:` / `# WHY:` 注释和 ADR / RFC 引用也做成节点挂到代码上。\n最值得称道的一点：**每条边都带 `EXTRACTED` 或 `INFERRED` 标签**，你能分清哪些是源码里明写的、哪些是它推出来的。这比 RAG 那种「相似度命中一段代码」可信得多。\n代价也要说：语义那一层（文档、PDF、图片、视频音频）仍然要调模型，只有你配了后端才跑；图是快照，代码改了就得重建，不是实时同步；项目在推付费的 Graphify Cloud 做常驻与跨仓库，开源 CLI 没有这部分。另外包名是 `graphifyy`（两个 y），装错会拿到别人的包。",
+    officialUrl: "https://www.graphify.com",
+    officialLabel: "www.graphify.com",
+    links: {
+      official: "https://www.graphify.com",
+      github: "https://github.com/Graphify-Labs/graphify",
+    },
+    whoFor: "仓库大到代理每次都要花大量 token 重新定位代码的人；以及需要回答「A 和 B 之间怎么串起来的」这类跨文件问题的人。",
+    whoNot: "小仓库或单文件项目——建图的开销大于 grep；也不适合指望它实时反映代码变化的人，图是快照，要自己重建。",
+    installTips: [
+      "PyPI 包名是 `graphifyy`（两个 y），命令仍是 `graphify`；PyPI 上其他 `graphify*` 包都不是官方的。",
+      "`uv tool install graphifyy` 后跑 `graphify install` 注册技能，再在 agent 里输入 `/graphify .`；装完找不到命令就 `uv tool update-shell`。",
+      "要装到项目而不是用户级：`graphify install --project`，文件落在 `.claude/skills/` 或 `.agents/skills/` 下，可以提交进仓库给团队共用。",
+      "需要 Python 3.10+；Windows 用 `winget install astral-sh.uv`，macOS 用 `brew install python@3.12 uv`，Ubuntu/Debian 可以 `sudo apt install python3.12 python3-pip pipx`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#0F766E",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：包名为什么是两个 y、装技能与建图是两步、三个产物分别怎么用、以及 EXTRACTED 与 INFERRED 该怎么看。",
+      markdown: `## 包名有两个 y
+
+这是第一个坑，也是最浪费时间的一个：
+
+\`\`\`bash
+uv tool install graphifyy      # 包名：graphifyy
+graphify install               # 命令：graphify
+\`\`\`
+
+PyPI 上其他 \`graphify*\` 包都与本项目无关。装完如果 \`graphify\` 找不到，跑 \`uv tool update-shell\` 刷新 PATH。
+
+需要 **Python 3.10+**。装 uv（推荐）或 pipx：
+
+\`\`\`bash
+# macOS
+brew install python@3.12 uv
+# Windows
+winget install astral-sh.uv
+\`\`\`
+
+## 两步：装技能，再建图
+
+\`graphify install\` 只是把技能注册给你的 agent（Claude Code、Cursor、Codex、Gemini CLI、Copilot 等 20+ 个平台），**这一步不建图**。
+
+建图是在 agent 里说的：
+
+\`\`\`text
+/graphify .
+\`\`\`
+
+产出一个目录、三个文件：
+
+\`\`\`text
+graphify-out/
+├── graph.html       浏览器打开，点节点、过滤、搜索
+├── GRAPH_REPORT.md  要点：关键概念、意外连接、建议提问
+└── graph.json       完整图，之后查询不必再读文件
+\`\`\`
+
+先看 \`GRAPH_REPORT.md\`，它是给人看的部分；\`graph.html\` 适合自己顺着边走一遍。
+
+\`graph.json\` 里带 \`graph.schema_version\` 和 \`graph.graphify_version\`，集成时先检查 schema 版本，格式变了要重建。
+
+## 三个查询命令
+
+\`\`\`bash
+graphify explain "APIRouter"
+graphify path "FastAPI" "ModelField"
+graphify query "认证是怎么串起来的"
+\`\`\`
+
+\`explain\` 的输出长这样：
+
+\`\`\`text
+Node: APIRouter
+  Source:    routing.py L2210
+  Community: 2
+  Degree:    47
+
+Connections (47):
+  --> RequestValidationError [uses] [INFERRED]
+  --> .get() [method] [EXTRACTED]
+  <-- __init__.py [imports] [EXTRACTED]
+\`\`\`
+
+**看标签。** \`EXTRACTED\` 是源码里明写的，\`INFERRED\` 是 Graphify 解析推出来的。看到一条关键结论主要靠 INFERRED 支撑时，自己回去核对一遍源码，不要直接写进代码。
+
+## 装到项目里给团队用
+
+默认 \`graphify install\` 装到用户级。要装进仓库：
+
+\`\`\`bash
+graphify install --project
+graphify install --project --platform codex
+\`\`\`
+
+文件会落在 \`.claude/skills/graphify/SKILL.md\` 或 \`.agents/skills/graphify/SKILL.md\`，可以 git 提交，团队共用同一份配置。
+
+## 它不做什么
+
+三件事别指望：
+
+1. **不是向量检索。** 没有 embedding、没有向量库，所以它回答不了「哪段代码和这个概念相似」这类模糊问题——它只能沿边走。
+2. **图是快照。** 代码改了要重新建图，不会自动同步。
+3. **语义层要调模型。** 代码用 tree-sitter 是纯本地的；文档、PDF、图片、音视频那一遍要走你配的模型后端，不配就不处理这些文件。
+
+跨仓库、常驻更新、形式化验证这些属于付费的 Graphify Cloud，开源 CLI 没有。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "Quickstart",
+          url: "https://docs.graphify.com/quickstart",
+          note: "从安装到建出第一张图的最短路径。第一次用照它走。",
+        },
+        {
+          kind: "html",
+          title: "安装与排错",
+          url: "https://docs.graphify.com/installation",
+          note: "覆盖 command not found、PowerShell 引号、git-hook PATH、严格模式等问题。装不上时看这里。",
+        },
+        {
+          kind: "html",
+          title: "支持的输入与语言",
+          url: "https://docs.graphify.com/concepts/supported-inputs",
+          note: "哪些语言与文件类型能进图。判断你的仓库能不能用之前先确认这一页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "browser-use",
+    linksCheckedAt: "2026-10-14",
+    name: "Browser Use",
+    nameZh: "Browser Use 浏览器代理",
+    aliases: ["browser use", "browser-use", "浏览器自动化", "AI 浏览器", "playwright agent"],
+    summary: "让 AI 像人一样操作浏览器，有 Python 库、CLI 与托管云三条路，Python 库本身 MIT 免费。适合要把重复网页操作自动化的开发者；代价是模型推理与云浏览器另收费，验证码也只能靠云方案缓解。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["浏览器自动化", "AI 代理", "Python", "开源"],
+    body: "Browser Use 做的事是「让代理开浏览器干活」：找可预约的时间段、选日期、处理验证码、完成预订——README 里举的就是这类例子。它有三条路径：完全托管的云、给现有编码代理装浏览器能力的 CLI、以及自己代码里调用的 Python 库。\nPython 库是 MIT 且免费的，最小例子很短：`uv add browser-use`，把 `OPENAI_API_KEY` 写进 `.env`，然后 `Agent(task=..., llm=ChatOpenAI(...))` 加 `await agent.run()`。系统提示由 `Agent(...)` 自动提供，你只管写 `task=`；要改可以用 `extend_system_message`，要换用 `override_system_message`。自定义工具用 `Tools()` 注册函数传进去。\n模型选择上，官方推荐自家的 BU2（`ChatBrowserUse(model='bu-2-0'`），走 `BROWSER_USE_API_KEY`；也能通过 provider 前缀用 Claude 或 Gemini，或者直接用 `ChatOpenAI` / `ChatAnthropic` / `ChatGoogle` 带自己的 Key。\n代价讲三点：一是**库免费不等于免费跑**——模型推理和托管浏览器都按量计费，只有用本地浏览器 + Ollama 本地模型才真正不花钱，但那样能力会弱很多。二是**验证码没有保证**：官方明说没有哪种浏览器配置能保证躲开或解开所有验证码，云的 stealth 浏览器和代理只是降低概率。三是 **Bash 工具需要 Linux / macOS 的 `/bin/bash`，Windows 要走 WSL**。另外登录态处理上，本地浏览器可以用 `Browser.from_system_chrome()` 复用 Chrome profile，云浏览器的 profile 同步只传 cookie，不传 localStorage、IndexedDB 和扩展。",
+    officialUrl: "https://browser-use.com",
+    officialLabel: "browser-use.com",
+    links: {
+      official: "https://browser-use.com",
+      github: "https://github.com/browser-use/browser-use",
+    },
+    whoFor: "要把「人要在网页上点十几步」这类重复操作自动化的开发者，以及想给自己的编码代理补上浏览器能力的团队。",
+    whoNot: "指望零成本跑的人——模型推理与云浏览器都按量计费；也不适合任务里必须稳定通过验证码的场景，官方明确不给保证。",
+    installTips: [
+      "Python 3.11+，用 `uv add browser-use` 装；新项目先 `uv init --python 3.12`。",
+      "把 `OPENAI_API_KEY` 写进 `.env`（用 BU2 模型或云浏览器再加 `BROWSER_USE_API_KEY`），脚本里 `load_dotenv()` 之后会自动读。",
+      "CLI 路线把 README 里那段提示直接粘给你的编码代理，它会装最新版、跑 `browser-use skill install` 注册技能并接上你的浏览器。",
+      "Windows 上 Bash 工具要 WSL——它需要 Linux 或 macOS 主机上的 `/bin/bash`；Python 库本身没有这个限制。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "B",
+      color: "#E85C0D",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：三条路选哪条、最小可跑的脚本长什么样、模型怎么选、以及登录态与验证码这两个现实约束怎么处理。",
+      markdown: `## 先选路径
+
+同一套东西有三条入口，选错会白装：
+
+| 路径 | 适合谁 |
+| --- | --- |
+| **完全托管云** | 只想发任务拿结果，不想管浏览器和基础设施 |
+| **CLI** | 已有编码代理（Claude Code、Codex、Hermes、Cursor 等），想给它开浏览器 |
+| **Python 库** | 要把浏览器代理嵌进自己的应用，要自定义工具和结构化输出 |
+
+CLI 和 Python 库都能连本地或云浏览器；完全托管的 API 连 agent 一起托管。
+
+## Python 库的最小脚本
+
+\`\`\`bash
+uv add browser-use    # Python >= 3.11
+\`\`\`
+
+\`.env\`：
+
+\`\`\`bash
+OPENAI_API_KEY=your-key
+# BROWSER_USE_API_KEY=your-key  # 可选：BU2 模型或云浏览器
+\`\`\`
+
+\`agent.py\`：
+
+\`\`\`python
+import asyncio
+from browser_use import Agent, Browser, ChatBrowserUse, ChatOpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+async def main():
+    llm = ChatBrowserUse(model='bu-2-0')
+    agent = Agent(
+        task="Find the number of stars of the browser-use repo",
+        llm=llm,
+        # browser=Browser(use_cloud=True),  # 需要 BROWSER_USE_API_KEY
+    )
+    history = await agent.run()
+    print(history.final_result())
+
+if __name__ == "__main__":
+    asyncio.run(main())
+\`\`\`
+
+\`\`\`bash
+uv run agent.py
+\`\`\`
+
+**不用写系统提示。** \`Agent(...)\` 自带，换模型也自带。你的任务写在 \`task=\` 里就够了。
+
+## 模型怎么选
+
+- **BU2**（官方推荐）：\`ChatBrowserUse(model='bu-2-0')\`，用 \`BROWSER_USE_API_KEY\`，专为浏览器任务优化。
+- **自带 Key 的通用模型**：\`ChatOpenAI\`、\`ChatAnthropic\`、\`ChatGoogle\`。
+- **通过 Browser Use 网关用别的厂**：\`ChatBrowserUse(model='anthropic/claude-sonnet-4-6')\`，provider 前缀即可。
+
+选型看三件事：任务难度、延迟、预算。官方给了 BU2 model card 和支持的模型与定价页做对比。
+
+## 登录态：本地与云不一样
+
+需要登录的站点，两条路处理不同：
+
+\`\`\`python
+# 本地：复用你的 Chrome profile
+browser = Browser.from_system_chrome()
+\`\`\`
+
+\`\`\`python
+# 云：用已同步的 profile
+browser = Browser(use_cloud=True, cloud_profile_id='your-profile-id')
+\`\`\`
+
+**关键差别**：profile 同步只传 cookie，**不传** localStorage、IndexedDB 和扩展。所以有些站点同步完还是要重新登录，这不是配置错了。
+
+## 验证码：别抱幻想
+
+官方 FAQ 的原话是：没有任何浏览器配置能保证每一个验证码都能被避开或解开。
+
+云浏览器提供 stealth 与住宅代理来**降低** bot 检测和验证码出现的概率，本地库开云浏览器也只是提高概率。如果你的任务必经验证码，成功率就是不可控的。
+
+## 免费吗
+
+Python 库是 MIT、免费。但**模型推理和托管浏览器都要钱**——包括 \`ChatBrowserUse\` 自己的网关。
+
+真正不花钱的组合是：本地浏览器 + 本地模型（官方支持通过 Ollama 接本地模型），代价是能力受硬件和模型限制。Bash 工具还有一条硬要求：需要 Linux 或 macOS 的 \`/bin/bash\`，Windows 用 WSL。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "Python 库文档",
+          url: "https://docs.browser-use.com/open-source/introduction",
+          note: "安装、Agent 用法、自定义工具与结构化输出。写自己的脚本时对着这一页。",
+        },
+        {
+          kind: "html",
+          title: "支持的模型与定价",
+          url: "https://docs.browser-use.com/open-source/supported-models",
+          note: "各模型的能力与费用，含如何用 Ollama 接本地模型。估算成本与选型前必读。",
+        },
+        {
+          kind: "html",
+          title: "真实浏览器与 profile 指南",
+          url: "https://docs.browser-use.com/open-source/customize/browser/real-browser",
+          note: "复用本地 Chrome profile 的方法与限制。要处理登录态时看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "caveman",
+    linksCheckedAt: "2026-10-14",
+    name: "Caveman",
+    nameZh: "Caveman 省 token 代理技能",
+    aliases: ["caveman", "caveman cli", "省 token", "token 压缩", "极简输出"],
+    summary: "装完让代理用最少的 token 说话、读压缩后的日志：官方测整会话输入 token 少 33.2%，Auto 档比 Opus 顶配便宜 54%。适合按量付费的重度用户；如果你按请求计费（如订阅制），省输出 token 并不省钱。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["编码代理", "Token 优化", "CLI", "开源"],
+    body: "Caveman 是一个装在你代理身上的省 token 套件，4.0 之后拆成六块：Say less（回答变短）、Read less（日志 / JSON / CSV / 测试输出在喂给模型前先压缩）、Auto（按任务难度自动挑模型和 effort）、Blocks（代理写的脚本存进仓库复用，别每次重写）、Waste fixes（找出 token 花在哪）、Browse（网页回来先压缩）。\n数字要带着条件看：Read less 那组官方自己标了诚实部分——测试文件是把一条记录藏在 61~72 KB 噪声里，HTML 目前没有压缩器所以在那一项上是变差的，整会话 33.2% 的节省来自 2026 年 8 月的旧引擎。Auto 那组 54% 的省钱主要来自「简单任务降 effort」，而且样本还在跑一半，0.5 分的差距在 ±7 的区间里根本分不出。\n有两个设计值得单独说：一是**它绝不改写你的 prompt**——Adobe Research 的论文发现把用户自己的 prompt 也 caveman 化会让答案变差；二是代码、命令、路径、错误信息逐字不动，只有散文被压缩。\n成本也要算：规则本身约 1160 个输入 token，而且如果你是按请求付费（比如 GitHub Copilot 订阅），回答变短一分钱也不省。另外只有 Auto 需要账号（免费），其余都跑在你本机、用你自己的 Key。",
+    officialUrl: "https://docs.caveman.so/caveman",
+    officialLabel: "docs.caveman.so",
+    links: {
+      official: "https://docs.caveman.so/caveman",
+      github: "https://github.com/JuliusBrussee/caveman",
+    },
+    whoFor: "按 token 付费、每天让代理跑大量任务的重度用户，尤其是日志和测试输出吃掉了大量上下文的场景。",
+    whoNot: "按请求计费的订阅用户（省输出 token 不省钱）；也不适合需要代理写详细解释与文档的人——它的默认取向就是少说。",
+    installTips: [
+      "一条命令：`npx @caveman-ai/cli@latest`。它会自己找出你装了哪些 agent、列出要改什么，确认后回车完成；需要 Node.js 22.13+。",
+      "只想要「说话更短」这一个能力：`npx skills add JuliusBrussee/caveman -g`，不装代理层，不碰你的登录态。",
+      "npm 12 及以上会拦住 git 安装，旧的一键脚本会失败；用 README 里的新版一行命令，或 `npx --allow-git=root -y github:JuliusBrussee/caveman#v4.0.0`。",
+      "卸载：`npx -y github:JuliusBrussee/caveman -- --uninstall`（npm 12+ 要额外加 `--allow-git=root`）；只装了技能就 `npx skills remove JuliusBrussee/caveman -g`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#6B4423",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：Node 版本与 npm 12 的安装坑、六块能力各自开关、哪些数字该打折扣、以及什么情况下它其实不省钱。",
+      markdown: `## 一条命令，但有两个前置
+
+\`\`\`bash
+npx @caveman-ai/cli@latest
+\`\`\`
+
+它会扫描你机器上装了哪些 agent、找出登录配置，把将要改动的地方列给你看，回车确认。
+
+硬要求：**Node.js 22.13+**。装完 \`claude\`、Codex、Gemini CLI、OpenCode 等 30+ 个 agent 都会变成 caveman 模式，跑在你本机、用你自己的 Key。
+
+**npm 12 的坑**：新版本 npm 会拦住 git 安装，钉在 v3.1.0 或更旧的脚本会直接失败。新版一行命令自己处理了这个，或者显式加参数：
+
+\`\`\`bash
+npx --allow-git=root -y github:JuliusBrussee/caveman#v4.0.0
+\`\`\`
+
+## 六块，各有开关
+
+\`\`\`bash
+caveman status          # 看哪些开着
+caveman off browse      # 关掉其中一块
+\`\`\`
+
+| 块 | 干什么 | 官方测得 |
+| --- | --- | --- |
+| Say less | 回答变短，代码不变 | 63 → 20 token，同一个修复 |
+| Read less | 日志 / JSON / CSV / 测试输出先压缩 | 整会话输入 token -33.2% |
+| Auto | 按任务难度挑模型和 effort | 比 Opus xhigh 便宜 54% |
+| Blocks | 代理写的脚本存进仓库复用 | 一次测试 397 → 76 token |
+| Waste fixes | 找 token 花在哪、保持 prompt cache 温着 | 未测 |
+| Browse | 网页回来先压缩 | 页面小 129.8 倍 |
+
+只有 **Auto 需要账号**，且免费：
+
+\`\`\`bash
+caveman login
+\`\`\`
+
+登录后在模型选择器里会出现 Auto；不登录就只是没有 Auto，也不会往外发东西。
+
+## 只想让回答变短
+
+不需要整套，只装那一条 skill：
+
+\`\`\`bash
+npx skills add JuliusBrussee/caveman -g
+\`\`\`
+
+在会话里敲 \`/caveman\`（Codex 里是 \`$caveman\`）；想更短有 \`/ultracave\`、\`/megacave\`。说 \`stop caveman\` 就恢复。
+
+## 这些数字该打几折
+
+README 里有专门的 HONEST-NUMBERS 一节，值得先看。几个关键点：
+
+1. **Read less 的测试文件是刻意设计的**：一条记录藏在 61~72 KB 噪声里，压缩比好看是必然的。你的日志不会这么极端。
+2. **HTML 目前没有压缩器**，在那一项上结果是变差的（9.9%），表格里那行是红的，作者没有藏。
+3. **整会话 33.2% 来自 2026 年 8 月的旧引擎**，现在未必一样。
+4. **Auto 的 54% 主要来自「简单任务降 effort」**，而且样本只跑了一半，0.5 分的得分差在 ±7 的置信区间里分辨不出。已经在用 Opus medium 的话，省得更少，且没测。
+
+## 什么情况下它不省钱
+
+两个前提缺一不可：
+
+- **你得按 token 付费。** 如果按请求计费（GitHub Copilot 这类订阅），回答变短一分钱不省。
+- **规则本身有成本。** 那套规则约 1160 个输入 token，每次请求都要带上。极短的任务可能反而更贵。
+
+## 它不碰什么
+
+三条硬边界，理解了这个就不会担心它搞坏东西：
+
+1. **你的 prompt 一个字不改。** Adobe Research 的论文发现把用户 prompt 也 caveman 化会让答案变差，所以作者明确不动它。
+2. **代码、命令、路径、错误信息逐字保留。** 压缩只发生在散文部分。
+3. **该说人话时说人话。** 安全警告、不可逆操作、用户表示困惑时，会切回完整句子。
+
+另外 JetBrains 的 A/B 测出一个前提：agent 会话里大部分内容是代码和工具调用，而 caveman 的「口音」不动这些——所以它后来才去做 Read less 和 Blocks 这两块。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "INSTALL.md：各平台安装与卸载",
+          url: "https://github.com/JuliusBrussee/caveman/blob/main/INSTALL.md",
+          note: "Claude app / 手机端 / Gemini / Windows / 多 agent 同时装的具体步骤，以及卸载方式。装不上时看这里。",
+        },
+        {
+          kind: "markdown",
+          title: "HONEST-NUMBERS：所有它输的场景",
+          url: "https://github.com/JuliusBrussee/caveman/blob/main/docs/HONEST-NUMBERS.md",
+          note: "列出 caveman 不奏效甚至变差的情况。决定要不要装之前先读这一页，比看宣传数字有用。",
+        },
+        {
+          kind: "html",
+          title: "v4.0.0 发布说明",
+          url: "https://github.com/JuliusBrussee/caveman/releases/tag/v4.0.0",
+          note: "六块能力的拆分与各自开关。升级后想搞清楚新增了什么，看这一页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "tradingagents",
+    linksCheckedAt: "2026-10-14",
+    name: "TradingAgents",
+    nameZh: "TradingAgents 多代理交易框架",
+    aliases: ["tradingagents", "trading agents", "多代理交易", "量化研究", "LLM 交易"],
+    summary: "把交易流程拆成分析师、研究员、交易员、风控与组合经理的多代理框架，产出带 HTML 报告的决策链。只适合做策略研究与回测——官方明确声明它不是投资建议，实盘盈亏自负。",
+    scenes: ["data", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["量化", "多代理", "回测", "开源"],
+    body: "TradingAgents 模拟真实交易公司的分工：基本面分析师、情绪分析师、新闻分析师、技术分析师各出报告（并行跑、各用各的工具），多空研究员就这些报告做结构化辩论，交易员汇总决定时机与仓位，风控团队评估波动率与流动性后把评估报告交给组合经理拍板，通过才发到模拟交易所。\n工程上它做得比多数同类认真：v0.5.0 之后强调 point-in-time integrity——回测时每个分析日期只能看到那天之前已发布的数据，SEC EDGAR 的财报按「申报时」提供，FRED 宏观与社交情绪也都做了前视偏差过滤。这一点是量化回测里最容易自欺的地方。输出是一份报告，v0.6.0 起还带 `complete_report.html` 单页版。\n模型端很开放：OpenAI、Google、Anthropic、xAI、DeepSeek、Qwen、GLM、MiniMax、OpenRouter、Mistral、Moonshot、Groq、NVIDIA NIM、Bedrock、Azure OpenAI，本地可以接 Ollama，任何 OpenAI 兼容服务（vLLM、LM Studio、llama.cpp）用 `openai_compatible` 加 `backend_url` 即可。\n必须说清楚：**这是研究框架，不是赚钱工具**。README 顶部就写着结果取决于骨干模型、温度、交易时段、数据质量等不确定因素，且明确不是财务、投资或交易建议。装它需要 Python 3.11+ 和至少一个模型 Key，跑一次完整分析的花费也要先算清楚。",
+    officialUrl: "https://arxiv.org/pdf/2412.20138",
+    officialLabel: "arxiv.org",
+    links: {
+      official: "https://arxiv.org/pdf/2412.20138",
+      github: "https://github.com/TauricResearch/TradingAgents",
+    },
+    whoFor: "做多代理决策与量化策略研究的人：想看 LLM 分工协作在金融任务上能做到什么程度，或者要一个带前视偏差防护的回测骨架。",
+    whoNot: "想拿它实盘赚钱的人——官方明确声明不是投资建议；也不适合对金融数据严谨性要求不高的玩具项目，它为了 point-in-time 完整性引入了额外复杂度。",
+    installTips: [
+      "需要 Python 3.11+：`git clone` 后用 conda（`conda create -n tradingagents python=3.13`）或 uv（`uv venv --python 3.13`）建环境，再 `pip install .`（uv 用 `uv pip install .`）。",
+      "Docker 路线：先 `cp .env.example .env` 填 Key，再 `docker compose run --rm tradingagents`；更新仓库后要重新 `docker compose build`。",
+      "结果、报告、记忆日志和缓存默认落在 `tradingagents_data` 卷里；想放宿主机目录就设 `TRADINGAGENTS_DATA_DIR`（例如 `mkdir -p data && TRADINGAGENTS_DATA_DIR=./data ...`）。",
+      "至少要配一个模型 Key（OpenAI / Google / Anthropic / DeepSeek / Qwen / GLM 等）；`FRED_API_KEY` 是免费的宏观数据，可选；本地模型用 `llm_provider: ollama`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#0B4F6C",
+    },
+    guide: {
+      intro: "按第一次跑会卡在哪讲：环境与依赖、Key 怎么配、CLI 交互与免交互两种跑法、ticker 后缀怎么填、以及为什么它的回测强调 point-in-time。",
+      markdown: `## 环境
+
+\`\`\`bash
+git clone https://github.com/TauricResearch/TradingAgents.git
+cd TradingAgents
+\`\`\`
+
+需要 **Python 3.11 或更高**。两种建法：
+
+\`\`\`bash
+conda create -n tradingagents python=3.13
+conda activate tradingagents
+pip install .
+\`\`\`
+
+\`\`\`bash
+uv venv --python 3.13
+source .venv/bin/activate
+uv pip install .
+\`\`\`
+
+Docker 也行，但**要先填 Key**：
+
+\`\`\`bash
+cp .env.example .env     # 填你的 API keys
+docker compose run --rm tradingagents
+\`\`\`
+
+改完仓库记得 \`docker compose build\` 重建镜像。
+
+## Key 与 provider
+
+至少配一个模型 Key，README 列了长长的清单：OpenAI、Google、Anthropic、xAI、DeepSeek、Qwen（国际 \`dashscope-intl\` 与国内 \`dashscope\` 分开）、GLM（Z.AI 与 BigModel 分开）、MiniMax、OpenRouter、Mistral、Moonshot、Groq、NVIDIA NIM。
+
+\`\`\`bash
+export OPENAI_API_KEY=...
+export FRED_API_KEY=...        # FRED 宏观数据，免费、可选
+export ALPHA_VANTAGE_API_KEY=...
+\`\`\`
+
+几个特殊情况：
+
+- **Azure OpenAI**：复制 \`.env.enterprise.example\` 到 \`.env.enterprise\` 填凭证。
+- **Bedrock**：额外装 \`pip install ".[bedrock]"\`，设 \`llm_provider: "bedrock"\`，配好 AWS 凭证与 \`AWS_DEFAULT_REGION\`。
+- **本地模型**：\`llm_provider: "ollama"\`，默认端点 \`http://localhost:11434/v1\`，远程就改 \`OLLAMA_BASE_URL\`。
+- **vLLM / LM Studio / llama.cpp**：\`llm_provider: "openai_compatible"\`，用 \`backend_url\` 指过去（vLLM 常是 \`http://localhost:8000/v1\`，LM Studio 是 \`http://localhost:1234/v1\`）。本地服务不需要 Key。
+
+## 两种跑法
+
+**交互式**：
+
+\`\`\`bash
+tradingagents          # 或直接 python -m cli.main
+\`\`\`
+
+屏幕让你选 ticker、分析日期、provider、研究深度等。**上一轮的答案会作为默认值**，一路回车就是重复上次的配置。
+
+**免交互**（给定时任务或脚本）：
+
+\`\`\`bash
+export TRADINGAGENTS_LLM_PROVIDER=openai TRADINGAGENTS_QUICK_THINK_LLM=gpt-6-luna TRADINGAGENTS_DEEP_THINK_LLM=gpt-6-sol
+export TRADINGAGENTS_OUTPUT_LANGUAGE=English TRADINGAGENTS_MAX_DEBATE_ROUNDS=1 TRADINGAGENTS_MAX_RISK_ROUNDS=1
+tradingagents --ticker NVDA --date 2026-09-23 --analysts market,news,fundamentals --save --no-show
+\`\`\`
+
+每个 flag 只跳过它自己那一问。跑在没有终端的环境里，缺任何一问的答案会在**开始前**就停下并告诉你缺哪个 flag 或变量——这点比静默用默认值强。
+
+## ticker 要带交易所后缀
+
+它支持 Yahoo Finance 覆盖的任何市场，公司身份与 alpha 基准按市场自动解析：
+
+\`\`\`text
+US      : AAPL, SPY
+香港    : 0700.HK        东京: 7203.T        伦敦: AZN.L
+印度    : RELIANCE.NS / .BO                  加拿大: .TO     澳洲: .AX
+A 股    : 600519.SS（沪） / .SZ（深）
+加密    : BTC-USD, ETH-USD
+\`\`\`
+
+## 报告长什么样
+
+\`--save\` 之后会多出 \`complete_report.html\`：整份报告做成单页，章节列在正文旁边，浏览器、手机、打印都能看。脚本里用 \`ta.save_reports(state, "NVDA", html=False)\` 可以不要这一页。
+
+## 前视偏差这件事
+
+它是这个框架最值得学的地方。v0.5.0 之后的每条 dated path 都做了 point-in-time 处理：
+
+- 回测时每个分析日期**只能看到该日期之前已发布**的数据
+- SEC EDGAR 的财报按「申报时」提供，而不是按财报期
+- FRED 宏观、社交情绪、决策日志记忆都做了前视过滤
+
+早期版本（v0.3.1 起）陆续修过 Alpha Vantage 的前视问题。如果你自己在上面加数据源，**这条约束要自己守住**——否则回测结果会漂亮得没有意义。
+
+## 别忘了那句话
+
+README 顶部有一句加粗：本框架为研究用途设计，交易表现取决于骨干模型、温度、交易时段、数据质量等不确定因素，**不构成财务、投资或交易建议**。
+
+跑出来的结论当研究素材看，别当信号下单。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "论文（arXiv）",
+          url: "https://arxiv.org/abs/2412.20138",
+          note: "框架的方法与各角色设计。想判断它的多代理结构是否可靠，读原文比读 README 有用。",
+        },
+        {
+          kind: "html",
+          title: "免责声明",
+          url: "https://tauric.ai/disclaimer/",
+          note: "官方对「不是投资建议」的完整说明。打算把输出用于任何实际决策前必读。",
+        },
+        {
+          kind: "markdown",
+          title: "CHANGELOG：各版本修了什么",
+          url: "https://github.com/TauricResearch/TradingAgents/blob/main/CHANGELOG.md",
+          note: "前视偏差、数据源、模型支持的逐版本记录。要自己加数据源时先看哪些坑已经修过。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "llms-from-scratch",
+    linksCheckedAt: "2026-10-14",
+    name: "LLMs-from-scratch",
+    nameZh: "从零实现大模型（教程代码库）",
+    aliases: ["llms from scratch", "build a large language model", "从零写 GPT", "大模型教程"],
+    summary: "《Build a Large Language Model (From Scratch)》的官方代码库，一章一章用 PyTorch 手写 GPT：注意力、预训练、分类微调、指令微调。适合真想看懂 LLM 内部的人；只想调 API 的话这里没有捷径。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["大模型", "PyTorch", "教程", "开源"],
+    body: "这是 Sebastian Raschka 那本《Build a Large Language Model (From Scratch)》的官方仓库，不是工具库。主线从第 2 章的文本数据与 DataLoader、第 3 章手写注意力机制、第 4 章从零搭出 GPT 模型、第 5 章在无标注数据上预训练、第 6 章分类微调、到第 7 章指令微调，附录 A 补 PyTorch 基础、附录 E 讲 LoRA 参数高效微调。不用任何外部 LLM 库，全部自己写。\n它最实在的一点是**硬件门槛低**：主章节代码设计成在普通笔记本上就能在合理时间内跑完，有 GPU 会自动用上。这和大多数「复现 LLM」的仓库不一样——那个量级的东西个人根本跑不动。\n每章都有练习，答案汇总在附录 C，各章目录下还有 `exercise-solutions.ipynb`；Manning 网站上还能免费下一本 170 页的测验 PDF（每章约 30 题）。另外有 17 小时 15 分的配套视频课，章节结构与书一一对应。\n代价是时间：这是「逐个概念手写一遍」的路子，不是三小时速成。想快速用上 LLM 的人应该去看推理框架或 API，这里解决的是「它到底怎么工作」。续作《Build A Reasoning Model (From Scratch)》从预训练模型出发讲推理时扩展、强化学习与蒸馏，读完主线再接那本。",
+    officialUrl: "https://amzn.to/4fqvn0D",
+    officialLabel: "amzn.to",
+    links: {
+      official: "https://amzn.to/4fqvn0D",
+      github: "https://github.com/rasbt/LLMs-from-scratch",
+    },
+    whoFor: "有 Python 基础、想真正理解注意力与 GPT 内部构造的学生与工程师；以及要给学生准备可动手教材的老师。",
+    whoNot: "想三天内做出一个能用的 AI 应用的人——这里全是原理与手写实现；也不适合没有 Python 基础的人，README 把「扎实的 Python 功底」列为最重要的前提。",
+    installTips: [
+      "`git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git` 拉代码，按 ch02 → ch07 的章节顺序读 notebook，每章目录下的 `01_main-chapter-code/` 是主代码。",
+      "环境别猜：先读仓库里的 `setup/README.md`，它讲了 Python 与本书依赖怎么装；`setup/03_optional-docker-environment` 有 Docker 环境指南。",
+      "没用过 PyTorch 就从附录 A 开始，它是一份精简入门；主章节代码会自动使用 GPU，没有 GPU 也能在笔记本 CPU 上跑完。",
+      "每个主章节都有 `exercise-solutions.ipynb`，答案汇总在附录 C；Manning 网站可免费下载含每章约 30 题的测验 PDF 自查。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#7C3AED",
+    },
+    guide: {
+      intro: "按第一次读会卡在哪讲：章节顺序怎么走、Python 与 PyTorch 两个前提怎么补、每章的三种文件分别是什么、以及哪些 bonus 材料值得回头看。",
+      markdown: `## 路线图：按章节走，别跳
+
+\`\`\`bash
+git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git
+\`\`\`
+
+主线是第 2 到第 7 章，每章一个目录：
+
+| 章 | 内容 |
+| --- | --- |
+| Ch 2 | 文本数据与 DataLoader |
+| Ch 3 | 手写注意力机制 |
+| Ch 4 | 从零实现 GPT 模型 |
+| Ch 5 | 在无标注数据上预训练 |
+| Ch 6 | 分类任务微调 |
+| Ch 7 | 指令微调 |
+
+**顺序不要跳。** 第 3 章的注意力是第 4 章模型的核心，第 4 章的模型又是第 5 章预训练的输入。跳章读会卡在「这个张量从哪来」。
+
+## 每章三种文件
+
+每个章节目录下都有 \`01_main-chapter-code/\`，里面通常是三类：
+
+- \`chXX.ipynb\` —— 主章节代码，跟着书走
+- \`gpt.py\` / \`gpt_train.py\` 之类 —— 把 notebook 收敛成可直接跑的脚本（README 表里标 summary 的那些）
+- \`exercise-solutions.ipynb\` —— 练习解答
+
+想省时间就跑脚本；想看懂就一行行走 notebook。
+
+## 两个前提
+
+README 把 **扎实的 Python 功底**列为最重要的前提。有深度神经网络经验会更好，但不是必需。
+
+PyTorch 这边：不要求精通，但熟悉基础有用。完全没碰过就先读附录 A（\`appendix-A/01_main-chapter-code/\`），它分两部分讲张量到多 GPU 训练，是精简版入门。
+
+硬件反而不是门槛：**主章节代码设计成在普通笔记本上就能在合理时间内跑完**，检测到 GPU 会自动用上。这和那些要求 A100 的复现仓库完全不同。
+
+环境别自己猜，仓库里有专门的 \`setup/README.md\`，还有 \`setup/03_optional-docker-environment\` 给想用 Docker 的人。
+
+## 练习和自查
+
+每章都有练习，三条路径：
+
+1. \`exercise-solutions.ipynb\` —— 各章目录下的可运行解答
+2. 附录 C —— 所有练习的答案汇总
+3. Manning 网站的免费 170 页 PDF《Test Yourself On Build a Large Language Model (From Scratch)》—— 每章约 30 道测验题加解答
+
+读完一章就做那一章的题，比连读三章再做有用得多。
+
+## 值得回头看的 bonus
+
+主线走完后，这些 bonus 材料含金量很高：
+
+- \`ch02/05_bpe-from-scratch/\` —— 从零写 BPE 分词器
+- \`ch04/03_kv-cache\` —— KV Cache
+- \`ch04/04_gqa\`、\`05_mla\`、\`06_swa\`、\`09_dsa\` ——  grouped-query / 多头潜在 / 滑动窗口 / DeepSeek 稀疏注意力
+- \`ch04/07_moe\` —— 混合专家
+- \`ch05/07_gpt_to_llama\` 与 \`ch05/11_qwen3/\`、\`12_gemma3/\` —— 把 GPT 改成 Llama，以及从零写 Qwen3、Gemma 3
+
+这批内容是主线之外最能建立「架构直觉」的部分。
+
+## 接下来读什么
+
+续作是《Build A Reasoning Model (From Scratch)》（仓库 rasbt/reasoning-from-scratch），它从预训练模型出发，实现推理时扩展、强化学习与蒸馏。
+
+顺序应该是：先走完本仓库主线（搞清模型怎么搭、怎么训），再进那本（搞清怎么让它会推理）。
+
+## 它不是什么
+
+这不是一个能 pip install 然后拿去干活的库，也没有推理优化、服务化、量化这些工程内容。它解决的是唯一一件事：**让你知道 LLM 内部到底在做什么**。想要能用的东西，读完第 4 章之后去看推理框架。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "setup/README.md：环境搭建",
+          url: "https://github.com/rasbt/LLMs-from-scratch/blob/main/setup/README.md",
+          note: "Python 与依赖的安装建议，含 Docker 环境指南。别自己猜版本，照这一页配。",
+        },
+        {
+          kind: "html",
+          title: "作者博客：怎么读这本书",
+          url: "https://sebastianraschka.com/blog/2025/reading-books.html",
+          note: "作者本人给的技术书阅读方法，README 里专门链了它。决定要不要从头啃之前看一眼。",
+        },
+        {
+          kind: "markdown",
+          title: "附录 A：PyTorch 入门",
+          url: "https://github.com/rasbt/LLMs-from-scratch/blob/main/appendix-A/01_main-chapter-code/code-part1.ipynb",
+          note: "给没用过 PyTorch 的人的精简入门，分两部分。主线开始前先过一遍这部分。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "claude-mem",
+    linksCheckedAt: "2026-10-14",
+    name: "claude-mem",
+    nameZh: "claude-mem 跨会话记忆",
+    aliases: ["claude mem", "claude-mem", "cmem", "代理记忆", "会话记忆"],
+    summary: "给编码代理装跨会话记忆：5 个生命周期 hook 自动抓取工具调用、压缩成摘要，下次会话自动注入。适合长项目反复断线的场景；注意 `npm install -g claude-mem` 只装 SDK，不注册 hook。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["代理记忆", "Claude Code", "上下文工程", "开源"],
+    body: "claude-mem 解决的是编码代理最烦的一件事：会话一断，之前做过的决定、踩过的坑全部归零。它用 5 个生命周期 hook（SessionStart、UserPromptSubmit、PostToolUse、Stop、SessionEnd）自动抓取会话里的工具使用观察，生成语义摘要，下次会话开始时自动注回上下文。\n检索设计得比较克制，是一个三层工作流：先 `search` 拿紧凑索引（每条约 50~100 token），再 `timeline` 看某个观察前后的时间线，最后只对筛出来的 ID 用 `get_observations` 取全文（每条约 500~1000 token）。官方称这样能省约 10 倍 token——关键是**先筛后取**，不要一上来就拉全文。\n架构是本地 worker 服务（Bun 管理，带 web viewer）+ SQLite（FTS5）+ Chroma 向量库做混合检索。配置在 `~/.claude-mem/settings.json`，模型、worker 端口、数据目录、日志级别和上下文注入都能调。隐私上有 `<private>` 标签，包住的内容不进存储。\n要注意两点：一是**安装方式**——`npm install -g claude-mem` 只装 SDK，不注册 hook 也不起 worker，必须走 `npx claude-mem install` 或 `/plugin`；二是它默认会引导你用邮箱魔法链接登录以换取 memory key 并开通 30 天试用（不登录也能用，加 `--provider` 或设 `CLAUDE_MEM_ONLINE_OPTIN=false` 即可跳过）。",
+    officialUrl: "https://claude-mem.ai",
+    officialLabel: "claude-mem.ai",
+    links: {
+      official: "https://claude-mem.ai",
+      github: "https://github.com/thedotmack/claude-mem",
+    },
+    whoFor: "在长周期项目里反复开新会话、厌倦了每次重新解释背景的人；以及跨多个 agent（Claude Code、Codex、OpenCode 等）干活、希望记忆能共用的人。",
+    whoNot: "会话都很短、上下文根本用不完的人——注入的记忆只会白白占上下文；也不适合不能接受「代理把你的工具调用记录写进本地库并可能走云端记忆服务」的团队。",
+    installTips: [
+      "用 `npx claude-mem install` 装；不要只跑 `npm install -g claude-mem`，那只装 SDK，不注册 hook 也不起 worker 服务。",
+      "需要 Node.js 20.0.0+；Bun 与 uv（向量检索用）缺失时会自动安装。装完重启 Claude Code，旧会话的上下文会自动出现在新会话里。",
+      "不想登录账号就加显式 `--provider`，或设 `CLAUDE_MEM_ONLINE_OPTIN=false`；CI 与非交互 shell 下会自动跳过登录。",
+      "敏感内容用 `<private>` 标签包起来，被包住的部分不会写入存储。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#2563EB",
+    },
+    guide: {
+      intro: "按第一次装会卡在哪讲：为什么 npm 全局装没用、登录后到底开了什么、三层检索怎么用才省 token、以及配置与隐私控制在哪。",
+      markdown: `## 最容易踩的安装坑
+
+\`\`\`bash
+npx claude-mem install
+\`\`\`
+
+**不要用 \`npm install -g claude-mem\` 代替。** README 专门加了 Note：全局 npm 安装只装 SDK / library，不注册 plugin hook，也不起 worker 服务。结果就是「装了但什么都没发生」。
+
+Claude Code 里也可以走插件市场：
+
+\`\`\`text
+/plugin marketplace add thedotmack/claude-mem
+/plugin install claude-mem
+\`\`\`
+
+**装完必须重启 Claude Code**，之后旧会话的上下文会自动出现在新会话里。
+
+要求 Node.js 20.0.0+，Bun 和 uv（向量检索用）缺了会自动装。
+
+## 登录那一步在做什么
+
+安装程序会让你在浏览器里用**邮箱魔法链接**登录（不需要信用卡）。登录后：
+
+- 为你的账号开通一个 memory key
+- 解锁 **claude-mem observer**，带 **30 天免费试用**：记忆走 off-plan，等于让你的套餐多出一倍的用量
+- 试用结束后，记忆会自动回落到你的 Anthropic 套餐，除非你订阅
+
+登录完你还要选记忆 provider：claude-mem observer、你自己的 OpenRouter / Gemini Key，或者直接用 Anthropic 套餐。
+
+**不想登录完全可以**：加显式的 \`--provider\`，或设 \`CLAUDE_MEM_ONLINE_OPTIN=false\`，或在 CI / 非交互 shell 里跑——安装会全程不问账号。
+
+\`\`\`bash
+npx claude-mem install --provider host   # 用本机 provider
+\`\`\`
+
+## 三层检索：先筛后取
+
+这是它省 token 的关键，也是最容易用反的地方：
+
+\`\`\`text
+search(query="authentication bug", type="bugfix", limit=10)   # 索引，每条 50~100 token
+timeline(...)                                                   # 看某个观察前后发生了什么
+get_observations(ids=[123, 456])                                # 只对筛出来的 ID 取全文
+\`\`\`
+
+**顺序不能反。** 直接 \`get_observations\` 拉全文，每条 500~1000 token，几十条就把上下文吃光了。
+
+官方给的省法是：先 \`search\` 拿到带 ID 的索引，挑出真正相关的 ID，**批量**传给 \`get_observations\`。这样能省约 10 倍 token。
+
+## 配置在哪
+
+\`~/.claude-mem/settings.json\`，首次运行自动带默认值生成。能调：AI 模型、worker 端口、数据目录、日志级别、上下文注入设置。
+
+一个常用的开关：想在 Claude Code 与 Codex 的 SessionStart 上下文里包含**所有** harness 的观察，把它设成 true：
+
+\`\`\`json
+"CLAUDE_MEM_SESSION_START_INCLUDE_ALL_SOURCES": "true"
+\`\`\`
+
+默认是 \`"false"\`，只注入当前 harness 的观察——这样上下文更干净，代价是跨 agent 的记忆不会自动带过来。
+
+## 隐私控制
+
+不想进存储的内容用 \`<private>\` 标签包住：
+
+\`\`\`text
+<private>这段不要记</private>
+\`\`\`
+
+被包住的部分不写入存储。涉及密钥、客户数据时养成这个习惯。
+
+## 它到底记了什么
+
+核心是 5 个生命周期 hook：SessionStart、UserPromptSubmit、PostToolUse、Stop、SessionEnd（6 个 hook 脚本），加上一个预执行脚本做依赖检查。
+
+worker 启动时会打印一个 URL，那是实时的 memory stream web viewer，可以直接在浏览器里看它记了什么、也支持搜索。观察都带 ID，可以在 worker API 或 viewer 里引用。
+
+存储是本地 SQLite（FTS5）+ Chroma 向量库做混合检索，另有可选的 Cloud Sync 往 cmem.ai 备份（worker 写入时同步，不需要常驻守护进程）。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装指南",
+          url: "https://docs.claude-mem.ai/installation",
+          note: "各 agent 的安装命令与 --provider 等参数。装之前确认你用的是哪条路径。",
+        },
+        {
+          kind: "html",
+          title: "检索工具用法",
+          url: "https://docs.claude-mem.ai/usage/search-tools",
+          note: "search / timeline / get_observations 三层工作流与示例。想省 token 就看这一页，别直接拉全文。",
+        },
+        {
+          kind: "html",
+          title: "配置参考",
+          url: "https://docs.claude-mem.ai/configuration",
+          note: "settings.json 的全部环境变量与上下文注入开关。要调注入范围时对着改。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "deep-live-cam",
+    linksCheckedAt: "2026-10-14",
+    name: "Deep-Live-Cam",
+    nameZh: "Deep-Live-Cam 实时换脸",
+    aliases: ["deep live cam", "deep-live-cam", "DLC", "实时换脸", "face swap"],
+    summary: "一张图即可做实时换脸与视频 deepfake，支持嘴部遮罩与多人换脸，GPU 下可实时。仅适合自己出镜或已取得肖像授权的内容创作；拿他人面孔做冒充或欺诈，既违规也可能违法。",
+    scenes: ["photo", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["换脸", "实时视频", "计算机视觉", "开源"],
+    body: "Deep-Live-Cam 是实时换脸与一键视频 deepfake 工具：选一张脸、选摄像头、点 live 就出画面，嘴部可保留原嘴形（Mouth Mask），也能同时对多人换不同脸（Face Mapping）。视频 / 图片模式是选源脸与目标素材，点 Start，输出落在以目标视频命名的目录里。\n技术上它跑 onnxruntime，按硬件切执行后端：`--execution-provider cuda`（NVIDIA，要 CUDA 12.8.0 + cuDNN 8.9.7 + onnxruntime-gpu 1.26.0）、`coreml`（Apple Silicon M1~M5）、`dml`（Windows DirectML）、`openvino`（Intel，注意 onnxruntime-openvino 与 openvino 版本要一一对齐）、以及默认 `cpu`。模型要手动下载 `gfpgan-1024.onnx` 和 `inswapper_128_fp16.onnx` 放进 models 目录，首次运行还会再下约 300MB。\n**它的合规边界必须先说清楚。** README 顶部就是免责声明：用真人面孔必须取得本人同意，分享时要明确标注是 deepfake；软件内置检查会拒绝处理不当内容（裸露、血腥、战争影像等敏感素材）；项目方保留在法律要求时关停或加水印的权利。Ars Technica、TrendMicro 等报道也都把实时换脸带来的身份欺诈风险列为首要担忧。合理用途是影视配音配像、虚拟角色演出、自制梗图与获得授权的创作；**把它用于在视频通话或直播中冒充他人、绕过身份验证，属于滥用且可能违法**。\n上手成本不低：README 明说手动安装需要技术能力、不适合新手，嫌麻烦可以走官方的预构建版本。",
+    officialUrl: "https://deeplivecam.net",
+    officialLabel: "deeplivecam.net",
+    links: {
+      official: "https://deeplivecam.net",
+      github: "https://github.com/hacksider/Deep-Live-Cam",
+    },
+    whoFor: "做影视 / 动画 / 虚拟角色内容的创作者：给自己或已授权的形象做实时演出、给外语片配口型、做自制梗图与短片。",
+    whoNot: "想在视频通话、直播或任何身份验证场景中冒充他人的人——这是滥用且可能违法；也不适合没有命令行与 Python 环境经验的新手，手动安装门槛不低。",
+    installTips: [
+      "手动安装需要 Python 3.11–3.14（推荐 3.14）、pip、git、ffmpeg，Windows 还要 Visual Studio 2022 运行库；README 明说这套流程不适合新手。",
+      "必须手动下载 `gfpgan-1024.onnx` 和 `inswapper_128_fp16.onnx` 放进 `models/` 目录，否则启动就报模型加载错误；首次运行还会额外下载约 300MB 模型。",
+      "强烈建议用 venv 隔离：`python -m venv venv` 后 `pip install -r requirements.txt`；macOS 还要 `brew install python-tk@3.14`，否则 GUI 起不来。",
+      "换 GPU 后端要换对应的 onnxruntime 包：CUDA 用 `onnxruntime-gpu==1.26.0` 配 `--execution-provider cuda`，Apple Silicon 用 `--execution-provider coreml`，Windows 用 `dml`，Intel 可用 `openvino`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#8B1E2D",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：合规与授权这条前置、模型文件为什么必须手动放、四种 GPU 后端怎么选、以及实时画面出不来时先查什么。",
+      markdown: `## 先过合规这一关
+
+这一节不是免责套话，是实际能不能用的前提。README 顶部的声明写得很具体：
+
+- **用真人面孔必须取得本人同意**
+- **分享时必须明确标注是 deepfake**
+- 软件内置检查会拒绝处理不当内容（裸露、血腥、战争影像等敏感素材）
+- 项目方保留在法律要求时关停项目或给输出加水印的权利
+
+合理用途：影视与动画的配音配像、虚拟角色演出、自制梗图、已获授权的形象创作。
+
+**不在合理用途范围内的**：在视频通话、直播或任何需要身份验证的场景里冒充他人。主流媒体对这类工具的报道，关注点几乎都集中在身份欺诈与 eKYC 风险上。这属于滥用，且可能违法。
+
+另外下载只认两个来源：官方站点 deeplivecam.net 和本 GitHub 仓库，别处来的构建不要装。
+
+## 模型文件要手动放
+
+这是启动失败最常见的原因。两个 onnx 模型必须自己下载并放进 \`models/\` 目录：
+
+\`\`\`text
+models/
+├── gfpgan-1024.onnx
+└── inswapper_128_fp16.onnx
+\`\`\`
+
+两个都在 Hugging Face 的 \`hacksider/deep-live-cam\` 仓库里。放错位置或未下载，启动时报的就是模型加载错误。
+
+首次运行还会额外下载约 300MB 模型，这一步要等。
+
+## 隔离环境，别装进系统 Python
+
+\`\`\`bash
+python -m venv venv
+source venv/bin/activate      # Windows: venv\\Scripts\\activate
+pip install -r requirements.txt
+\`\`\`
+
+Python 版本：**3.11 是最低要求**（onnxruntime 已不支持 3.10），**3.14 是推荐版本**。macOS 上还必须有 tkinter，否则 GUI 起不来：
+
+\`\`\`bash
+brew install python@3.14
+brew install python-tk@3.14
+python3.14 -m venv venv
+\`\`\`
+
+装崩了就整个 venv 删掉重来（\`rm -rf venv\`），比逐个修包快。
+
+## GPU 后端：换后端要换包
+
+默认 \`python run.py\` 走 CPU，能跑但慢。要实时必须换后端，**每个后端对应不同的 onnxruntime 包**：
+
+| 硬件 | 安装 | 运行 |
+| --- | --- | --- |
+| NVIDIA | CUDA 12.8.0 + cuDNN 8.9.7，\`pip install onnxruntime-gpu==1.26.0\` | \`python run.py --execution-provider cuda\` |
+| Apple Silicon M1~M5 | 无需额外装，官方 onnxruntime 已带 CoreML | \`python3.14 run.py --execution-provider coreml\` |
+| Windows（DirectML） | \`pip install onnxruntime-directml==1.21.0\` | \`python run.py --execution-provider dml\` |
+| Intel（OpenVINO） | \`pip install onnxruntime-openvino==1.21.0\` | \`python run.py --execution-provider openvino\` |
+
+两个易错点：
+
+1. **Apple Silicon 上如果装过 \`onnxruntime-silicon\` 这个已停维护的 fork，必须先卸载**——它会遮蔽真正的包。
+2. **OpenVINO 版本必须一一对齐**：1.24.1 配 OpenVINO 2025.4.1、1.23.0 配 2025.3、1.22.0 配 2025.1。高于 1.21.0 的 onnxruntime-openvino 必须同时装对应版本的 openvino。
+
+NVIDIA 那条路还要注意 cuDNN 的 bin 目录要在系统 PATH 里。
+
+## 实时画面出不来，先查这三样
+
+Webcam 模式的流程是：\`python run.py\` → 选源脸 → 点 Live → **等 10~30 秒**预览出现。
+
+很多人在第 4 步以为卡死了。等不到画面时按顺序查：
+
+1. 模型是不是真的在 \`models/\` 里
+2. 执行后端是不是匹配你的硬件（CPU 下会很慢，但应该会出画面）
+3. macOS 上是不是用了 \`python\` 而不是 \`python3.14\`（多版本共存时这是高频原因）
+
+想推流用 OBS 之类的采集工具抓这个窗口；换脸就换源图。
+
+## 命令行参数（标注为未维护）
+
+README 把 CLI 参数一节标了 Unmaintained，但常用的还在：\`--mouth-mask\` 保留原嘴形、\`--many-faces\` 处理每一张脸、\`--map-faces\` 多脸映射、\`--keep-fps\` / \`--keep-audio\` 保留帧率与原音、\`--max-memory\` 限制内存。
+
+注意：**用了 \`-s/--source\` 参数就会进入 CLI 模式**，不再弹 GUI。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方站点与快速开始",
+          url: "https://deeplivecam.net/index.php/quickstart",
+          note: "预构建版本的下载入口，以及免责声明与使用条款。不想手动装依赖就走这一页，同时确认合规要求。",
+        },
+        {
+          kind: "html",
+          title: "模型下载（Hugging Face）",
+          url: "https://huggingface.co/hacksider/deep-live-cam/tree/main",
+          note: "gfpgan-1024.onnx 与 inswapper_128_fp16.onnx 的下载地址。手动安装必须先把这两个放进 models 目录。",
+        },
+        {
+          kind: "html",
+          title: "Ars Technica 的报道",
+          url: "https://arstechnica.com/information-technology/2024/08/new-ai-tool-enables-real-time-face-swapping-on-webcams-raising-fraud-concerns/",
+          note: "主流媒体对实时换脸带来的身份欺诈风险的讨论。评估要不要引入这类工具前，值得读一遍这个视角。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "taste-skill",
+    linksCheckedAt: "2026-10-14",
+    name: "Taste Skill",
+    nameZh: "Taste Skill 前端审美技能",
+    aliases: ["taste skill", "tasteskill", "design-taste-frontend", "反 AI 味", "前端设计"],
+    summary: "一组可移植的 Agent Skills，专治 AI 生成界面的「AI 味」：布局、字体、动效、间距都有明确禁令。适合让代理直接产出像样前端的人；代价是 v2 需要 Node 22+ 和本机 Chrome，没有浏览器就没有自动检查。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["前端设计", "Agent Skills", "UI", "开源"],
+    body: "Taste Skill 是一组可移植的 Agent Skills，装在编码代理身上，目的是治掉 AI 生成界面那股模板味。默认的 `design-taste-frontend` 已经是 v2：它先让代理盘点「只有客户端才有的东西」，再从一个研究过的方向库里发三个方向供你选（20 个方向、48 个 hero、172 种版块布局、44 套字体系统、56 组配色），最后用一个真实浏览器检查器按规则判页面不合格。\n最有意思的是那份禁令清单，它把「AI 味」拆成了可判定的项：眉批式小标签（eyebrows）、等宽小字标签、01/02/03 编号、发丝线、渐变、静止阴影、奶油配色土、紫色、超过两行的标题、空屏、被遮挡的文字。判完之后还有一轮看着自己的截图修的循环。\n除了这个默认技能，还有一堆各有专长的：`image-to-code`（先出图再分析再实现）、`redesign-existing-projects`（先审计再改老项目）、`high-end-visual-design`（克制高级感）、`minimalist-ui`、`industrial-brutalist-ui`、`full-output-enforcement`（治代理输出半成品）、`gpt-taste`（给 GPT/Codex 的更严版本），以及三个只出图不出代码的 imagegen 技能。\n代价与坑：v2 的检查器需要 **Node 22+ 和本机已装的 Chrome / Edge / Chromium**（它自己不装任何东西），没有浏览器就只剩方向建议，拿不到自动检查；旧的单文件版本才带 DESIGN_VARIANCE / MOTION_INTENSITY / VISUAL_DENSITY 三个旋钮，v2 没有旋钮，方向来自抽签参数、约束来自检查器，别按旧文档给 v2 调参。",
+    officialUrl: "https://tasteskill.dev",
+    officialLabel: "tasteskill.dev",
+    links: {
+      official: "https://tasteskill.dev",
+      github: "https://github.com/Leonxlnx/taste-skill",
+    },
+    whoFor: "让编码代理直接产出前端页面、但受够了千篇一律模板感的人；以及想在实现前先拿到有审美的参考图的团队。",
+    whoNot: "只有纯后端需求的人；也不适合机器上没有 Chrome / Edge / Chromium 又不想装的人——v2 的检查器跑不起来，只剩一半能力。",
+    installTips: [
+      "`npx skills add https://github.com/Leonxlnx/taste-skill` 一次装全部；只装默认那个用 `--skill \"design-taste-frontend\"`（这是 SKILL frontmatter 里的 name，不是目录名）。",
+      "只用 Claude Code 可以装成插件：`/plugin marketplace add Leonxlnx/taste-skill` + `/plugin install taste-skill@taste-skill`，所有技能都挂在 `taste-skill:` 命名空间下，不会和你已有的技能撞名。",
+      "v2 的检查器要求本机有 Chrome / Edge / Chromium 且 Node 22+，它自身不安装任何东西；没有浏览器就只能拿到方向建议。",
+      "出图不出代码用 `imagegen-frontend-web` / `imagegen-frontend-mobile` / `brandkit`；要先审计再改老项目用 `redesign-existing-projects`；代理老输出半成品就加 `full-output-enforcement`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#DB2777",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：安装名和目录名的区别、v2 为什么需要 Chrome、那份「AI 味禁律」具体禁了什么、以及其余十几个技能该挑哪个。",
+      markdown: `## 安装名不是目录名
+
+这是第一个坑。\`npx skills add\` 的 \`--skill\` 参数吃的是 **SKILL frontmatter 里的 \`name:\` 字段**，不是文件夹名：
+
+\`\`\`bash
+# 装全部
+npx skills add https://github.com/Leonxlnx/taste-skill
+
+# 只装默认那个
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"
+\`\`\`
+
+默认技能是一个**文件夹**（指令 + 库 + 脚本），必须整体安装，不能只拷 SKILL.md。其余单文件技能可以拷进项目或直接贴进 ChatGPT / Codex 对话。
+
+Claude Code 用户还有一条更省事的路——装成插件：
+
+\`\`\`text
+/plugin marketplace add Leonxlnx/taste-skill
+/plugin install taste-skill@taste-skill
+\`\`\`
+
+所有技能都会挂在 \`taste-skill:\` 命名空间下，例如 \`/taste-skill:imagegen-frontend-web\`，不会和你已有的同名技能冲突。之后用 \`/plugin update\` 升级。
+
+## v2 需要 Chrome，这条是硬要求
+
+v2 的两条腿是：
+
+1. **抽签发方向**：\`--tone\`、\`--have\`、\`--keep\` 决定发到什么方向
+2. **真实浏览器检查器**：按规则判页面不合格，并在自己的截图上做 look-and-fix 循环
+
+第二条要 **Node 22+ 加一个已安装的 Chrome / Edge / Chromium**。它**不安装任何东西**，只调用你机器上现有的浏览器。
+
+没有浏览器的话，抽签和方向库照常可用，但**自动检查这一半就没了**——你得到的只是建议，不会有人判你的页面不合格。
+
+## 它禁的是什么
+
+这份清单是它最实用的部分，值得原样记住：
+
+\`\`\`text
+eyebrows（眉批式小标签）· 等宽小字标签 · 01/02/03 编号
+发丝线 · 渐变 · 静止阴影 · 奶油配色土
+紫色 · 标题超过两行 · 空屏 · 文字被遮挡
+\`\`\`
+
+每一条都有明确判定，检查器会对着截图逐项判。所以它不是「让 AI 更有品味」这种空话，而是把「AI 味」拆成了可执行的规则。
+
+## 十几个技能，挑哪个
+
+按交付物分两类：**实现技能**出代码，**出图技能**只出参考图。
+
+| 场景 | 用哪个 |
+| --- | --- |
+| 通用默认 | \`design-taste-frontend\`（v2） |
+| 老项目改造 | \`redesign-existing-projects\`（先审计再改） |
+| 图 → 分析 → 代码 | \`image-to-code\` |
+| 视觉方向已定 | \`high-end-visual-design\` / \`minimalist-ui\` / \`industrial-brutalist-ui\` |
+| 代理老输出半成品 | \`full-output-enforcement\` |
+| GPT / Codex 要更严 | \`gpt-taste\` |
+| 只要参考图 | \`imagegen-frontend-web\` / \`imagegen-frontend-mobile\` / \`brandkit\` |
+
+出图技能的典型流程是：用它生成参考帧 → 把图交给 Codex / Cursor / Claude Code 去实现。想一条流水线走完就用 \`image-to-code\`，并在 prompt 里写明「先出图，再分析，再写代码」。
+
+## 旧版本的旋钮别往 v2 上套
+
+\`DESIGN_VARIANCE\`、\`MOTION_INTENSITY\`、\`VISUAL_DENSITY\` 这三个 1–10 的旋钮属于**旧的单文件版本**（\`design-taste-frontend-v2-experimental\` 和 \`design-taste-frontend-v1\`）。
+
+**v2 没有旋钮**：方向来自抽签，约束来自检查器。按旧文档给 v2 调参是无效的。
+
+依赖旧版本确切行为的项目可以显式装旧版，它们的安装名各自独立，不会互相覆盖：
+
+\`\`\`bash
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend-v2-experimental"
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend-v1"
+\`\`\`
+
+## 一句提醒
+
+README 里有一条 Disclaimer：Taste Skill 没有官方代币、代币或加密项目，任何用其名义的代币都与其无关。这类高星前端项目常被蹭名，装包认准 \`Leonxlnx/taste-skill\`。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与变更记录",
+          url: "https://www.tasteskill.dev/changelog",
+          note: "v1 / v2-experimental / v2 各版本改了什么、为什么改。升级或挑版本前看这一页。",
+        },
+        {
+          kind: "markdown",
+          title: "默认技能 SKILL.md",
+          url: "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/SKILL.md",
+          note: "v2 的完整指令、方向库与检查器规则原文。想确认它的审美取向是否适合你的项目，直接读这个。",
+        },
+        {
+          kind: "html",
+          title: "skills CLI（npx skills）",
+          url: "https://github.com/vercel-labs/agent-skills",
+          note: "安装命令 npx skills add 来自这个项目。想搞清楚技能被装到哪个目录、怎么卸载，看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "vllm",
+    linksCheckedAt: "2026-10-14",
+    name: "vLLM",
+    nameZh: "vLLM 推理服务引擎",
+    aliases: ["vllm", "vllm project", "大模型推理", "PagedAttention", "推理引擎"],
+    summary: "高吞吐的大模型推理与服务引擎：PagedAttention 管显存、连续批处理提吞吐、量化覆盖广，自带 OpenAI 兼容接口。适合要并发服务的生产部署；个人只想本地聊天的话它太重。",
+    scenes: ["code", "engineering"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["推理引擎", "LLM 服务", "GPU", "开源"],
+    body: "vLLM 解决的是「把模型服务好」而不是「把模型跑起来」。核心是 PagedAttention——像操作系统分页管理内存那样管理 attention 的 K/V 缓存，把显存碎片压下去，配合连续批处理、chunked prefill、前缀缓存，把吞吐拉满。它出自 UC Berkeley 的 Sky Computing Lab，现在是一个两千多名贡献者的社区项目。\n工程特性很全：CUDA/HIP graph 加速、量化覆盖 FP8 / MXFP8 / MXFP4 / NVFP4 / INT8 / INT4 / GPTQ / AWQ / GGUF / compressed-tensors / ModelOpt / TorchAO、注意力内核有 FlashAttention / FlashInfer / TRTLLM-GEN / FlashMLA / Triton、投机解码支持 n-gram / suffix / EAGLE / DFlash，还有 prefill 与 decode 分离部署。对外是 OpenAI 兼容 API，另有 Anthropic Messages API 和 gRPC。\n硬件上主线支持 NVIDIA / AMD / Intel GPU 和 x86 / ARM / PowerPC CPU，Google TPU、Intel Gaudi、IBM Spyre、华为昇腾、Apple Silicon 等属于插件支持。200+ 种 Hugging Face 架构可用（含 MoE、混合注意力与状态空间模型、多模态、嵌入与重排模型）。\n代价要说清楚：这是为 GPU 服务器设计的生产组件。装它要 `uv pip install vllm` 加 `vllm download-kernels`（拉预编译内核加快启动），跑起来要调显存占用、并行策略、量化方案，运维复杂度远高于本地聊天工具。**Windows 不在它的支持列表里**，个人想在本机跑模型请用 Ollama 一类工具。",
+    officialUrl: "https://vllm.ai",
+    officialLabel: "vllm.ai",
+    links: {
+      official: "https://vllm.ai",
+      github: "https://github.com/vllm-project/vllm",
+    },
+    whoFor: "要在 GPU 服务器上给多个用户或高并发请求提供模型服务，并且需要榨干单卡吞吐的工程团队。",
+    whoNot: "个人想在本机跑个模型聊天的用户——太重，用 Ollama 更合适；也不适合 Windows 环境，它不在支持列表里，需要走 WSL 或远程 Linux 机器。",
+    installTips: [
+      "官方推荐用 uv：`uv pip install vllm`，再跑一次 `vllm download-kernels` 拉预编译内核，能明显加快启动。",
+      "主线支持 NVIDIA / AMD / Intel GPU 与 x86 / ARM / PowerPC CPU；TPU、Gaudi、昇腾、Apple Silicon 属于插件支持，别按主线的安装步骤套。",
+      "服务起来就是 OpenAI 兼容接口（另有 Anthropic Messages API 与 gRPC），现有按 OpenAI 写的代码改 base_url 即可接入。",
+      "要开发或改内核就走 build-wheel-from-source 从源码构建，别在 pip 安装的包上改。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "V",
+      color: "#0891B2",
+    },
+    guide: {
+      intro: "按第一次部署会卡在哪讲：安装为什么有第二步、它快在哪里、量化与并行怎么选、以及什么情况下你不该上它。",
+      markdown: `## 安装有两步
+
+\`\`\`bash
+uv pip install vllm
+vllm download-kernels     # 预编译内核，为了启动更快
+\`\`\`
+
+第二步很容易被跳过。不做也能跑，但每次启动要现场编译内核，冷启动时间会明显变长。
+
+要改内核或做开发，走官方的 build-wheel-from-source，别在 pip 装出来的包上直接改文件。
+
+## 它为什么快
+
+三层原因，理解了这个才知道该调什么：
+
+1. **PagedAttention**：把 attention 的 K/V 缓存像操作系统分页那样管理，解决显存碎片。这是它的成名作，论文见 arXiv:2309.06180。
+2. **连续批处理 + chunked prefill + 前缀缓存**：请求不等齐再跑，长的 prefill 切开做，相同前缀复用。
+3. **图与内核**：piecewise / full CUDA-HIP graph、FlashAttention / FlashInfer / TRTLLM-GEN / FlashMLA / Triton 等优化内核，以及 torch.compile 的自动内核生成与图层变换。
+
+还有投机解码（n-gram / suffix / EAGLE / DFlash）和 prefill / decode / encode 分离部署，用来进一步压延迟。
+
+## 量化怎么选
+
+选项很多：FP8、MXFP8/MXFP4、NVFP4、INT8、INT4、GPTQ、AWQ、GGUF、compressed-tensors、ModelOpt、TorchAO。
+
+判断顺序是：**先看你的卡支持哪种精度**（NVFP4 这类要新架构），**再看你的质量容忍度**，最后才是吞吐。不要一上来就压到 INT4——省下来的显存往往抵不过掉的质量。
+
+## 并行与部署形态
+
+支持张量、流水线、数据、专家、上下文五种并行。粗粒度规则：
+
+- 单卡放得下 → 不用张量并行
+- 单卡放不下 → 张量并行（多卡切一层）
+- 吞吐不够 → 数据并行 / 多副本
+- MoE 模型 → 专家并行
+- 长上下文 → 上下文并行
+
+延迟敏感的场景再考虑 prefill 与 decode 分离，以及投机解码。
+
+## 对外接口
+
+起来就是 **OpenAI 兼容** API，另有 Anthropic Messages API 和 gRPC。
+
+实用含义：现有按 OpenAI SDK 写的代码，改一下 base_url 就能接进来，业务代码不用动。这是它比自研服务层省事的地方。
+
+多 LoRA 也支持（dense 与 MoE 层都有），一个底座服务多个微调版本时很划算。
+
+## 硬件：主线与插件是两回事
+
+主线支持：
+
+- NVIDIA / AMD / Intel GPU
+- x86 / ARM / PowerPC CPU
+
+插件支持（别按主线步骤装）：Google TPU、Intel Gaudi、IBM Spyre、华为昇腾、Rebellions NPU、**Apple Silicon**、MetaX GPU 等。
+
+**Windows 不在支持列表里。** 需要在 Windows 上开发就走 WSL 或远程 Linux 机器。
+
+## 什么情况下别上它
+
+vLLM 是生产组件，不是本地玩具。以下情况都不划算：
+
+- 个人在本机跑个模型聊天：用 Ollama 一类工具，一条命令，不用管显存与并行
+- 只有零星请求、没有并发压力：连续批处理带来的吞吐优势用不上，但运维成本照付
+- 没有 GPU 服务器：CPU 模式能跑，但失去它最大的价值
+
+它的收益只在「有很多并发请求、想榨干一张或多张卡」时才兑现。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://docs.vllm.ai/en/latest/getting_started/installation.html",
+          note: "各硬件的安装方式，含从源码构建 wheel。TPU / Gaudi / Apple Silicon 等插件看这里，别套主线步骤。",
+        },
+        {
+          kind: "html",
+          title: "支持的模型清单",
+          url: "https://docs.vllm.ai/en/latest/models/supported_models.html",
+          note: "200+ 种架构的支持状态。上线前确认你的模型在不在列表里、支持到什么程度。",
+        },
+        {
+          kind: "html",
+          title: "量化指南",
+          url: "https://docs.vllm.ai/en/latest/features/quantization/index.html",
+          note: "各量化方案的支持矩阵与硬件要求。选精度前对照着看，别一上来压到 INT4。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ragflow",
+    linksCheckedAt: "2026-10-14",
+    name: "RAGFlow",
+    nameZh: "RAGFlow 检索增强生成引擎",
+    aliases: ["ragflow", "rag flow", "RAG 引擎", "知识库问答", "文档解析 RAG"],
+    summary: "开源 RAG 引擎，强在复杂格式文档的解析与可追溯引用，答案能追到具体分块。适合要给企业文档做问答的人；代价是 Docker 起步就要 4 核 16G，且镜像暂不支持 macOS。",
+    scenes: ["data", "office"],
+    platforms: ["windows", "linux"],
+    source: "opensource",
+    tags: ["RAG", "文档解析", "知识库", "开源"],
+    body: "RAGFlow 是 infiniflow 的开源 RAG 引擎，和「向量库 + 自己拼一套检索链」的差别在文档解析这一层：它用 DeepDoc 做深度文档理解，直接从 Word、PPT、Excel、PDF、扫描件、网页里抽结构化内容，分块有可选模板、结果能在界面上可视化并人工干预，答案附可追溯引用。1.0 之后又加了「知识编译」——把文档或数据集编译成 Wiki、Graph、树、PageIndex、思维导图、时间线等结构化产物，以及带 Low / Medium / High / Ultra 四档思考强度的 Agentic Retrieval。\n代价要算清楚：它是重型服务而不是一个库。Docker 部署的推荐起步配置是 4 核、16 GB 内存、50 GB 可用磁盘，还要 Docker ≥ 24.0.0 与 Compose ≥ v2.26.1；开源版 1.0 的 DeepDoc 走 CPU 推理（布局分析、OCR、表格识别），大批量解析会很慢。另外 README 自己写明 Docker 镜像目前不支持 macOS。\n第一次启动最容易卡在三处：用 Elasticsearch 时宿主机的 vm.max_map_count 要 ≥ 262144（用 Infinity 通常不必）；RAGFlow 容器本身没有定义 Compose healthcheck，得自己 curl 健康检查端点或看 docker logs；起来之后必须先到模型供应商页填 LLM、embedding 和 rerank 的模型名、服务地址与 API key，否则建了知识库也问不出东西。",
+    officialUrl: "https://ragflow.io",
+    officialLabel: "ragflow.io",
+    links: {
+      official: "https://ragflow.io",
+      github: "https://github.com/infiniflow/ragflow",
+    },
+    whoFor: "要给企业或团队的文档（合同、手册、财报、工单）做可引用问答的人，尤其是格式复杂、扫描件多、需要人工核对分块的场景。",
+    whoNot: "只想给几十个 Markdown 文件做个简单问答的人——这一整套服务与资源开销不划算；以及 macOS 用户，Docker 镜像目前没有官方支持。",
+    installTips: [
+      "克隆后 `cd ragflow/docker`，切到发布标签（README 示例 `git checkout v1.0.0-rc1`）再 `docker compose -f docker-compose.yml up -d`；要求 Docker ≥ 24.0.0、Docker Compose ≥ v2.26.1。",
+      "起步配置按 README 是 4 核 CPU、16 GB 内存、50 GB 可用磁盘；用 Elasticsearch 时先 `sudo sysctl -w vm.max_map_count=262144`，要永久生效得写进 /etc/sysctl.conf。",
+      "启动后先 `curl -f http://localhost/api/v1/system/healthz`，返回 200 再开网页；默认 HTTP 端口是 80，浏览器直接输机器 IP，不必带端口号。",
+      "登录后第一件事是在模型供应商页添加 LLM、embedding 和 rerank（模型名、服务地址、API key）；从源码启动则要 Go 1.27、Clang 20、LLD 20、CMake ≥ 4.0 与 PCRE2 开发文件。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#2B6CB0",
+    },
+    guide: {
+      intro: "按第一次部署会卡在哪讲：资源与版本前提、Elasticsearch 那个内核参数、容器没有 healthcheck 时怎么判断就绪、以及起来之后必须补的模型配置。",
+      markdown: `## 先确认机器够不够
+
+README 给的推荐起步配置是 **4 核 CPU、16 GB 内存、50 GB 可用磁盘**，实际需求随文档引擎、数据量、解析任务和并发上升，再加本地模型还要另算。软件版本也有硬要求：
+
+- Docker ≥ 24.0.0
+- Docker Compose ≥ v2.26.1
+
+## 起服务
+
+\`\`\`bash
+git clone https://github.com/infiniflow/ragflow.git
+cd ragflow/docker
+git checkout v1.0.0-rc1
+docker compose -f docker-compose.yml up -d
+\`\`\`
+
+用 Elasticsearch 作为文档引擎时，宿主机要先调内核参数，否则容器起不来：
+
+\`\`\`bash
+sysctl vm.max_map_count                  # 先看当前值
+sudo sysctl -w vm.max_map_count=262144   # 低于 262144 才需要
+\`\`\`
+
+这个改动重启即失效，要长期生效就把 \`vm.max_map_count=262144\` 写进 \`/etc/sysctl.conf\`。**用 Infinity 的话这一步通常不需要。**
+
+## 怎么判断「起来了」
+
+坑在这里：**RAGFlow 容器本身没有定义 Compose healthcheck**。依赖服务全部 \`healthy\`、RAGFlow 容器还在 running，不代表能用了：
+
+\`\`\`bash
+curl -f http://localhost/api/v1/system/healthz
+\`\`\`
+
+拿到 HTTP 200 再打开浏览器。改过 \`SVR_WEB_HTTP_PORT\` 就把端口一起换掉。起不来就看日志：
+
+\`\`\`bash
+docker logs --tail 50 ragflow-cpu
+\`\`\`
+
+## 起完之后还有一步
+
+登录 UI 之后**必须先到模型供应商页添加 LLM、embedding 和 rerank**，填模型名、服务地址和 API key。这一步不做，知识库建好了也没法问答——这是新手以为「装坏了」的第一大原因。
+
+## macOS 用户注意
+
+README 的 Docker 配置页明确标注 **macOS 目前不在支持列表**。别在这上面耗时间，用 Linux 服务器或虚拟机。
+
+## 什么时候该考虑从源码启动
+
+从源码跑是为了开发和调试，而不是为了用：需要 \`go.mod\` 里指定的 Go 版本（当前 Go 1.27）、Clang 20、LLD 20、CMake ≥ 4.0 与 PCRE2 开发文件，还要先跑 \`uv run tools/scripts/download_dev_deps.py\` 拉 pdfium、onnxruntime 与 DeepDoc 权重，再用 \`./build.sh --all\`，最后分四个终端启动 admin、ingestor、syncer、api 四个服务。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档（Quickstart / 配置 / FAQ）",
+          url: "https://ragflow.io/docs/dev/",
+          note: "部署、配置、版本说明与常见问题都在这一处。第一次装先看 Quickstart 与 FAQ 两节，能省掉大半排查时间。",
+        },
+        {
+          kind: "html",
+          title: "Docker 配置说明",
+          url: "https://github.com/infiniflow/ragflow/blob/main/docker/README.md",
+          note: "镜像、端口、密码、文档引擎与平台支持（含 macOS 不支持这条）都写在这里。要改默认配置前必读。",
+        },
+        {
+          kind: "html",
+          title: "发布记录",
+          url: "https://ragflow.io/docs/dev/release_notes",
+          note: "查当前稳定版本号与 breaking change。README 的部署示例钉在具体 tag，跟 main 分支容易踩到未发布改动。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "paddleocr",
+    linksCheckedAt: "2026-10-14",
+    name: "PaddleOCR",
+    nameZh: "PaddleOCR 文档解析 OCR 工具包",
+    aliases: ["paddleocr", "paddle ocr", "PP-OCR", "OCR 识别", "文档解析"],
+    summary: "百度飞桨的 OCR 与文档解析工具包，能把 PDF/图片转成 Markdown 或 JSON 给 LLM 用，100+ 语种。适合中文扫描件与表格公式多的场景；代价是模型与依赖不轻，轻量的只需 PP-OCRv6 tiny 档。",
+    scenes: ["data", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["OCR", "文档解析", "PDF 转 Markdown", "开源"],
+    body: "PaddleOCR 现在不只是「识别文字」，而是一套文档 AI：一条线是 PP-OCRv6 做通用文字识别（单模型覆盖中英日等 50 种语言，tiny / small / medium 三档分别 1.5M、7.7M、34.5M 参数，对应端侧、移动端和服务器），另一条线是文档解析——PaddleOCR-VL-1.6（0.9B）直接输出 Markdown / JSON，PP-StructureV3 则额外给出表格单元格、文字的坐标信息。后者适合要把版面位置一起交给下游的场景，前者适合只要内容的场景。\n选它而不是通用多模态大模型的理由通常是中文与复杂版面：官方给的 OmniDocBench v1.6 准确率 96.3%，在文本、公式、表格三项领先，古文、生僻字、印章、图表也做了专门增强。它已经接进 Dify、RAGFlow、Cherry Studio，做 RAG 的知识入库层很省事。\n代价有两个。一是别指望一条管线打天下：想要坐标就用 PP-StructureV3，想要高吞吐解析就上 HPD-Parsing（分层并行解码 + P-MTP，公开基准峰值 4752 tokens/s，支持 OpenAI 兼容 serving 与定制 vLLM 本地推理）。二是部署环境：官方支持 NVIDIA GPU、Intel CPU、昆仑芯 XPU 等多种后端，但具体后端与版本对应关系要查文档，Windows 上新版显卡（如 RTX 50 系）有单独的说明页。",
+    officialUrl: "https://www.paddleocr.com",
+    officialLabel: "www.paddleocr.com",
+    links: {
+      official: "https://www.paddleocr.com",
+      github: "https://github.com/PaddlePaddle/PaddleOCR",
+    },
+    whoFor: "要给中文 PDF、扫描件、票据、表格做结构化入库的人：RAG 的知识解析层、批量档案数字化、需要坐标信息的版面还原。",
+    whoNot: "只偶尔识别几张截图的人——不如直接用现成的在线 OCR 或浏览器端 SDK；也不适合没有 Python 环境又不想碰模型权重下载的轻量需求。",
+    installTips: [
+      "3.5.0 起官方提供 `PaddleOCR.js` 浏览器推理 SDK，可以直接在浏览器里跑 PP-OCRv5；不想装 Python 和模型权重时先试这条。",
+      "核心依赖与可选依赖已经分离：只做文字识别装最小核心依赖即可，文档解析与信息抽取的额外依赖按需再装。",
+      "高吞吐解析走 HPD-Parsing：支持 OpenAI 兼容 serving，也可以通过定制 vLLM runtime 本地推理，环境与服务化步骤看官方 HPD-Parsing 教程。",
+      "选模型先定档位：PP-OCRv6 有 tiny(1.5M) / small(7.7M) / medium(34.5M) 三档，端侧、移动端、服务器各取所需，别一上来就上最大的。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#1E6FD9",
+    },
+    guide: {
+      intro: "按第一次选型会卡在哪讲：文字识别和文档解析是两条不同的管线、模型档位怎么选、要不要坐标、以及不想装环境时的浏览器方案。",
+      markdown: `## 先分清两条管线
+
+这是最容易走错的一步。PaddleOCR 里「识别文字」和「解析文档」不是同一件事：
+
+| 你要什么 | 用哪个 |
+| --- | --- |
+| 图片 / 自然场景里的文字 | **PP-OCRv6**（单模型覆盖中英日等 50 种语言） |
+| 文档转 Markdown / JSON，只要内容 | **PaddleOCR-VL-1.6**（0.9B） |
+| 文档转结构化，还要表格单元格与文字坐标 | **PP-StructureV3** |
+| 高吞吐批量解析 | **HPD-Parsing**（峰值 4752 tokens/s） |
+
+README 特别点了一句：**PP-StructureV3 相比 PaddleOCR-VL 系列多了细粒度坐标信息**（表格单元格坐标、文字坐标）。要做版面还原或让下游定位到原文位置，就必须选它，光靠 VL 模型拿不到。
+
+## 档位按部署位置选
+
+PP-OCRv6 分三档，不是越大越好：
+
+- \`tiny\` 1.5M —— 端侧
+- \`small\` 7.7M —— 移动端
+- \`medium\` 34.5M —— 服务器
+
+官方给的加速数据：CPU 端到端 5.2×（OpenVINO）、Apple M4 上 6.1×（tiny）、A100 上 0.13s。嵌入式和笔记本上硬上 medium 只会白等。
+
+## 不想装环境怎么办
+
+3.5.0 起有官方浏览器推理 SDK：
+
+\`\`\`js
+// PaddleOCR.js —— 官方浏览器推理 SDK，支持直接跑 PP-OCRv5
+\`\`\`
+
+适合一次性识别、内部小工具、或者不想在机器上放模型权重的场景。真正批量处理还是回到 Python。
+
+## 依赖别一次装全
+
+3.2.0 之后**核心依赖与可选依赖已经分离**：基础文字识别只需要最小核心依赖，文档解析、信息抽取的额外依赖按需安装。一次性装 all 会拉进来一堆用不到的包，升级时也更容易冲突。
+
+## 接 RAG 的话
+
+它已经深度集成进 Dify、RAGFlow、Pathway、Cherry Studio。做 RAG 时通常不需要自己写解析脚本，直接在那些平台里选 PaddleOCR 作为解析后端即可；解析结果还能导出 DOCX（PaddleOCR-VL 系列、PP-StructureV3、PP-DocTranslation 都支持），方便人工校对。
+
+## 硬件后端
+
+官方列了 NVIDIA GPU、Intel CPU、昆仑芯 XPU 和多种 AI 加速器。Windows 上的新显卡（例如 RTX 50 系）有单独的安装说明页，别照着通用教程装。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://www.paddleocr.ai/latest/en/version3.x/pipeline_usage/HPD-Parsing.html",
+          note: "HPD-Parsing 的环境准备、serving 与本地推理步骤。要做高吞吐解析照这一页配。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库与版本记录",
+          url: "https://github.com/PaddlePaddle/PaddleOCR",
+          note: "各版本的模型变更、安装与部署说明入口。选管线和档位前先看对应版本的 release note。",
+        },
+        {
+          kind: "html",
+          title: "PaddleOCR-VL-1.6 模型页",
+          url: "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6",
+          note: "文档解析主模型的权重与说明。要本地离线部署时从这里取权重。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "openhands",
+    linksCheckedAt: "2026-10-14",
+    name: "OpenHands",
+    nameZh: "OpenHands Agent Canvas 代理控制台",
+    aliases: ["openhands", "agent canvas", "OpenHands Agent Canvas", "编码代理平台", "自托管代理"],
+    summary: "把编码代理变成自托管的控制台：一个界面切换本地 / Docker / 云后端，也能挂 Claude Code、Codex 等第三方代理。适合要让代理常驻并接 Slack、GitHub 自动化的人；代价是无沙箱模式等于把整机文件系统交给它。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["编码代理", "自托管", "自动化", "开源"],
+    body: "Agent Canvas 是 OpenHands 现在的前端形态：一个自托管的开发者控制台，默认跑开源的 OpenHands 代理，也能换成 Claude Code、Codex、Gemini CLI、Pi、OpenCode 或任何支持 ACP 的代理。它解决的是「代理只能在我开着笔记本时干活」——把后端放到服务器或云上，代理就能继续跑，还能被 Slack、GitHub、Datadog 这类第三方触发。同一个前端可以在本地、Docker、虚拟机、公司基础设施之间切换后端，团队共用一台做代码评审与依赖升级，个人代理留在自己笔记本上。\n三种跑法要分清。`npm install -g @openhands/agent-canvas` 起本地全栈，README 用警告标了：代理直接跑在你装的机器上，对文件系统有完全访问权限。Docker 沙箱版把项目目录挂进容器，代理只能看到 PROJECTS_PATH。`OH_CONVERSATION_RUNTIME=docker agent-canvas` 是每次对话一个容器，适合并发跑多个代理，容器被替换后工作区与会话状态仍在。\n第二个坑是对外暴露：本地启动只监听 127.0.0.1 并自动注入 session key；一旦加 `--host 0.0.0.0`，session key 不再注入，必须自己设强 LOCAL_BACKEND_API_KEY。Docker 镜像默认监听容器内的所有网卡，README 明确建议：要发布到局域网或公网就去掉 AGENT_CANVAS_ALLOW_LAN_SESSION_KEY，改为在界面里手填 key，并按自托管指南做加固。",
+    officialUrl: "https://openhands.dev",
+    officialLabel: "openhands.dev",
+    links: {
+      official: "https://openhands.dev",
+      github: "https://github.com/OpenHands/OpenHands",
+    },
+    whoFor: "想让编码代理 7×24 常驻、按计划或按 webhook 触发（发报告到 Slack、拆解 GitHub issue）的团队，以及需要在一个界面里管理多个代理后端的人。",
+    whoNot: "只在本地 IDE 里偶尔让代理改几行代码的人——控制台 + 后端这一层是纯额外负担；也不适合不能接受把机器文件系统交给代理、又不想维护 Docker 的人。",
+    installTips: [
+      "最快一条：`npm install -g @openhands/agent-canvas` 然后 `agent-canvas`，需要 Node.js 24 或更高与 `uv`；也可以 `--frontend-only` / `--backend-only` 分开起。",
+      "Docker 沙箱版：`docker run -it --rm -p 127.0.0.1:8000:8000 -e AGENT_CANVAS_ALLOW_LAN_SESSION_KEY=true -v \"$HOME/.openhands:/home/openhands/.openhands\" -v \"${PROJECTS_PATH}:/projects\" ghcr.io/openhands/agent-canvas:1.27.1`，PROJECTS_PATH 要先建好。",
+      "每个对话一个容器：先全局装 npm 包，再 `OH_CONVERSATION_RUNTIME=docker agent-canvas`，需要 Node.js 24+、uv，且当前用户能执行 docker 命令。",
+      "npm / 源码启动的入口是 http://localhost:8000，Docker 镜像是 http://localhost:8000/canvas，别找错；Windows 命令在仓库的 README.windows.md 里。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#0F5C5C",
+    },
+    guide: {
+      intro: "按第一次上手会卡在哪讲：三种跑法怎么选、无沙箱等于整机权限这件事、并发场景为什么要用每对话一容器、以及对外暴露时 session key 该怎么管。",
+      markdown: `## 先选跑法
+
+| 跑法 | 前提 | 特点 |
+| --- | --- | --- |
+| 无沙箱 \`agent-canvas\` | Node.js 24+、\`uv\` | 最快，但代理有**整机文件系统权限** |
+| Docker 沙箱 | Docker、一个 PROJECTS_PATH 目录 | 代理只看到挂进去的项目目录 |
+| 每对话一容器 | Node.js 24+、\`uv\`、Docker | 适合并发，容器替换后工作区与历史仍在 |
+
+三种跑法共用同一个前端，后两种需要 Docker Desktop（macOS / Windows）或 Docker Engine（Linux）。
+
+## 无沙箱模式 = 整机权限
+
+README 在 Option 1 和 Option 4 前面都挂了警告：**agent-server 直接跑在你安装的机器上，代理对你的文件系统有完全访问权限**。
+
+这不是保守措辞，是它真的会照代理的判断去读写。个人或测试环境无所谓；放在有生产凭据的机器上之前，先换成 Docker 沙箱。
+
+## 想并发跑多个代理
+
+\`\`\`bash
+npm install -g @openhands/agent-canvas
+OH_CONVERSATION_RUNTIME=docker agent-canvas
+\`\`\`
+
+每次新对话开一个新容器，各自有独立的 Agent Server 与工具。注意两点：**已有的本地对话不会被转换**；同一份宿主机工作区仍会被多个对话共享，想避免互相改文件就用不同目录或 worktree。
+
+## 对外暴露前先管好 key
+
+默认行为（README 写得很细）：
+
+- npm / 源码启动只监听 \`127.0.0.1\`，并把 session key 自动注入到页面里
+- 加 \`--host 0.0.0.0\` 或设 \`OH_BIND_HOST\` 后，**session key 不再注入**，界面改成手填 API key
+- Docker 监听容器内所有网卡，默认不注入 key；要发布到局域网就别设 \`AGENT_CANVAS_ALLOW_LAN_SESSION_KEY\`
+- 把 \`LOCAL_BACKEND_API_KEY\` 设成强值，或用 \`docker exec <container> sh -c 'cat "$STATE_DIR/api-key.txt"'\` 取生成的那个
+
+面向公网的安装请照仓库里的自托管指南做加固。
+
+## 前端能管多个后端
+
+Canvas 连的是 Agent Server（一个 REST API，一台机器一个 host/port），所以它能在本地、云主机、公司服务器之间切换后端，不用为每个环境再装一套界面。定时与事件触发属于配套的 Automation Server，和 Canvas 是不同的仓库。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "后端（backends）文档",
+          url: "https://docs.openhands.dev/openhands/usage/agent-canvas/backends",
+          note: "本地 / 远程 / 云三类后端的差异与切换方式。决定把 agent-server 放哪之前先看这页。",
+        },
+        {
+          kind: "html",
+          title: "自托管与安全加固指南",
+          url: "https://github.com/OpenHands/OpenHands/blob/main/docs/SELF_HOSTING.md",
+          note: "对外发布时的安全处理与 session key / API key 管理。打算让代理常驻在服务器上时必读。",
+        },
+        {
+          kind: "html",
+          title: "内置自动化与第三方集成",
+          url: "https://docs.openhands.dev/openhands/usage/agent-canvas/prebuilt-automations",
+          note: "Slack、GitHub、Linear、Notion 等自动化与定时 / webhook 触发方式。想知道它除了聊天还能干什么看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "crawl4ai",
+    linksCheckedAt: "2026-10-14",
+    name: "crawl4ai",
+    nameZh: "Crawl4AI 网页转 Markdown 爬虫",
+    aliases: ["crawl4ai", "crawl 4 ai", "网页爬虫", "网页转 Markdown", "LLM 爬虫"],
+    summary: "把任意网页抓成干净、适合喂给 LLM 的 Markdown，支持深度爬取、CSS/XPath 结构化抽取和 stealth 反爬。适合做 RAG 数据源与 Agent 联网；代价是自己跑就得自己养浏览器和代理。",
+    scenes: ["data", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["爬虫", "Markdown", "RAG", "开源"],
+    body: "Crawl4AI 做的是一件事：把网页变成 LLM 读得顺的 Markdown。它和 requests + 解析库手刮的差别在于自带异步浏览器池与缓存，能跑 JS、等元素、整页滚动再抓，还能出 fit_markdown——用 PruningContentFilterLXML、BM25ContentFilter 或 LLMContentFilter 去掉菜单页脚这类噪音。抽取给了三条路：不用 LLM 的 JsonCssExtractionStrategy / JsonXPathExtractionStrategy / RegexExtractionStrategy，schema 可用 generate_schema 生成；要语义就上 LLMExtractionStrategy，接任意 provider（LiteLLM 支持的都行，包括本地 ollama）。\n三条用法要分清：Python 库（免费，浏览器在你自己的 Python 进程里）、自建 Docker 服务端（免费，浏览器在容器里，每个端点都要 CRAWL4AI_API_TOKEN）、Crawl4AI Cloud（按量付费，浏览器、代理、JS 重页面和 bot wall 全由对方处理，另多出只有云端有的 /search、/serp、/answer）。取舍就一句话——**JS 重页面和反爬谁来扛**：自己跑，代理轮换、enable_stealth、undetected-browser 适配器都归你配。\n两个必踩的安装坑：`pip install -U crawl4ai` 之后必须跑一次 `crawl4ai-setup` 装浏览器，失败就手动 `python -m playwright install --with-deps chromium`；起 Docker 服务端必须设 token，否则只有容器内可访问。",
+    officialUrl: "https://crawl4ai.com",
+    officialLabel: "crawl4ai.com",
+    links: {
+      official: "https://crawl4ai.com",
+      github: "https://github.com/unclecode/crawl4ai",
+    },
+    whoFor: "要给 RAG 或 Agent 建网页数据源的人：批量抓文档站、竞品页、新闻，需要干净的 Markdown 或结构化 JSON。",
+    whoNot: "只偶尔抓一两个页面的小需求——浏览器与依赖的安装成本不划算；也不适合指望零配置就能稳定突破强反爬站点的人。",
+    installTips: [
+      "`pip install -U crawl4ai` 之后必须 `crawl4ai-setup` 装一次浏览器，再用 `crawl4ai-doctor` 自查；浏览器装不上就 `python -m playwright install --with-deps chromium`。",
+      "起自建服务端：`export CRAWL4AI_API_TOKEN=\"$(openssl rand -hex 32)\"`，再 `docker run -d -p 11235:11235 --name crawl4ai --shm-size=1g -e CRAWL4AI_API_TOKEN=\"$CRAWL4AI_API_TOKEN\" unclecode/crawl4ai:latest`，约 10 秒后 curl /md 验证。",
+      "临时抓用命令行 `crwl`：`crwl https://example.com -o markdown`；深爬 `crwl URL --deep-crawl bfs --max-pages 10`；带 LLM 提问先 `crwl config` 配 key。",
+      "接编码代理：`claude mcp add --transport http crawl4ai https://api.crawl4ai.com/mcp --header \"Authorization: Bearer $CRAWL4AI_KEY\"`；自托管 Docker 同样提供 MCP 端点。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#3E7B4F",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：库 / 自建服务端 / 云三种形态怎么选、浏览器必须单独装这件事、不用 LLM 也能结构化抽取、以及深爬与自适应爬取的用法。",
+      markdown: `## 三种形态，先选一个
+
+| | Python 库 | 自建 Docker 服务端 | Crawl4AI Cloud |
+| --- | --- | --- | --- |
+| 谁跑浏览器 | 你的 Python 进程 | 你的 Docker | 对方 |
+| JS 重页面 / 反爬 | 你自己配代理与设置 | 你自己配 | 自动处理 |
+| 网页搜索 | 无 | 无 | \`/search\`、\`/serp\`、\`/answer\` |
+| 费用 | 免费 | 免费（自付机器） | 按量，有免费额度 |
+
+判断点只有一句：**JS 重页面和 bot wall 谁来扛**。自己扛就自己配代理轮换与 \`enable_stealth\`，也就要承担被封和调试的成本。
+
+## 装完记得装浏览器
+
+这是最常见的「装了但跑不起来」：
+
+\`\`\`bash
+pip install -U crawl4ai
+crawl4ai-setup      # 安装并配置浏览器，只需一次
+crawl4ai-doctor     # 自检
+\`\`\`
+
+失败就手动装：
+
+\`\`\`bash
+python -m playwright install --with-deps chromium
+\`\`\`
+
+## 第一次抓取
+
+\`\`\`python
+import asyncio
+from crawl4ai import AsyncWebCrawler
+
+async def main():
+    async with AsyncWebCrawler() as crawler:
+        result = await crawler.arun(url="https://news.ycombinator.com")
+        print(result.markdown)
+
+asyncio.run(main())
+\`\`\`
+
+想要干净正文，上 content filter：
+
+\`\`\`python
+from crawl4ai import CrawlerRunConfig, CacheMode
+from crawl4ai.content_filter_strategy import PruningContentFilterLXML
+from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
+
+run_config = CrawlerRunConfig(
+    cache_mode=CacheMode.BYPASS,
+    markdown_generator=DefaultMarkdownGenerator(
+        content_filter=PruningContentFilterLXML(threshold=0.48, threshold_type="fixed", min_word_threshold=0)
+    ),
+)
+\`\`\`
+
+比较 \`result.markdown.raw_markdown\` 与 \`result.markdown.fit_markdown\` 的长度，就知道滤掉了多少。
+
+## 结构化抽取，不一定要花 LLM 的钱
+
+列表页、商品页这种结构稳定的，用 CSS schema 更快也更省：
+
+\`\`\`python
+schema = {
+    "name": "Quotes",
+    "baseSelector": "div.quote",
+    "fields": [
+        {"name": "text", "selector": "span.text", "type": "text"},
+        {"name": "author", "selector": "small.author", "type": "text"},
+    ],
+}
+run_config = CrawlerRunConfig(
+    extraction_strategy=JsonCssExtractionStrategy(schema),
+    scan_full_page=True,   # 滚到底，懒加载的内容才会出现
+    scroll_delay=0.5,
+)
+\`\`\`
+
+懒加载页面一定要开 \`scan_full_page\`，否则只拿到首屏。需要语义字段时才用 \`LLMExtractionStrategy\`，配 \`LLMConfig(provider="openai/gpt-4o-mini", api_token=...)\` 加 Pydantic schema。
+
+## 深爬与自适应
+
+\`\`\`bash
+crwl https://docs.crawl4ai.com --deep-crawl bfs --max-pages 10
+\`\`\`
+
+BFS / DFS / best-first 三种策略，长任务有 \`resume_state\` 断点恢复。不知道该抓多少页时用 \`AdaptiveCrawler\`，它对着你给的 query 判断「够了」就停。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.crawl4ai.com",
+          note: "安装、CLI、Docker 与自托管、各抽取策略的完整参数。第一次用照 Installation 与 core 两节走一遍。",
+        },
+        {
+          kind: "html",
+          title: "官方示例代码",
+          url: "https://github.com/unclecode/crawl4ai/tree/main/docs/examples",
+          note: "可直接跑的进阶示例。想写 CSS schema 或接 LLM 抽取时，抄这里的骨架最省时间。",
+        },
+        {
+          kind: "html",
+          title: "Cloud API 文档",
+          url: "https://crawl4ai.com/docs",
+          note: "/scrape、/extract、/search、/serp、/answer 的接口与计费档位。决定自建还是买云服务前先看它。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "deer-flow",
+    linksCheckedAt: "2026-10-14",
+    name: "DeerFlow",
+    nameZh: "DeerFlow 长时任务代理框架",
+    aliases: ["deerflow", "deer-flow", "deer flow", "深度研究代理", "super agent harness"],
+    summary: "字节开源的 super agent harness：编排子代理、记忆、沙箱与技能，接调研、编码这类要跑几分钟到几小时的任务。适合想自建长任务代理的人；代价是配置与安全都重，README 明确警告网关管理员权限等同代码执行。",
+    scenes: ["code", "tools"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["AI 代理", "深度研究", "LangGraph", "开源"],
+    body: "DeerFlow 2.0 是一次彻底重写，和 1.x 不共用代码——原来那个 Deep Research 框架还在 `main-1.x` 分支上维护，2.0 的定位是 super agent harness：用子代理、记忆（DeerMem 做记忆抽取）、沙箱和可扩展技能去接「几分钟到几小时」的长任务，不再只是产出一份研究报告。它建在 LangGraph 上，前端有项目、文档架、定时任务、终端 TUI 这一整套，私有知识检索还能接 RAGFlow。\n上手路径是 `git clone` 后 `make setup`：一个交互向导，让你选 LLM provider、可选的联网搜索，以及沙箱模式、bash 访问、文件写工具这类执行与安全偏好，生成最小 `config.yaml` 并把 key 写进 .env，约两分钟。之后随时 `make doctor` 验环境，要提 issue 就跑 `make support-bundle`（生成可直接粘进 issue 的摘要、AI 草稿与诊断 zip，且不含 .env、原始对话和用户文件内容）。\n两个要提前知道的坑。一是**安全**：README 单独写了一节，说部署不当会引入安全风险，网关管理员权限等同代码执行，外部聊天消息的角色也当作不可信输入处理。二是**委托式抓取后端**：自托管的 Browserless、Crawl4AI、Firecrawl、fastCRW 默认会被拒绝，必须先确认出站隔离（私有网段、loopback、链路本地、云元数据）再设 `network_isolation_confirmed: true`，因为重定向、DNS 和子资源都是这些服务自己处理的；`make doctor` 会列出会被拒的配置。另外 InfoQuest 的 reader / 网页搜索 / 图片搜索用的是 30 秒 HTTP 连接与读取不活动超时，抓取的 `timeout`、`navigation_timeout` 是另一组服务端选项，别混着调。",
+    officialUrl: "https://deerflow.tech",
+    officialLabel: "deerflow.tech",
+    links: {
+      official: "https://deerflow.tech",
+      github: "https://github.com/bytedance/deer-flow",
+    },
+    whoFor: "想自己搭一个能跑长任务（调研 + 编码 + 产出）的代理系统的人，尤其已经熟悉 LangGraph、愿意自己管配置与部署的团队。",
+    whoNot: "只想一键出一份研究报告的人——1.x 那条线更轻；也不适合没有部署经验的人，README 自己把网关权限等同代码执行写进了安全警告。",
+    installTips: [
+      "`git clone https://github.com/bytedance/deer-flow.git && cd deer-flow && make setup`：交互向导约 2 分钟，生成最小 config.yaml 并把 key 写进 .env，之后可随时 `make doctor` 复验。",
+      "让编码代理代装，直接给它一句：'Help me clone DeerFlow if needed, then bootstrap it for local development by following https://raw.githubusercontent.com/bytedance/deer-flow/main/Install.md'。",
+      "自托管的 Crawl4AI / Firecrawl / Browserless / fastCRW 抓取后端默认会被拒绝，必须先做出站隔离再设 `network_isolation_confirmed: true`；`make doctor` 会报出会被拒的配置。",
+      "提 issue 前跑 `make support-bundle`：输出 issue 摘要、AI 草稿与可选诊断 zip，默认不含 .env、原始对话与用户文件；zip 只在维护者要求时附。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#7A5C3E",
+    },
+    guide: {
+      intro: "按第一次上手会卡在哪讲：2.0 与 1.x 分支不是同一套代码、make setup 向导会问什么、委托抓取后端的隔离门槛、以及 README 里那条安全警告到底意味着什么。",
+      markdown: `## 先确认你要的是哪一代
+
+README 开宗明义：**DeerFlow 2.0 是彻底重写，与 v1 不共用任何代码**。如果你要的是原来那个 Deep Research 框架，它在 \`main-1.x\` 分支上继续维护；2.0 是 super agent harness，目标是「几分钟到几小时」的通用长任务。
+
+## 三步起环境
+
+\`\`\`bash
+git clone https://github.com/bytedance/deer-flow.git
+cd deer-flow
+make setup
+\`\`\`
+
+向导会依次问：
+
+1. **LLM provider**（README 推荐 Doubao-Seed-2.0-Code、DeepSeek v3.2、Kimi 2.5）
+2. **是否配联网搜索**（Brave、Tavily、Jina、InfoQuest 等，也可以先跳过）
+3. **执行与安全偏好**：沙箱模式、bash 访问、文件写工具
+
+它生成一个最小 \`config.yaml\`，把 key 写进 \`.env\`，全程约两分钟。之后出问题先跑：
+
+\`\`\`bash
+make doctor
+\`\`\`
+
+不想一步步点，也可以把这句话交给 Claude Code / Codex / Cursor：
+
+\`\`\`text
+Help me clone DeerFlow if needed, then bootstrap it for local development by
+following https://raw.githubusercontent.com/bytedance/deer-flow/main/Install.md
+\`\`\`
+
+## 委托抓取后端有个硬门槛
+
+这一条最容易莫名其妙被拒。自托管的 **Browserless、Crawl4AI、Firecrawl、fastCRW** 后端，DeerFlow 默认拒绝，因为它们自己处理重定向、DNS 解析和子资源。要启用必须先确认出站隔离——私有网段、loopback、链路本地、云元数据地址都要断掉——再给对应工具设：
+
+\`\`\`yaml
+network_isolation_confirmed: true
+\`\`\`
+
+\`allow_private_addresses\` 只是允许你故意访问内网目标，**不能绕过这个后端检查**。\`make doctor\` 会直接列出会被拒绝的后端配置。
+
+## 安全：网关管理员 = 代码执行
+
+README 用了一整节讲这件事，核心两条：
+
+- **网关管理员权限等同代码执行**，别把它当成只读的后台账号
+- **外部聊天消息的角色是不可信输入**，不要按消息里自称的身份授权
+
+开放部署前先按 README 的 Deployment Defaults 与 Security Recommendations 过一遍。
+
+## 超时是两套，别调错
+
+InfoQuest 的 reader、网页搜索、图片搜索用的是 **30 秒 HTTP 连接 / 读取不活动超时**；抓取的 \`timeout\` 与 \`navigation_timeout\` 是独立的服务端选项，改后者不会影响前者。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与真实案例",
+          url: "https://deerflow.tech",
+          note: "落地页的案例以只读白名单方式开放，不用登录就能看。判断它能不能干你的活，先看案例。",
+        },
+        {
+          kind: "html",
+          title: "后端配置文档",
+          url: "https://github.com/bytedance/deer-flow/blob/main/backend/docs/CONFIGURATION.md",
+          note: "prompt overlays、模型请求准入、委托抓取后端隔离等配置项。配搜索与抓取时几乎一定会翻到这里。",
+        },
+        {
+          kind: "markdown",
+          title: "Install.md（代理引导安装）",
+          url: "https://raw.githubusercontent.com/bytedance/deer-flow/main/Install.md",
+          note: "README 推荐的引导式安装脚本说明，可直接交给编码代理执行。手动装不动时走这条。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "lobehub",
+    linksCheckedAt: "2026-10-14",
+    name: "LobeHub",
+    nameZh: "LobeHub 智能体协作平台",
+    aliases: ["lobehub", "lobe hub", "lobechat", "智能体平台", "Agent 协作"],
+    summary: "自托管的智能体工作空间：把代理当员工来招、排班、汇报，有 Agent Groups、Pages、定时任务和可编辑的白盒记忆。适合要长期养一批代理的人；代价是要自备 OpenAI API key 并自己运维。",
+    scenes: ["tools", "office"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI 代理", "自托管", "协作", "开源"],
+    body: "LobeHub 现在的定位是 Chief Agent Operator：把「代理」当成工作单元，招进来、排班、汇报，你在掌控但不必一直在线。它和普通聊天客户端的差别在三处——Agent Builder 描述一次需求就自动配置好一个代理；Agent Groups 让多个代理在一个共享上下文里并行协作（Pages 一起写内容、Project 按项目组织、Workspace 按团队分权限）；Schedule 让代理在你离线时按计划执行。另外还有 Personal Memory，而且是白盒的：结构化、可编辑，它记错了你能直接改掉。\n接入面给得也很宽：统一接入任意模型与模态，一万多个技能与 MCP 兼容插件，IM Gateway 让你在已经在用的聊天工具里跟代理说话。\n代价是它不是开箱即用的 SaaS。自托管要自备 OPENAI_API_KEY 并起 Docker，README 给的 Docker 路径是 `mkdir lobehub-db && cd lobehub-db`，再 `bash <(curl -fsSL https://lobe.li/setup.sh)` 初始化基础设施，最后 `docker compose up -d`。一键部署有个真实的坑：Vercel 默认是「创建项目」而不是 fork，结果是一直提示有更新、又检测不准，官方建议改用 Auto Sync With Latest 重新部署；自己 fork 的话只保留 upstream sync 这个 action，其余关掉。另外 `OPENAI_MODEL_LIST` 是个容易被忽略的控制点：`+模型` 加、`-模型` 隐藏、`模型名=显示名` 改名，逗号分隔。",
+    officialUrl: "https://lobehub.com",
+    officialLabel: "lobehub.com",
+    links: {
+      official: "https://lobehub.com",
+      github: "https://github.com/lobehub/lobehub",
+    },
+    whoFor: "想长期维护一批常驻代理（定时出报告、协作写内容、按项目分工）的团队，以及希望记忆可控可编辑、不想被黑盒画像牵着走的人。",
+    whoNot: "只想要一个能聊天的界面的人——它整套「招人 / 排班 / 汇报」的抽象对你没用；也不适合不想管 Docker 与 API key 的人。",
+    installTips: [
+      "Docker 路径：`mkdir lobehub-db && cd lobehub-db`，`bash <(curl -fsSL https://lobe.li/setup.sh)` 初始化基础设施，再 `docker compose up -d`。",
+      "`OPENAI_API_KEY` 是必填环境变量；走代理设 `OPENAI_PROXY_URL`，要控制可见模型用 `OPENAI_MODEL_LIST`（如 `qwen-7b-chat,+glm-6b,-gpt-3.5-turbo`）。",
+      "一键部署到 Vercel / Zeabur / Sealos / 阿里云时记得填 OPENAI_API_KEY；Vercel 分配的域名在部分地区 DNS 被污染，建议绑自定义域名。",
+      "fork 之后只保留 upstream sync 这个 GitHub Action，其余全部禁用；用一键部署建的项目会一直提示更新，要按官方的 Auto Sync With Latest 重来一遍。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#4C6EF5",
+    },
+    guide: {
+      intro: "按第一次部署会卡在哪讲：Vercel 一键部署与 Docker 自托管怎么选、三个关键环境变量、Vercel 那个「一直提示更新」的坑、以及白盒记忆为什么值得先摸一遍。",
+      markdown: `## 两条部署路线
+
+| | 一键部署（Vercel / Zeabur / Sealos / 阿里云） | Docker 自托管 |
+| --- | --- | --- |
+| 门槛 | 登录即部署 | 自己起 Docker |
+| 必填 | \`OPENAI_API_KEY\` | \`OPENAI_API_KEY\` |
+| 适合 | 先跑起来看看 | 长期用、数据在自己手里 |
+
+Docker 路径 README 写得很短：
+
+\`\`\`bash
+mkdir lobehub-db && cd lobehub-db
+bash <(curl -fsSL https://lobe.li/setup.sh)   # 初始化基础设施
+docker compose up -d
+\`\`\`
+
+## 三个环境变量
+
+| 变量 | 必填 | 作用 |
+| --- | --- | --- |
+| \`OPENAI_API_KEY\` | 是 | 在 OpenAI 账号页申请的 key |
+| \`OPENAI_PROXY_URL\` | 否 | 覆盖默认 \`https://api.openai.com/v1\` |
+| \`OPENAI_MODEL_LIST\` | 否 | 控制模型列表 |
+
+\`OPENAI_MODEL_LIST\` 的语法值得记住：
+
+\`\`\`text
+qwen-7b-chat,+glm-6b,-gpt-3.5-turbo
+\`\`\`
+
+即 \`+\` 增加、\`-\` 隐藏、\`model_name=display_name\` 改显示名，逗号分隔。默认列出的模型不合用时，改这一个变量就够了，不用动代码。
+
+## Vercel 上「一直提示有更新」
+
+这是 README 里点明的已知问题：Vercel 默认是**创建项目**而不是 fork，导致无法正确检测上游更新，于是反复提示。
+
+处理办法：
+
+1. 自己 fork 仓库后再部署
+2. fork 后**只保留 upstream sync 这个 action**，其余在仓库里关掉
+3. 已经用一键部署建好的项目，按官方的 Auto Sync With Latest 重来一遍
+
+另外 Vercel 分配的域名在部分地区 DNS 被污染，绑个自定义域名能直连。
+
+## 先摸一遍白盒记忆
+
+LobeHub 把 Personal Memory 做成结构化、可编辑的，而不是一个你改不了的画像。建议第一次用就把记忆区打开看看，它到底记了什么、按什么结构记的——后续代理的行为几乎都由这块决定，早发现记错比事后纠正省事得多。
+
+## 别一上来就堆代理
+
+Agent Groups、Pages、Schedule、Workspace 是按团队协作设计的。个人先用单个 Agent Builder 生成的代理跑通一条流程，再考虑分组与定时，否则很容易变成一堆没人管的常驻任务。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://lobehub.com",
+          note: "功能总览与产品入口。想先判断「招代理 / 排班 / 汇报」这套抽象是否适合你，看官网比看仓库快。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/lobehub/lobehub",
+          note: "自托管步骤、环境变量表与 fork 后的注意事项。装之前照这一页走。",
+        },
+        {
+          kind: "html",
+          title: "版本发布",
+          url: "https://github.com/lobehub/lobehub/releases",
+          note: "查最新版本与破坏性变更。项目处于活跃开发期，升级前先看 release note。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "rtk",
+    linksCheckedAt: "2026-10-14",
+    name: "rtk",
+    nameZh: "rtk 命令行输出压缩代理",
+    aliases: ["rtk", "rtk-ai", "CLI proxy", "上下文省流", "token 压缩"],
+    summary: "单个 Rust 二进制：在 shell 输出进入 LLM 上下文之前压缩它，覆盖 100+ 命令，开销 10ms 以内。适合天天用 Claude Code / Codex 烧 token 的人；代价是只拦 Bash 调用，内置 Read / Grep 管不到。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["CLI", "上下文优化", "编码代理", "开源"],
+    body: "rtk 做的事很直接：你（和你的代理）敲的 shell 命令，输出先过它一道再进上下文。它是单个 Rust 二进制、零依赖、开销 10ms 以内，覆盖 100+ 命令——ls 变树形并带文件计数、cat/read 取签名与结构而不是全文、grep 截断长行并按文件分组、git status 变紧凑 stat、git log 只留 hash 与主题、测试只留失败项（通过项压成计数）、docker ps 只留关键字段，AWS 命令还会顺手去掉策略文档和敏感字段。装好 `rtk init -g` 之后它往代理的 hook 里注册，命令被自动重写成 `rtk git status`，代理不需要知道 rtk 存在。\n省多少要说实话：README 自己强调「最多省 90% 的 bash 输出」不等于账单少 90%——bash 输出只是输入 token 的一部分，输入又只是账单的一部分，每一层都在稀释。而且它没带分词器，token 数按 bytes / 4 估算，**百分比可信、绝对数字是近似值**。\n两个必踩的坑。一是名字撞车：crates.io 上另有一个叫 rtk 的 Rust Type Kit，`rtk gain` 报错基本就是装错了，改用 `cargo install --git`。二是 hook 只在 Bash 工具调用上生效，Claude Code 内置的 Read / Grep / Glob 不走 Bash，所以要改用 shell 命令（cat、rg、find）或直接调 `rtk read` / `rtk grep` / `rtk find` 才有压缩。",
+    officialUrl: "https://www.rtk-ai.app",
+    officialLabel: "www.rtk-ai.app",
+    links: {
+      official: "https://www.rtk-ai.app",
+      github: "https://github.com/rtk-ai/rtk",
+    },
+    whoFor: "每天让编码代理跑大量 shell 命令（git、测试、lint、构建、kubectl、aws）的人，尤其是被长输出撑爆上下文或按量付费心疼的人。",
+    whoNot: "主要用 IDE 内置工具读文件、很少走 Bash 的人——hook 管不到那条路径，收益有限；也不适合指望装完账单立刻砍半的人。",
+    installTips: [
+      "macOS：`brew install rtk`；Windows：`winget install rtk-ai.rtk`（不用自己配 PATH）；Linux/macOS 通用：`curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh`，装到 ~/.local/bin。",
+      "装完 `rtk --version` 应显示 rtk 0.28.2，`rtk gain` 打开节省看板；若 gain 报错说明装成了 crates.io 上同名的 Rust Type Kit，改 `cargo install --git https://github.com/rtk-ai/rtk`。",
+      "接入代理：`rtk init -g`（Claude Code / Copilot 默认），Gemini CLI 加 `--gemini`，Codex 加 `--codex`，Cursor / Windsurf / Cline / Kilo Code / Trae 等各有 `--agent <name>`；改完必须重启代理才生效。",
+      "Windows 用预编译包时把 rtk.exe 放进 PATH（如 C:\\Users\\<你>\\.local\\bin），从命令提示符 / PowerShell / Windows Terminal 运行，不要双击 exe。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#8B5E3C",
+    },
+    guide: {
+      intro: "按第一次装会卡在哪讲：安装与验证、init 之后要重启、hook 只覆盖 Bash 这件事、以及「省 90% 输出」为什么不等于省 90% 账单。",
+      markdown: `## 装，然后立刻验证
+
+\`\`\`bash
+brew install rtk                 # macOS
+winget install rtk-ai.rtk        # Windows
+curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh   # Linux/macOS
+\`\`\`
+
+Linux / macOS 的脚本装到 \`~/.local/bin\`，必要时加 PATH：
+
+\`\`\`bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc   # zsh 用 ~/.zshrc
+\`\`\`
+
+验证两条命令：
+
+\`\`\`bash
+rtk --version   # 应显示 rtk 0.28.2
+rtk gain        # 打开节省看板
+\`\`\`
+
+**\`rtk gain\` 失败 = 装错了包**：crates.io 上另有一个叫 rtk 的 Rust Type Kit。改用 \`cargo install --git https://github.com/rtk-ai/rtk\`。
+
+## 接进你的代理
+
+\`\`\`bash
+rtk init -g                     # Claude Code / Copilot（默认）
+rtk init -g --gemini            # Gemini CLI
+rtk init -g --codex             # Codex
+rtk init -g --agent cursor      # Cursor
+\`\`\`
+
+改完**必须重启代理**，然后敲一句 \`git status\`——它会被自动重写成 \`rtk git status\`，代理拿到的是压缩后的输出。
+
+## hook 只管 Bash
+
+这是最容易被误解的一条：
+
+- **生效**：Bash 工具调用（\`git status\`、\`npm test\`、\`cat file\`…）
+- **不生效**：Claude Code 内置的 \`Read\`、\`Grep\`、\`Glob\`，它们不经过 Bash hook
+
+想要后者的压缩，两个办法：改用 shell 命令（\`cat\` / \`head\` / \`tail\`、\`rg\` / \`grep\`、\`find\`），或直接调用 \`rtk read\`、\`rtk grep\`、\`rtk find\`。
+
+## 省 90% 输出 ≠ 省 90% 账单
+
+README 单独用一节解释这件事：bash 输出只是输入 token 的一部分，输入 token 又只是账单的一部分（还有输出 token），**每一层都在稀释**。另外 rtk 不带分词器，token 估算按 \`bytes / 4\`，所以：
+
+- 百分比（趋势）可信
+- 绝对 token 数是近似值
+
+要看自己真实的数据，用 \`rtk gain\`。
+
+## 常用的几条
+
+\`\`\`bash
+rtk git status                  # 紧凑状态
+rtk git log -n 10               # 单行提交
+rtk pytest                      # 只留失败
+rtk tsc                         # TypeScript 错误按文件分组
+rtk docker logs <container>     # 去重日志
+rtk read file.rs -l aggressive  # 只要签名
+rtk err <cmd>                   # 只留错误与警告
+rtk run <cmd>                   # 原样执行，不过滤
+\`\`\`
+
+需要原始输出时用 \`rtk run\`，别为了拿完整结果去关掉 hook。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://www.rtk-ai.app",
+          note: "安装方式、支持命令与故障排查入口。想知道它覆盖你常用的哪些命令，看官网的清单。",
+        },
+        {
+          kind: "html",
+          title: "节省口径说明",
+          url: "https://github.com/rtk-ai/rtk/blob/master/docs/guide/resources/savings-explained.md",
+          note: "讲清「省 90% 输出」与账单的关系、以及 token 为什么是估算值。被百分比误导前先读这页。",
+        },
+        {
+          kind: "html",
+          title: "版本发布与预编译包",
+          url: "https://github.com/rtk-ai/rtk/releases",
+          note: "各平台的预编译二进制下载与更新记录。不用 brew / winget 时从这里取包。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "archify",
+    linksCheckedAt: "2026-10-14",
+    name: "archify",
+    nameZh: "Archify 交互式架构图技能",
+    aliases: ["archify", "架构图 skill", "交互式架构图", "图表生成技能", "agent skill"],
+    summary: "给编码代理装的 skill：一句话把想法、方案或代码库变成可交互的单文件 HTML 图。适合要把系统讲给别人听的人；代价是产出质量全看你用的代理，README 里还夹带大量推广内容。",
+    scenes: ["design", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["架构图", "Agent Skill", "可视化", "开源"],
+    body: "Archify 是一个 agent skill，不是独立软件：装进 Cursor、Claude Code、Codex CLI 或 OpenCode 之后，你用一句话描述，它生成一个自带交互的单文件 HTML——节点可点开看细节、路径可追溯上下游、明暗主题一键切换，还能导出 PNG 与分享卡。它强调 source-backed：可以让代理先读一个真实仓库再出图（README 给了对 mco-org/mco 某个 commit 的追踪案例），而不是凭空画一张好看的图。\n最有价值的一点是产物独立：生成的 HTML 是自包含的，下载下来双击就能看，看的人不需要装 Archify，发给别人交互也跟着走（外链和地图跳转才需要联网）。\n要说清楚的代价：它只是一层 skill，图的质量完全取决于你用的代理和模型，换代理结果差别很大；README 里赞助与推广占了相当篇幅（API 中转、加速器、模型聚合等），这些与项目本身无关，官方自己也标注了第三方服务由各自提供者运营；当前稳定版 v3.1.0，运行时会去拉一个固定的稳定 manifest 做更新提醒（只是提醒，不会自动下载安装，可用 `ARCHIFY_UPDATE_CHECK_DISABLED=1` 关掉联网与提醒状态写入）。",
+    officialUrl: "https://archify.si",
+    officialLabel: "archify.si",
+    links: {
+      official: "https://archify.si",
+      github: "https://github.com/tt-a1i/archify",
+    },
+    whoFor: "经常要把系统架构、请求链路、方案结构讲给同事或客户的人，以及想让代理读仓库后直接产出一张能点开看的图的开发者。",
+    whoNot: "想要一个独立绘图软件的人——它没有自己的界面，必须挂在编码代理上；也不适合对图的结构准确性要求极高、又无法提供真实代码库的人。",
+    installTips: [
+      "`npx skills add tt-a1i/archify -g` 全局安装；Cursor 想要非交互的明确安装用 `npx -y skills add tt-a1i/archify --skill archify --agent cursor --global --copy --yes`。",
+      "不想装就临时试：`npx skills use tt-a1i/archify@archify --agent codex`；DeepSeek Harness 走 `dsh plugin --profile web add @tt-a1i/archify-dsh@1.0.0`。",
+      "不要求必须有仓库：直接描述一句需求就能出图；想画真实系统就让代理先读仓库，README 的案例是针对某个具体 commit 做的追踪。",
+      "介意联网可设 `ARCHIFY_UPDATE_CHECK_DISABLED=1`：默认只会 GET 一个固定的稳定 manifest 用于提醒，不会自动下载或安装更新。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#6B4E9B",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：装到哪个代理、一句话 prompt 怎么写、出图后怎么迭代、以及产物为什么可以直接发别人。",
+      markdown: `## 装到你的代理上
+
+\`\`\`bash
+npx skills add tt-a1i/archify -g
+\`\`\`
+
+支持 Cursor、Claude Code、Codex CLI、OpenCode。要一次装死某个代理（非交互）：
+
+\`\`\`bash
+npx -y skills add tt-a1i/archify --skill archify --agent cursor --global --copy --yes
+\`\`\`
+
+只想试一次：
+
+\`\`\`bash
+npx skills use tt-a1i/archify@archify --agent codex
+\`\`\`
+
+## 一句话就够了
+
+装完直接把需求说给代理：
+
+\`\`\`text
+Use Archify to diagram a web request: Browser calls the API,
+the API checks Redis, and a cache miss queries PostgreSQL and fills the cache.
+\`\`\`
+
+**不需要仓库**。想画真实系统时再让代理去读代码：
+
+\`\`\`text
+读一下这个仓库，用 Archify 出一张 source-backed 的架构图。
+\`\`\`
+
+## 出图之后继续迭代
+
+这是它比「生成一张静态图」有用的地方——用自然语言接着改：
+
+- \`Add authentication\`
+- \`Highlight the cache-miss path\`
+- \`Switch to the light theme\`
+
+导出菜单可以把 PNG 复制到剪贴板，也能下载静态或动图格式；追踪过一条路径后还能导出 1200×630 的分享卡，图本身保留在卡里做上下文。
+
+## 产物是独立 HTML
+
+生成的 HTML 自包含，**下载下来双击就能打开**，查看的人不需要装 Archify；发给别人，节点详情和路径探索一起带过去。只有外链网站和地图跳转需要联网。
+
+## 看案例比看功能表有用
+
+官网的 Proof Lab 收了 11 个检查过的场景、它们的 JSON 源与验证记录，另有社区作品（旅行行程、合同审阅、事故复盘等）。判断它适不适合你的场景，先翻案例。
+
+## 两点提醒
+
+- **README 里大量篇幅是赞助与推广**（API 中转、加速器、模型聚合站），与项目本身无关，别当成官方推荐。
+- 更新检查默认开着，但只 GET 一个固定 manifest 用于提醒，不会自动下载或安装；不想联网就 \`ARCHIFY_UPDATE_CHECK_DISABLED=1\`。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与开始页",
+          url: "https://archify.si",
+          note: "按代理选安装方式的入口与各场景指南。第一次用从这里挑你的代理。",
+        },
+        {
+          kind: "html",
+          title: "Proof Lab 案例库",
+          url: "https://archify.si/gallery.html",
+          note: "11 个检查过的场景、JSON 源与验证记录，以及社区作品。判断值不值得装，看案例最直接。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/tt-a1i/archify",
+          note: "当前稳定版本、changelog 与全部安装选项。升级与排查版本问题看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "hello-agents",
+    linksCheckedAt: "2026-10-14",
+    name: "Hello-Agents",
+    nameZh: "Hello-Agents 智能体构建教程",
+    aliases: ["hello agents", "hello-agents", "从零开始构建智能体", "Datawhale 智能体教程", "Agent 教程"],
+    summary: "Datawhale 的中文智能体系统教程，16 章从 ReAct 手写讲到上下文工程、通信协议、Agentic RL 与评估。适合想从「调 API」走到「造框架」的人；代价是要按章节啃，且采用 CC BY-NC-SA，不能商用。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["教程", "智能体", "Python", "开源"],
+    body: "Hello-Agents 是 Datawhale 的《从零开始构建智能体》，讲的是 AI Native Agent——它把 Dify、Coze、n8n 这类流程驱动的「软件工程派」放在第五章讲完，主体是真正以 LLM 驱动的智能体。全书 16 章分五部分：智能体与 LLM 基础；ReAct、Plan-and-Solve、Reflection 手写实现、低代码平台、AutoGen / AgentScope / LangGraph，再到从零自研一个框架（配套 HelloAgents）；进阶的记忆与检索、上下文工程、MCP / A2A / ANP 协议、Agentic RL（SFT 到 GRPO）、性能评估；三个综合案例（智能旅行助手、自动化深度研究智能体、赛博小镇）与毕业设计。\n它比「10 分钟搭个 Agent」那类材料重得多，README 写明的前置是：会 Python、知道怎么通过 API 调一次 LLM，但不需要算法或模型训练背景。\n三点要提前知道。一是代码全部在仓库的 `code` 目录，不跑等于没学，作者明确要求亲手运行、调试、修改每一份代码。二是许可为 CC BY-NC-SA 4.0（署名 - 非商业性使用 - 相同方式共享），企业内部培训、二次分发前要看清条款；PDF 版还预加了 Datawhale 的水印（作者说明是为了防止被加水印转卖）。三是这是条快速迭代的赛道，README 提到的《从零开始训练智能体》与 2026 年 5 月的学习路线在另一个仓库 Agent-Learning-Hub，别把两份路线混着跟。",
+    officialUrl: "https://hello-agents.datawhale.cc",
+    officialLabel: "hello-agents.datawhale.cc",
+    links: {
+      official: "https://hello-agents.datawhale.cc",
+      github: "https://github.com/datawhalechina/hello-agents",
+    },
+    whoFor: "有 Python 基础、能调 LLM API，想系统搞清智能体原理并亲手写出一套框架的人；也适合准备 Agent 岗位面试（有专门的面试题与答案章节）。",
+    whoNot: "只想照着搭个工作流的人——第五章的低代码平台之外的内容都不适合你；以及需要把教材用于商业培训的人，CC BY-NC-SA 不允许。",
+    installTips: [
+      "直接在线读：国外 https://datawhalechina.github.io/hello-agents/ ，国内加速 https://hello-agents.datawhale.cc ，不用下载。",
+      "PDF 在 Releases 页（https://github.com/datawhalechina/hello-agents/releases/latest/），国内镜像为 datawhale.cn 的对应页面；PDF 里预置了 Datawhale 水印。",
+      "要动手就把仓库 `code` 目录里的代码逐份跑一遍，README 明确要求亲手运行、调试、修改。",
+      "环境配置与常见问题看 Extra-Chapter 的《07-环境配置》《04-Hello-agents课程常见问题》；面试准备看《01-Agent面试题总结》与参考答案。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "H",
+      color: "#2F855A",
+    },
+    guide: {
+      intro: "按第一次学这本书会卡在哪讲：前置够不够、五大部分怎么取舍、哪些章节可以跳、以及许可与路线图这两件容易踩的事。",
+      markdown: `## 先对照前置
+
+README 写得很明确：**会 Python，知道怎么通过 API 调一次 LLM**，不需要算法或模型训练背景。
+
+不满足第二条的，先花一小时随便调通一家模型的 API 再开始，否则第四、六、七章会一直卡在「为什么我的跑不通」。
+
+## 五大部分怎么取舍
+
+| 部分 | 章节 | 你要是时间紧 |
+| --- | --- | --- |
+| 一、基础与 LLM | 1–3 | 第 3 章值得读，1–2 可快翻 |
+| 二、构建智能体 | 4–7 | **核心**，第 4 章手写 ReAct 别跳 |
+| 三、高级扩展 | 8–12 | 上下文工程（9）与评估（12）优先 |
+| 四、综合案例 | 13–15 | 挑一个和你方向最接近的做 |
+| 五、毕业设计 | 16 | 想检验成果再做 |
+
+第二部分是全书的骨架：先手写经典范式，再看低代码平台和 LangGraph 这类框架，最后从零造一个自己的框架——「用轮子」和「造轮子」两头都走一遍。
+
+## 代码必须自己跑
+
+所有配套代码在仓库的 \`code\` 目录。这本书的价值几乎全在实现细节里，只读不动手等于读了另一本书。
+
+遇到环境问题先看 Extra-Chapter：
+
+- \`Extra07-环境配置\` —— 环境搭建
+- \`Extra04-DatawhaleFAQ\` —— 课程常见问题
+- \`Extra11-WebAgent科普与实战\` —— 反爬与 HelloAgents 集成
+
+## 想找 Agent 岗位
+
+\`Extra01-面试问题总结\` 与配套的 \`Extra01-参考答案\` 是现成的复习材料，正文第十二章的评估方法也常出现在面试里。
+
+## 两件容易踩的事
+
+**许可**：全文采用 CC BY-NC-SA 4.0（署名 - 非商业性使用 - 相同方式共享）。企业内训、二次发行前先确认条款；PDF 里预置了 Datawhale 水印，是作者为防止被转卖特意加的。
+
+**路线图分叉**：README 里提到的《从零开始训练智能体》以及 2026 年 5 月更新的学习路线在另一个仓库 \`datawhalechina/Agent-Learning-Hub\`，别把两份路线混着跟。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线阅读（国内加速）",
+          url: "https://hello-agents.datawhale.cc",
+          note: "国内可直接打开的在线版，不用下载仓库。想先翻目录再决定要不要系统学时用它。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库（章节与 Extra-Chapter）",
+          url: "https://github.com/datawhalechina/hello-agents",
+          note: "全部章节、配套 code 目录与社区精选文章。环境配置与常见问题在 Extra-Chapter 里。",
+        },
+        {
+          kind: "html",
+          title: "PDF 版国内下载",
+          url: "https://www.datawhale.cn/learn/summary/239",
+          note: "PDF 整本的国内下载地址（也可从 GitHub Releases 取）。离线阅读或打印时用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "unsloth",
+    linksCheckedAt: "2026-10-14",
+    name: "Unsloth",
+    nameZh: "Unsloth 本地模型运行与微调",
+    aliases: ["unsloth", "Unsloth Studio", "Unsloth Desktop", "微调", "本地大模型"],
+    summary: "Unsloth 现在是桌面应用：本地跑和微调 LLM、扩散、语音等模型，支持 GGUF / MLX / Qwen3.8 / FLUX，还能导出 GGUF。适合不想写代码做微调的人；代价是要自己管 GPU，且对外暴露时必须先设管理员密码。",
+    scenes: ["code", "data"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["微调", "本地大模型", "LoRA", "开源"],
+    body: "Unsloth 已经从「微调加速库」长成一个桌面应用：Windows / Linux / WSL / macOS 都支持，NVIDIA、AMD、Intel GPU、CPU 与 Vulkan 后端都能跑，多卡也行。它有三层用法——Unsloth Desktop（下载安装包即用，推荐）、Unsloth Studio（Web UI，`unsloth studio` 启动）、Unsloth Core（代码版，`uv pip install unsloth --torch-backend=auto`）。微调这块官方给的是 2 倍速度、70% 显存下降且无精度损失，覆盖 LoRA / QLoRA / 全参微调 / 预训练 / RL / GRPO / DPO / FP8，导出支持 GGUF、NVFP4、FP8 等格式，数据集还能从 PDF、CSV、DOCX 直接构建。\n它有个很实用的入口：`unsloth start claude --model unsloth/Qwen3.8-27B-GGUF:UD-Q4_K_XL` 这类一条命令，把本地模型接给 Claude Code、Codex、VS Code、OpenCode、Hermes、OpenClaw 等代理，不用自己搭 OpenAI 兼容层。\n坑有三处。Windows 装 Core 必须**先装 torchao** 再装 unsloth：`--torch-backend` 只在 PyTorch 索引里找 torchao，那里没有较新的 Windows 版本，一步装会静默解析到旧版 Unsloth。Docker 在 Linux / Mac 上要先跑官方脚本配一次 NVIDIA toolkit，AMD 另有 `unsloth/unsloth-rocm` 镜像。对外暴露（`--secure`、`--cloudflare`、非 loopback 的 `-H`）会要求在终端设管理员密码，**Ctrl+C 是中止启动而不是沿用自动生成的密码**；headless 用 `UNSLOTH_STUDIO_PASSWORD='...' unsloth studio --secure`，忘了就 `unsloth studio reset-password`。",
+    officialUrl: "https://unsloth.ai/docs",
+    officialLabel: "unsloth.ai",
+    links: {
+      official: "https://unsloth.ai/docs",
+      github: "https://github.com/unslothai/unsloth",
+    },
+    whoFor: "想在自己机器上微调或跑本地模型、又不想从零拼训练脚本的人；以及想让编码代理走本地模型而不是云 API 的人。",
+    whoNot: "没有独显或显存很紧的人——省 70% 显存也还是要显存；也不适合想开箱即用、不愿处理 Docker / GPU 驱动 / 端口密码的人。",
+    installTips: [
+      "桌面版直接下安装包：Windows .exe（另含 ARM64 版）、macOS .dmg、Linux deb（含 ARM64）与 AppImage；也能 `brew install --cask unsloth` 或 `winget install --id UnslothAI.Unsloth -e`。",
+      "Studio（Web UI）：macOS / Linux / WSL 用 `curl -fsSL https://unsloth.ai/install.sh | sh`，Windows 用 `irm https://unsloth.ai/install.ps1 | iex`，启动 `unsloth studio`。",
+      "Windows 装 Core 的顺序不能反：先 `uv pip install torchao`，再 `uv pip install unsloth --torch-backend=auto`；官方示例是 Python 3.13 + venv。",
+      "Docker：`docker run -d --name unsloth --gpus all --ipc=host -p 8000:8000 -p 8888:8888 -v \"$PWD\":/workspace/host -v \"$HOME/.cache/huggingface\":/workspace/.cache/huggingface -v unsloth-studio:/opt/unsloth-studio unsloth/unsloth`；AMD 用 unsloth/unsloth-rocm，只要 notebook 用 :core 标签。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "U",
+      color: "#2C7A7B",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：三种形态怎么选、把本地模型接给编码代理那条命令、对外暴露时的密码机制、以及 Windows 上 torchao 的安装顺序。",
+      markdown: `## 三种形态，别装重了
+
+| 形态 | 怎么起 | 适合 |
+| --- | --- | --- |
+| **Unsloth Desktop** | 下载安装包 | 不碰命令行，推荐 |
+| **Unsloth Studio** | \`unsloth studio\` | Web UI，想远程访问 |
+| **Unsloth Core** | \`uv pip install unsloth --torch-backend=auto\` | 写脚本、嵌进自己的流程 |
+
+三者共用同一套能力（跑模型、微调、导出、数据集），装一个就够。
+
+## 把本地模型接给编码代理
+
+这是很多人装它真正的理由：
+
+\`\`\`bash
+unsloth start claude --model unsloth/Qwen3.8-27B-GGUF:UD-Q4_K_XL
+\`\`\`
+
+| 代理 | 命令 |
+| --- | --- |
+| Claude Code | \`unsloth start claude\` |
+| OpenAI Codex | \`unsloth start codex\` |
+| VS Code | \`unsloth start vscode\` |
+| OpenCode | \`unsloth start opencode\` |
+| Hermes / Pi / OpenClaw | \`unsloth start hermes\` / \`pi\` / \`openclaw\` |
+
+## 对外暴露前先管好密码
+
+README 用「be careful」强调了这一层：**服务端工具默认是开着的**。
+
+- 用 \`--secure\`、\`--cloudflare\` 或非 loopback 的 \`-H\` 启动时，终端会要求设一个新的管理员密码
+- 在这里按 Ctrl+C 是**中止启动**，不是沿用自动生成的密码
+- headless 场景提前给：\`UNSLOTH_STUDIO_PASSWORD='your-strong-password' unsloth studio --secure\`
+- 忘了密码：\`unsloth studio reset-password\`
+- 想暴露又不想开工具：加 \`--disable-tools\`
+
+局域网访问在 \`Settings > API keys > LAN access\` 里开，别直接把 \`-H 0.0.0.0\` 当默认配置。
+
+## Windows 上的安装顺序
+
+这是静默失败最多的一步。Core 版要这样装：
+
+\`\`\`powershell
+winget install -e --id Python.Python.3.13
+winget install --id=astral-sh.uv -e
+uv venv unsloth_env --python 3.13
+.\\unsloth_env\\Scripts\\activate
+uv pip install torchao
+uv pip install unsloth --torch-backend=auto
+\`\`\`
+
+**torchao 必须单独先装**：\`--torch-backend\` 只在 PyTorch 索引里找 torchao，而那里没有较新的 Windows 版本，一步装会静默解析到旧版 Unsloth，症状是能装上但不是你要的版本。
+
+## Docker 与 GPU
+
+Linux / Mac 上先配一次 NVIDIA toolkit（官方脚本 \`install_nvidia_toolkit.sh\`），AMD 用 \`unsloth/unsloth-rocm\` 镜像。只要 notebook 就拉 \`:core\` 标签，体积小很多。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://unsloth.ai/docs",
+          note: "Desktop / Studio / Core 三种形态的安装与用法、导出格式、LAN 与远程访问。选形态前先看。",
+        },
+        {
+          kind: "html",
+          title: "发布页（各平台安装包）",
+          url: "https://github.com/unslothai/unsloth/releases",
+          note: "Windows / macOS / Linux（含 ARM64）安装包下载地址与更新记录。桌面版从这里取。",
+        },
+        {
+          kind: "html",
+          title: "Docker Hub 镜像",
+          url: "https://hub.docker.com/r/unsloth/unsloth",
+          note: "镜像标签（含 :core 与 rocm 版）与 GPU 访问配置。要在服务器或团队环境跑时看这页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "llamafactory",
+    linksCheckedAt: "2026-10-14",
+    name: "LlamaFactory",
+    nameZh: "LlamaFactory 大模型微调框架",
+    aliases: ["llamafactory", "llama factory", "LLaMA Board", "大模型微调", "LoRA 训练"],
+    summary: "统一微调框架：100+ 模型，从 LoRA / QLoRA / 全参到 PPO / DPO / KTO，命令行与零代码 Web UI 双入口。适合要在自己机器上微调的人；代价是 README 没有 Windows 路径，且第三方站点均被官方声明为非授权。",
+    scenes: ["code", "data"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["微调", "LoRA", "大模型", "开源"],
+    body: "LlamaFactory 解决的是「微调这件事太碎」。模型侧覆盖 LLaMA、LLaVA、Mistral、Mixtral-MoE、Qwen3、Qwen3-VL、DeepSeek、Gemma、GLM、Phi 等一百多个；方法侧从（增量）预训练、多模态 SFT、奖励模型到 PPO、DPO、KTO、ORPO；资源侧支持 16-bit 全参、freeze、LoRA 与 2/3/4/5/6/8-bit QLoRA（AQLM / AWQ / GPTQ / LLM.int8 / HQQ / EETQ）。算法上还堆了 GaLore、BAdam、APOLLO、Adam-mini、Muon、OFT、DoRA、LongLoRA、LoRA+、LoftQ、PiSSA，推理侧可切 vLLM 或 SGLang worker 的 OpenAI 风格 API。\n两条入口：命令行与零代码的 LLaMA Board（Gradio）。不想在本地装环境，README 给了三条免费路径——Colab、阿里云 PAI-DSW 免费试用、AMD GPU Cloud 免费额度；想先试界面，HuggingFace Spaces 与 ModelScope 上都有官方的 LLaMA Board。新模型跟进速度是它真正的卖点：Day 0 支持 Qwen3 / Qwen2.5-VL / Gemma 3 / GLM-4.1V / InternLM 3 / MiniCPM-o-2.6，Day 1 支持 Llama 3 / GLM-4 / Mistral Small / PaliGemma2 / Llama 4。\n两条坑必须讲。一是 README 用醒目提示写明：**除了它列出的那几个链接，其他网站都是未经授权的第三方站点**，别从搜索出来的第三方渠道拿镜像或一键包。二是 Windows 没有出现在 README 的任何一条路径里（云端、Docker、ASCEND NPU、AMD 都是 Linux 语境），Windows 用户别默认自己被支持。另外要留意它还在快速变化：25/10 才通过 mcore_adapter 加了 Megatron-core 训练后端。",
+    officialUrl: "https://llamafactory.readthedocs.io",
+    officialLabel: "llamafactory.readthedocs.io",
+    links: {
+      official: "https://llamafactory.readthedocs.io",
+      github: "https://github.com/hiyouga/LlamaFactory",
+    },
+    whoFor: "要在自己的 GPU 机器上微调开源模型、又不想自己写训练循环的人；以及需要快速跟上新模型（Day 0 / Day 1 支持）的团队。",
+    whoNot: "Windows 桌面用户——README 里没有任何 Windows 安装路径；也不适合想找「一键傻瓜包」的人，官方明确把第三方站点都标为非授权。",
+    installTips: [
+      "不想装环境就先用免费入口：README 给了 Colab notebook、阿里云 PAI-DSW 免费试用与 AMD GPU Cloud 免费额度三条路。",
+      "只想点点鼠标：HuggingFace Spaces 与 ModelScope 上都有官方的 LLaMA Board，可以直接试零代码 Web UI。",
+      "本地部署用 Docker Hub 上的 `hiyouga/llamafactory` 镜像；依赖版本与详细安装步骤以官方文档站 llamafactory.readthedocs.io 为准，README 没钉版本号。",
+      "ASCEND NPU 与 AMD GPU 各有单独文档（readthedocs 的 multibackend/npu 与 ROCm 文档），别照通用 CUDA 教程装。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#975A16",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：先选免费环境还是本地、CLI 与 LLaMA Board 两条入口、训练方法与显存档位怎么挑、以及那条「第三方站点均非授权」的警告。",
+      markdown: `## 先决定在哪跑
+
+README 一上来就给了三条不用装环境的路：
+
+- **Colab（免费）** —— 官方 notebook，适合先跑通一次
+- **PAI-DSW（免费试用）** —— 阿里云上的现成环境
+- **AMD GPU Cloud（免费额度）** —— AMD 卡
+
+确认要长期用，再回本地 Docker 或裸机。这个顺序能省掉大量环境调试时间。
+
+## 两条入口
+
+| 入口 | 适合 |
+| --- | --- |
+| 命令行（CLI） | 批量、脚本化、可复现 |
+| **LLaMA Board**（Gradio Web UI） | 零代码，先把一次训练跑通 |
+
+零代码是它的宣传点之一：Web UI 里选模型、选数据、调参数就能开训。不熟悉训练参数的人从 Board 入手，把跑通的配置再搬到 CLI。
+
+## 方法与显存档位
+
+按显存从高到低大致是：
+
+- **16-bit 全参微调** —— 显存最吃紧
+- **freeze-tuning** —— 冻住部分层
+- **LoRA** —— 常用档
+- **QLoRA** —— 2/3/4/5/6/8-bit（AQLM / AWQ / GPTQ / LLM.int8 / HQQ / EETQ），显存最省
+
+目标只是让模型学会某种风格或格式，LoRA / QLoRA 足够；真要改底层能力再考虑全参。省显存的优化器还有 GaLore、BAdam、APOLLO、Adam-mini、Muon 可选。
+
+## 推理别用训练时的后端
+
+训完要部署，README 给了 **vLLM worker 或 SGLang worker** 的 OpenAI 风格 API（\`infer_backend: sglang\`），比直接用训练框架推理快得多。它的文档站有完整参数表。
+
+## 那条警告要当真
+
+README 用 NOTE 明确写：**除了它列出的那几个链接，其他网站都是未经授权的第三方网站，请谨慎使用**。搜索出来的「一键包」「国内镜像站」都不在官方列表里，别用。
+
+## 新模型支持节奏
+
+它对前沿模型的跟进被整理成了一张表：Day 0 支持 Qwen3 / Qwen2.5-VL / Gemma 3 / GLM-4.1V / InternLM 3 / MiniCPM-o-2.6；Day 1 支持 Llama 3 / GLM-4 / Mistral Small / PaliGemma2 / Llama 4。新模型刚发布就想微调时，这张表比任何评测都有用。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://llamafactory.readthedocs.io/en/latest/",
+          note: "安装、参数、数据集与多后端（NPU / AMD）说明。README 没钉版本，装之前以这站为准。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/hiyouga/LlamaFactory",
+          note: "支持的模型与方法清单、Day-0/Day-1 支持表、以及官方授权的链接列表。选型前先扫一遍。",
+        },
+        {
+          kind: "html",
+          title: "Docker 镜像标签",
+          url: "https://hub.docker.com/r/hiyouga/llamafactory/tags",
+          note: "官方镜像的版本标签。要在服务器或团队环境部署时用官方 tag，不要用第三方镜像。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "headroom",
+    linksCheckedAt: "2026-10-14",
+    name: "headroom",
+    nameZh: "headroom 上下文压缩代理",
+    aliases: ["headroom", "headroom-ai", "上下文压缩", "token 压缩", "CCR"],
+    summary: "在工具输出、日志、RAG 片段进入 LLM 之前压缩它们，全程本地运行不上传内容。适合被长上下文撑爆的编码代理用户；代价是收益取决于内容重复度，散文几乎压不动。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["上下文工程", "压缩", "编码代理", "开源"],
+    body: "Headroom 压缩的是「代理读进去的一切」——工具输出、日志、RAG 片段、文件和对话历史，压缩在你本机完成，不把 prompt 或文件内容发到任何地方。内部是 ContentRouter 判定内容类型后选压缩器（JSON 走 SmartCrusher、代码走 CodeCompressor、散文走 Kompress-v2-base），CacheAligner 标记会破坏 provider KV-cache 前缀的易变内容（它本身不改写 prompt），CCR 把原文存在本地，模型需要全文时调用 `headroom_retrieve` 取回。\n三种形态：Python / TypeScript 库（`compress(messages)`）、零改代码的代理（`headroom proxy --port 8787`）、以及一条命令包住某个编码代理（`headroom wrap claude|codex|grok|copilot|cursor|aider|cline|...`，`headroom unwrap` 撤销）。它还顺带管输出侧：把「be terse」提示加到 system prompt **末尾**（这样缓存仍然命中），并在「模型只是接着工具结果继续」时降低思考强度——默认关闭，用 `HEADROOM_OUTPUT_SHAPER=1` 开启。\n代价要看清：收益完全取决于重复度。README 给的四个真实场景是代码搜索 21%、SRE 排障 57%、代码库探索 42%、issue 分类 30%；重复 JSON 与日志行能清掉 90% 以上，散文和本身紧凑的输出压不了多少，跑 `headroom savings` 才有属于你自己的数字。另外 npm 包 `headroom-ai` 只是 TypeScript SDK，**不带 `headroom` 命令**，CLI 只在 PyPI 包里；接 DeepSeek / OpenRouter 这类第三方 OpenAI 兼容服务时必须显式 `--openai-api-url`，否则 key 会被发到 OpenAI 并返回 401。",
+    officialUrl: "https://docs.headroomlabs.ai/docs",
+    officialLabel: "docs.headroomlabs.ai",
+    links: {
+      official: "https://docs.headroomlabs.ai/docs",
+      github: "https://github.com/headroomlabs-ai/headroom",
+    },
+    whoFor: "每天让编码代理或自建 Agent 吞大量 JSON、日志、检索结果的人，以及想省 token 又不想把内容传到第三方压缩服务的人。",
+    whoNot: "主要处理散文、短对话的人——压缩率会低到没有意义；也不适合不愿在代理外面再挂一层本地代理服务的人。",
+    installTips: [
+      "`uv tool install --python 3.13 \"headroom-ai[all]\"`（隔离环境里的 CLI）或 `pip install \"headroom-ai[all]\"`（同样带 CLI）；npm 的 `headroom-ai` 只是 TS SDK，不提供 headroom 命令。",
+      "三选一起手：`headroom deploy` 一条龙部署并配好代理；`headroom wrap claude` 包住某个代理；`headroom proxy --port 8787` 零改代码接管任意 OpenAI 兼容客户端。",
+      "装完 `headroom doctor` 确认路由生效，`headroom perf` 看节省，`headroom dashboard` 看实时数据（代理必须在跑）。",
+      "用 DeepSeek / OpenRouter / 自建网关这类第三方 OpenAI 兼容服务时，wrap 必须加 `--openai-api-url https://...`（或先 export `OPENAI_TARGET_API_URL`），否则 key 会被发到 OpenAI 并返回 401。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "H",
+      color: "#4A5568",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：三种形态怎么选、wrap 会顺带装上 Serena、第三方 provider 那个 401 坑、以及为什么你看到的压缩率和官方数字不一样。",
+      markdown: `## 装（CLI 只在 Python 包里）
+
+\`\`\`bash
+uv tool install --python 3.13 "headroom-ai[all]"   # 隔离环境里的 CLI
+pip install "headroom-ai[all]"                     # 同样带 headroom CLI
+npm install headroom-ai                            # 只是 TS SDK，没有 CLI
+\`\`\`
+
+记住这条：**npm 包不提供 \`headroom\` 命令**，它是给你 \`import { compress } from 'headroom-ai'\` 用的库。
+
+## 三种形态
+
+\`\`\`bash
+headroom deploy             # 一条龙：本地部署 + 配好代理
+headroom wrap claude        # 包住某个编码代理
+headroom proxy --port 8787  # 起代理，任意 OpenAI 兼容客户端零改代码接入
+\`\`\`
+
+库模式直接嵌在代码里：
+
+\`\`\`python
+from headroom import compress
+result = compress(messages, model="gpt-4o")
+print(f"Saved {result.tokens_saved} tokens ({result.compression_ratio:.0%})")
+\`\`\`
+
+包完之后**每次都用 wrap 启动会话**才会生效。\`headroom wrap\` 会起本地代理、装上 Serena 做语义代码导航，并把代理配置成走 Headroom；Claude Code 下 Serena 只注册给当前项目（\`--code-memory-scope user\` 改成全局，\`--code-memory none\` 跳过），\`headroom unwrap\` 可以撤销。
+
+## 第三方 provider 的 401
+
+用 OpenCode + DeepSeek / OpenRouter / 自建网关时，默认上游是 \`https://api.openai.com/v1\`，你的 key 会被发到 OpenAI 并 401。必须显式指定：
+
+\`\`\`bash
+headroom wrap opencode --openai-api-url https://api.deepseek.com/v1
+# 或先 export OPENAI_TARGET_API_URL=... 再 wrap
+\`\`\`
+
+## 为什么你的压缩率没那么高
+
+README 把数字摊开讲了：**收益随内容重复度上升**。
+
+| 场景 | 压缩率 |
+| --- | --- |
+| 代码搜索（100 条结果） | 21% |
+| SRE 排障 | 57% |
+| 代码库探索 | 42% |
+| issue 分类 | 30% |
+
+重复 JSON 数组与日志行能清掉 90% 以上；散文和本就紧凑的输出几乎压不动。跑 \`headroom savings\` 拿你自己的数字，别照搬 README。
+
+## 输出侧也要省
+
+输出 token 在 Opus 级模型上比输入贵得多。开启：
+
+\`\`\`bash
+export HEADROOM_OUTPUT_SHAPER=1
+headroom proxy --port 8787
+\`\`\`
+
+它做两件事：把「简洁些」的提示追加到 system prompt **末尾**（保住 prompt 缓存），以及在模型只是接着工具结果继续时降低思考强度。用 \`headroom output-savings\` 看结果——那是带置信区间的**估算值**，想要实测值就 \`export HEADROOM_OUTPUT_HOLDOUT=0.1\` 留一成会话做对照。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "快速开始",
+          url: "https://docs.headroomlabs.ai/docs/quickstart",
+          note: "安装、三种形态与自检命令。第一次装完照这页走一遍再接代理。",
+        },
+        {
+          kind: "html",
+          title: "架构说明（ContentRouter / CCR）",
+          url: "https://docs.headroomlabs.ai/docs/architecture",
+          note: "讲清压缩发生在本机、原文如何缓存与取回。关心数据不出本机的看这页。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/headroomlabs-ai/headroom",
+          note: "支持的代理清单、基准脚本与版本情况。要确认你的代理是否被 wrap 支持时查这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ai-for-beginners",
+    linksCheckedAt: "2026-10-14",
+    name: "AI-For-Beginners",
+    nameZh: "AI-For-Beginners 人工智能课程",
+    aliases: ["ai for beginners", "AI-For-Beginners", "微软 AI 课程", "人工智能入门", "AI 课程"],
+    summary: "微软的 12 周 24 节 AI 课程：从符号 AI、神经网络到 CV 与 NLP，TensorFlow 与 PyTorch 双实现。适合系统补基础的人；代价是内容停留在经典深度学习，不覆盖大模型与强化学习。",
+    scenes: ["education"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["课程", "深度学习", "教程", "开源"],
+    body: "这是微软的《Artificial Intelligence for Beginners》：12 周、24 节课，每节有讲解、测验和 Lab，代码用 TensorFlow 与 PyTorch 两套给，还包含 AI 伦理。它的特别之处是开头讲「老派」AI——知识表示、专家系统、本体与概念图（GOFAI），之后再进入神经网络与深度学习、面向图像与文本的神经架构，最后还有遗传算法与多智能体系统这些不太热门的分支。课程有官方 Mindmap，五十多种语言翻译由 GitHub Action 自动同步。\n要提前知道的边界，README 写得比大多数课程都清楚：它**不讲** AI 商业案例、**不讲**经典机器学习（另有 ML-for-Beginners）、**不讲** Cognitive Services / Azure OpenAI 这类现成服务、**不讲**具体云上 ML 框架、**不讲**对话机器人、**不讲**深度学习背后的数学（推荐 Goodfellow 那本书）。想学大模型应用开发的人会失望——它停在经典深度学习，README 自己也承认架构部分「在最新 SOTA 上可能略有欠缺」。\n两个实用信息：仓库含 50+ 语言翻译，直接 clone 非常大，README 给了 sparse checkout 命令（`git clone --filter=blob:none --sparse` 再 `git sparse-checkout set --no-cone '/*' '!translations' '!translated_images'`）；课程代码可以在 Binder 上直接跑，本地环境不是必需的。",
+    officialUrl: "https://github.com/microsoft/AI-For-Beginners",
+    officialLabel: "github.com/microsoft/AI-For-Beginners",
+    links: {
+      official: "https://github.com/microsoft/AI-For-Beginners",
+      github: "https://github.com/microsoft/AI-For-Beginners",
+    },
+    whoFor: "想系统补齐 AI 基础的学生和转行者：搞清神经网络为什么这样工作，能用 TensorFlow / PyTorch 写得出模型，而不是只会调 API。",
+    whoNot: "想学大模型应用（RAG、Agent、微调）的人——这门课停在经典深度学习；也不适合想快速上手做出产品的人。",
+    installTips: [
+      "仓库含 50+ 语言翻译，直接 clone 很大；用 sparse checkout：`git clone --filter=blob:none --sparse https://github.com/microsoft/AI-For-Beginners.git`，然后 `git sparse-checkout set --no-cone '/*' '!translations' '!translated_images'`（Windows CMD 用双引号）。",
+      "不想配环境就用 README 上的 Binder 链接，直接在浏览器里跑 notebook；每节课的 Lab 都有独立 README。",
+      "环境搭建看第 0 课的 `lessons/0-course-setup/setup.md` 与 `how-to-run.md`，再按目录表一节节跟 notebook。",
+      "中文读者直接进 `translations/zh-CN/README.md`，翻译由 GitHub Action 自动同步，比啃英文版省事。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#0078D4",
+    },
+    guide: {
+      intro: "按第一次学这门课会卡在哪讲：它到底覆盖什么、不覆盖什么、怎么跳过五十多种语言翻译的巨大体积，以及代码要不要本地跑。",
+      markdown: `## 先看「不覆盖什么」
+
+README 把边界写得很清楚，省去了很多试错：
+
+| 它讲 | 它不讲 |
+| --- | --- |
+| 符号 AI（知识表示、专家系统、本体） | AI 商业案例 |
+| 神经网络与深度学习（TF + PyTorch） | 经典机器学习（另有 ML-for-Beginners） |
+| 图像与文本的神经架构 | Cognitive Services / Azure OpenAI |
+| 遗传算法、多智能体系统 | 云上 ML 框架（Azure ML、Databricks） |
+| AI 伦理 | 对话机器人、深度数学 |
+
+**想学大模型应用的人不适合这门课**——它停在 GAN、Autoencoder、VAE 这一代。README 自己也说架构部分在最新 SOTA 上可能略有欠缺。
+
+## 别直接 clone
+
+仓库带 50+ 语言翻译，完整 clone 会非常大。官方给的 sparse checkout：
+
+\`\`\`bash
+git clone --filter=blob:none --sparse https://github.com/microsoft/AI-For-Beginners.git
+cd AI-For-Beginners
+git sparse-checkout set --no-cone '/*' '!translations' '!translated_images'
+\`\`\`
+
+Windows CMD 把单引号换成双引号即可。这样下载快得多，且不影响完成课程。
+
+## 代码不一定本地跑
+
+README 顶部有 Binder 徽章，点进去直接在浏览器里运行 notebook。先确认自己会不会长期学，再决定要不要在本地配 TensorFlow / PyTorch 环境。
+
+本地搭建看第 0 课：
+
+- \`lessons/0-course-setup/setup.md\` —— 环境准备
+- \`lessons/0-course-setup/how-to-run.md\` —— 怎么跑示例代码
+
+## 中文读者
+
+直接进 \`translations/zh-CN/README.md\`，另外还有 zh-HK / zh-MO / zh-TW 等变体。翻译由 GitHub Action 自动同步，不用等人工更新。
+
+## 建议的读法
+
+第一部分（1–3 章）里，符号 AI 那两节很容易被跳过，但它是后面理解「为什么需要神经网络」的铺垫，至少翻一遍。第三部分（CV）与第四部分（NLP）的 Lab 是真正花时间的地方，一个 Lab 跑通比十节课看完有用。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "课程仓库（目录与章节表）",
+          url: "https://github.com/microsoft/AI-For-Beginners",
+          note: "12 周 24 节的完整目录、每节的 notebook 与 Lab 链接，以及多语言入口。选章节前先看这张表。",
+        },
+        {
+          kind: "html",
+          title: "第 0 课：环境搭建",
+          url: "https://github.com/microsoft/AI-For-Beginners/blob/main/lessons/0-course-setup/setup.md",
+          note: "本地跑 TensorFlow / PyTorch 示例前的环境准备步骤。不用 Binder 时照这页配。",
+        },
+        {
+          kind: "html",
+          title: "Microsoft Learn 配套集合",
+          url: "https://learn.microsoft.com/en-us/collections/7w28iy2xrqzdj0",
+          note: "官方整理的本课程附加资源集合，含 Azure 上的计算机视觉等内容。想把 Lab 放到云上跑时用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "system-prompts-leaks",
+    linksCheckedAt: "2026-10-14",
+    name: "system_prompts_leaks",
+    nameZh: "System Prompts Leaks 系统提示词合集",
+    aliases: ["system prompts leaks", "system_prompts_leaks", "系统提示词", "提示词泄漏", "prompt 合集"],
+    summary: "收录各主流聊天机器人与编码代理的系统提示词原文，按厂商 / 产品 / 模型分目录，更新很勤。适合做提示词工程与代理行为研究的人；代价是来源是第三方整理，不能当官方文档，版本要自己对。",
+    scenes: ["code", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["提示词", "提示工程", "语料", "开源"],
+    body: "这个仓库做的事很单一：把主流聊天机器人与编码代理的系统提示词原文收齐，按厂商 / 产品 / 模型分目录放着，并在 README 顶部维护一张「最近新增 / 变更」表，逐条标明内容与日期。覆盖面很广——Anthropic 侧有 Claude.ai 各模型、Claude Code（按模型与形态分：桌面版、云端、headless）、artifact types 的 SKILL.md、Claude Design / Cowork / Science、Microsoft 365 集成与注入提醒；OpenAI 侧有 ChatGPT 各版本与人格指令、Codex 各模型与模式（plan mode、auto-review、computer use）、API 注入提示；还有 Meta Muse、xAI Grok 等。\n它的价值在于两件别处做不了的事：一是横向对比——同一厂商不同版本之间加了什么、删了什么，能看出产品方向的调整；二是照着写——想让自己的 agent 有类似的行为约束，可以参考成熟提示词的结构与措辞，而不是从零摸索。外部认可也有：华盛顿邮报用它做过交互报道，Simon Willison 称它是「已知最详尽的泄露系统提示词集合」。\n边界要讲清楚：这些是第三方整理的泄露内容，**不是官方文档**，模型名与日期要自己对（顶部那张表就是用来对版本的）；厂商随时会改，今天的提示词下周就可能失效。照抄到自己的产品里之前也要想清楚——里面有大量针对特定产品的工具定义与合规约束，直接搬往往水土不服。协议是 CC0-1.0，README 也欢迎大家提 PR 补差异。",
+    officialUrl: "https://github.com/asgeirtj/system_prompts_leaks",
+    officialLabel: "github.com/asgeirtj/system_prompts_leaks",
+    links: {
+      official: "https://github.com/asgeirtj/system_prompts_leaks",
+      github: "https://github.com/asgeirtj/system_prompts_leaks",
+    },
+    whoFor: "做提示词工程、研究代理行为边界、或想参考成熟提示词结构写自己 agent 的人；也适合跟踪各家产品策略变化的观察者。",
+    whoNot: "想查官方使用说明的人——这里没有官方参数文档；也不适合把内容直接搬进生产产品的团队，里面充满针对特定产品的工具定义与合规约束。",
+    installTips: [
+      "不用安装：直接在 GitHub 上按目录浏览，README 顶部的「Most recent additions/changes」表标了每条的日期与链接，先对版本再看内容。",
+      "想本地全文检索就 clone 下来搜；仓库就是一堆 Markdown 文件，没有构建步骤，也不需要任何依赖。",
+      "找 Claude Code 相关的进 `Anthropic/claude-code/` 目录（按模型与形态分文件），Codex 进 `OpenAI/Codex/`，ChatGPT 主提示词在 `OpenAI/` 根目录。",
+      "做行为研究时别只看主提示词：配套的 skills、slash commands、subagent 与注入提醒（如 `Anthropic/claude-code/skills`、`Anthropic/anthropic_reminders.md`）往往更能说明实际行为。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#5F4B8B",
+    },
+    guide: {
+      intro: "按第一次翻这个仓库会卡在哪讲：目录是怎么组织的、怎么对上版本、除了主提示词还该看什么、以及为什么它不能当官方文档用。",
+      markdown: `## 先看顶部那张表
+
+README 的 **Most recent additions/changes** 表是这个仓库的索引，每行有：
+
+- 内容（哪个模型 / 产品）
+- 日期
+- 直接链接到对应文件
+
+**先对日期再看文件**。厂商改提示词比你想象的频繁，三个月前的链接内容可能已经和线上不一样了。
+
+## 目录组织
+
+| 你要看什么 | 去哪 |
+| --- | --- |
+| Claude.ai 各模型 | \`Anthropic/\`（如 \`claude-sonnet-5.5.md\`） |
+| Claude Code | \`Anthropic/claude-code/\`（按模型 + 形态分：desktop / cloud / headless） |
+| Claude 的 artifact 类型 | \`Anthropic/artifact-types/\`（Slides / Dashboard / Design / Docs 各自的 SKILL.md） |
+| ChatGPT 主提示词 | \`OpenAI/\`（如 \`gpt-5.6-sol.md\`） |
+| Codex | \`OpenAI/Codex/\`（含 plan_mode、auto-review、computer-use） |
+| API 注入的提示词 | \`OpenAI/gpt-5.5-api.md\` 一类 |
+
+## 别只看主提示词
+
+真正决定行为的往往是配套文件：
+
+- **skills / slash commands** —— \`Anthropic/claude-code/skills\`、\`Anthropic/claude-code/commands\`
+- **subagent 提示词** —— \`Anthropic/claude-code/agents\`
+- **注入提醒** —— \`Anthropic/anthropic_reminders.md\`（运行时追加的提醒，不在主提示词里）
+- **人格指令** —— \`OpenAI/chatgpt-personality-instructions.md\`
+
+只看主文件会漏掉大量实际约束。
+
+## 两种正确用法
+
+**横向对比**：把同一厂商相邻两个版本的文件并排看，加了什么、删了什么，比任何发布会都能说明产品方向。
+
+**照着写结构**：想给自己的 agent 写行为约束时，参考成熟提示词是怎么组织的（先定身份、再定工具使用规则、再定边界与拒绝方式、最后给出格式要求）。
+
+## 两个不要
+
+- **不要当官方文档**：这是第三方整理的泄露内容，不是厂商发布的参数说明，也没有版本承诺。
+- **不要直接抄进你的产品**：里面大量内容是针对特定产品的工具定义、合规要求与内部约定，脱离那个环境往往失效甚至有害。
+
+协议是 CC0-1.0；发现不同结果可以提 PR，README 里欢迎。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "仓库首页（最近更新表）",
+          url: "https://github.com/asgeirtj/system_prompts_leaks",
+          note: "顶部的最近新增 / 变更表是全仓索引，标了日期与链接。找某个模型时从这里进，别直接猜路径。",
+        },
+        {
+          kind: "html",
+          title: "Claude Code 提示词目录",
+          url: "https://github.com/asgeirtj/system_prompts_leaks/tree/main/Anthropic/claude-code",
+          note: "按模型与形态（desktop / cloud / headless）分的 Claude Code 提示词，另有 skills、commands、agents 子目录。做编码代理研究时看这里。",
+        },
+        {
+          kind: "html",
+          title: "Codex 提示词目录",
+          url: "https://github.com/asgeirtj/system_prompts_leaks/tree/main/OpenAI/Codex",
+          note: "Codex 各模型主提示词与 plan mode、auto-review、computer use 等模式提示。想对照另一家的做法时用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ai-engineering-from-scratch",
+    linksCheckedAt: "2026-10-14",
+    name: "ai-engineering-from-scratch",
+    nameZh: "AI Engineering 从零实现课程",
+    aliases: ["ai engineering from scratch", "AI 工程从零", "AI 工程课程", "528 lessons", "从零实现"],
+    summary: "528 节课 20 个阶段的 AI 工程课程，自己实现模型内部、检索管线与代理运行时，附三个带本地批改器的项目。适合想补工程内功的人；代价是要真写代码，Python/TS/Rust 都会碰。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["教程", "AI 工程", "项目实战", "开源"],
+    body: "这个仓库的路线是「实现模型内部、检索管线与代理运行时」——不是教你调 API，而是让你自己写出来。规模是 528 节课、20 个阶段，涉及 Python、TypeScript、Rust、Julia，MIT 协议，网站 / 编码代理 / 本地跑代码三种学法都行。\n它和普通课程最大的差别在「项目挑战」：三个带阶段性 starter、参考实现和本地 grader 的项目，starter 在你实现之前是**故意失败的**。01 检索评估实验（Python 3.10+，做逐查询的 NDCG 对比，并能在发布检查里失败）；02 Agent Trace Debugger（TypeScript，Node.js 22.18+，解析 JSONL trace、做区间运算、产出可检视的时间线）；03 Tool Call Firewall（Rust，校验调用信封、角色与路径、消耗与请求绑定的一次性审批）。每个项目都写明了「你要留下什么产物」，比如 02 要求保住独占的 per-span token 计数，避免父子 span 重复计算。\n最方便的入口是把课程装成编码代理的 tutor：`npx skills add rohitg00/ai-engineering-from-scratch`，之后 Codex 用 `start-learning`、Claude Code 用 `/start-learning`。一次十题的摸底测验会把你映射到合适的起始阶段并生成 `LEARNING.md`；之后 `learn` 每次教一节（概念、数学、代码、测验），`course-guide` 直接跳到你卡住的那节。只想学 MCP 或只想学 Agent Skills 也各有 17 节 / 5 节的专项路线。\n代价：这是「从零实现」路线，不动手等于没学；环境也有硬要求（Node.js、npx、python3，以及一个支持 skill 的宿主和可写目录）。",
+    officialUrl: "https://aiengineeringfromscratch.com",
+    officialLabel: "aiengineeringfromscratch.com",
+    links: {
+      official: "https://aiengineeringfromscratch.com",
+      github: "https://github.com/rohitg00/ai-engineering-from-scratch",
+    },
+    whoFor: "想把 AI 工程内功补上的人：能自己写出优化器、检索评估、trace 分析与工具调用边界，而不只会拼 API 与框架。",
+    whoNot: "想快速做出产品的人——528 节的实现路线太慢；也不适合没有 Node.js / Python 环境、或不愿写代码的学习者。",
+    installTips: [
+      "不想装任何东西：直接上 aiengineeringfromscratch.com 读，不需要 clone 仓库，也没有构建步骤。",
+      "装成编码代理的 tutor：`npx skills add rohitg00/ai-engineering-from-scratch`，安装时选宿主与 scope；Codex 用 `start-learning`，Claude Code 用 `/start-learning`，其他宿主按名字调用。",
+      "跑项目前先确认版本：`node --version`、`npx --version`、`python3 --version`；检索项目要 Python 3.10+，Agent Trace Debugger 要 Node.js 22.18+。",
+      "项目从仓库根目录跑：`python3 scripts/project_test.py retrieval-evaluation-lab --init learning-artifacts/retrieval-evaluation-lab`，再 `--stage 1 --path ... --strict`，最后 `--all --path ... --strict`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#805AD5",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：三种学法怎么选、把课程装进编码代理的命令、三个项目的运行方式，以及为什么 starter 一上来就是失败的。",
+      markdown: `## 三种学法
+
+| 学法 | 需要什么 |
+| --- | --- |
+| 网站 | 浏览器，什么都不装 |
+| **编码代理当 tutor** | Node.js、\`npx\`、一个支持 skill 的宿主 |
+| 本地跑项目 | \`python3\`（部分项目要 Node.js 22.18+ / Rust） |
+
+推荐第二种——它就是为这个设计的：
+
+\`\`\`bash
+npx skills add rohitg00/ai-engineering-from-scratch
+\`\`\`
+
+装的时候选宿主和 scope（\`.claude/skills/\`、\`.cursor/skills/\`、\`.codex/skills/\` 等）。调用语法属于宿主，不属于 SKILL.md：
+
+| 宿主 | 开始课程 | 阶段测验 |
+| --- | --- | --- |
+| Codex | \`start-learning\` | \`check-understanding 13\` |
+| Claude Code | \`/start-learning\` | \`/check-understanding 13\` |
+| 其他兼容宿主 | \`Use start-learning to begin the course.\` | \`Use check-understanding to quiz me on Phase 13.\` |
+
+摸底测验会生成一份 \`LEARNING.md\` 学习计划；之后 \`learn\` 每次只教一节（概念、数学、代码、测验），\`course-guide\` 用来跳到卡住的那节。
+
+## 只想学一块
+
+- **只学 MCP**：用 \`learn-mcp\`（Claude Code 是 \`/learn-mcp\`），一条 17 节课的路线，生成 \`MCP-LEARNING.md\`
+- **只学 Agent Skills**：用 \`learn-agent-skills\`，5 节课：契约、发现、调用、沙箱边界、发布评估与宿主可移植性
+
+## 三个项目，starter 故意是坏的
+
+别以为装坏了：**starter 在你实现之前就是会失败的**。
+
+\`\`\`bash
+python3 scripts/project_test.py retrieval-evaluation-lab \\
+  --init learning-artifacts/retrieval-evaluation-lab
+
+python3 scripts/project_test.py retrieval-evaluation-lab \\
+  --stage 1 --path learning-artifacts/retrieval-evaluation-lab --strict
+
+python3 scripts/project_test.py retrieval-evaluation-lab \\
+  --all --path learning-artifacts/retrieval-evaluation-lab --strict
+\`\`\`
+
+三个项目分别是：
+
+| 项目 | 语言 | 关键点 |
+| --- | --- | --- |
+| 01 检索评估实验 | Python 3.10+ | 逐查询 NDCG 对比，能作为发布检查失败掉 |
+| 02 Agent Trace Debugger | TypeScript | JSONL 解析、区间运算、HTML 时间线 |
+| 03 Tool Call Firewall | Rust | 调用信封校验、角色与路径检查、一次性审批 |
+
+命令都从仓库根目录跑。每个项目都写明要保留什么产物——例如 02 要保住 per-span 的独占 token 计数，父子不能重复计。
+
+## 环境不够就别硬上
+
+没有 Node.js / npx / python3 / 支持的宿主 / 可写目录，就走网站读 \`docs/en.md\`。那条路线能学概念，但真实宿主的发现、调用、脚本与卸载验证得等环境齐了才能做。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "课程官网",
+          url: "https://aiengineeringfromscratch.com",
+          note: "528 节课的在线阅读入口与学习路线。不想装任何东西就从这里开始。",
+        },
+        {
+          kind: "html",
+          title: "项目列表与参考实现",
+          url: "https://aiengineeringfromscratch.com/projects.html",
+          note: "三个项目的说明、分级 starter 与参考实现入口。动手前先看它要你交付什么。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/rohitg00/ai-engineering-from-scratch",
+          note: "全部阶段目录、skills 定义与项目脚本。要给编码代理装 tutor 或本地跑 grader 时用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "strix",
+    linksCheckedAt: "2026-10-14",
+    name: "strix",
+    nameZh: "Strix AI 渗透测试代理",
+    aliases: ["strix", "strix agent", "strix-agent", "AI 渗透测试", "AI 安全测试"],
+    summary: "开源的 AI 渗透测试代理：真跑代码、真出 PoC 来验证漏洞，而不是静态扫描报一堆误报。适合对有授权的目标做上线前自查；代价是要 Docker 加自己的 LLM key，且只能用于自有资产。",
+    scenes: ["code"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["安全测试", "渗透测试", "AI 代理", "开源"],
+    body: "Strix 是自主的 AI 渗透测试代理，定位是「像真人黑客一样干活」：动态跑你的代码、找漏洞、再用真实可用的 PoC 去验证，而不是像传统扫描器那样丢一堆误报。能力覆盖侦察、利用、验证，带 HTTP 拦截代理（Caido）、浏览器利用（XSS / CSRF / 点击劫持 / 认证绕过）、shell 与命令执行、Python 沙箱写 PoC、SAST + DAST，漏洞按 CVSS 打分并按 OWASP 分类。多代理编排会把侦察、利用、后利用拆给不同的 agent 并行跑。\n跑法很简单：`curl -sSL https://strix.ai/install | bash` 装 CLI，设 `STRIX_LLM` 与 `LLM_API_KEY`，然后 `strix --target ./app-directory`。目标也可以是 GitHub 仓库 URL、线上站点，或者 API 契约 + 实际 base URL（`strix --target ./openapi.yaml --target https://api.your-app.com`），后者让它直接测声明的每个端点而不是靠爬。首次运行会自动拉沙箱 Docker 镜像，结果写进 `strix_runs/<run-name>`，`strix view` 起本地看板（默认只绑 127.0.0.1 并打印带 token 的链接，别乱分享）。CI 里用 `strix -n -t ./ --scan-mode quick`，发现漏洞时以非零码退出。\n三点必须讲清。一是**授权**：这是渗透测试工具，只能对自有或明确书面授权的目标使用。二是**成本与依赖**：需要运行中的 Docker 和任意受支持 provider 的 LLM key，也可以 `strix auth login chatgpt` 后按 `chatgpt/<model>` 走 ChatGPT Plus/Pro 订阅。三是**配置会落盘**：`STRIX_LLM` 等会自动存到 `~/.strix/cli-config.json`；升级要区分装法，standalone 用 `strix --update`，pipx / uv / pip 装的它会直接打印对应的升级命令。",
+    officialUrl: "https://strix.ai",
+    officialLabel: "strix.ai",
+    links: {
+      official: "https://strix.ai",
+      github: "https://github.com/usestrix/strix",
+    },
+    whoFor: "开发与安全团队在发布前对自有应用做一次自动化安全自查，以及把安全扫描接进 PR 流程的人。",
+    whoNot: "想拿它扫别人站点的人——只能用于自有或授权目标；也不适合没有 Docker 环境、或不愿为 LLM 调用付费的人。",
+    installTips: [
+      "前提：Docker 正在运行，加任意受支持 provider 的 LLM API key（OpenAI、Anthropic、Google 等，也可 `strix auth login chatgpt` 走 ChatGPT 订阅）。",
+      "安装与首次扫描：`curl -sSL https://strix.ai/install | bash`，`export STRIX_LLM=\"openrouter/z-ai/glm-5.3\"`、`export LLM_API_KEY=\"...\"`，然后 `strix --target ./app-directory`；首次运行会自动拉沙箱镜像。",
+      "看结果用 `strix view`（最近一次）或 `strix view my-run-name`；要固定端口对外用 `strix view --host 0.0.0.0 --port 8080 --no-open`，默认只绑 127.0.0.1 并打印带 token 的链接。",
+      "升级看装法：standalone 用 `strix --update`；pipx / uv / pip 装的它会直接打印对应命令（`pipx upgrade strix-agent` / `uv tool upgrade strix-agent` / `pip install --upgrade strix-agent`）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#9B2C2C",
+    },
+    guide: {
+      intro: "按第一次跑会卡在哪讲：授权这条底线、三类目标的写法、CI 里怎么接、成本从哪来、以及本地看板为什么不默认对外。",
+      markdown: `## 先说授权
+
+这是渗透测试工具。**只对自己拥有或有明确书面授权的目标使用**。这条不是免责声明式的套话：它会真的去跑利用、发请求、执行命令。
+
+## 装与第一次扫描
+
+\`\`\`bash
+curl -sSL https://strix.ai/install | bash
+
+export STRIX_LLM="openrouter/z-ai/glm-5.3"
+export LLM_API_KEY="your-api-key"
+
+strix --target ./app-directory
+\`\`\`
+
+前提只有两个：**Docker 正在运行**，以及一个受支持 provider 的 LLM key。首次运行会自动拉沙箱镜像，结果写到 \`strix_runs/<run-name>\`。
+
+配置会自动存进 \`~/.strix/cli-config.json\`，不用每次重填。
+
+## 三类目标
+
+\`\`\`bash
+strix --target ./app-directory              # 本地代码
+strix --target https://github.com/org/repo  # 仓库 URL
+strix --target https://your-app.com         # 黑盒站点
+\`\`\`
+
+有 API 契约时别让它自己爬，直接给契约 + 实际地址：
+
+\`\`\`bash
+strix --target ./openapi.yaml --target https://api.your-app.com
+strix --target postman://<collection-uuid> --target https://api.your-app.com
+\`\`\`
+
+需要登录态就加指令：
+
+\`\`\`bash
+strix --target https://your-app.com --instruction "Perform authenticated testing using credentials: user:pass"
+\`\`\`
+
+## 接进 CI
+
+\`\`\`yaml
+- name: Run Strix
+  env:
+    STRIX_LLM: \${{ secrets.STRIX_LLM }}
+    LLM_API_KEY: \${{ secrets.LLM_API_KEY }}
+  run: strix -n -t ./ --scan-mode quick
+\`\`\`
+
+要点：\`-n\` 是非交互模式，发现漏洞时**以非零码退出**，正好用来卡住 PR；checkout 要 \`fetch-depth: 0\`，因为在 PR 场景里它按改动文件来界定快速评审的范围。
+
+## 成本与模型
+
+两种付费方式：自己的 LLM key，或者 \`strix auth login chatgpt\` 后用 \`chatgpt/<model>\` 走 ChatGPT Plus / Pro 订阅。长扫描的 token 消耗不小，先在单目录上试一次再铺开。
+
+## 看板默认只给自己
+
+\`\`\`bash
+strix view                                  # 最近一次
+strix view my-run-name                      # 指定某次
+strix view --host 0.0.0.0 --port 8080 --no-open   # 需要固定端口对外时
+\`\`\`
+
+默认绑 \`127.0.0.1\`，并打印一个带 token 的链接——**那个链接等于该次运行的访问权**，别随手转发。UI 是预置好的，数据不出本机。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.strix.ai",
+          note: "快速开始、支持的 LLM provider、CLI 参考与 CI/CD 集成。第一次跑之前先看 Quickstart 与 llm-providers。",
+        },
+        {
+          kind: "html",
+          title: "CLI 参考",
+          url: "https://docs.strix.ai/usage/cli",
+          note: "全部选项：扫描模式、diff 范围、指令文件与预算。要控制成本与扫描范围时查这页。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/usestrix/strix",
+          note: "安装脚本、GitHub Actions 示例与 MCP 服务器配置方式。要把扫描接进流水线时看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "openmontage",
+    linksCheckedAt: "2026-10-14",
+    name: "OpenMontage",
+    nameZh: "OpenMontage 智能体视频制作系统",
+    aliases: ["openmontage", "open montage", "AI 视频制作", "agentic 视频", "视频流水线"],
+    summary: "把编码代理变成视频工作室：12 条流水线、700+ 技能与制作知识文件，从脚本、素材、配音到成片全包。适合批量产短视频的人；代价是要自备一堆付费 API key，成本按条算。",
+    scenes: ["photo", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["视频制作", "Agent Skill", "AI 生成", "开源"],
+    body: "OpenMontage 是给编码代理用的一套 agentic 视频制作系统：你对 Claude Code / Cursor / Copilot / Windsurf / Codex 说一句需求，它做联网调研、写脚本、生成素材、配音、找免版税音乐、烧字幕、合成成片。仓库里有 12 条生产流水线、100+ 工具和 700+ 技能与制作知识文件。\n它特意强调了一个区分：不只是「把几张图动起来就叫视频」，还能走真实素材路线——从免费素材库与开放档案建语料、检索真实运动片段、剪进时间线再渲染出成品。README 里每支样片都标了用了什么工具和花了多少钱（一支 60 秒动画短片 $1.33，一支 50 秒竖版约 $4），这个习惯值得学。另一个更实用的入口是「从你喜欢的视频开始」：贴一个 YouTube / Short / Reel / TikTok 链接或本地片段，代理分析字幕、节奏、场景、关键帧与风格，给出 2–3 个差异化概念、诚实的工具路径和成本估算，并先出样片。\n代价很实在。它是**要花钱的**：FAL、Atlas Cloud、Kling、Pexels、Pixabay 这些 key 全部可选，但每多一把钥匙就多一批工具，免费素材路线之外的画面基本都得按次付费。环境也要 Python 3.10+、FFmpeg 和 Node.js 18+。协议是 AGPL-3.0，改了要一并开源。另外它有个特色组件 Backlot（本地故事板）：`python -m backlot open` 看所有项目，资产生成会停在逐场景的 contact sheet 上等你批准后再渲染——这个审批闸门能直接省掉「渲完了才发现不对」的浪费。",
+    officialUrl: "https://www.openmontage.video",
+    officialLabel: "www.openmontage.video",
+    links: {
+      official: "https://www.openmontage.video",
+      github: "https://github.com/calesthio/OpenMontage",
+    },
+    whoFor: "要批量产短视频（解说、产品片、竖版内容）的人，尤其是想把制作流程交给编码代理、并且愿意按条付素材费的团队。",
+    whoNot: "预算为零的人——免费素材路线之外的画面都要付费；也不适合想用拖拽式界面做视频的人，它没有自己的 GUI，必须挂在编码代理上。",
+    installTips: [
+      "前提：Python 3.10+、FFmpeg（`brew install ffmpeg` / `sudo apt install ffmpeg`）、Node.js 18+，以及一个能读文件并执行命令的编码代理（Claude Code、Cursor、Copilot、Windsurf、Codex 均可）。",
+      "`git clone https://github.com/calesthio/OpenMontage.git && cd OpenMontage && make setup`；没有 make 就手工建 venv、装 requirements、进 remotion-composer 跑 npm install，再 `python -m pip install piper-tts` 并 `cp .env.example .env`。",
+      "Windows 上 `npm install` 报 `ERR_INVALID_ARG_TYPE` 就改用 `npx --yes npm install`；PowerShell 的等价命令 README 里也给了。",
+      "API key 全部可选、按需往 .env 加：`FAL_KEY`（FLUX 图 + Veo / Kling / MiniMax 视频）、`ATLASCLOUD_API_KEY`、`KLING_API_KEY`、`PEXELS_API_KEY`、`PIXABAY_API_KEY`（后两个是免费素材）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#B7791F",
+    },
+    guide: {
+      intro: "按第一次跑会卡在哪讲：四个前置、make setup 到底装了什么、从参考视频起步那条更快的路径、以及 Backlot 的审批闸门怎么帮你省钱。",
+      markdown: `## 四个前置，缺一个就跑不动
+
+- **Python 3.10+**
+- **FFmpeg**（\`brew install ffmpeg\` / \`sudo apt install ffmpeg\`）
+- **Node.js 18+**
+- **一个 AI 编码助手**：Claude Code、Cursor、Copilot、Windsurf 或 Codex
+
+\`\`\`bash
+git clone https://github.com/calesthio/OpenMontage.git
+cd OpenMontage
+make setup
+\`\`\`
+
+没有 \`make\` 时按 README 的手工步骤来：建 venv、装 requirements、进 \`remotion-composer\` 跑 \`npm install\`、装 \`piper-tts\`、复制 \`.env.example\` 成 \`.env\`。Windows 上 \`npm install\` 报 \`ERR_INVALID_ARG_TYPE\` 就换成 \`npx --yes npm install\`。
+
+## 从参考视频起步更快
+
+对着空白 prompt 想创意很慢。README 推荐的方式是贴一条你喜欢的视频（YouTube / Short / Reel / TikTok / 本地片段），让代理分析字幕、节奏、场景、关键帧与风格，然后你会拿到：
+
+- 2–3 个**差异化概念**
+- 一条**诚实的工具路径**
+- 目标时长下的**成本估算**
+- 一个**样片**
+
+\`\`\`text
+Here's a YouTube Short I love. Make me something like this, but about quantum computing.
+\`\`\`
+
+关键在「成本估算在生成之前」——这能避免跑完才发现超预算。
+
+## 用 Backlot 在渲染前卡一道
+
+\`\`\`bash
+python -m backlot open                  # 本机所有项目
+python -m backlot open <project-id>     # 某次生产的实时看板
+python scripts/backlot_simulate_run.py  # 没跑过就看一个模拟的
+\`\`\`
+
+Backlot 是本地故事板，生产一开始会自动打开。它最重要的作用是把**资产生成停在逐场景的 contact sheet 上**（每条 take、prompt、单资产成本、质量分），你批准之后才渲染。省的就是「渲完才发现画面不对」的那笔钱和那几小时。
+
+跑完还能 \`▶ REPLAY RUN\`，按时间戳整条回放。
+
+## 成本要自己盯
+
+样片都标了实际花费：60 秒动画短片 $1.33、50 秒竖版约 $4、七场景展示约 $5。费用主要来自图像 / 视频生成 API。想压成本就多用 Pexels / Pixabay 的免费素材路线（真实素材剪辑），少用纯生成。
+
+## 协议与定位
+
+AGPL-3.0，改了要一并开源。它不是一个独立软件——**必须挂在一个能读文件、能执行代码的编码代理上**，图与片的质量也随你用的模型和代理变化。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://www.openmontage.video",
+          note: "样片、流水线总览与上手入口。判断它能不能做你想要的片型，先看样片和它们标注的成本。",
+        },
+        {
+          kind: "html",
+          title: "Providers 说明（API key 与成本）",
+          url: "https://github.com/calesthio/OpenMontage/blob/main/docs/PROVIDERS.md",
+          note: "各家图像 / 视频 / 配音 provider 的 key、能力与计费方式。配 .env 前必读，直接决定你能跑哪条流水线。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库与 Agent Guide",
+          url: "https://github.com/calesthio/OpenMontage",
+          note: "安装步骤、12 条流水线定义与 AGENT_GUIDE.md。让代理接管生产前，先让它读 AGENT_GUIDE。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "mem0",
+    linksCheckedAt: "2026-10-14",
+    name: "mem0",
+    nameZh: "mem0 智能体记忆层",
+    aliases: ["mem0", "mem zero", "mem0ai", "记忆层", "长期记忆"],
+    summary: "给 AI 应用加记忆层：分 User / Session / Agent 三级记住偏好，跨会话检索。适合做长期陪伴型助手与客服；代价是默认依赖 OpenAI 做抽取与嵌入，且自托管现已默认开启鉴权。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["记忆", "AI 应用", "向量检索", "开源"],
+    body: "mem0 做的是记忆这一层：把 User / Session / Agent 三级状态分开存，做自适应个性化，跨会话检索。用法分三种——库（`pip install mem0ai`）、自托管服务端（`cd server && make bootstrap` 或 `docker compose up -d`）、云平台（app.mem0.ai 注册即用）。代码层面就是 add 与 search 两个动作：检索相关记忆拼进 system prompt，再把这轮对话 add 回去。\n2026 年 4 月它换了新的记忆算法，README 把变化讲得很具体：单次 LLM 调用的 ADD-only 抽取（不再 UPDATE / DELETE，记忆只增不覆盖）、agent 生成的确认为一等公民、实体链接、语义 + BM25 关键词 + 实体匹配的多信号融合检索、以及时间感知排序。官方给的分数是 LoCoMo 92.5、LongMemEval 94.4、BEAM(1M) 64.1，p50 延迟 1 秒左右，但**那是托管平台的成绩，含开源 SDK 没有的优化，开源用户应预期方向一致但数字不同**。\n两个坑。一是**默认依赖 OpenAI**：默认 LLM 是 gpt-5-mini、默认嵌入是 text-embedding-3-small，要换得查 Supported LLMs / Embeddings 文档；自托管想用混合检索（语义 + 关键词 + 实体）官方建议至少 Qwen 600M 级别的嵌入模型，装法是 `pip install mem0ai[nlp]` 加 `python -m spacy download en_core_web_sm`。二是**自托管现在默认开启鉴权**：从无鉴权的旧版升级要设 `ADMIN_API_KEY`、通过向导注册管理员，或用 `AUTH_DISABLED=true`（仅限本地开发）。",
+    officialUrl: "https://mem0.ai",
+    officialLabel: "mem0.ai",
+    links: {
+      official: "https://mem0.ai",
+      github: "https://github.com/mem0ai/mem0",
+    },
+    whoFor: "做客服机器人、个人助理、长期陪伴型应用的人：需要跨会话记住用户偏好与历史，而不是每次从零开始。",
+    whoNot: "只需要单次会话内上下文的应用——加一层记忆只是增加延迟与成本；也不适合完全不接受 OpenAI 默认依赖、又不愿自配 LLM 与嵌入模型的团队。",
+    installTips: [
+      "只是试试就装库：`pip install mem0ai`（Node 用 `npm install mem0ai`）；要混合检索（BM25 + 实体抽取）用 `pip install mem0ai[nlp]` 再加 `python -m spacy download en_core_web_sm`。",
+      "自托管推荐一条命令：`cd server && make bootstrap`（起栈、建管理员、发第一个 API key）；手动版是 `cd server && docker compose up -d`，然后浏览器打开 http://localhost:3000 走向导。",
+      "从无鉴权的旧版升级要先处理鉴权：设 `ADMIN_API_KEY` 或走注册向导；`AUTH_DISABLED=true` 仅限本地开发。",
+      "终端管记忆用 CLI：`npm install -g @mem0/cli`（或 `pip install mem0-cli`），`mem0 add \"Prefers dark mode and vim keybindings\" --user-id alice`、`mem0 search \"...\" --user-id alice`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#2C5282",
+    },
+    guide: {
+      intro: "按第一次接入会卡在哪讲：三种形态怎么选、最小可用代码长什么样、默认模型怎么换、以及自托管升级后那个鉴权开关。",
+      markdown: `## 先选形态
+
+| 形态 | 怎么用 | 适合 |
+| --- | --- | --- |
+| 库 | \`pip install mem0ai\` | 先试、做原型 |
+| 自托管服务端 | \`cd server && make bootstrap\` | 团队，跑在自己基础设施上 |
+| 云平台 | 到 app.mem0.ai 注册 | 零运维的生产使用 |
+
+只有库形态没有 dashboard，也没有鉴权与 API key；这两样从自托管开始才有。
+
+## 最小可用代码
+
+\`\`\`python
+from openai import OpenAI
+from mem0 import Memory
+
+openai_client = OpenAI()
+memory = Memory()
+
+def chat_with_memories(message: str, user_id: str = "default_user") -> str:
+    relevant = memory.search(query=message, filters={"user_id": user_id}, top_k=3)
+    memories_str = "\\n".join(f"- {entry['memory']}" for entry in relevant["results"])
+
+    system_prompt = f"You are a helpful AI. Answer based on query and memories.\\nUser Memories:\\n{memories_str}"
+    messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": message}]
+    response = openai_client.chat.completions.create(model="gpt-5-mini", messages=messages)
+    assistant_response = response.choices[0].message.content
+
+    messages.append({"role": "assistant", "content": assistant_response})
+    memory.add(messages, user_id=user_id)
+    return assistant_response
+\`\`\`
+
+就两个动作：**检索 → 拼进 system prompt → 把本轮 add 回去**。
+
+## 默认依赖 OpenAI，要换早换
+
+- 默认 LLM：\`gpt-5-mini\`
+- 默认嵌入：\`text-embedding-3-small\`
+
+换模型看官方的 Supported LLMs / Embeddings 文档。想要混合检索（语义 + 关键词 + 实体提升），官方建议**至少 Qwen 600M 级别的嵌入模型**，并安装 NLP 支持：
+
+\`\`\`bash
+pip install mem0ai[nlp]
+python -m spacy download en_core_web_sm
+\`\`\`
+
+## 自托管：鉴权现在默认开
+
+这是升级时最容易踩的一条。**自托管默认开启鉴权**，从无鉴权的旧构建升上来要三选一：
+
+1. 设 \`ADMIN_API_KEY\`
+2. 通过向导注册一个管理员
+3. 本地开发才用 \`AUTH_DISABLED=true\`
+
+\`\`\`bash
+cd server && make bootstrap     # 推荐：起栈 + 建管理员 + 发第一个 key
+cd server && docker compose up -d   # 手动：起栈后走浏览器向导
+\`\`\`
+
+## 新算法意味着什么
+
+2026 年 4 月后：**单次 LLM 调用的 ADD-only 抽取**，记忆只增不覆盖。好处是少了 UPDATE / DELETE 的额外调用；代价是纠错只能靠新增记忆去覆盖语义，旧条目仍在库里。做合规删除需求时要自己补一层。
+
+官方分数（LoCoMo 92.5 等）来自**托管平台**，含开源 SDK 没有的优化，开源部署请按「方向一致、数字不同」来预期。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "Quickstart 文档",
+          url: "https://docs.mem0.ai/quickstart",
+          note: "库 / 自托管 / 云三条路径的最小接入步骤与 API 参考。第一次接照这页走。",
+        },
+        {
+          kind: "html",
+          title: "自托管搭建与升级说明",
+          url: "https://docs.mem0.ai/open-source/setup",
+          note: "make bootstrap 流程、鉴权开关与旧版升级注意事项。自托管或从旧版升级前必读。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库（含 Agent Skills）",
+          url: "https://github.com/mem0ai/mem0",
+          note: "算法变更说明、CLI 用法与可直接装进编码代理的 skills。想让代理帮你接入时用 /mem0-integrate。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "anything-llm",
+    linksCheckedAt: "2026-10-14",
+    name: "AnythingLLM",
+    nameZh: "AnythingLLM 本地文档问答",
+    aliases: ["anythingllm", "anything llm", "AnythingLLM", "本地知识库", "私有 ChatGPT"],
+    summary: "一体化、本地优先的 AI 应用：接本地或云端 LLM、吃文档、带多用户权限与无代码 Agent 构建器。适合在内网给团队搭私有问答；代价是多用户只在 Docker 版，且默认带遥测。",
+    scenes: ["office", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["知识库", "本地大模型", "多用户", "开源"],
+    body: "AnythingLLM 是一个 all-in-one 的 AI 应用：接你喜欢的本地或云端 LLM，把文档喂进去，几分钟开聊，自带 agent、向量库与文档处理管线。模型侧支持得极宽——llama.cpp 兼容模型、OpenAI、Azure、Bedrock、Anthropic、Gemini、Ollama、LM Studio、LocalAI、DeepSeek、Groq、Mistral、LiteLLM 等三十多家；向量库默认 LanceDB，也能换 PGVector、Pinecone、Chroma、Weaviate、Qdrant、Milvus、Zilliz；嵌入、TTS、STT 各有默认与可选项。\n它比「一个聊天界面」多的部分在企业与自动化：动态模型路由（按规则把对话分给最合适的模型）、自动与用户管理的记忆、cron 定时任务、智能技能选择（官方称每次查询最多省 80% token）、无代码 Agent 构建器（Agent Flows）、MCP 兼容，以及可嵌入网站的聊天挂件。\n三点要提前知道。一是**多用户只属于 Docker 版**——桌面版（Mac / Windows / Linux）是单机的，要权限、多人实例和嵌入挂件必须走 Docker 部署。二是**默认带遥测**：收集安装类型、文档增删事件、向量库类型、模型 tag、发消息事件，不收集内容与 IP，provider 是 PostHog；关掉的方式是设 `DISABLE_TELEMETRY=true` 或在侧栏 Privacy 里关——但即便关掉，用外部 LLM / 向量库、从 `cdn.anythingllm.com` 拉模型、从 githubusercontent 取缓存文件仍会有出站连接。三是它是 monorepo（frontend / server / collector / docker / embed / browser-extension），改代码就从根目录 `yarn setup` 填 .env（务必填 server/.env.development），再分别 `yarn dev:server`、`yarn dev:frontend`、`yarn dev:collector`。",
+    officialUrl: "https://anythingllm.com",
+    officialLabel: "anythingllm.com",
+    links: {
+      official: "https://anythingllm.com",
+      github: "https://github.com/Mintplex-Labs/anything-llm",
+    },
+    whoFor: "要在内网给团队搭一套私有 ChatGPT 的人：文档不能出网、需要多人分权限、还想接定时任务与 Agent。",
+    whoNot: "只想单机自己跟文档聊天的人——Ollama + 一个轻量界面就够；也不适合对出站连接有硬性审计要求的环境，遥测与 CDN 拉取要逐项确认。",
+    installTips: [
+      "桌面版（Mac / Windows / Linux）从 anythingllm.com/download 下；要多人、权限和可嵌入挂件必须用 Docker 版。",
+      "官方与社区维护了十来种部署模板（Docker、AWS、GCP、DigitalOcean、Render、Railway、Elestio、Northflank、Sealos、Easypanel）；不用 Docker 看仓库里的 BARE_METAL.md。",
+      "在意隐私就先关遥测：服务端或 Docker 的 .env 里设 `DISABLE_TELEMETRY=true`，也可以在应用内 侧栏 > Privacy 里关。",
+      "改代码：`yarn setup` 生成各部分的 .env（务必填 server/.env.development），再 `yarn dev:server`、`yarn dev:frontend`、`yarn dev:collector` 分别起。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#1A365D",
+    },
+    guide: {
+      intro: "按第一次部署会卡在哪讲：桌面版与 Docker 版的能力差、模型与向量库怎么选、遥测怎么关，以及改代码时六个目录分别是什么。",
+      markdown: `## 桌面版 vs Docker 版
+
+这是第一个岔路，而且**不是能力多少的问题，是有没有的问题**：
+
+| | 桌面版 | Docker 版 |
+| --- | --- | --- |
+| 安装 | 下载安装包 | Docker / 云模板 |
+| 多用户与权限 | **没有** | 有 |
+| 可嵌入网站挂件 | 没有 | 有 |
+| 适合 | 单机自用 | 团队、内网部署 |
+
+要给别人用，就直接上 Docker 版，别在桌面版上试。
+
+## 选模型与向量库
+
+默认就能跑：内置 Native Embedder + **LanceDB** 向量库，不需要额外服务。
+
+要换的话，README 列的支持面很宽：
+
+- **LLM**：llama.cpp 兼容模型、OpenAI、Azure、Bedrock、Anthropic、Gemini、Ollama、LM Studio、LocalAI、DeepSeek、Groq、Mistral、LiteLLM 等三十多家
+- **向量库**：LanceDB（默认）、PGVector、Pinecone、Chroma、Weaviate、Qdrant、Milvus、Zilliz
+- **语音**：内置转录，TTS 可选 PiperTTSLocal（浏览器内）、OpenAI TTS、ElevenLabs
+
+先跑通默认组合，再按需要替换，比一上来就配一堆外部服务省时间。
+
+## 关遥测（如果需要在意的项目里用）
+
+默认开启，收集的是：安装类型、文档增删**事件**（不含文档内容）、向量库类型、LLM provider 与模型 tag、发消息**事件**。不收集 IP 与内容，provider 是 PostHog。
+
+\`\`\`bash
+DISABLE_TELEMETRY=true   # 写在 server 或 docker 的 .env 里
+\`\`\`
+
+也可以在应用内 侧栏 > Privacy 里关。要自己核对，README 给了搜 \`Telemetry.sendTelemetry\` 调用点的链接。
+
+**关掉之后仍有出站连接**：外部 LLM / 嵌入 / 向量库各自的服务、\`cdn.anythingllm.com\`（拉模型的镜像 CDN，对网络受限地区反而有用）、github / githubusercontent（缓存用的 flat 文件）。有严格出站审计的环境要逐项确认。
+
+## 它不只是聊天
+
+值得单独摸一遍的功能：
+
+- **动态模型路由**：按规则把对话分给最合适的模型
+- **智能技能选择**：官方称每次查询最多省 80% token
+- **Agent Flows**：无代码 Agent 构建器
+- **定时任务**：cron，带完整 agent 能力
+- **MCP 兼容**
+
+这几项决定了它和「一个本地聊天框」的差距。
+
+## 想改代码
+
+monorepo 六个部分：\`frontend\`（Vite + React）、\`server\`（Express，管向量库与 LLM）、\`collector\`（文档解析）、\`docker\`、\`embed\`（网页挂件）、\`browser-extension\`。
+
+\`\`\`bash
+yarn setup          # 生成各部分的 .env，务必填 server/.env.development
+yarn dev:server
+yarn dev:frontend
+yarn dev:collector
+\`\`\`
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://anythingllm.com",
+          note: "桌面版下载与产品总览。先判断要不要 Docker 版（多用户 / 挂件）再看部署页。",
+        },
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.anythingllm.com",
+          note: "模型路由、记忆、定时任务、Agent Flows、MCP 与部署方式的完整说明。配置前先查这站。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库（部署模板与裸机安装）",
+          url: "https://github.com/Mintplex-Labs/anything-llm",
+          note: "十来种一键部署模板，以及不用 Docker 的 BARE_METAL.md。内网部署时看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "rustdesk",
+    linksCheckedAt: "2026-10-14",
+    name: "RustDesk",
+    nameZh: "RustDesk 远程桌面",
+    aliases: ["rustdesk", "rust desk", "远程桌面", "远程控制", "自建远程"],
+    summary: "开源远程桌面，能自建中继服务器把数据留在自己手里。适合被 TeamViewer 商用检测卡住、又不想按年付费的人。",
+    scenes: ["tools", "office"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["远程桌面", "远程控制", "自建服务", "开源"],
+    body: "RustDesk 是用 Rust 写的远程桌面，对标 TeamViewer / AnyDesk，差异在于它是开源且可以自己搭中继服务器。商业远控软件把「商用用途」做成付费判定：个人免费档被检测到商用就限速断连，判定规则不公开也不可申诉。RustDesk 的解决办法是把服务器也开源——装配套的 hbbs（ rendezvous，负责配对）与 hbbr（relay，负责中转），所有连接只经过你自己的机器。\n没打算自建也能直接用：默认连官方提供的公共服务器，开箱免配置，装好就有 ID 和密码，两端输入即可连。这一步不需要注册账号。真正的差别在你需不需要「可控」——自建之后，延迟、带宽、谁的数据都不再依赖第三方，代价是要维护一台有公网 IP 的服务器，并且自己处理升级与安全。\n常见的误用是把它当成长期的无人运维通道却不改默认设置。默认的固定密码如果被扫到，等于把机器开放给发现它的人。无人值守场景要改成强密码或配置密钥认证，别只依赖随机 ID。",
+    officialUrl: "https://rustdesk.com/",
+    officialLabel: "rustdesk.com",
+    links: {
+      official: "https://rustdesk.com/",
+      github: "https://github.com/rustdesk/rustdesk",
+    },
+    whoFor: "需要远程访问自己设备的人：家里 NAS / 开发机的维护、帮家人处理电脑故障、TeamViewer 判定商用后的替代方案。",
+    whoNot: "只想偶尔连一次且不在乎商用检测的人，或没有公网服务器也不打算折腾——用默认公共服务器即可，不必强行自建。",
+    installTips: [
+      "直接官网下载对应系统的安装包即可，Windows / macOS / Linux 都有现成构建，不需要自己编译 Rust。",
+      "客户端绿色版双击就能跑，控制端与被控端是同一个程序，两侧都装它。",
+      "要自建服务器请另行部署 rustdesk-server 的 hbbs 与 hbbr，客户端里填服务器地址与 key；只有windows/macOS/linux 官方二进制，别把它和客户端装在同一台机器上抢端口。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#2C5C8F",
+      simpleIcon: "rustdesk",
+    },
+    guide: {
+      intro: "按第一次使用的顺序讲：ID 与密码怎么用、什么时候才需要自建服务器、以及无人值守场景下必须改的安全设置。",
+      markdown: `## 先明白三个名字
+
+第一次打开会看到三样东西：**ID** 是一台机器的标识，**密码** 是一次性的随机口令，还有一个可以自己设置的**固定密码**。
+
+最简单的连法：被控那台把 ID 报给控制方，控制方输入 ID 后按提示填密码，连上。这一步用的是官方公共服务器，不需要注册账号，也不需要任何配置。
+
+## 什么时候才需要自建
+
+默认所有连接的数据都经过 RustDesk 官方提供的中继服务器。**性能不是自建的主要理由，数据主权才是**——想要连接不经第三方，就得自己部署服务。
+
+自建需要一台有公网 IP 的服务器，跑两个进程：
+
+- \`hbbs\`：rendezvous，负责两端配对与 ID 注册
+- \`hbbr\`：relay，在直连失败时负责中转流量
+
+两者合起来才是完整的自建服务，只跑一个的话会在特定网络环境下卡住。
+
+配置完成后，客户端里填入服务器地址与 key。若不想改自己的服务，也可以选它的付费云档位，本质就是让别人替你维护这两个进程。
+
+## 无人值守必须改默认设置
+
+这一段是安全底线：**长期使用请把随机密码换成自定义的强密码**。
+
+随机密码每次重启可能变化，反过来导致你连不上自己的机器；而固定密码如果太简单，被扫到就等于把整机开放出去。两者要平衡：
+
+1. 设置一个足够长的固定密码，或
+2. 使用密钥认证，避免密码本身成为攻击面
+
+此外注意临时访问与持续访问的区别——临时连接用完即走，长期无人值守才需要放宽 sleeper（常驻权限）。给一台长期在线的机器配上弱口令，是最常见的踩坑方式。
+
+## 连不上时的排查顺序
+
+先看两端是否都在线、ID 是否变动过；再看中间的中继是否可达。公司或校园网屏蔽出站时会<｜hy_place▁holder▁no▁813｜>中继，表现为「双方都在线但永远转圈」——此时自建服务器换端口通常能解决。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://rustdesk.com/",
+          note: "各系统的安装包下载入口，以及付费云档位与商业版的说明。想判断要不要自建先看这一页。",
+        },
+        {
+          kind: "html",
+          title: "自建服务器说明",
+          url: "https://rustdesk.com/server",
+          note: "官方对自建 hbbs / hbbr 的说明，含部署前提。决定是否投入维护成本前必读。",
+        },
+        {
+          kind: "html",
+          title: "版本发布记录",
+          url: "https://github.com/rustdesk/rustdesk/releases",
+          note: "查最新客户端安装包与安全更新。自建时服务端与客户端版本最好保持兼容。",
+        },
+      ],
+    },
+  },
+
 
 
 ];
