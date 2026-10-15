@@ -42,6 +42,9 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   // （相同方式共享与 copyleft 同义；禁商用的细节由 summary 与 allowsClosedSource 表达）。
   // 实测 hello-agents（Datawhale 教程仓库）用它——不进表前台静默不显示。
   "CC-BY-NC-SA-4.0": { summary: "仅限非商业使用，需署名且衍生作品同方式共享", tier: "strong-copyleft", allowsClosedSource: false },
+  // CC-BY-NC-ND 禁商用 + 禁演绎，比 NC-SA 更严。实测 You-Dont-Know-JS 用它——
+  // 不进表前台静默不显示，读者会以为没核过。
+  "CC-BY-NC-ND-4.0": { summary: "仅限非商业使用，需署名且不得演绎", tier: "strong-copyleft", allowsClosedSource: false },
   // Artistic 是宽松但要保留声明（Perl 系标准许可，ExifTool 与 Perl 本身用它）。
   // 不写进表里前台就静默不显示，读者会以为没核过。
   "Artistic-1.0-Perl": { summary: "允许商用闭源分发，需保留许可声明", tier: "permissive", allowsClosedSource: true },
