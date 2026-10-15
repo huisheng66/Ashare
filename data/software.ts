@@ -13470,6 +13470,39 @@ yarn dev:collector
     featured: false,
     icon: { letter: "L", color: "#002B36", simpleIcon: "logseq" },
   },
+  {
+    license: "MIT",
+    version: "v28.1.0",
+    slug: "gitea",
+    linksCheckedAt: "2026-10-15",
+    name: "Gitea",
+    aliases: ["gitea", "git 托管", "自建 git", "git 服务", "代码托管"],
+    kind: "opensource",
+    source: "opensource",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    tags: ["代码托管", "Git", "自托管", "代码评审", "CI"],
+    summary: "轻量的自托管 Git 服务：用一个二进制就能搭起代码托管、代码评审、议题、看板、Wiki、包仓库与 CI/CD，资源占用小。",
+    body: "Gitea 是一套自托管的「一体化」软件开发服务，把 Git 代码托管、代码评审、议题跟踪、项目看板、Wiki、团队协作、包仓库与 CI/CD 放进一个程序里。它针对「想在自己的服务器上管代码，又不想为此运维一套庞杂系统」的场景——用 Go 编写，部署门槛低、资源占用小。\n\n核心是围绕 Git 仓库的协作功能：仓库浏览与提交历史、分支与标签、Pull Request 的代码评审与合并、议题与里程碑、项目看板；内置包仓库支持 npm、Maven、Docker Registry 等，CI/CD 复用 GitHub Actions 的写法（配套独立的 runner）；还有 Wiki、组织与团队权限、Git LFS。因为用 Go 写成，它能跑在 Linux、macOS、Windows、BSD 等多平台与 x86、ARM、RISC-V 等多种架构上，除源码安装外有官方 Docker 镜像，也提供托管版。\n\n代价在自托管本身与规模。代码、账号、数据都在自己的机器上，省下托管费也意味着部署、数据库、备份、升级与安全补丁全要自己扛；服务一停，团队就失去访问。它主打轻量，超大仓库、海量并发与复杂企业权限的场景未必比得上重型托管平台，需要按团队规模评估服务器资源。\n\n许可证是 MIT，源码在 GitHub 开源；服务器二进制与安装包由 GitHub Releases 发布，容器用官方镜像 gitea/gitea，文档见 docs.gitea.com，项目域名 gitea.com。",
+    officialUrl: "https://gitea.com",
+    officialLabel: "gitea.com",
+    links: {
+      official: "https://gitea.com",
+      github: "https://github.com/go-gitea/gitea",
+    },
+    installTips: [
+      "按官方文档安装：下载二进制，或用 Docker 镜像 gitea/gitea 起容器。",
+      "首次启动访问 Web 安装页，设置数据库与管理员账号。",
+      "新建仓库后按页面提示配置本机 git remote 并推送代码。",
+      "按需开启议题、Pull Request 评审与 Actions（另装 runner）做协作与 CI。",
+    ],
+    whoFor: "想在自己的服务器或内网里托管代码，看重部署简单、资源占用低，并能自己承担运维的人。",
+    whoNot: "需要托管方代管运维、按量弹性扩展的大型团队；或不想处理数据库、备份与安全更新的场景。",
+    alternatives: [],
+    featured: false,
+    icon: { letter: "G", color: "#609926", simpleIcon: "gitea" },
+  },
+
 
 
 
