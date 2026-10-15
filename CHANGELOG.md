@@ -1,5 +1,74 @@
 # 变更记录
 
+## 2026-10-15 · games 场景补三个主机模拟器（107 → 110）
+
+`content:audit` 的场景盘点显示 games 只有 4 条，是当时最薄的场景；而上一批（bot 40 条）已经把
+高星 AI / 开发类收到占目录一半（55/107）。再按星数收割只会重复同一类仓库，所以这批按
+「场景最薄 + 候选干净」选：**Dolphin**（GameCube / Wii）、**PCSX2**（PS2）、**RPCS3**（PS3），
+三条互挂 `alternatives`。游戏场景 4 → 7。
+
+| 条目 | 许可证 | 判读依据 |
+| --- | --- | --- |
+| dolphin | `GPL-2.0-or-later` | 仓库 `COPYING`：「自有代码 GPLv2+，整体与 GPLv3 兼容」 |
+| pcsx2 | `GPL-3.0` | `COPYING.GPLv3` 为 GPLv3 全文；仓库未声明是否允许后续版本，故不写 `-only` |
+| rpcs3 | `GPL-2.0-only` | README 明说「多数文件 GPL-2.0-only，个别文件以文件头为准」 |
+
+三条都按来源原文判读许可证，没有照抄 GitHub 头部的 `NOASSERTION` / `GPL-3.0` 字段
+（dolphin 那栏就与 GitHub 不一致）。
+
+**模拟器有分量的红线是「项目不提供游戏和固件」。** 三条的 body 第三段都写清：游戏镜像 /
+BIOS 转储 / PS3 固件要用户自己准备、来源自行保证合法；措辞避开站里的 `CRACK_WORDS`，
+`ingest --strict` 的 `crack-words` 检查一次通过。
+
+**录入与验收**：三条合成一个批次文件跑 `ingest --dry-run --strict`（同批互挂 `alternatives`
+需要一次性校验，分三次跑会被判成指向不存在的 slug）→ 0 错误 → 正式写入（运行库 107 → 110）
+→ `seed:upsert` 写种子 → `seed:drift` 报 **0 不一致**（110 / 110）→ `npm run check`
+218 pass / 0 fail → dev server 真实环境跑 `smoke:detail dolphin pcsx2 rpcs3`，3 个详情页 0 异常。
+
+字段缺口没有新增：`同类替代` 41 与 `许可证` 4 在这次前后没变，三条的 tags / whoFor /
+whoNot / tutorial 都齐；`详细教程` 从 12 涨到 15 —— 这批没写 guide，理由是「实测过的才写」，
+本批没有实机验证，宁缺勿编。
+
+**本机环境两处卡点**（下次照做）：`MySQL84` 服务停着且 `.env.local` 指向 3307，所以要先按
+`%LOCALAPPDATA%\Ashare\mysql-data` 手动起 `mysqld`（`--port=3307 --mysqlx=0`）；
+`npm run backup` 的 mysqldump 用应用账号会因缺 `PROCESS` / `SHOW VIEW` 权限失败，改用 `root`
+加 `--no-tablespaces --routines --triggers --events` 手导到 `backups/manual-*.sql`（799KB，exit 0）。
+
+## 2026-10-14 · Link watch 转绿：把巡检红色里的误报与真死链分开处理
+
+定时外链巡检长期变红，但红色里混着三类东西，处理方式完全不同：
+
+| 类别 | 本次实例 | 处理 |
+| --- | --- | --- |
+| 真死链 | anyps5 引用的 `docs/user/COMPATIBILITY.md` 被上游删除 | 改指向 README `#compatibility` |
+| CI 环境误报 | pan.quark.cn 超时、docs.vllm.ai 429、heroicgameslauncher.com 与 npmjs.com 403 | 按判据进 `FLAKY` 名单 |
+| 上游临时故障 | deer-flow 官网 deerflow.tech 证书 2026-10-11 过期 | official 临时改指仓库，留回退标记 |
+
+`FLAKY` 新增 4 个域名（`pan.quark.cn` / `docs.vllm.ai` / `heroicgameslauncher.com` /
+`npmjs.com`）时把判据写进了注释：只有**本机复核可达、且 CI 上稳定失败**才配进表；
+404 与证书过期一律留在表外，让流水线照旧变红 —— 否则会把真死链一起豁免掉。
+
+**顺带修 anyps5 的兼容性叙述。** 上游删掉了 `docs/user/COMPATIBILITY.md`，README 的
+Compatibility 一节改成指向社区 blocker map（逐游戏阶段 + 未解阻塞项，附来源）与
+Game bring-up 讨论区。原文「官方测试过的只有一款 Dreaming Sarah」已经过时：截至
+2026-10-14，地图跟踪 215 款、**4 款到 Playable**（Animal Well、Dreaming Sarah、
+Hollow Knight: Silksong、Road of Death）、71 款仍有未解阻塞项。body / whoNot /
+installTips / guide 四处一起刷新，并新增一条指向 blocker map 的教程资源。
+
+**两个落点都改了。** `whoNot` 与 `installTips` 不在 `SEED_SYNC_FIELDS` 里（那是
+「后台改得更准」的 store-owned 字段），只改种子会留下漂移，所以运行库
+`data/store/catalog.json` 一并对齐，`seed:drift` 回到 0 不一致。
+
+**报告行号同步**：`scripts/stale-links.mjs` 因新增 FLAKY 条目涨到 308 行，
+`docs/优化改进报告.md` 的 `:245` → `:258`，`verify-report-refs.mjs` 的 EXPECT 表
+一起更新，避免「按报告找代码却指到别处」。
+
+**deer-flow 的证书过期走第三条路。** 它不属于误报（证书真的过期了），进 FLAKY 会
+把真故障一起豁免掉，所以改成**临时换掉 official 指向**：`officialUrl` /
+`officialLabel` / `links.official` 与教程里那条「官网与真实案例」资源，一并从
+`deerflow.tech` 改到 `github.com/bytedance/deer-flow`（GitHub 代验 200）。这条是
+临时措施，源文件里留了三行注释标明「上游续期后换回这三处」，别让它变成永久状态。
+
 ## 2026-10-14 · 收录流程简化：collect / draft / seed:upsert 三件套（+KeePassXC，总条目 107）
 
 「收录一个项目需要收集什么」从此在项目里定义清楚，不再每批手写种子脚本：

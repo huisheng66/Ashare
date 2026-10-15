@@ -4477,7 +4477,7 @@ dig @<c3-ip> github.com        # -> 真实 IP  （已转发）
     platforms: ["linux", "windows"],
     source: "opensource",
     tags: ["PS5", "移植", "逆向", "C++", "开源"],
-    body: "AnyPS5 是一个把 PS5 可执行文件自动移植到 Linux 和 Windows 的工具。核心是一个 **relinker（重链接器）**，把可执行文件转换成目标系统的原生格式，加上供动态链接用的**系统 prx 库实现**。关键在最后一句：**没有模拟，也没有额外的运行时进程**。\n和模拟器路线（比如 PCSX2、RPCS3 那类）的区别是根本性的：它不是解释执行，而是把程序翻译成你机器的原生指令直接跑。代价是兼容性完全取决于「这个游戏用到的东西有没有被实现」。\n**当前状态要如实看。** 官方在 README 里给了一张测试过的游戏表，只有一款：**Dreaming Sarah**（2D 平台跳跃），代码 PPSA02929，在 GTX 1050 Ti / i5-7500 3.4GHz 上稳定 60 FPS，在 Intel HD Graphics 620 / i5-7200 2.5GHz 上 36 FPS，Windows 上可玩，Linux 那一栏官方自己标的是问号。系统库和着色器的完成度用徽章展示，项目主页有实时的库函数百分比地图。\n架构上还有一条硬约束：**遇到不支持或不符合预期的状态会严格抛 `std::runtime_error`，what() 打到 stderr 然后进程终止。** 不做静默降级——这是研究型项目的常见选择，代价是任何未实现的系统调用都会让程序直接崩。\n着色器这块有实打实的产出：shader 重编译器能成功生成 SPIR-V，并且在开启 `ANYPS5_ENABLE_SPIRV_TOOLS` 构建时用 Spirv-Tools 做校验。\n手柄支持是完整的：SDL 映射的游戏手柄都支持，包括摇杆和扳机。键鼠要在 `anyps5-input.ini` 里配置。\n**必须说清的前提：** 官方声明该项目面向互操作性、研究、保存与兼容性用途，**不包含、不分发、也不需要任何受版权保护的软件、固件、加密密钥或专有库**。用户需要自己确保手上的二进制来源合法且符合许可条款。翻译成实际使用：\n**能不能跑完全取决于那款游戏的兼容情况**，请先查官方兼容列表再决定投入时间。",
+    body: "AnyPS5 是一个把 PS5 可执行文件自动移植到 Linux 和 Windows 的工具。核心是一个 **relinker（重链接器）**，把可执行文件转换成目标系统的原生格式，加上供动态链接用的**系统 prx 库实现**。关键在最后一句：**没有模拟，也没有额外的运行时进程**。\n和模拟器路线（比如 PCSX2、RPCS3 那类）的区别是根本性的：它不是解释执行，而是把程序翻译成你机器的原生指令直接跑。代价是兼容性完全取决于「这个游戏用到的东西有没有被实现」。\n**当前状态要如实看，而且它比 README 给人的印象乐观得多。** 官方 README 里那张「测试过的游戏只有一款」的表格，以及独立的 `docs/user/COMPATIBILITY.md`，都已经从仓库移除；兼容性改由社区维护的 blocker map 承接，逐游戏给出所处阶段、卡在哪个未解 issue 上，以及库与 GPU 的覆盖情况。截至 2026-10-14，它跟踪 215 款游戏，其中 4 款已到 **Playable**（Animal Well、Dreaming Sarah、Hollow Knight: Silksong、Road of Death），23 款进到菜单，71 款仍有未解阻塞项；阶段序列是 Converts → Loads → Starts → First draw → Presents → Menus → Ingame → Playable。Dreaming Sarah 那条老实测也没被丢掉，被地图当成「存档自已移除的 COMPATIBILITY.md」保留了：GTX 1050 Ti / i5-7500 稳定 60 FPS，Intel HD Graphics 620 / i5-7200 36 FPS。要留意它自己的声明——社区项目，建在公开 GitHub 数据上，不是官方页面。系统库和着色器的完成度仍用徽章展示，进度页在 boykopovar.github.io/AnyPS5/progress.html，官方标明那只是「项目已知函数的比例」，不是固件导出的全量，也不等于 ABI 兼容或可玩。\n架构上还有一条硬约束：**遇到不支持或不符合预期的状态会严格抛 `std::runtime_error`，what() 打到 stderr 然后进程终止。** 不做静默降级——这是研究型项目的常见选择，代价是任何未实现的系统调用都会让程序直接崩。\n着色器这块有实打实的产出：shader 重编译器能成功生成 SPIR-V，并且在开启 `ANYPS5_ENABLE_SPIRV_TOOLS` 构建时用 Spirv-Tools 做校验。\n手柄支持是完整的：SDL 映射的游戏手柄都支持，包括摇杆和扳机。键鼠要在 `anyps5-input.ini` 里配置。\n**必须说清的前提：** 官方声明该项目面向互操作性、研究、保存与兼容性用途，**不包含、不分发、也不需要任何受版权保护的软件、固件、加密密钥或专有库**。用户需要自己确保手上的二进制来源合法且符合许可条款。翻译成实际使用：\n**能不能跑完全取决于那款游戏的兼容情况**，请先查社区 blocker map 里你的目标游戏处在哪个阶段、卡在什么上面，再决定投入时间。",
     officialUrl: "https://github.com/boykopovar/AnyPS5",
     officialLabel: "github.com/boykopovar/AnyPS5",
     links: {
@@ -4485,9 +4485,9 @@ dig @<c3-ip> github.com        # -> 真实 IP  （已转发）
       github: "https://github.com/boykopovar/AnyPS5",
     },
     whoFor: "做逆向工程与跨平台移植研究的开发者；或者想在自己 Linux/Windows 机器上原生跑某个特定 PS5 游戏、且愿意接受只有少数游戏可用的现实的人。",
-    whoNot: "想找「PS5 游戏全兼容」方案的人——目前官方测试过的只有一款游戏；也不适合不懂命令行、不愿意自己准备合法二进制的人。",
+    whoNot: "想找「PS5 游戏全兼容」方案的人——社区地图跟踪的 215 款里只有 4 款到 Playable，大多数停在启动或开场画面上；也不适合不懂命令行、不愿意自己准备合法二进制的人。",
     installTips: [
-      "先查兼容列表再动手。官方 docs/user/COMPATIBILITY.md 目前只有 Dreaming Sarah 一行，确认你的目标游戏在里面再投入时间。",
+      "先查兼容列表再动手。官方原先的 docs/user/COMPATIBILITY.md 已被上游删除，README 的 Compatibility 一节现在指向社区维护的 blocker map 与 Game bring-up 讨论区；确认你的目标游戏不在阻塞项里再投入时间。",
       "relinker 没有 --help。不带参数运行会打印用法语法并以错误码退出——这就是它的帮助信息。",
       "所有开关默认关闭，unused-filter 默认 0、--rpath 默认 $ORIGIN/libs。别照抄别人的命令行，选项是逐个叠加的。",
       "在 Windows 上用 --rpath 时要加引号，PowerShell 里写 '$ORIGIN/libs'，否则 $ORIGIN 会被 shell 展开掉。",
@@ -4615,13 +4615,25 @@ SDL 映射的游戏手柄都支持，**包括摇杆和扳机**。键鼠要在 \`
 
 ## 现在能跑什么
 
-官方测试过的兼容性表目前只有一款游戏：
+官方 README 里那张「只有一款测试过」的表格已经不在了，原先单独的 \`docs/user/COMPATIBILITY.md\` 也被删除。逐游戏的现状改由社区维护的 [blocker map](https://alxcbtw.github.io/anyps5-roadmap/) 承接：它从公开 GitHub 数据（issue、PR、discussion）里挖出每款游戏走到哪个阶段、卡在哪个未解的问题上。
 
-| 游戏 | ID | Windows | Linux | GTX 1050 Ti / i5-7500 | HD 620 / i5-7200 |
-|---|---|---|---|---|---|
-| Dreaming Sarah | PPSA02929 | 可玩 | ？ | 60 FPS | 36 FPS |
+截至 2026-10-14 它跟踪 215 款游戏，阶段序列是 Converts → Loads → Starts → First draw → Presents → Menus → Ingame → Playable，落在各阶段的款数是：
 
-Linux 那一栏是官方自己标的问号。库函数和着色器的完成度在项目主页有实时徽章（boykopovar.github.io/AnyPS5），系统库那个百分比是「已声明的函数里项目已知的比例」，不是「所有 PS5 系统函数的比例」——总数会随着函数声明增加而涨。
+| 阶段 | 款数 |
+|---|---|
+| Playable | 4 |
+| Ingame | 3 |
+| Menus | 16 |
+| Presents | 69 |
+| First draw | 2 |
+| Starts | 53 |
+| Converts | 26 |
+
+已到 **Playable** 的 4 款是 Animal Well、Dreaming Sarah、Hollow Knight: Silksong、Road of Death；另有 23 款进到菜单，71 款仍有未解阻塞项。Dreaming Sarah 那条老实测没被丢掉，地图把它作为「存档自已移除的 COMPATIBILITY.md」保留了下来：GTX 1050 Ti / i5-7500 稳定 60 FPS，Intel HD Graphics 620 / i5-7200 36 FPS。
+
+要留意地图自己的声明：**社区项目，建在公开 GitHub 数据上，不是官方页面**，每个阶段都能追到它的来源。
+
+库函数和着色器的完成度仍在官方进度页上有徽章（boykopovar.github.io/AnyPS5/progress.html），系统库那个百分比是「已声明的函数里项目已知的比例」，不是「所有 PS5 系统函数的比例」——总数会随着函数声明增加而涨。
 
 **看这个百分比要理解它的增长方式。** 它衡量的是已知覆盖，不是完成度目标。
 
@@ -4643,14 +4655,20 @@ Linux 那一栏是官方自己标的问号。库函数和着色器的完成度�
         {
           kind: "link",
           title: "已验证游戏兼容列表",
-          url: "https://github.com/boykopovar/AnyPS5/blob/main/docs/user/COMPATIBILITY.md",
-          note: "很短——只有 Dreaming Sarah 一行，附两套硬件的实测帧率。决定是否投入时间前先看这个。",
+          url: "https://github.com/boykopovar/AnyPS5#compatibility",
+          note: "原先是独立的 docs/user/COMPATIBILITY.md（只有 Dreaming Sarah 一行），该文件已被上游删除；现在改由 README 的 Compatibility 一节指向社区维护的 blocker map 与 Game bring-up 讨论区。",
         },
         {
           kind: "link",
           title: "技术债清单（53KB）",
           url: "https://github.com/boykopovar/AnyPS5/blob/main/docs/dev/TechnicalDebt.md",
           note: "了解项目真实状态最有价值的一份文档：哪些部分还是近似实现、哪些会抛 runtime_error，都在这里。",
+        },
+        {
+          kind: "link",
+          title: "社区 blocker map：逐游戏阶段、阻塞项与库/GPU 覆盖",
+          url: "https://alxcbtw.github.io/anyps5-roadmap/",
+          note: "非官方页面，但比官方 README 那句「只有一款测试过」准确得多：截至 2026-10-14 跟踪 215 款、4 款到 Playable、71 款仍有未解阻塞项。Dreaming Sarah 的老实测也被它存档保留。",
         },
       ],
     },
@@ -10462,10 +10480,14 @@ BFS / DFS / best-first 三种策略，长任务有 \`resume_state\` 断点恢复
     source: "opensource",
     tags: ["AI 代理", "深度研究", "LangGraph", "开源"],
     body: "DeerFlow 2.0 是一次彻底重写，和 1.x 不共用代码——原来那个 Deep Research 框架还在 `main-1.x` 分支上维护，2.0 的定位是 super agent harness：用子代理、记忆（DeerMem 做记忆抽取）、沙箱和可扩展技能去接「几分钟到几小时」的长任务，不再只是产出一份研究报告。它建在 LangGraph 上，前端有项目、文档架、定时任务、终端 TUI 这一整套，私有知识检索还能接 RAGFlow。\n上手路径是 `git clone` 后 `make setup`：一个交互向导，让你选 LLM provider、可选的联网搜索，以及沙箱模式、bash 访问、文件写工具这类执行与安全偏好，生成最小 `config.yaml` 并把 key 写进 .env，约两分钟。之后随时 `make doctor` 验环境，要提 issue 就跑 `make support-bundle`（生成可直接粘进 issue 的摘要、AI 草稿与诊断 zip，且不含 .env、原始对话和用户文件内容）。\n两个要提前知道的坑。一是**安全**：README 单独写了一节，说部署不当会引入安全风险，网关管理员权限等同代码执行，外部聊天消息的角色也当作不可信输入处理。二是**委托式抓取后端**：自托管的 Browserless、Crawl4AI、Firecrawl、fastCRW 默认会被拒绝，必须先确认出站隔离（私有网段、loopback、链路本地、云元数据）再设 `network_isolation_confirmed: true`，因为重定向、DNS 和子资源都是这些服务自己处理的；`make doctor` 会列出会被拒的配置。另外 InfoQuest 的 reader / 网页搜索 / 图片搜索用的是 30 秒 HTTP 连接与读取不活动超时，抓取的 `timeout`、`navigation_timeout` 是另一组服务端选项，别混着调。",
-    officialUrl: "https://deerflow.tech",
-    officialLabel: "deerflow.tech",
+    // 【临时】官网 https://deerflow.tech 的 TLS 证书 2026-10-11 过期，访问直接报
+    // SEC_E_CERT_EXPIRED，暂时把 official 指向仓库，免得访客点进去先撞证书警告。
+    // 上游续期后要换回三处：officialUrl / officialLabel / links.official，以及
+    // 教程里那条「官网与真实案例」资源。
+    officialUrl: "https://github.com/bytedance/deer-flow",
+    officialLabel: "github.com/bytedance/deer-flow",
     links: {
-      official: "https://deerflow.tech",
+      official: "https://github.com/bytedance/deer-flow",
       github: "https://github.com/bytedance/deer-flow",
     },
     whoFor: "想自己搭一个能跑长任务（调研 + 编码 + 产出）的代理系统的人，尤其已经熟悉 LangGraph、愿意自己管配置与部署的团队。",
@@ -10540,9 +10562,9 @@ InfoQuest 的 reader、网页搜索、图片搜索用的是 **30 秒 HTTP 连接
       resources: [
         {
           kind: "html",
-          title: "官网与真实案例",
-          url: "https://deerflow.tech",
-          note: "落地页的案例以只读白名单方式开放，不用登录就能看。判断它能不能干你的活，先看案例。",
+          title: "仓库首页与案例入口",
+          url: "https://github.com/bytedance/deer-flow",
+          note: "【临时】官网 deerflow.tech 证书 2026-10-11 过期不可用，先指向仓库首页；续期后应换回官网——那里有不登录就能看的案例白名单。",
         },
         {
           kind: "html",
@@ -12223,4 +12245,105 @@ yarn dev:collector
     alternatives: ["syncthing"],
     icon: { letter: "K", color: "#0071e3", simpleIcon: "keepassxc" },
   },
+  {
+    license: "GPL-2.0-or-later",
+    slug: "dolphin",
+    linksCheckedAt: "2026-10-15",
+    name: "Dolphin",
+    nameZh: "Dolphin 模拟器",
+    aliases: ["dolphin", "dolphin emu", "海豚模拟器", "gamecube 模拟器", "wii 模拟器"],
+    kind: "opensource",
+    source: "opensource",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    tags: ["模拟器", "GameCube", "Wii", "开源"],
+    summary: "开源 GameCube 与 Wii 模拟器，在 Windows、macOS、Linux 上跑这两台主机的游戏，支持提升内部分辨率、宽屏修正与即时存档。",
+    body: "Dolphin 是 GameCube 与 Wii 的模拟器，把这两台停产主机的游戏搬到电脑上运行。它解决的是「实机早已买不到、老光盘难读」这件事——模拟器本身不含任何游戏，游戏镜像与 Wii 系统固件都需要你自己准备。\n\n常用能力都对着实际玩游戏的流程来：内部分辨率可以拉到远超原生的 480p，并支持宽屏修正与部分游戏的纹理替换；随时存读档、录制回放；视频后端可选 Direct3D 12、Vulkan 与 OpenGL，音频有 HLE（快）与 LLE（准）两档 DSP 模拟可切；手柄与体感 Wiimote 都能映射，Android 版与桌面版在同一仓库维护。命令行工具 dolphin-tool 能转换与校验镜像格式（RVZ、ISO、GCZ、WIA），批量归档比图形界面省事。\n\n代价要先算清楚：硬件门槛不低，官方建议 2008 年以后的双核 3GHz 处理器与支持 Direct3D 11.1 / OpenGL 3.3 的显卡，机器太旧掉帧会很明显；不同显卡驱动对 OpenGL 的支持差异直接影响帧率，AMD 与 NVIDIA 的推荐后端并不一样；游戏镜像与固件要你自己保证来源合法，项目不提供也不代为获取；部分 Wii 游戏依赖原机固件文件，缺失时模拟器只给出提示，不会替你补齐。\n\n仓库 COPYING 写明 Dolphin 自有代码按 GPLv2 及以后版本授权，整体与 GPLv3 兼容；官网提供 Windows、macOS、Linux 三平台安装包。",
+    officialUrl: "https://dolphin-emu.org",
+    officialLabel: "dolphin-emu.org",
+    links: {
+      official: "https://dolphin-emu.org",
+      github: "https://github.com/dolphin-emu/dolphin",
+    },
+    price: "免费",
+    installTips: [
+      "从官网下载页取对应系统的安装包；Windows 有安装器与免安装包，macOS 取 .dmg，Linux 可用发行版仓库或自行编译。",
+      "首次启动先在图形设置里挑视频后端，NVIDIA 与 AMD 优先试 Vulkan 或 Direct3D 12，出问题再退回 OpenGL。",
+      "在 Paths 设置里把游戏目录加进去，列表会自动扫描；Wii 游戏还需要指定系统固件所在目录。",
+      "接上手柄做按键映射；帧率不稳先降内部分辨率、关掉抗锯齿，再考虑切换 DSP 的 HLE / LLE 档位。",
+    ],
+    whoFor: "想在电脑上跑 GameCube 或 Wii 作品、需要比实机更高的内部分辨率与更方便的存档的人。",
+    whoNot: "手上没有可用的游戏镜像与 Wii 固件、又不想自己准备的人；显卡只支持老版本 OpenGL 的机器上，帧率会明显不如预期。",
+    alternatives: ["pcsx2", "rpcs3"],
+    icon: { letter: "D", color: "#1f6fb2", simpleIcon: "dolphin" },
+  },
+  {
+    license: "GPL-3.0",
+    version: "2.8.2",
+    slug: "pcsx2",
+    linksCheckedAt: "2026-10-15",
+    name: "PCSX2",
+    nameZh: "PCSX2 模拟器",
+    aliases: ["pcsx2", "ps2 模拟器", "ps2 emulator", "playstation 2 模拟器"],
+    kind: "opensource",
+    source: "opensource",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    tags: ["模拟器", "PlayStation 2", "PS2", "开源"],
+    summary: "开源 PlayStation 2 模拟器，在 Windows、macOS、Linux 上跑 PS2 游戏，配有 2500 多款作品的兼容性列表，稳定版与 nightly 双线发布。",
+    body: "PCSX2 是 PlayStation 2 模拟器，让 PS2 游戏能在电脑上以更高分辨率和更省心的存档方式运行。模拟器本身不带游戏，运行前需要用自己主机导出的 BIOS 转储文件。\n\n项目开发已超过二十年，如今多数商业作品能跑到满速，官方兼容性列表收录 2500 多款游戏并逐条标注状态；支持内部分辨率提升、逐游戏独立配置、即时存档与录像回放；图形后端覆盖 Vulkan、Direct3D 与 OpenGL；发布分稳定版与每日 nightly 两条线，nightly 先拿到修复与新功能，也更容易遇到回归。\n\n要注意几件事：BIOS 转储必须来自你自己的主机，模拟器不提供也不会替你找；兼容性按游戏差异很大，冷门作品仍可能碰到画面或音频问题，收录前先去兼容性列表确认现状；nightly 更新频繁，出问题要能退回稳定版，两种构建也别共用一份配置目录；对显卡驱动版本敏感，驱动过旧可能直接启动失败而不是降级运行。\n\n仓库的 COPYING.GPLv3 是 GPLv3 全文，GitHub 检测同样标为 GPL-3.0，许可证未写明是否允许后续版本，以仓库声明为准；官网提供 Windows、macOS、Linux 三平台安装包，Linux 另有 AppImage 与发行版包。",
+    officialUrl: "https://pcsx2.net",
+    officialLabel: "pcsx2.net",
+    links: {
+      official: "https://pcsx2.net",
+      github: "https://github.com/PCSX2/pcsx2",
+    },
+    price: "免费",
+    installTips: [
+      "从官网下载页取安装包，稳定版与 nightly 二选一；Linux 可用 AppImage 或发行版仓库。",
+      "首次启动按向导把 BIOS 转储文件放到指定目录，来源必须是你自己的 PS2 主机。",
+      "把游戏所在目录加进游戏列表，右键单个游戏可以建独立的图形与按键配置。",
+      "遇到画面或音频异常，先查官方兼容性列表里这款游戏的状态，再逐项改图形后端与内部分辨率。",
+    ],
+    whoFor: "想用更高分辨率、即时存档和录像回放玩 PS2 作品，并且能自己准备主机 BIOS 转储的人。",
+    whoNot: "拿不到 BIOS 转储的人；以及期待装完就能玩的人——PS2 游戏的兼容性因作品而异，逐游戏调设置几乎是常态。",
+    alternatives: ["dolphin", "rpcs3"],
+    icon: { letter: "P", color: "#5b47a5" },
+  },
+  {
+    license: "GPL-2.0-only",
+    version: "0.0.43",
+    slug: "rpcs3",
+    linksCheckedAt: "2026-10-15",
+    name: "RPCS3",
+    nameZh: "RPCS3 模拟器",
+    aliases: ["rpcs3", "ps3 模拟器", "ps3 emulator", "playstation 3 模拟器"],
+    kind: "opensource",
+    source: "opensource",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    tags: ["模拟器", "PlayStation 3", "PS3", "开源"],
+    summary: "开源 PlayStation 3 模拟器与调试器，是这类工具里最早的开源实现，Windows、Linux、macOS、FreeBSD 都能跑，兼容性按游戏在官方 Wiki 逐条维护。",
+    body: "RPCS3 是 PlayStation 3 的模拟器兼调试器，除了把游戏跑起来，还能连上官方调试接口查看线程、内存与图形指令。它不含任何游戏，游戏文件需要你自己准备。\n\n官方 Wiki 逐游戏维护兼容性状态，论坛与 Discord 是主要反馈渠道；图形后端有 Vulkan 与 OpenGL 可选，支持内部分辨率缩放与逐游戏独立配置；Windows 上需要 Visual C++ 2022 运行库与较新的显卡驱动，缺一项就起不来；除 Windows、Linux、macOS 外还有 FreeBSD 构建。\n\nPS3 的 Cell 架构靠多线程动态重编译来模拟，同一款游戏在不同 CPU 上帧率差别很大，单核性能尤其吃紧；部分作品依赖特定固件版本，项目不提供固件文件；兼容性列表逐游戏维护，意味着冷门作品的问题由志愿者按优先级修复，遇到卡死先去 Wiki 查该作状态和推荐配置，比自己乱调参数有效。\n\n仓库 LICENSE 是 GPL-2.0 全文，README 注明多数文件按 GPL-2.0-only 授权、个别文件许可不同以文件头为准；官网提供 Windows 与 Linux 安装包，macOS 与 FreeBSD 需按仓库里的构建文档自行编译。",
+    officialUrl: "https://rpcs3.net/",
+    officialLabel: "rpcs3.net",
+    links: {
+      official: "https://rpcs3.net/",
+      github: "https://github.com/RPCS3/rpcs3",
+    },
+    price: "免费",
+    installTips: [
+      "从官网下载页取 Windows 或 Linux 安装包；macOS 与 FreeBSD 需按仓库里的构建文档自行编译。",
+      "Windows 上先装 Visual C++ 2022 运行库并把显卡驱动更新到较新版本，否则启动会直接失败。",
+      "首次启动后把固件文件放到指定目录，再把游戏所在目录加进列表。",
+      "默认设置跑不动时，先查官方 Wiki 里这款游戏的兼容性与推荐配置，再逐项调图形后端与内部分辨率。",
+    ],
+    whoFor: "想在自己机器上跑 PS3 作品、并愿意按 Wiki 逐游戏核对兼容性与设置项的人。",
+    whoNot: "CPU 偏弱又不接受逐游戏调参的人；想要一份配置通吃所有游戏的话，PS3 模拟目前的兼容性水平还达不到。",
+    alternatives: ["dolphin", "pcsx2"],
+    icon: { letter: "R", color: "#c0392b" },
+  },
+
+
+
 ];
