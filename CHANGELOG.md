@@ -1,5 +1,47 @@
 # 变更记录
 
+## 2026-10-15 · GitHub 热门实用项目净增 50 条（110 → 160）
+
+上一批说完「按场景最薄选」，这批直接把库存拉到均线：先写 `data/inbox/plan-50/manifest.json`
+按「场景最薄」而非星数分配名额，再按「每批 ≤10 条、一个场景一批」执行，共 11 批、净增 50 条。
+
+| 场景 | 前 → 后 | 场景 | 前 → 后 |
+| --- | --- | --- | --- |
+| 音乐 | 4 → 13 | 游戏 | 7 → 10 |
+| 社交 | 5 → 13 | 办公 | 17 → 20 |
+| 教育 | 7 → 14 | 数据 | 24 → 27 |
+| 摄影与录像 | 10 → 15 | 文档 | 15 → 17 |
+| 设计 | 11 → 16 | 开发 | 55 → 56 |
+| 制图 | 14 → 18 | | |
+
+**许可证一律按仓库 `LICENSE` 原文判读，不抄 GitHub 头部**——这次头部错报的地方就有六处：
+musescore / sonic-pi 头部 `NOASSERTION`（原文 GPL-3.0；sonic-pi 为混合许可，正文写明主源码 MIT、
+Web 版与引擎 AGPL、GUI 二进制含 GPL）；mattermost 头部 `NOASSERTION`（原文按编译版 MIT、
+源码 AGPL-3.0 或商业，记 `MIT OR AGPL-3.0`）；photoprism 头部 `NOASSERTION`（原文 AGPL-3.0）；
+d2 采集器误报 `GPL-3.0`（原文 `MPL-2.0`，因 MPL 的 Secondary License 段提到 GPL）；
+DuckStation 原文明为 `CC-BY-NC-ND-4.0`（非 OSI、禁商用禁演绎）——按 SKILL「判据是许可证，
+不是仓库是否可见」，这一条归 `source: official` / `kind: app` 而非 `opensource`。
+
+**校验脚本被这次收录推进了一步。** `npm run check` 收尾首报 2 条失败：`you-dont-know-js` 的
+`CC-BY-NC-ND-4.0` 在 `lib/license-info.ts` 里没有对应人话，前台会静默不显示。补上该表项后
+218 pass / 0 fail（duckstation 复用同一条）。
+
+**已知风险都写进正文第 3 段，不因「不好看」省略**：模拟器（shadPS4 / DuckStation / Lutris）
+写清只提供程序本体、游戏镜像与固件需自备且来源自行保证合法；自托管类（Navidrome / Mastodon /
+PhotoPrism / Stirling-PDF / Gitea 等）写部署运维与存储成本、联邦治理、规模上限；
+`30-days-of-python` 仓库没有 `LICENSE` 文件，license 如实留空、风险写进正文；
+`tldraw` 为自定义非 OSI 许可（生产需 license key、不得作为独立产品分发），license 留空、限制写正文。
+
+**教程口径**：这 50 条一律只写 `tutorial`（怎么开始），**不写 `guide`**——没有实机验证，
+按「实测过的才写」宁缺勿编。因此 `详细教程` 缺口从 15 涨到 65，这是刻意留下的债，不是遗漏。
+
+**录入与验收（每批固定走一遍）**：`collect` → `draft-from-inbox` → 人工写 `draft.json` →
+合成单批次文件 `ingest --dry-run --strict`（同批互挂 `alternatives` 必须一次校验）→ 0 错误 →
+正式写入 → `seed:upsert` → `seed:drift` 报 0 不一致 → `npm run check` → dev server 真实环境
+`smoke:detail` 0 异常 → 按路径 `git commit`（不卷入在途改动）。11 批各提交一次；
+全部收尾再跑一次全量 `smoke:detail` 覆盖这 50 个新 slug：**50 个详情页 0 异常**。
+写库前用 `root` 手导备份 `backups/manual-20261015-192038.sql`（809KB，exit 0）。
+
 ## 2026-10-15 · games 场景补三个主机模拟器（107 → 110）
 
 `content:audit` 的场景盘点显示 games 只有 4 条，是当时最薄的场景；而上一批（bot 40 条）已经把
