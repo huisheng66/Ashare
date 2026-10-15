@@ -107,6 +107,13 @@ const FLAKY = new Map([
   ["jasp-stats.org", "同上，403 是误报（2026-09-28 人工确认）"],
   ["texstudio.org", "本机代理隧道超时，站点活着（2026-09-28 人工确认）"],
   ["gimp.org", "同上，代理超时（2026-09-28 人工确认）"],
+  // 2026-10-14 追加：这四类在 CI 上稳定误报，逐条本机复核过，站点都活着。
+  // 判据与上面一致 —— 只有「本机可达 + CI 必失败」才配进这张表；
+  // 真挂了（404 / 证书过期）一律留在表外，让流水线照旧变红。
+  ["pan.quark.cn", "网盘分享链，GitHub runner 连不上（ETIMEDOUT），本机 200（2026-10-14 人工确认）"],
+  ["docs.vllm.ai", "Mintlify 对 runner 限流 429，本机 200（2026-10-14 人工确认）"],
+  ["heroicgameslauncher.com", "站前 WAF 拦自动化 403，本机 200（2026-10-14 人工确认）"],
+  ["npmjs.com", "npmjs 拦自动化 403，包在 registry 上 200（2026-10-14 人工确认）"],
 ]);
 
 async function probe(url, args) {

@@ -57,7 +57,7 @@ const EXPECT = {
   "scripts/stale-links.mjs:65": ["必须配合"],
   "scripts/stale-links.mjs:87": ["catalogFromSeed"],
   "scripts/stale-links.mjs:88": ["seedToItem"],
-  "scripts/stale-links.mjs:251": ["every((r) => r.ok)"],
+  "scripts/stale-links.mjs:258": ["every((r) => r.ok)"],
   "app/media/[...path]/route.ts:18": ["export async function GET"],
   "app/media/[...path]/route.ts:27": ["decideHotlink"],
   "app/media/[...path]/route.ts:25": ["hotlinkOptionsFromEnv"],
