@@ -114,6 +114,16 @@ const FLAKY = new Map([
   ["docs.vllm.ai", "Mintlify 对 runner 限流 429，本机 200（2026-10-14 人工确认）"],
   ["heroicgameslauncher.com", "站前 WAF 拦自动化 403，本机 200（2026-10-14 人工确认）"],
   ["npmjs.com", "npmjs 拦自动化 403，包在 registry 上 200（2026-10-14 人工确认）"],
+  // 2026-10-21 追加：收录 50 个新条目后 CI 暴露出来的一批，逐条用真实浏览器复核过。
+  // 前四条是 WAF/地区性拦截；hello-algo 是限流；pixelfed 是本地区出口被 Cloudflare
+  // 判 521，换境外出口能取到完整首页；arstechnica 是 Akamai 人机验证。真 404 不在这里。
+  ["dolphin-emu.org", "WAF 拦自动化 403（浏览器打开正常，跳 cn.dolphin-emu.org）（2026-10-21 确认）"],
+  ["rpcs3.net", "Cloudflare 挑战页拦自动化 403，站点活着（2026-10-21 确认）"],
+  ["misskey-hub.net", "CI runner 403，本机 curl 200，浏览器打开正常（2026-10-21 确认）"],
+  ["usememos.com", "同上，CI runner 403，本机 200（2026-10-21 确认）"],
+  ["hello-algo.com", "站点限流 429，本机与 CI 都触发，浏览器打开正常（2026-10-21 确认）"],
+  ["pixelfed.org", "本地区出口 Cloudflare 521，境外出口取到完整首页（2026-10-21 确认）"],
+  ["arstechnica.com", "Akamai 人机验证拦自动化（本机 405 / CI 503），浏览器停在验证页，仅确认站点在线（2026-10-21 确认）"],
 ]);
 
 async function probe(url, args) {
