@@ -10,6 +10,7 @@ import { SoftwareCard } from "@/components/SoftwareCard";
 import { Button } from "@/components/ui/button";
 import { catalogCounts, searchCatalog } from "@/lib/catalog";
 import { parseCatalogPage, searchQueryParam, type PageSearchParams } from "@/lib/catalog-query";
+import { highlightTermsOf } from "@/lib/highlight";
 import { nameSuggestions, taskSuggestions } from "@/lib/navigation";
 
 export const metadata: Metadata = {
@@ -46,6 +47,7 @@ export default async function SearchPage({ searchParams }: Props) {
   const query = searchQueryParam(params.q);
   // 搜索与分页都下推：不再把整份目录读进内存再打分。
   const [results, counts] = await Promise.all([searchCatalog(query, parseCatalogPage(params)), catalogCounts()]);
+  const terms = highlightTermsOf(query);
 
   const pageHref = (target: number) => {
     const next = new URLSearchParams();
@@ -76,6 +78,7 @@ export default async function SearchPage({ searchParams }: Props) {
             {results.total ? (
               <>
                 找到 <span className="font-semibold text-foreground tabular-nums">{results.total}</span> 款，按相关度排列
+                {results.fuzzy ? <span className="ml-1">（严格匹配没有结果，以下是放宽后的相近项）</span> : null}
               </>
             ) : (
               "没有找到匹配的工具"
@@ -86,7 +89,7 @@ export default async function SearchPage({ searchParams }: Props) {
               <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {results.items.map((item) => (
                   <li key={item.slug} className="flex *:flex-1">
-                    <SoftwareCard item={item} headingLevel={2} />
+                    <SoftwareCard item={item} headingLevel={2} highlightTerms={terms} />
                   </li>
                 ))}
               </ul>
@@ -128,7 +131,9 @@ export default async function SearchPage({ searchParams }: Props) {
                   </>
                 }
               >
-                用更短的名称或常用别名，或者直接写要做的事。没收录的工具，也欢迎推荐给我们。
+                用更短的名称或常用别名，或者直接写要做的事。也支持拼音和首字母——比如输入{" "}
+                <span className="font-medium text-foreground">tupian</span> 或{" "}
+                <span className="font-medium text-foreground">tp</span> 找「图片」类工具。没收录的工具，也欢迎推荐给我们。
               </EmptyState>
               <TermList label="大家常搜" terms={taskSuggestions} />
             </div>

@@ -42,6 +42,7 @@ function bundleOf(overrides = {}) {
     guide_intro: null,
     guide_markdown: null,
     search_text: "派生字段不该进差异",
+    search_pinyin: "派生字段不该进差异",
     created_at: "2026-01-01T00:00:00.000Z",
     updated_at: "2026-01-01T00:00:00.000Z",
     ...overrides,
@@ -64,7 +65,7 @@ function bundleOf(overrides = {}) {
 const norm = (bundle) => JSON.parse(JSON.stringify(bundle));
 
 /**
- * 比对时排除派生字段（search_text / updated_at）。
+ * 比对时排除派生字段（search_text / search_pinyin / updated_at）。
  *
  * 它们不进 payload —— 因为每次都变，记进差异是噪音，重放时重算即可。
  * 所以「内容是否一致」这个问题上不该拿它们当判据；但它们**必须存在**，
@@ -72,7 +73,7 @@ const norm = (bundle) => JSON.parse(JSON.stringify(bundle));
  */
 const content = (bundle) => ({
   ...bundle,
-  item: { ...bundle.item, search_text: null, updated_at: null },
+  item: { ...bundle.item, search_text: null, search_pinyin: null, updated_at: null },
 });
 
 function revisionOf(rowVersion, payload, kind = payload.kind) {
@@ -96,6 +97,7 @@ test("首版存完整快照，之后只存差异", () => {
   assert.equal(baseline.kind, "snapshot");
   /** 每次都变的派生字段不进快照 —— 重放时重算。 */
   assert.equal("search_text" in baseline.columns, false);
+  assert.equal("search_pinyin" in baseline.columns, false);
   assert.equal("row_version" in baseline.columns, false);
   assert.equal("updated_at" in baseline.columns, false);
   /**
@@ -155,13 +157,14 @@ test("重放到任意版本，结果与当时的实际状态逐字段相同", ()
   for (const [version, expected] of [[1, v1], [2, v2], [3, v3], [4, v4]]) {
     const restored = replay(revisions, version);
     assert.deepEqual(
-      // search_text 与 updated_at 不进 payload（派生字段），重放时重算。
-      // 所以比对时要排除它们 —— 它们的值由 searchTextOf 决定，不该在这里重复断言。
-      norm({ ...restored, item: { ...restored.item, search_text: null, updated_at: null } }),
-      norm({ ...expected, item: { ...expected.item, search_text: null, updated_at: null } }),
+      // search_text / search_pinyin / updated_at 不进 payload（派生字段），重放时重算。
+      // 所以比对时要排除它们 —— 它们的值由 searchTextOf / searchPinyinOf 决定，
+      // 不该在这里重复断言。
+      norm({ ...restored, item: { ...restored.item, search_text: null, search_pinyin: null, updated_at: null } }),
+      norm({ ...expected, item: { ...expected.item, search_text: null, search_pinyin: null, updated_at: null } }),
       `重放到第 ${version} 版应与实际完全一致`,
     );
-    // 但派生字段必须**存在** —— 丢了它前台「最近更新」会拿到空值。
+    // 但派生字段必须**存在** —— 丢了它前台「最近更新」会拿到空值、拼音搜索会失效。
     assert.equal(typeof restored.item.search_text, "string");
     assert.ok(restored.item.updated_at, "updated_at 也要还原出来");
   }

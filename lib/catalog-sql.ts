@@ -283,7 +283,62 @@ function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, (character) => "\\" + character);
 }
 
-export type SearchResult = { items: CatalogItem[]; total: number };
+export type SearchResult = {
+  items: CatalogItem[];
+  total: number;
+  /** true 表示严格匹配无结果、已放宽为 OR 语义（容错降级）。调用方据此提示读者。 */
+  fuzzy: boolean;
+};
+
+/**
+ * 原文召回条件（search_text）。strict=true 时每个词都必须命中（布尔模式的 + 前缀）；
+ * strict=false 去掉 + 变成 OR 语义，用于零结果时的容错降级。
+ */
+function textRecall(longTerms: string[], shortTerms: string[], query: string, strict: boolean) {
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+  if (longTerms.length) {
+    conditions.push("MATCH(i.search_text) AGAINST(? IN BOOLEAN MODE)");
+    params.push(longTerms.map((term) => (strict ? "+" : "") + term).join(" "));
+  }
+  for (const term of shortTerms) {
+    conditions.push("i.search_text LIKE ?");
+    params.push("%" + escapeLike(term) + "%");
+  }
+  // 输入全是符号时上面两条都不成立，退化成整体包含匹配，而不是返回全部。
+  if (!conditions.length) {
+    conditions.push("i.search_text LIKE ?");
+    params.push("%" + escapeLike(query) + "%");
+  }
+  return { where: "(" + conditions.join(" AND ") + ")", params };
+}
+
+/**
+ * 拼音召回条件（search_pinyin，独立列）。只处理长词 —— 拼音列里是字母，单字符没有意义。
+ *
+ * 命中即返回，但**不参与排序打分**：排序里没有它的相关度项。这是刻意的 ——
+ * 拼音是为了「让 tupian 也能找到图片」，不是为了把拼音命中排到真名命中前面。
+ */
+function pinyinRecall(longTerms: string[], strict: boolean) {
+  if (!longTerms.length) return { where: "(1 = 0)", params: [] as unknown[] };
+  return {
+    where: "(MATCH(i.search_pinyin) AGAINST(? IN BOOLEAN MODE))",
+    params: [longTerms.map((term) => (strict ? "+" : "") + term).join(" ")],
+  };
+}
+
+/**
+ * 名称命中分档，作 ORDER BY 第一优先级：精确 → 前缀 → 包含 → 别名 → 其他。
+ *
+ * 比只判 name 更细：中文名（name_zh）与别名的命中现在也能拔高，
+ * 与内存实现 lib/items.ts 的 200/120/100/90 档位保持同一取向。
+ * name_zh 可为 NULL，`= ?` 与 `LIKE ?` 对 NULL 都返回 false，无需额外处理。
+ */
+const NAME_RANK =
+  "CASE WHEN i.name = ? OR i.name_zh = ? THEN 0 " +
+  "WHEN i.name LIKE ? OR i.name_zh LIKE ? THEN 1 " +
+  "WHEN i.name LIKE ? OR i.name_zh LIKE ? THEN 2 " +
+  "WHEN i.aliases LIKE ? THEN 3 ELSE 4 END ASC";
 
 /**
  * 目录搜索。
@@ -292,14 +347,18 @@ export type SearchResult = { items: CatalogItem[]; total: number };
  *  - 检索字段是 items.search_text（名称 + 中文名 + 别名 + 标签 + 简介），**不含长正文**。
  *    旧的内存实现还会扫 body / whoFor / whoNot，因此只在正文里出现的词搜不到了 —— 这是
  *    「把 5 万字的正文塞进全文索引」换来的取舍，不是疏漏。
- *  - 每个词都必须命中（AND），与旧实现一致；布尔模式的 "+" 前缀就是这个意思。
- *  - 排序：先按名称命中程度分档（精确 → 前缀 → 包含），再按全文相关度，最后回到目录顺序。
+ *  - 召回有两条通道：search_text（原文）与 search_pinyin（拼音，独立列）。
+ *    两条都是「每个词都必须命中」（AND），彼此之间是 OR —— 原文命中或拼音命中都算。
+ *    拼音通道只影响**能否召回**，不进排序，避免稀释原文的相关度。
+ *  - 排序：先按名称命中程度分档（精确 → 前缀 → 包含 → 别名），再按全文相关度，最后回到目录顺序。
+ *  - 容错：严格 AND 查不到时，降级为 OR 语义重查一次（去掉布尔 + 前缀），
+ *    结果以 fuzzy=true 标记。这样「ollma」这类少打一个字的查询也能救回来。
  *  - 短于 2 字的词走 LIKE，无法用索引，是一次全表扫描；短查询本来就少，且 5 万条量级可接受。
  *    要根治得调小 ngram_token_size（索引膨胀）或上独立搜索引擎。
  */
 export async function searchCatalog(raw: string, limit: number, offset: number): Promise<SearchResult> {
   const query = normalizeQuery(raw);
-  if (!query) return { items: [], total: 0 };
+  if (!query) return { items: [], total: 0, fuzzy: false };
 
   const longTerms: string[] = [];
   const shortTerms: string[] = [];
@@ -310,44 +369,40 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
     else shortTerms.push(term);
   }
 
-  const conditions = ["i.status = 'published'"];
-  const whereParams: unknown[] = [];
-  if (longTerms.length) {
-    conditions.push("MATCH(i.search_text) AGAINST(? IN BOOLEAN MODE)");
-    whereParams.push(longTerms.map((term) => "+" + term).join(" "));
-  }
-  for (const term of shortTerms) {
-    conditions.push("i.search_text LIKE ?");
-    whereParams.push("%" + escapeLike(term) + "%");
-  }
-  // 输入全是符号时上面两条都不成立，退化成整体包含匹配，而不是返回全部。
-  if (!longTerms.length && !shortTerms.length) {
-    conditions.push("i.search_text LIKE ?");
-    whereParams.push("%" + escapeLike(query) + "%");
-  }
-  const condition = conditions.join(" AND ");
+  const run = (strict: boolean): Promise<SearchResult> => {
+    const text = textRecall(longTerms, shortTerms, query, strict);
+    const pinyin = pinyinRecall(longTerms, strict);
+    const condition = "i.status = 'published' AND (" + text.where + " OR " + pinyin.where + ")";
+    const whereParams = [...text.params, ...pinyin.params];
 
-  return withConnection(async (conn) => {
-    const [countRows] = await conn.query<RowDataPacket[]>(
-      "SELECT COUNT(*) AS c FROM items i WHERE " + condition,
-      whereParams,
-    );
-    const total = Number(countRows[0].c);
-    if (!total) return { items: [], total: 0 };
+    return withConnection(async (conn) => {
+      const [countRows] = await conn.query<RowDataPacket[]>(
+        "SELECT COUNT(*) AS c FROM items i WHERE " + condition,
+        whereParams,
+      );
+      const total = Number(countRows[0].c);
+      if (!total) return { items: [], total: 0, fuzzy: !strict };
 
-    const orderParams: unknown[] = [query, escapeLike(query) + "%", "%" + escapeLike(query) + "%"];
-    let order =
-      "CASE WHEN i.name = ? THEN 0 WHEN i.name LIKE ? THEN 1 WHEN i.name LIKE ? THEN 2 ELSE 3 END ASC";
-    if (longTerms.length) {
-      order += ", MATCH(i.search_text) AGAINST(? IN BOOLEAN MODE) DESC";
-      orderParams.push(longTerms.map((term) => "+" + term).join(" "));
-    }
-    order += ", i.sort_index ASC, i.id ASC";
+      const like = escapeLike(query);
+      const orderParams: unknown[] = [
+        query, query, like + "%", like + "%", "%" + like + "%", "%" + like + "%", "%" + like + "%",
+      ];
+      let order = NAME_RANK;
+      if (longTerms.length) {
+        order += ", MATCH(i.search_text) AGAINST(? IN BOOLEAN MODE) DESC";
+        orderParams.push(longTerms.map((term) => "+" + term).join(" "));
+      }
+      order += ", i.sort_index ASC, i.id ASC";
 
-    const [rows] = await conn.query<RowDataPacket[]>(
-      "SELECT " + CARD_COLUMNS + " FROM items i WHERE " + condition + " ORDER BY " + order + " LIMIT ? OFFSET ?",
-      [...whereParams, ...orderParams, limit, offset],
-    );
-    return { items: await toCards(conn, rows), total };
-  });
+      const [rows] = await conn.query<RowDataPacket[]>(
+        "SELECT " + CARD_COLUMNS + " FROM items i WHERE " + condition + " ORDER BY " + order + " LIMIT ? OFFSET ?",
+        [...whereParams, ...orderParams, limit, offset],
+      );
+      return { items: await toCards(conn, rows), total, fuzzy: !strict };
+    });
+  };
+
+  const strict = await run(true);
+  if (strict.total) return strict;
+  return run(false);
 }

@@ -72,7 +72,15 @@ function normalizeSearchText(value: string): string {
   return value.normalize("NFKC").toLowerCase().replace(/\s+/gu, " ").trim();
 }
 
-/** 支持全角输入、连续空白与跨字段多关键词；每个词都必须命中。 */
+/**
+ * 支持全角输入、连续空白与跨字段多关键词；每个词都必须命中。
+ *
+ * **本函数不支持拼音召回**，这是刻意的：拼音要靠 pinyin-pro，而本模块被多个客户端组件
+ * 引入（CatalogBrowser / FilterPanel 等），在这里 import 会把约 950KB 的拼音库打进
+ * 客户端包。拼音召回只做在 SQL 主路径（lib/catalog-sql.ts 的 search_pinyin 列）。
+ * 本函数是 STORE_DRIVER=json 的**回滚路径**，少这一项能力可以接受 ——
+ * 与它「反而多扫 body」的既有差异同属一类，都如实记录而非假装一致。
+ */
 export function searchSoftware(query: string, items: Software[]): Software[] {
   const needle = normalizeSearchText(query);
   if (!needle) return items;

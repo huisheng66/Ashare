@@ -110,6 +110,55 @@ installTips / guide 四处一起刷新，并新增一条指向 blocker map 的�
 `officialLabel` / `links.official` 与教程里那条「官网与真实案例」资源，一并从
 `deerflow.tech` 改到 `github.com/bytedance/deer-flow`（GitHub 代验 200）。这条是
 临时措施，源文件里留了三行注释标明「上游续期后换回这三处」，别让它变成永久状态。
+## 2026-10-14 · 搜索升级到国际站标准：即时搜索 / 拼音 / 容错 / 高亮
+
+把站内搜索从「纯服务端表单」提到国际一流站点的体验水平。分五个阶段落地，每阶段独立可验：
+
+| 阶段 | 内容 |
+| --- | --- |
+| A | 拼音派生函数 `searchPinyinOf`（全拼分音节 / 连写 / 首字母 + 英文去元音），引入 `pinyin-pro`（950KB、零依赖；对比 hotoo/pinyin 的 62MB 小 65 倍） |
+| B | 迁移 `0007_search-pinyin`：新增 `search_pinyin TEXT NULL` + 独立 FULLTEXT `ft_items_pinyin`；打通写库全链路与版本回滚 |
+| C | `searchCatalog` 加拼音召回通道、容错降级、名称命中分档细化 |
+| D | `/api/suggest` 接口 + `SearchCommand` 即时搜索面板（⌘K）+ 搜索历史/热门 |
+| E | 结果关键词高亮 + 无结果引导 + 本记录 |
+
+**关键设计：拼音走独立列，不并进 `search_text`。** 并进去会被 ngram 切成 2-gram、
+与中英文 token 混进同一个 BM25 空间，把 `MATCH` 相关度稀释掉。独立成列后，
+拼音只作「命中即返回」的召回通道，主排序一行未改。
+
+**容错策略**：严格 AND 优先；严格无结果时降级为 OR 重查一次，结果带 `fuzzy: true`，
+前台如实提示「以下是放宽后的相近项」。取舍与 Meilisearch 的 partial results 同向：
+宁可给部分结果，也不直接空手；代价是降级后是并集语义，结果可能比单词查询更多。
+
+**两处如实记录的差异**（不假装一致）：`lib/items.ts` 的内存回退路径**不做拼音召回**——
+该模块被多个客户端组件引入，引入 pinyin-pro 会把 950KB 打进客户端包；它是
+`STORE_DRIVER=json` 的回滚路径，少这一项可接受，与该路径「反而多扫正文」的既有差异同类。
+
+**顺手修掉两个既有缺陷**（都不是本次引入，是被这次改动暴露出来的）：
+
+1. **`db:reindex` 用 DROP/ADD INDEX 重建不了 ngram token。** 实测 MySQL 8.0.46：
+   `ALTER TABLE ... DROP INDEX` / `ADD FULLTEXT INDEX` 之后，含 a/i 的 token 仍然缺失
+   （搜 `af`/`an` 恒为 0、索引里没有 a 开头的 token）；改用 `OPTIMIZE TABLE`（recreate + analyze）
+   立刻恢复。这解释了「停用词配置明明对了却搜不到」的顽疾。见坑位 52。
+2. **`tests/catalog-sql.test.mjs` 只重放 `0001_init.sql` 不重放后续迁移。** 它的 schema 因此
+   依赖「上一个测试文件留下的产物」，运行顺序一变就红（长期 flaky 的来源之一）。改为整库重建。
+3. `tests/search-sql.test.mjs` 在批量 `persistCatalog` 提交后立即查询，会因 InnoDB 全文索引
+   对新事务行的可见性延迟而漏行；加 `OPTIMIZE TABLE` 强制同步后稳定。
+
+**实测**（本地 MySQL 8 + 107 条数据）：
+
+```
+af            -> llamafactory, darktable      （2 字符首字母，此前恒为 0）
+an fang       -> darktable                     （分音节拼音，此前降级返回 46 条）
+wsjq          -> lossless-cut                  （首字母）
+gkml          -> public-apis                   （首字母）
+图片          -> markitdown, paddleocr          （原文）
+rustdesk zzzz -> rustdesk（fuzzy=true）        （容错降级）
+/api/suggest?q=anfang -> {"items":[{"slug":"darktable",...,"nameZh":"暗房"}]}
+```
+
+**验证**：`npm run check` 全绿（293 tests / 0 fail）；`npm run test:db` 全绿（59 pass / 0 fail）；
+`npm run db:migrate` 幂等可重跑。
 
 ## 2026-10-14 · 收录流程简化：collect / draft / seed:upsert 三件套（+KeePassXC，总条目 107）
 

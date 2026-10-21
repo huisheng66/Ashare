@@ -226,6 +226,9 @@ clicks                       出站点击
 49. **手写的字段清单等于静默失明。** 漂移检查与同步脚本各有一份手写清单，新增可透传字段却漏登记，检查就对它永远「相等」——不报错、不警告。这个坑踩过三次（linksCheckedAt、guide、以及本轮）。改成 `lib/seed.ts` 的**登记表 + 契约测试**：CARRIED = DRIFT ∪ EXCLUDED、SYNC ⊆ DRIFT，且每个名字必须**真的是 Software 的键**（写错名字与漏登记同样致命：`item[field]` 两边都是 undefined）。
 50. **「缺省」与「显式空值」不是差异。** `featured` 缺省 vs `false`、`[]` vs 缺省、`""` vs 缺省，语义相同。实测展开字段集后一次冒出 23 条假漂移，全部属于这一类；归一化之后是 0 条真实差异。
 51. **种子无法从数据库无损重建。** `SeedSoftware` 有 `officialLabel` 与 `officialUrl`，运行库（`Software`）里没有对应字段。所以「种子降级为导出产物」**不做** —— 反向生成会静默丢掉它们，比现状更糟。种子的定位是「人手维护的内容源 + 全新部署的引导数据」，与数据库并存。改为把漂移检查做严：字段集从 13 个扩到 24 个。
+52. **`ALTER TABLE ... DROP INDEX` / `ADD FULLTEXT INDEX` 重建不了 ngram token —— 必须 `OPTIMIZE TABLE`。** MySQL 8.0.46 实测：把停用词表换成空表后，用 DROP+ADD 重建 `ft_items_search`，**含 a/i 的 token 依然缺失**（`MATCH(search_pinyin) AGAINST('af')` 恒为 0，`INNODB_FT_INDEX_TABLE` 里连一个 a 开头的 word 都没有）；同一张表改用 `OPTIMIZE TABLE items`（内部 recreate + analyze）后立刻恢复（a 开头的 token 重新出现、`af` 命中 darktable）。**对照组**：新建一张空表 + 新建 ngram 全文索引 + 插入同样文本，token 完全正常 —— 说明问题只在「在既有索引上换配置」，不在配置本身。这解释了「停用词变量查着是空的，却还是搜不到」这个最难查的状态；`scripts/db-reindex.mjs` 已改为 OPTIMIZE。
+53. **测试里只重放部分迁移 = 顺序耦合。** `tests/catalog-sql.test.mjs` 原先只执行 `0001_init.sql` 再 DELETE 数据，于是它的 schema 依赖「上一个测试文件跑完留下的产物」。加迁移 0007 后立刻炸 `Unknown column 'search_pinyin'`，而且换一个执行顺序可能是绿的 —— 属于最难复现的一类。改为与 `search-sql.test.mjs` 一致：先按子表→主表 DROP，再按文件名排序重放**全部**迁移。
+54. **InnoDB 全文索引对新事务提交的行有可见性延迟。** 批量 `persistCatalog` 在一个事务里插完 107 条并 commit 后立即查询，会漏行（`search-sql.test.mjs` 的「不漏也不多」因此随机报缺，如「电路」漏 kicad）；而单条 autocommit 插入立即可见。测试 setup 里加一次 `OPTIMIZE TABLE` 强制同步即可稳定。**注意这与 52 是两件事**：52 是重建 token 的方式不对，这条是新数据的可见性时机。
 
 ## 八、本地开发环境
 

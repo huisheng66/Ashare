@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { after, before, test } from "node:test";
 
 import mysql from "mysql2/promise";
@@ -10,7 +10,7 @@ import { canonicalItem } from "../lib/catalog-rows.ts";
 import { persistCatalog } from "../lib/catalog-persist.ts";
 import { kindIds, parseCatalogFilters, platformIds, sceneIds, selectCatalogItems } from "../lib/catalog-query.ts";
 import * as sql from "../lib/catalog-sql.ts";
-import { closePool, connectionOptions, query } from "../lib/db.ts";
+import { closePool, connectionOptions } from "../lib/db.ts";
 import { toCatalogItem } from "../lib/items.ts";
 import { normalizeItems } from "../lib/normalize.ts";
 import { seedToItem } from "../lib/seed.ts";
@@ -46,11 +46,20 @@ before(async () => {
   if (skip) return;
   const ddl = await mysql.createConnection({ ...connectionOptions(), multipleStatements: true });
   try {
-    await ddl.query(readFileSync("db/migrations/0001_init.sql", "utf8"));
+    // 整库重建并重放**全部**迁移，而不是只跑 0001。
+    // 只跑 0001 时，后续迁移新增的列（如 0007 的 search_pinyin）不会出现，
+    // persistCatalog 会以 "Unknown column" 失败；更隐蔽的是，schema 状态会依赖
+    // 上一个测试文件留下的产物，运行顺序一变就红——属于隐形顺序耦合。
+    // TABLES 已是子表在前的顺序，按原序删除即可满足外键。
+    for (const table of TABLES) await ddl.query("DROP TABLE IF EXISTS " + table);
+    await ddl.query("DROP TABLE IF EXISTS ft_stopwords");
+    await ddl.query("DROP TABLE IF EXISTS schema_migrations");
+    for (const file of readdirSync("db/migrations").filter((name) => name.endsWith(".sql")).sort()) {
+      await ddl.query(readFileSync("db/migrations/" + file, "utf8"));
+    }
   } finally {
     await ddl.end();
   }
-  for (const table of TABLES) await query("DELETE FROM " + table);
 
   const conn = await mysql.createConnection({ ...connectionOptions() });
   try {

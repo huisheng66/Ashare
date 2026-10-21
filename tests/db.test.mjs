@@ -49,7 +49,7 @@ test("迁移：0001 已应用且表齐全", { skip }, async () => {
   // 但表没建，运行时才发现。
   assert.deepEqual(applied.map((row) => row.version), [
     "0001_init", "0002_search-stopwords", "0003_audit-log", "0004_users",
-    "0005_list-indexes", "0006_item-revisions",
+    "0005_list-indexes", "0006_item-revisions", "0007_search-pinyin",
   ]);
 });
 
@@ -71,6 +71,30 @@ test("索引：items.search_text 是 FULLTEXT", { skip }, async () => {
   );
   assert.equal(rows.length, 1);
   assert.equal(rows[0].type, "FULLTEXT");
+});
+
+test("索引：items.search_pinyin 是 FULLTEXT（拼音召回通道，不参与排序）", { skip }, async () => {
+  const rows = await query(
+    "SELECT INDEX_NAME AS name, INDEX_TYPE AS type FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'items' AND INDEX_NAME = 'ft_items_pinyin'",
+  );
+  assert.equal(rows.length, 1, "缺少 ft_items_pinyin 索引（迁移 0007 未应用？）");
+  assert.equal(rows[0].type, "FULLTEXT");
+});
+
+test("ngram：拼音列独立可搜（tupian 命中 search_pinyin）", { skip }, async () => {
+  // 与 search_text 的探针同理：FULLTEXT 看不到本事务刚插入的行，所以不走事务、finally 清理。
+  await query(
+    "INSERT INTO items (slug, name, aliases, status, kind, source, summary, body, tutorial, who_for, who_not, icon_letter, search_text, search_pinyin, created_at, updated_at) VALUES (?, ?, '[]', 'published', 'app', 'official', ?, ?, '[]', ?, ?, ?, ?, ?, NOW(3), NOW(3))",
+    ["__test_pinyin", "PicTool", "摘要", "正文", "适合", "不适合", "P", "PicTool 图片工具", "tu pian tupian tp"],
+  );
+  try {
+    const hit = await query("SELECT slug FROM items WHERE MATCH(search_pinyin) AGAINST(? IN BOOLEAN MODE)", ["tupian"]);
+    assert.ok(hit.some((row) => row.slug === "__test_pinyin"), "连写全拼 tupian 应命中");
+    const initials = await query("SELECT slug FROM items WHERE MATCH(search_pinyin) AGAINST(? IN BOOLEAN MODE)", ["tp"]);
+    assert.ok(initials.some((row) => row.slug === "__test_pinyin"), "首字母 tp 应命中");
+  } finally {
+    await query("DELETE FROM items WHERE slug = '__test_pinyin'");
+  }
 });
 
 test("ngram：多字命中，单字不命中（ngram_token_size=2 的已知约束）", { skip }, async () => {

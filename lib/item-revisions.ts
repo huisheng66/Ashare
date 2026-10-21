@@ -1,4 +1,4 @@
-import { fromBundle, searchTextOf, type ItemBundle, type ItemRow } from "./catalog-rows.ts";
+import { fromBundle, searchPinyinOf, searchTextOf, type ItemBundle, type ItemRow } from "./catalog-rows.ts";
 
 /**
  * 内容级历史：基线快照 + 字段级差异，可重放还原任意版本。
@@ -18,7 +18,8 @@ import { fromBundle, searchTextOf, type ItemBundle, type ItemRow } from "./catal
 /**
  * 不参与差异比较的列（但**仍然写进快照**）。
  *
- * - search_text：派生自 body / tutorial / guide 等。改动会连带变化，每次都记它是噪音。
+ * - search_text / search_pinyin：派生自 name / aliases / summary 等。改动会连带变化，
+ *   每次都记它是噪音，重放时用 searchTextOf / searchPinyinOf 重算即可。
  * - updated_at：写入时自动更新，不是内容。
  * - row_version：并发计数，不是内容。
  * - created_at：**不可变**，所以每次都相同、差异比较永远为 false。但它必须存 ——
@@ -29,6 +30,7 @@ import { fromBundle, searchTextOf, type ItemBundle, type ItemRow } from "./catal
  */
 export const DERIVED_COLUMNS: ReadonlySet<string> = new Set([
   "search_text",
+  "search_pinyin",
   "updated_at",
   "row_version",
 ]);
@@ -205,13 +207,15 @@ export function replay(revisions: Revision[], targetVersion?: number): ItemBundl
   for (const revision of limited) {
     current = applyDelta(current, revision.payload);
     /**
-     * updated_at 与 search_text 不进 payload（派生字段，每次都变），但还原出来的条目
-     * 必须有它们，否则前端「最近更新」会拿到空值、搜索也会失效。
-     * updated_at 用**该版本的写入时刻** —— 这正是它当时的值；search_text 重算，
-     * 口径与 lib/catalog-rows.ts 的 searchTextOf 完全一致。
+     * updated_at 与两个检索列（search_text / search_pinyin）不进 payload（派生字段，
+     * 每次都变），但还原出来的条目必须有它们，否则前端「最近更新」会拿到空值、搜索也会失效。
+     * updated_at 用**该版本的写入时刻** —— 这正是它当时的值；检索列重算，
+     * 口径与 lib/catalog-rows.ts 的 searchTextOf / searchPinyinOf 完全一致。
      */
+    const restored = fromBundle(current);
     current.item.updated_at = revision.at;
-    current.item.search_text = searchTextOf(fromBundle(current));
+    current.item.search_text = searchTextOf(restored);
+    current.item.search_pinyin = searchPinyinOf(restored) || null;
   }
   return current;
 }

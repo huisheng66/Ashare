@@ -135,7 +135,7 @@ export async function queryCatalog(filters: CatalogFilters, page = 1): Promise<C
   };
 }
 
-export type SearchPage = { items: CatalogItem[]; total: number; page: number; pageCount: number };
+export type SearchPage = { items: CatalogItem[]; total: number; page: number; pageCount: number; fuzzy: boolean };
 
 /**
  * 搜索：SQL 路径走 FULLTEXT + ngram（短词 LIKE 兜底），JSON 路径用内存打分。
@@ -147,8 +147,8 @@ export async function searchCatalog(query: string, page = 1): Promise<SearchPage
   const offset = (safePage - 1) * PAGE_SIZE;
 
   if (mysqlDriver()) {
-    const { items, total } = await sql.searchCatalog(query, PAGE_SIZE, offset);
-    return { items, total, page: safePage, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
+    const { items, total, fuzzy } = await sql.searchCatalog(query, PAGE_SIZE, offset);
+    return { items, total, page: safePage, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)), fuzzy };
   }
 
   const results = query ? searchSoftware(query, await allPublished()) : [];
@@ -157,6 +157,8 @@ export async function searchCatalog(query: string, page = 1): Promise<SearchPage
     total: results.length,
     page: safePage,
     pageCount: Math.max(1, Math.ceil(results.length / PAGE_SIZE)),
+    // JSON 回退路径没有容错降级（见 lib/items.ts 的说明），恒为 false。
+    fuzzy: false,
   };
 }
 

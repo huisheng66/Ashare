@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ChevronDown, Menu, Plus, Search } from "lucide-react";
 
 import { Logo } from "@/components/Logo";
 import { SceneIcon } from "@/components/SceneIcon";
+import { SearchCommand } from "@/components/SearchCommand";
 import { ThemeSegmented, ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -197,27 +198,21 @@ function MobileMenu({ scenes, pathname }: { scenes: SceneNavItem[]; pathname: st
 
 export function SiteHeader({ scenes }: { scenes: SceneNavItem[] }) {
   const pathname = usePathname();
-  const router = useRouter();
   const searchRef = useRef<HTMLInputElement>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const onSearchPage = pathname === "/search";
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey || event.key.toLowerCase() !== "k") return;
       event.preventDefault();
-      // 顶栏搜索框可见时优先用它，其次是页面里的搜索框，都没有就去搜索页
-      const header = searchRef.current;
-      const target = header && header.offsetParent ? header : document.getElementById("search-page");
-      if (target instanceof HTMLInputElement) {
-        target.focus();
-        target.select();
-      } else {
-        router.push("/search");
-      }
+      // 打开站内搜索命令面板。它由 Radix Dialog 承载，自带 focus trap 与 Esc 关闭，
+      // 所以这里不再像从前那样手动去找输入框聚焦 —— 面板里的输入框会自动获得焦点。
+      setPaletteOpen(true);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [router]);
+  }, []);
 
   return (
     <header className="glass sticky top-0 z-40 border-b border-border">
@@ -238,10 +233,21 @@ export function SiteHeader({ scenes }: { scenes: SceneNavItem[] }) {
           {onSearchPage ? null : (
             <>
               <HeaderSearch inputRef={searchRef} />
-              <Button asChild variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground lg:hidden" aria-label="搜索工具">
-                <Link href="/search">
-                  <Search className="size-[18px]" />
-                </Link>
+              {/*
+                移动端没有物理键盘，⌘K 用不上，所以另给一个可见入口打开同一个面板。
+                这里不再是 <Link href="/search">：搜索页走 MobileMenu 里的「搜索」链接兜底，
+                按钮改成开面板才能让手机用户也享受到即时建议。
+              */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground lg:hidden"
+                aria-label="搜索工具"
+                aria-keyshortcuts="Control+K Meta+K"
+                onClick={() => setPaletteOpen(true)}
+              >
+                <Search className="size-[18px]" />
               </Button>
             </>
           )}
@@ -255,6 +261,8 @@ export function SiteHeader({ scenes }: { scenes: SceneNavItem[] }) {
           <MobileMenu scenes={scenes} pathname={pathname} />
         </div>
       </div>
+      {/* 命令面板全局常驻：需要 ⌘K 在任何页面（含 /search）都能唤起。 */}
+      <SearchCommand open={paletteOpen} onOpenChange={setPaletteOpen} />
     </header>
   );
 }

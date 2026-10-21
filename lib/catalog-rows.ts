@@ -1,3 +1,5 @@
+import { pinyin } from "pinyin-pro";
+
 import type {
   Guide,
   GuideResource,
@@ -55,6 +57,8 @@ export type ItemRow = {
   guide_intro: string | null;
   guide_markdown: string | null;
   search_text: string;
+  /** 派生列，由 searchPinyinOf 生成；独立于 search_text，只为拼音召回，不参与排序权重。 */
+  search_pinyin: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -106,6 +110,50 @@ export function searchTextOf(item: Software): string {
     ...(item.tags ?? []),
     item.summary,
   ].join(" ").normalize("NFKC");
+}
+
+/** 汉字 Unicode 范围（用 Script=Han，比手写区间更全，能覆盖扩展区与兼容表意文字）。 */
+const NON_HAN = /[^\p{Script=Han}]/gu;
+
+/**
+ * 拼出供**拼音检索**使用的派生文本，写入独立的 search_pinyin 列。
+ *
+ * 为什么不并进 search_text：
+ *   search_text 走 ngram(2-gram) 全文索引。拼音串并进去会与中英文 token 混在同一个
+ *   BM25 空间里，把 MATCH 相关度稀释掉——「ollama」这种精确名命中会被一堆拼音 2-gram 拉平。
+ *   独立成列后，拼音只作为「命中即返回」的召回通道，主排序一行不用改。
+ *
+ * 内容分三档覆盖不同输入习惯：
+ *   - 分音节全拼 `tu pian`：按词输入
+ *   - 连写全拼   `tupian`：连打
+ *   - 首字母     `tp`    ：缩写
+ * 另对英数名做去元音折叠（Ollama → ollm），兼容漏打元音的输入。
+ *
+ * 坑（实测）：pinyin-pro 对纯 ASCII 会**逐字符**返回（'Ollama' → ['O','l','l','a','m','a']），
+ * 直接喂进去会把英文名变成 `O l l a m a` 这种噪音灌进索引。所以必须先剥离非汉字再转。
+ */
+export function searchPinyinOf(item: Software): string {
+  // 先 NFKC 归一（全角 → 半角），与 search_text 口径一致；否则全角「Ｏllama」会被
+  // 当成两个不认识的字符，英文部分直接丢失。
+  const sources = [item.nameZh ?? "", item.name, ...(item.aliases ?? [])]
+    .map((value) => value.normalize("NFKC"))
+    .filter(Boolean);
+  const parts = new Set<string>();
+  for (const source of sources) {
+    const han = source.replace(NON_HAN, "");
+    if (han) {
+      const syllables = pinyin(han, { toneType: "none", type: "array" }) as string[];
+      const initials = pinyin(han, { pattern: "first", toneType: "none", type: "array" }) as string[];
+      parts.add(syllables.join(" "));
+      parts.add(syllables.join(""));
+      parts.add(initials.join(""));
+    }
+    // 英数名去元音：RustDesk → rstdsk，兼容漏打元音（rstdsk）。
+    // 注意副作用：Ollama → llm，与「大模型」缩写撞车，属可接受代价——真名命中优先级更高。
+    const ascii = source.replace(/[^A-Za-z0-9]/g, "").toLowerCase();
+    if (ascii.length >= 3) parts.add(ascii.replace(/[aeiou]/g, ""));
+  }
+  return [...parts].filter(Boolean).join(" ").normalize("NFKC");
 }
 
 /** JSON 里有、但 Software 契约未定义的顶层键。 */
@@ -175,6 +223,7 @@ export function toBundle(item: Software, sortIndex: number): ItemBundle {
       guide_intro: item.guide?.intro ?? null,
       guide_markdown: item.guide?.markdown ?? null,
       search_text: searchTextOf(item),
+      search_pinyin: searchPinyinOf(item) || null,
       created_at: requireTime(item.createdAt, "createdAt", item.slug),
       updated_at: requireTime(item.updatedAt, "updatedAt", item.slug),
     },
@@ -280,5 +329,7 @@ export function itemRowFromDb(raw: Record<string, unknown>): ItemRow {
     updated_at: iso(raw.updated_at),
     links_checked_at: day(raw.links_checked_at),
     featured: Number(raw.featured) === 1 ? 1 : 0,
+    // 老库（迁移 0007 之前）可能还没有这列，mysql2 会返回 undefined；统一收成 null。
+    search_pinyin: raw.search_pinyin == null ? null : String(raw.search_pinyin),
   };
 }
