@@ -1725,7 +1725,7 @@ Krita 的图层栈比同类软件更复杂，因为它同时支持**绘画图层
         {
           kind: "html",
           title: "Krita 官方用户手册",
-          url: "https://docs.krita.org/user_manual.html",
+          url: "https://docs.krita.org/en/user_manual.html",
           note: "官方手册总入口，画笔、图层、动画、矢量都有系统章节。",
         },
         {
