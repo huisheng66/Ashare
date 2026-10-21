@@ -21479,4 +21479,8691 @@ Agent 能操作 DOM 不代表它应该拥有所有业务权限。登录、删除
       ],
     },
   },
+  {
+    slug: "cs249r-book",
+    linksCheckedAt: "2026-10-21",
+    name: "Machine Learning Systems",
+    nameZh: "Machine Learning Systems 机器学习系统教材",
+    aliases: ["cs249r_book", "mlsysbook", "Machine Learning Systems", "哈佛 CS249r 教材", "MLSys 教材"],
+    summary: "哈佛 CS249r 的四卷本机器学习系统教材（MIT Press 系列），配 TinyTorch 手写框架实验、硬件套件与 MLSys·im 模拟器。适合想把「会调模型」补成「懂系统」的人；代价是卷三卷四仍在开发，README 明确要求勿引用勿授课。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["教材", "机器学习系统", "AI 工程", "课程", "开源"],
+    body: "这套教材要补的是「世界在急着造 AI 系统，却没人系统地工程化它们」这个缺口。作者把整个仓库当成一门课，而不是一堆独立项目：教科书讲理论，TinyTorch 让你用 20 个递进模块从零写一个 ML 框架，硬件套件把模型部署到 Arduino、Seeed、Grove 与树莓派上直面内存、功耗与延迟约束，MLSys·im 则用来推演你租不起的那些基础设施规模下的瓶颈。\n四卷的分工很清楚：卷一是 Foundations，讲单节点上如何高效执行；卷二 Scaling 讲分布式集群与数据中心；卷三 Agentic 讲推理-行动回路、记忆、工具、编排与安全；卷四 Physical AI 讲感知、世界模型、控制与实时约束。README 用「失败后果」来界定每一卷：卷一失败只是预测差或效率低，卷二失败是数百万美元的集群停摆，卷三失败是轨迹漂移与越权的副作用。\n代价要提前说清：卷一已发布、卷二是 Preview，卷三卷四标注 In Development 且变动很快，README 直接写了「请勿引用或用于教学」。另外这不是读一遍就完事的教材，作者的设计前提是只读不内化、只写不泛化，所以labs 与 TinyTorch 是主线的必要部分，不是可选练习。",
+    officialUrl: "https://mlsysbook.ai",
+    officialLabel: "mlsysbook.ai",
+    links: {
+      official: "https://mlsysbook.ai",
+      github: "https://github.com/harvard-edge/cs249r_book",
+    },
+    whoFor: "学过模型但没学过系统的学生与工程师，想把训练、推理、部署、评估、负责任系统这条链路补齐的人；以及要开机器学习系统课程的教师（Instructor Hub 有两份 16 周大纲、评分量规与助教手册）。",
+    whoNot: "只想找一本能立刻引用做论文的稳定参考书的人——卷三卷四还在开发中；也不适合只想读不想动手的人，这套课程的设计前提是你得真的把框架写出来。",
+    installTips: [
+      "不需要安装：直接在 mlsysbook.ai/vol1/ 在线读卷一，试做 Lab 00（Marimo notebook，mlsysbook.ai/labs/），改一个参数看什么会崩。",
+      "想真正内化就走 TinyTorch（mlsysbook.ai/tinytorch/），20 个模块按序号从头写一遍自己的 ML 框架。",
+      "硬件套件要把 ML 部署到 Arduino、Seeed、Grove 与树莓派，需要自备开发板，不是纯软件路径。",
+      "卷三卷四只应从仓库 books/vol3、books/vol4 看开发进度，反馈走仓库的 Book feedback issue 表单。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#A41034",
+    },
+    guide: {
+      intro: "按 README 给的「Choose Your Path」讲：自学者、教师、贡献者各从哪进，以及四卷里哪些能引用、哪些不能。",
+      markdown: `## 先定位你在哪条路径
+
+README 把入口分成三类。自学者从卷一开始，读完接 Lab 00，然后做 TinyTorch；教师直接打开 Instructor Hub 的 AI Engineering Blueprint；贡献者挑自己最常用的组件改。
+
+官方给的学习回路是：**Read → Explore → Build → Model → Deploy → Practice → Teach**。
+
+## 哪些能读，哪些还不能引用
+
+状态必须看清：
+
+- **Vol I（Foundations）**：已发布，讲基础、抽象、生命周期、数据、训练、推理、评估、部署、负责任系统。
+- **Vol II（Scaling）**：Preview，讲分布式计算、加速器、内存、通信、并行、服务、可靠性与效率。
+- **Vol III（Agentic）**：In Development，讲推理与行动回路、记忆、工具、规划、搜索、编排、评估、安全与多智能体。
+- **Vol IV（Physical AI）**：In Development，讲感知、世界模型、控制、机器人、具身与实时约束。
+
+README 原文明确写了卷三卷四**请勿引用或用于教学**，反馈走 Book feedback issue 表单。写论文或备课前一定先看这条。
+
+## 别只读不写
+
+这套课程的设计前提是「只读不内化，只写不泛化」。所以主线里有三件非可选的动手事：
+
+- **Labs**：Marimo notebook，改参数看什么会崩，背后由 MLSys·im 驱动。
+- **TinyTorch**：20 个模块从零写 ML 框架——官方的说法是你没造过一个系统就不算懂它。
+- **Kits**：把模型部署到 Arduino / Seeed / Grove / 树莓派，面对真实的内存、功耗与延迟约束。
+
+## 教师另有配套
+
+Instructor Hub 提供两份 16 周大纲、教学法指南、评分量规与 TA 手册；每章有 Beamer 幻灯片，四种主题变体可直接拿去上课。另有 StaffML 用于 MLS 岗位面试练习，Newsletter 跟踪课程更新。`,
+      resources: [
+        {
+          kind: "html",
+          title: "卷一在线阅读",
+          url: "https://mlsysbook.ai/vol1/",
+          note: "已发布的 Foundations 卷，自学者应该从这里开始，不需要任何本地环境。",
+        },
+        {
+          kind: "link",
+          title: "TinyTorch 上手",
+          url: "https://mlsysbook.ai/tinytorch/",
+          note: "20 个模块手写 ML 框架的入口，是这套课程里最花时间但收益最大的部分。",
+        },
+        {
+          kind: "link",
+          title: "教师中心 Instructor Hub",
+          url: "https://mlsysbook.ai/instructors/",
+          note: "两份 16 周大纲、评分量规与 TA 手册；开课前先看这里的 AI Engineering Blueprint。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "mastra",
+    linksCheckedAt: "2026-10-21",
+    name: "Mastra",
+    nameZh: "Mastra TypeScript AI 应用框架",
+    aliases: ["mastra", "Mastra", "mastra-ai", "TS Agent 框架", "AI 应用框架"],
+    summary: "TypeScript 栈的 AI 应用与 Agent 框架：模型路由接 40+ 供应商，另有图式 workflow、human-in-the-loop、evals 与 observability，还能写 MCP server。适合已在 Next.js/Node 上的人；代价是 ee/ 目录下的功能是企业许可，生产用要看清边界。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Agent 框架", "TypeScript", "工作流", "MCP", "开源"],
+    body: "Mastra 的定位是「用现代 TypeScript 栈做 AI 应用与 Agent」，从原型到生产是同一套代码。它把你本来要自己拼的东西都内置了：模型路由用一套接口接 40+ 供应商（OpenAI、Anthropic、Gemini 等）；Agent 围绕目标自己决定用哪些工具并迭代到给出最终答案或触发停止条件；需要显式控制执行顺序时用图式 workflow，语法是 .then()、.branch()、.parallel()。\n几个点值得单独说。human-in-the-loop 是真的能挂起：借助 storage 记住执行状态，你可以无限期暂停等人工审批再恢复。上下文管理分成会话历史、从 API/数据库/文件检索的 RAG，以及 Observational Memory 这种类人记忆。它还能直接编写 MCP server，把 agent、工具与结构化资源暴露给任何支持该协议的系统。上线后的 evals 与 observability 也是自带的，不是外接。\n代价是许可证要读：核心框架与绝大多数代码是 Apache-2.0，但任何名为 ee/ 的目录（如 packages/core/src/auth/ee/）走 Mastra Enterprise License——开发和测试可免费用，生产用需要有效企业许可。此外它是 TypeScript 优先，Python 团队用不上。",
+    officialUrl: "https://mastra.ai",
+    officialLabel: "mastra.ai",
+    links: {
+      official: "https://mastra.ai",
+      github: "https://github.com/mastra-ai/mastra",
+    },
+    whoFor: "已经在 React / Next.js / Node.js 栈上、要把 Agent 嵌进现有产品而不是另起一套后端服务的团队；以及需要审批流、可观测性与评估闭环的生产场景。",
+    whoNot: "Python 技术栈的团队；也不适合打算把 ee/ 目录里的功能直接上生产却不买企业许可的场景。只想做个对话框 Demo 的话，这套框架偏重。",
+    installTips: [
+      "官方推荐入口是 `npm create mastra@latest`，CLI 会引导完成项目创建，安装完成后跟随 Installation guide 做手动配置也可行。",
+      "要在命令里一次给全：`npm create mastra@latest <项目名> -- --llm <provider>`，provider 可选 openai、anthropic、google、xai。",
+      "启动开发服务器：`npx bgproc start -n <项目名> -w -- npm run dev`，然后打开 http://localhost:4111 的 Mastra Studio，用它构建、测试与管理 agent、workflow 与工具。",
+      "新建项目默认会为检测到的编码助手安装 Mastra skills，并按需初始化 Git；不确定就按提示逐项确认，不要一路回车。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#1F2937",
+    },
+    guide: {
+      intro: "按首次上手顺序讲：脚手架怎么起、Studio 在哪、什么时候该用 workflow 而不是 agent，以及 ee/ 目录的许可边界。",
+      markdown: `## 一条命令起项目
+
+官方推荐路径：
+
+\`\`\`bash
+npm create mastra@latest
+\`\`\`
+
+如果想跳过交互：
+
+\`\`\`bash
+npm create mastra@latest my-mastra-app -- --llm openai
+\`\`\`
+
+provider 只支持 openai / anthropic / google / xai，填错会让你重填。创建过程会为你检测到的编码助手装上 Mastra skills，并在合适时初始化 Git。
+
+## 先打开 Studio
+
+进项目目录起开发服务器：
+
+\`\`\`bash
+npx bgproc start -n my-mastra-app -w -- npm run dev
+\`\`\`
+
+然后打开 \`http://localhost:4111\`。Studio 是构建、测试与管理 agents / workflows / tools 的界面——第一次用建议先在 Studio 里跑通一个 agent，再写业务代码，比直接读文档快。
+
+## Agent 还是 Workflow
+
+这是第一个会卡住的设计决定：
+
+- **Agent**：目标开放、让模型自己决定用什么工具、迭代到出结果或触发停止条件。
+- **Workflow**：你需要**显式控制**执行流程时用图引擎，语法是 \`.then()\`、\`.branch()\`、\`.parallel()\`。
+
+判断标准很简单：步骤顺序出错就会出事的业务流程（下单、审批、退款）用 workflow；开放式问答与研究类用 agent。
+
+## 需要人工点头就挂起
+
+human-in-the-loop 靠 storage 记住执行状态，可以无限期暂停再恢复：
+
+\`\`\`typescript
+// 在 workflow 中 suspend 并等待人工输入/批准，恢复后从断点继续
+\`\`\`
+
+要用这个功能必须先配好 storage，否则恢复不了。
+
+## ee/ 目录不是开源
+
+核心框架是 Apache-2.0，但任何名为 \`ee/\` 的目录走 Mastra Enterprise License：开发测试免费，生产需要有效许可。把依赖锁进 构建前先确认你没引用到 \`ee/\` 下的导出。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Mastra 官方文档",
+          url: "https://mastra.ai/docs",
+          note: "安装、agents、workflows、memory、RAG、evals 的完整说明，脚手架之后的下一步看这里。",
+        },
+        {
+          kind: "link",
+          title: "模型路由目录",
+          url: "https://mastra.ai/models",
+          note: "模型 router 支持的供应商与模型清单，选型前先确认你要用的模型在列。",
+        },
+        {
+          kind: "link",
+          title: "模板与课程",
+          url: "https://mastra.ai/docs/getting-started/templates",
+          note: "官方模板与入门课程，第一次写 agent 时照着改比从零快得多。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "officecli",
+    linksCheckedAt: "2026-10-21",
+    name: "OfficeCLI",
+    nameZh: "OfficeCLI 给 AI 用的 Office 命令行",
+    aliases: ["OfficeCLI", "officecli", "Office CLI", "Office 命令行", "文档自动化"],
+    summary: "面向 AI Agent 的 Office 命令行工具：单文件二进制、内置 .NET 运行时，不装 Office 就能创建、读取、修改 docx/xlsx/pptx，还自带 HTML 渲染引擎让 Agent 能「看见」成品。适合批量生成与校验文档；代价是项目很新，复杂排版仍需人工过目。",
+    scenes: ["office", "tools", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Office", "命令行", "AI Agent", "docx", "pptx", "xlsx"],
+    body: "OfficeCLI 解决的不是「人怎么用命令行写 Word」，而是「Agent 怎么操作 Office 文件」。它的核心卖点是内置 HTML 渲染引擎：能把 docx/xlsx/pptx 渲染成 HTML 或 PNG，从而闭合「渲染 → 看 → 修」这个循环——没有这一步，Agent 生成完文档根本不知道排版是不是崩的。\n用法是路径式的：create 建文件，add/set/remove 改元素，view 看大纲或 HTML，get --json 拿结构化数据，close 把常驻会话刷盘。README 给的 30 秒演示是 create 一个 pptx、watch 起本地预览（http://localhost:26315），另一个终端 add 一页幻灯片，浏览器实时刷新。对比它自己举的例子：原来用 python-pptx 写 50 行的事，现在是一条 officecli add。\n覆盖范围很广，且是按格式分册写在 wiki 上的：Word 有段落、run、表格、样式、页眉页脚、公式（LaTeX 输入）、图表、批注、脚注、水印、书签、目录、超链接，还带 i18n 与 RTL（可 create --locale ar-SA 直接开 RTL）；Excel 有 350+ 公式函数、数据透视表、切片器、条件格式、迷你图；PowerPoint 有动画、切换、3D 模型（.glb）、缩放、主题、连接线。\n代价要说清：这是 2026 年 3 月才建仓、发布节奏很快的新项目，功能清单长不等于每个边角都稳；另外 Apache-2.0 许可下它是单二进制分发，装的是官方 install.sh 脚本，企业环境应先审脚本再跑。",
+    officialUrl: "https://officecli.ai",
+    officialLabel: "officecli.ai",
+    links: {
+      official: "https://officecli.ai",
+      github: "https://github.com/iOfficeAI/OfficeCLI",
+    },
+    whoFor: "要让 Agent 或 CI 批量产出/校验 Word、Excel、PPT 的开发者，尤其是容器里无头跑、装不了 Office 的场景；以及需要跨文档复制元素、做模板填充的团队。",
+    whoNot: "只想手工排版一份精致文档的人——这不是给人用的图形编辑器；也不适合对「执行远程安装脚本」有合规限制、又不愿先审脚本的环境。",
+    installTips: [
+      "macOS / Linux 一条命令：`curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash`；Windows 用 PowerShell：`irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex`。",
+      "也可用包管理器：`brew install officecli` 或 `npm install -g @officecli/officecli`。二进制自带 .NET 运行时，不需要另外装依赖。",
+      "给 Agent 用最快的方式是在聊天里贴 `curl -fsSL https://officecli.ai/SKILL.md`，skill 文件会教它安装与全部命令。",
+      "给人用可以装 AionUi 走 GUI；命令行下 `officecli install` 会把二进制放进 PATH，并给它检测到的 Claude Code、Cursor、Windsurf、GitHub Copilot 装上 skill。",
+      "改完记得 `officecli close 文件`，把常驻会话刷到磁盘。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#2B579A",
+    },
+    guide: {
+      intro: "按「先有反馈回路再批量生成」的顺序讲：装好二进制 → watch 起预览 → add/set 改结构 → view html 看渲染 → close 落盘。",
+      markdown: `## 先跑 30 秒演示
+
+这一步不要跳过，它建立的是反馈回路：
+
+\`\`\`bash
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
+
+officecli create deck.pptx
+officecli watch deck.pptx      # 打开 http://localhost:26315
+\`\`\`
+
+然后**另开一个终端**：
+
+\`\`\`bash
+officecli add deck.pptx / --type slide --prop title="Hello, World!"
+\`\`\`
+
+浏览器会立刻刷新。之后每次 \`add\` / \`set\` / \`remove\` 都会实时更新预览——这就是它区别于普通文档库的地方。
+
+## 路径就是元素地址
+
+所有编辑都靠类 XPath 的路径定位，这是第二个会卡住的点：
+
+\`\`\`bash
+officecli add deck.pptx '/slide[1]' --type shape \\
+  --prop text="Revenue grew 25%" --prop x=2cm --prop y=5cm \\
+  --prop font=Arial --prop size=24 --prop color=FFFFFF
+
+officecli view deck.pptx outline    # 先看结构，确认路径
+officecli get deck.pptx '/slide[1]/shape[1]' --json
+\`\`\`
+
+不确定路径就先 \`view outline\` 打印大纲，再动手改，别猜编号。
+
+## 渲染出来才能发现问题
+
+\`\`\`bash
+officecli view deck.pptx html
+\`\`\`
+
+HTML 预览不需要起服务器。OfficeCLI 内置渲染引擎，能输出 HTML 或 PNG——让 Agent（和你自己）真正看见排版，而不是只看 XML 是否合法。这是「渲染 → 看 → 修」闭环的关键一步。
+
+## 收尾要 close
+
+改完执行：
+
+\`\`\`bash
+officecli close deck.pptx
+\`\`\`
+
+把常驻会话刷到磁盘。漏掉这一步，你可能拿到一个没落盘的半成品。
+
+## 装之前看一眼脚本
+
+用 \`curl | bash\` 前先读一遍脚本内容，尤其是企业环境。也可以改用 \`brew install officecli\` 或 \`npm install -g @officecli/officecli\` 这类包管理器路径。`,
+      resources: [
+        {
+          kind: "html",
+          title: "OfficeCLI 官网",
+          url: "https://officecli.ai",
+          note: "SKILL.md 入口与安装说明；想让 Agent 自动完成安装，就把这里的 SKILL.md 地址贴给聊天。",
+        },
+        {
+          kind: "link",
+          title: "GitHub 发布页与二进制下载",
+          url: "https://github.com/iOfficeAI/OfficeCLI/releases",
+          note: "各平台二进制下载，CLI 路线从这里拿包；装完再跑 officecli install。",
+        },
+        {
+          kind: "link",
+          title: "功能 Wiki",
+          url: "https://github.com/iOfficeAI/OfficeCLI/wiki",
+          note: "按 Word / Excel / PowerPoint 分册的属性与命令细则，写复杂属性时对照查。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "composio",
+    linksCheckedAt: "2026-10-21",
+    name: "Composio",
+    nameZh: "Composio Agent 工具集成平台",
+    aliases: ["composio", "Composio", "composio.dev", "Agent 工具集", "工具路由"],
+    summary: "给 Agent 接 1000+ 工具集、按用户隔离的 session、托管鉴权、触发器与沙箱，还能把 session 暴露成托管 MCP 端点；另有 CLI 给 Claude Code 用。适合不想自己写一堆 OAuth 的团队；代价是强依赖 Composio 云服务与 API Key。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Agent 工具", "MCP", "OAuth", "集成", "TypeScript", "Python"],
+    body: "Composio 解决的是 Agent 落地里最烦的一块：让 agent 真正能「做事」而不只是说话。它提供 1000+ 预置工具集、工具搜索、上下文管理、鉴权与沙箱工作台。这个仓库是 SDK monorepo，含 TypeScript SDK（@composio/core）、Python SDK（composio）、CLI，以及面向 OpenAI Agents、Claude Agent SDK、Vercel AI SDK、LangChain 等框架的 provider adapter。\n核心抽象是 session：每个 session 绑定你的一个终端用户，`composio.create(\"user_123\")` 后 `session.tools()` 拿到工具交给 agent。默认 session 带 meta tools，能在运行时去发现、鉴权并执行工具，而不是把上百个工具定义一次性塞进上下文——这是它和「把工具全丢给模型」的主要差别。把 `session.session_id` 存下来，多轮之间用 `composio.use()` 复用。若你更想用 MCP，`composio.create({ mcp: true })` 会返回一个托管 MCP 端点 `session.mcp.url`，Claude、Cursor 或任何 MCP 客户端直接指过去即可。\n代价要讲清楚：它本质上是云依赖，先要在 dashboard 拿 COMPOSIO_API_KEY；工具执行与鉴权都经过 Composio。另外 TS SDK 要求 Node 22+、Python SDK 要求 3.10+，老环境要升级。仓库本身是 MIT，但服务是另一回事。",
+    officialUrl: "https://docs.composio.dev",
+    officialLabel: "docs.composio.dev",
+    links: {
+      official: "https://docs.composio.dev",
+      github: "https://github.com/ComposioHQ/composio",
+    },
+    whoFor: "要让 agent 操作 Gmail、日历、CRM 这类第三方 SaaS，又不想逐个实现 OAuth 与 token 刷新的团队；以及已经用 OpenAI Agents / LangChain / LangGraph / CrewAI 等框架、想直接复用现成 provider 的人。",
+    whoNot: "要求工具调用完全不出自己网络的人——session 与鉴权都在 Composio 云端；也不适合 Node < 22 或 Python < 3.10 且暂时不能升级的环境。",
+    installTips: [
+      "TypeScript：`npm install @composio/core @composio/openai-agents @openai/agents`，然后 `new Composio({ provider: new OpenAIAgentsProvider() })`。",
+      "Python：`pip install composio composio-openai-agents openai-agents`，入口同样是 `Composio(provider=OpenAIAgentsProvider())`。",
+      "先去 dashboard.composio.dev/settings 拿 COMPOSIO_API_KEY；session 用 `composio.create(\"user_123\")`，把返回的 session_id 存下来供多轮复用。",
+      "装 CLI：`curl -fsSL https://composio.dev/install | sh`，新开终端跑 `composio login`，之后 `composio search` 找工具、`composio execute` 跑工具、`composio link` 连账号。",
+      "想要更小体积可用 `@composio/slim`（去掉随包 TS 源码与 SDK 文档，API 相同）；安装只要二进制可设 COMPOSIO_INSTALL_SHELL=none。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#0F172A",
+    },
+    guide: {
+      intro: "按第一次接线的顺序讲：拿 Key → 建 session → 把 tools 交给 agent → 决定用 provider 还是 MCP，以及 session 的复用与收敛。",
+      markdown: `## 先拿 Key，再建 session
+
+一切从 dashboard 的 \`COMPOSIO_API_KEY\` 开始。核心抽象是 **session**，一个 session 对应你的一个终端用户：
+
+\`\`\`typescript
+const composio = new Composio({ provider: new OpenAIAgentsProvider() });
+const session = await composio.create("user_123");
+const tools = await session.tools();
+
+const agent = new Agent({ name: "Personal Assistant", tools });
+const result = await run(agent, "Summarize my emails from today");
+\`\`\`
+
+Python 侧是同一套形状：\`composio.create(user_id="user_123")\` 后 \`session.tools()\`。
+
+## 为什么别把工具全塞进上下文
+
+默认 session 拿到的是 **meta tools**——运行时再去发现、鉴权、执行具体应用工具。这样就不必把上百个工具定义一次性放进上下文。
+
+配套动作是把 \`session.session_id\` 持久化，多轮对话用 \`composio.use()\` 取回，不要每次重建 session，否则用户的已连接账号会丢失。
+
+## Provider 还是 MCP
+
+两条路都通：
+
+- **Provider adapter**：把 Composio 工具转成你所用框架的原生格式。README 给了完整对照表，覆盖 OpenAI、OpenAI Agents、Anthropic、Claude Agent SDK、Vercel、Google、LangChain、LangGraph、LlamaIndex、Mastra、CrewAI、AutoGen 等。
+- **MCP**：\`composio.create({ mcp: true })\`，把 \`session.mcp.url\` 指给 Claude、Cursor 或任意 MCP 客户端。
+
+框架不在列表里就走 MCP，或按文档自己写 custom provider。
+
+## 用 CLI 先验证工具
+
+在写业务代码之前，建议先用 CLI 把工具跑通：
+
+\`\`\`bash
+curl -fsSL https://composio.dev/install | sh
+composio login
+composio search      # 找工具
+composio link        # 连账号
+composio execute     # 直接跑
+\`\`\`
+
+它同时给 Claude Code 这类编码 agent 提供了本地工具面。装完记得**新开终端**才能拿到 PATH；只要二进制就设 \`COMPOSIO_INSTALL_SHELL=none\`。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Composio 文档",
+          url: "https://docs.composio.dev",
+          note: "quickstart、session 机制与 provider 对照表，第一次接线照这里的顺序做。",
+        },
+        {
+          kind: "html",
+          title: "Session 工作原理",
+          url: "https://docs.composio.dev/docs/how-composio-works",
+          note: "解释 session、meta tools 与鉴权的关系，搞不清「为什么工具这么少」时看这篇。",
+        },
+        {
+          kind: "link",
+          title: "CLI 文档",
+          url: "https://docs.composio.dev/docs/cli",
+          note: "search / execute / link / run 的用法与 shell 安装覆盖选项，含 COMPOSIO_INSTALL_SHELL=none。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "gitleaks",
+    linksCheckedAt: "2026-10-21",
+    name: "Gitleaks",
+    nameZh: "Gitleaks 密钥泄露扫描",
+    aliases: ["gitleaks", "Gitleaks", "git 密钥扫描", "secret scanning", "凭据扫描"],
+    summary: "扫描 git 历史、目录与 stdin 里的密码、API Key、Token，支持 baseline 抑制旧问题与自定义正则规则，可挂 pre-commit 或 CI。适合在提交前拦住凭据泄露；代价是作者已声明功能冻结，只做安全补丁，重心转向 Betterleaks。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["安全", "密钥扫描", "CI", "pre-commit", "Go", "开源"],
+    body: "Gitleaks 是一个**检测**工具，不是防护罩：它扫 git 仓库、目录文件和 stdin，找出硬编码的密码、API Key、Token。检测引擎的思路作者写在博客《Regex is (almost) all you need》里，本质是高命中正则 + 熵值判断。它扫的是过去与现在——底层用 `git log -p` 扫补丁，所以已经进了历史提交的密钥一样会被翻出来。\n三种扫描模式：`git` 扫本地仓库（可用 --log-opts 限定 commit 范围）、`dir`（别名 files、directory）扫目录或文件、`stdin` 接管道。大仓库或长历史的实用做法是建 baseline：先 `--report-path` 出一份报告当作已知问题清单，之后 `--baseline-path` 跑，报告里只剩新增问题。规则可以自定义 TOML，支持 extend 默认配置并用 disabledRules 关掉噪音规则，allowlists 用 commits / paths / stopwords 降误报。\n坑要说在前头：README 顶部挂着 WARNING——Gitleaks 已 feature complete，作者不再合并新功能，未来只发安全补丁，精力转向 Betterleaks。选型时要考虑这一点。另外 v8.19.0 起 `detect` 与 `protect` 被弃用（仍可用但已从 --help 隐藏），新脚本请用 `git` / `dir` / `stdin`；v8.21.0 起 `[rules.allowlist]` 被 `[[rules.allowlists]]` 取代，旧写法仍兼容。",
+    officialUrl: "https://gitleaks.io",
+    officialLabel: "gitleaks.io",
+    links: {
+      official: "https://gitleaks.io",
+      github: "https://github.com/gitleaks/gitleaks",
+    },
+    whoFor: "需要把密钥扫描塞进 pre-commit 或 CI 的团队；以及在合并外部仓库、接管老项目前想先摸清历史里有没有裸奔凭据的人。",
+    whoNot: "指望它持续新增检测规则或长期演进的人——项目已功能冻结；也不适合把「扫不出」当成「没有泄露」，它检测的是已知模式，自定义弱口令扫不到。",
+    installTips: [
+      "macOS：`brew install gitleaks`；其他平台从 releases 页下载对应二进制，或 `git clone` 后 `make build`（需装 Go）。",
+      "Docker：`docker run -v ${要扫描的目录}:/path zricethezav/gitleaks:latest [COMMAND] [OPTIONS] [SOURCE_PATH]`，也可用 ghcr.io/gitleaks/gitleaks:latest 镜像。",
+      "挂 pre-commit：在 .pre-commit-config.yaml 里把 repo 指向 https://github.com/gitleaks/gitleaks、rev 填 v8.24.2、hook id 填 gitleaks，然后 `pre-commit install`；临时跳过用 `SKIP=gitleaks git commit`。",
+      "接入 CI 可用官方 gitleaks-action；报告格式支持 json、csv、junit、sarif，`-r/--report-path` 指定输出文件。",
+      "老仓库先建 baseline 再启用：`gitleaks git --report-path gitleaks-report.json`，之后用 `--baseline-path` 跑，只报新增。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#1E3A5F",
+      simpleIcon: "gitleaks",
+    },
+    guide: {
+      intro: "按「先出报告、再建 baseline、最后才卡 CI」的顺序讲，并说明为什么新脚本不该再用 detect/protect。",
+      markdown: `## 三个子命令，别用旧的
+
+当前有三种扫描模式：
+
+\`\`\`bash
+gitleaks git -v                 # 扫本地 git 仓库（底层用 git log -p）
+gitleaks dir -v path/to/dir     # 扫目录或文件，别名 files / directory
+cat some_file | gitleaks -v stdin
+\`\`\`
+
+注意 v8.19.0 起 \`detect\` 与 \`protect\` 已弃用——仍能跑但已从 \`--help\` 隐藏。新脚本直接写 \`git\` / \`dir\` / \`stdin\`。
+
+想限定范围就用 \`--log-opts\`：
+
+\`\`\`bash
+gitleaks git -v --log-opts="--all commitA..commitB" path_to_repo
+\`\`\`
+
+## 老仓库先建 baseline
+
+这是能不能真正落地的关键。直接上 CI 会被历史问题淹没：
+
+\`\`\`bash
+# 1. 先出一份全量报告当基线
+gitleaks git --report-path gitleaks-report.json
+
+# 2. 之后再跑，只报新增
+gitleaks git --baseline-path gitleaks-report.json --report-path findings.json
+\`\`\`
+
+baseline 可以是任意一份 gitleaks 报告。没这一步，大仓库基本推不动。
+
+## 降误报靠 allowlists
+
+自定义规则写在 TOML 里。推荐做法是 extend 默认配置、关掉噪音规则：
+
+\`\`\`toml
+[extend]
+useDefault = true
+disabledRules = [ "generic-api-key" ]
+
+[[rules]]
+id = "awesome-rule-1"
+description = "awesome rule 1"
+regex = '''one-go-style-regex-for-this-rule'''
+secretGroup = 3
+entropy = 3.5
+keywords = [ "auth", "password", "token" ]
+
+[[rules.allowlists]]
+description = "ignore commit A"
+condition = "OR"
+commits = [ "commit-A" ]
+paths = [ "path/to/ignore" ]
+\`\`\`
+
+v8.21.0 起 \`[rules.allowlist]\` 换成了 \`[[rules.allowlists]]\`，旧写法仍兼容。任一 allowlist 命中即忽略该发现。
+
+## 配置优先级
+
+\`--config/-c\` → \`GITLEAKS_CONFIG\`（文件路径）→ \`GITLEAKS_CONFIG_TOML\`（文件内容）→ 目标路径下的 \`.gitleaks.toml\`。都没用才走内置默认配置。
+
+## 落地前先看 WARNING
+
+README 顶部明确写了：Gitleaks 已 feature complete，不再合并新功能，后续只发安全补丁，作者转向 Betterleaks。把它作为长期选型时要纳入评估。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Gitleaks 官网",
+          url: "https://gitleaks.io",
+          note: "项目主页与检测引擎介绍入口，判断它还适不适合你的长期规划前先看。",
+        },
+        {
+          kind: "link",
+          title: "GitHub Actions 版 gitleaks-action",
+          url: "https://github.com/gitleaks/gitleaks-action",
+          note: "官方 CI 集成方案，想在流水线里拦提交从这里接。",
+        },
+        {
+          kind: "link",
+          title: "默认规则配置",
+          url: "https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml",
+          note: "内置规则的现行版本，自定义配置时用它当起点，也用来确认某类密钥是否在检测范围。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "repomix",
+    linksCheckedAt: "2026-10-21",
+    name: "Repomix",
+    nameZh: "Repomix 仓库打包喂给 AI",
+    aliases: ["repomix", "Repomix", "仓库打包", "代码喂 LLM", "codebase packer"],
+    summary: "一条命令把整个仓库打包成单个 AI 友好文件（默认 XML），带 token 计数、.gitignore 感知、Secretlint 敏感信息过滤与 --compress 压缩。适合把代码交给 LLM 做评审或重构；代价是大仓库必须先裁剪范围，否则上下文会被撑爆。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["代码打包", "LLM", "上下文", "CLI", "开源"],
+    body: "Repomix 做的是一件很小但高频的事：把整个仓库塞进一个文件，方便丢给 Claude、ChatGPT、Gemini、DeepSeek 这类模型。默认输出 XML，README 解释了理由——Anthropic 自己的提示工程文档推荐用 XML 标签，能让模型更准确地分段解析。\n几个设计得比较周到的点：输出文件开头自带一段面向 AI 的说明，解释这份文件的结构与用途；会给出每个文件及全仓库的 token 计数，方便你判断能不能塞进上下文；自动尊重 .gitignore、.ignore 与 .repomixignore；内置 Secretlint，命中已知凭据格式的文件会被排除在输出之外；`--compress` 用 Tree-sitter 抽取关键代码元素，在保留结构的前提下压 token。\n用法上除了 `repomix` 一把梭，裁剪手段很全：`--include` / `--ignore` 用 glob 选文件，`--remote` 直接打远程仓库（支持 owner/repo 简写，也能指分支、tag、commit 甚至 URL），`--stdin` 从管道接文件列表（可以配合 rg、fd、fzf 精确挑文件），`--include-logs` / `--include-diffs` 带上 git 提交历史与 diff。\n代价：它解决的是「怎么喂进去」，不解决「喂进去之后模型能不能处理好」。大仓库不裁剪就直接打包，输出往往超出上下文上限；`--compress` 会丢细节，需要逐行审查的改动别开着它跑。",
+    officialUrl: "https://repomix.com",
+    officialLabel: "repomix.com",
+    links: {
+      official: "https://repomix.com",
+      github: "https://github.com/yamadashy/repomix",
+    },
+    whoFor: "要把整个项目交给 LLM 做代码评审、生成文档、写测试或做架构梳理的人；以及需要在 CI 里产出代码快照喂给模型的场景。",
+    whoNot: "期待「打包即答案」的人——它只负责整理输入；也不适合把含敏感信息的仓库随手传到在线服务的人，虽然有 Secretlint 兜底，但识别的是已知格式。",
+    installTips: [
+      "最快试一次不用装：`npx repomix@latest`，在项目目录跑完生成 repomix-output.xml。",
+      "常用就全局装：`npm install -g repomix`（也支持 yarn global add、bun add -g）；macOS/Linux 还可 `brew install repomix`，之后任意目录直接 `repomix`。",
+      "不想装任何东西：打开 repomix.com 填仓库名点 Pack，网页端可选 XML / Markdown / 纯文本并即时估算 token。",
+      "只想打包一部分：`repomix --include \"src/**/*.ts,**/*.md\"` 或 `repomix --ignore \"**/*.log,tmp/\"`；也可以用 `rg --files --type ts | repomix --stdin` 精确挑文件。",
+      "生成配置模板用 `repomix --init`；跑 Docker 用 `docker run -v .:/app -it --rm ghcr.io/yamadashy/repomix`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#D97706",
+    },
+    guide: {
+      intro: "按第一次使用的顺序讲：跑出第一个文件 → 用 include/ignore 裁剪 → 用 --stdin 精确选文件 → 什么时候开 --compress。",
+      markdown: `## 先跑出第一个文件
+
+在项目根目录：
+
+\`\`\`bash
+npx repomix@latest          # 不想安装就用这个
+# 或安装后
+npm install -g repomix
+repomix
+\`\`\`
+
+产出 \`repomix-output.xml\`。丢给模型时配一句提示：
+
+\`\`\`
+This file contains all the files in the repository combined into one.
+I want to refactor the code, so please review it first.
+\`\`\`
+
+输出开头自带面向 AI 的说明与目录结构，模型能自己看懂组织方式。
+
+## 大仓库必须裁剪
+
+第一个卡点几乎总是「输出太大」。先估算，再裁剪：
+
+\`\`\`bash
+repomix --include "src/**/*.ts,**/*.md"
+repomix --ignore "**/*.log,tmp/"
+\`\`\`
+
+它默认尊重 \`.gitignore\`、\`.ignore\`、\`.repomixignore\`，内置的 Secretlint 会把命中已知凭据格式的文件排除掉——但那只是兜底，别拿它当脱敏方案。
+
+## 精确选文件用 --stdin
+
+glob 不够表达时用管道喂文件列表：
+
+\`\`\`bash
+git ls-files "*.ts" | repomix --stdin
+rg --files --type ts | repomix --stdin
+fd -e ts | repomix --stdin
+fzf -m | repomix --stdin      # 交互式挑
+\`\`\`
+
+注意：stdin 进来的文件是**追加到 include 模式**，仍然受 ignore 规则约束，命中 ignore 的照样被排除。
+
+## 远程仓库也能直接打
+
+不用先 clone：
+
+\`\`\`bash
+repomix --remote yamadashy/repomix
+repomix --remote https://github.com/yamadashy/repomix --remote-branch main
+repomix --remote https://github.com/yamadashy/repomix/tree/main
+\`\`\`
+
+想让模型理解代码演进，再带上 git 上下文：
+
+\`\`\`bash
+repomix --include-logs --include-logs-count 10
+repomix --include-logs --include-diffs
+\`\`\`
+
+## --compress 别乱开
+
+\`--compress\` 用 Tree-sitter 抽取关键元素，压 token 但丢细节。做架构梳理、整体了解时开它；要逐行审查或精确重构就别开。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Repomix 在线版",
+          url: "https://repomix.com",
+          note: "网页端直接填仓库名打包，可选输出格式并即时估算 token，不想装 CLI 时用。",
+        },
+        {
+          kind: "link",
+          title: "打包结果讨论区",
+          url: "https://github.com/yamadashy/repomix/discussions/154",
+          note: "社区分享搭配哪些 AI 工具、有效提示词与技巧，第一次写提示词前值得翻。",
+        },
+        {
+          kind: "link",
+          title: "VSCode 扩展 Repomix Runner",
+          url: "https://marketplace.visualstudio.com/items?itemName=DorianMassoulier.repomix-runner",
+          note: "社区维护的编辑器内运行方式，支持复用现有 repomix.config.json。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "uptime-kuma",
+    linksCheckedAt: "2026-10-21",
+    name: "Uptime Kuma",
+    nameZh: "Uptime Kuma 自托管可用性监控",
+    aliases: ["uptime-kuma", "Uptime Kuma", "uptime kuma", "自托管监控", "可用性监控"],
+    summary: "自托管监控面板：HTTP(s)/TCP/Ping/DNS/Websocket/Docker 等探测、20 秒间隔、90+ 通知渠道、多状态页与证书信息，一条 docker compose 就能跑。适合替代 UptimeRobot 免费档；代价是数据必须落在本地卷，README 明确不支持 NFS。",
+    scenes: ["tools", "engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["监控", "自托管", "状态页", "Docker", "开源"],
+    body: "Uptime Kuma 是「自己搭一个 UptimeRobot」。作者的动机写得很直接：想找一个自托管的可用性监控，最接近的 statping 不够稳定且已停止维护，于是自己做了一个，顺带练 Vue 3 + vite、Bootstrap 5，并用 WebSocket 做 SPA 而不是 REST API。\n能力面：监控类型覆盖 HTTP(s)、TCP、HTTP(s) 关键字、HTTP(s) JSON 查询、Websocket、Ping、DNS 记录、Push、Steam 游戏服务器与 Docker 容器；通知支持 Telegram、Discord、Gotify、Slack、Pushover、SMTP 邮件等 90+ 服务；探测间隔可到 20 秒；支持多个状态页、把状态页映射到指定域名、Ping 图表、证书信息、代理与 2FA。\n部署极简，两种 Docker 方式：docker compose 拉官方 compose.yaml 直接 up -d，或一条 docker run 挂 volume。装完跑在 3001 端口，且默认监听所有网卡——只想本机访问要显式写 `-p 127.0.0.1:3001:3001`。非 Docker 路径需要 Node.js >= 20.4、Git 与 pm2，README 明确不支持 FreeBSD / OpenBSD / NetBSD，也不支持 Replit / Heroku。\n最重要的坑在存储：README 用 WARNING 写明 **NFS 这类网络文件系统不支持**，必须映射到本地目录或卷。把数据卷挂到 NFS 上是自托管里最常见的翻车方式。",
+    officialUrl: "https://uptime.kuma.pet",
+    officialLabel: "uptime.kuma.pet",
+    links: {
+      official: "https://uptime.kuma.pet",
+      github: "https://github.com/louislam/uptime-kuma",
+    },
+    whoFor: "有几台自建服务或 NAS、想知道它们什么时候挂了的人；以及想给客户/团队出一个公开状态页、又不想按监控点付费的小团队。",
+    whoNot: "需要跨地域多探针、SLA 报表与复杂告警编排的企业场景；也不适合只有 NFS 存储可用、或只能跑在 Replit / Heroku 这类平台上的环境。",
+    installTips: [
+      "Docker Compose 最快：`mkdir uptime-kuma && cd uptime-kuma && curl -o compose.yaml https://raw.githubusercontent.com/louislam/uptime-kuma/master/compose.yaml && docker compose up -d`，之后访问 http://localhost:3001。",
+      "单条 docker run：`docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name uptime-kuma louislam/uptime-kuma:2`；只暴露本机就把 -p 写成 127.0.0.1:3001:3001。",
+      "**数据卷一定要映射到本地目录或卷，不要挂 NFS**，README 明确说网络文件系统不支持。",
+      "非 Docker 需要 Node.js >= 20.4 与 Git，跑 `npm run setup` 后用 `pm2 start server/server.js --name uptime-kuma` 常驻，`pm2 startup && pm2 save` 设开机自启。",
+      "先看效果可去 demo.kuma.pet/start-demo，10 分钟后数据清空。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "U",
+      color: "#5CDD8B",
+    },
+    guide: {
+      intro: "按第一次部署的顺序讲：Docker 起服务 → 首次登录建管理员 → 加第一个监控 → 配通知 → 出状态页，并强调存储与端口暴露这两处坑。",
+      markdown: `## 一条 compose 起服务
+
+\`\`\`bash
+mkdir uptime-kuma && cd uptime-kuma
+curl -o compose.yaml https://raw.githubusercontent.com/louislam/uptime-kuma/master/compose.yaml
+docker compose up -d
+\`\`\`
+
+然后打开 \`http://localhost:3001\`。注意 README 说明它是跑在**所有网卡**上的（\`http://你的IP:3001\` 同样可达）。
+
+如果只打算本机访问，docker run 时把端口绑定写死：
+
+\`\`\`bash
+docker run -d --restart=always -p 127.0.0.1:3001:3001 \\
+  -v uptime-kuma:/app/data --name uptime-kuma louislam/uptime-kuma:2
+\`\`\`
+
+## 存储别踩 NFS
+
+这是自托管翻车第一名。README 用 WARNING 写明：**NFS 这类网络文件系统不支持**，必须映射到本地目录或 volume。SQLite 数据放在网络文件系统上会出现锁与损坏问题。
+
+排障先看：
+
+\`\`\`bash
+docker compose logs
+\`\`\`
+
+## 非 Docker 路径的要求
+
+要自己跑需满足：主流 Linux 发行版或 Windows 10 x64 / Server 2012 R2 x64 及以上；**Node.js >= 20.4**；Git；pm2 用于常驻。
+
+\`\`\`bash
+git clone https://github.com/louislam/uptime-kuma.git
+cd uptime-kuma
+npm run setup
+npm install pm2 -g && pm2 install pm2-logrotate
+pm2 start server/server.js --name uptime-kuma
+pm2 startup && pm2 save
+\`\`\`
+
+README 明确列出不支持：FreeBSD / OpenBSD / NetBSD，以及 Replit / Heroku。
+
+## 加监控与通知
+
+首次登录会让你建管理员账号，建议立刻开 2FA（README 把它列在特性里）。监控类型按目标选：
+
+- 网页用 HTTP(s)，要判定内容就用 **HTTP(s) Keyword**，要校验接口字段用 **HTTP(s) Json Query**
+- 纯存活用 Ping / TCP
+- 内网服务与外部触发用 Push
+- 还有 DNS 记录、Websocket、Steam 游戏服务器与 Docker 容器
+
+通知有 90+ 渠道（Telegram、Discord、Gotify、Slack、Pushover、SMTP 等），先配一个能立刻收到的，再调告警阈值。
+
+## 出公开状态页
+
+支持多个状态页，还能把状态页映射到指定域名。对外服务建议单独建一个状态页，只暴露必要的监控项，不要把你全部内网服务都列出去。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Uptime Kuma 官网",
+          url: "https://uptime.kuma.pet",
+          note: "项目主页与在线演示入口（demo 数据 10 分钟后清空），先试再装。",
+        },
+        {
+          kind: "link",
+          title: "安装 Wiki",
+          url: "https://github.com/louislam/uptime-kuma/wiki/%F0%9F%94%A7-How-to-Install",
+          note: "含反向代理等进阶安装方式，要挂域名或用 HTTPS 时看这篇。",
+        },
+        {
+          kind: "link",
+          title: "升级 Wiki",
+          url: "https://github.com/louislam/uptime-kuma/wiki/%F0%9F%86%99-How-to-Update",
+          note: "自托管最容易被忽略的一步；升级前照这里做，别直接换镜像了事。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "coolify",
+    linksCheckedAt: "2026-10-21",
+    name: "Coolify",
+    nameZh: "Coolify 自托管 PaaS",
+    aliases: ["coolify", "Coolify", "自托管 PaaS", "自建 Vercel", "Heroku 替代"],
+    summary: "开源自托管 PaaS：只要 SSH 就能接管 VPS，部署应用、数据库与 300+ 一键服务，自带自动 HTTPS、PR 预览、回滚与备份。适合想脱离 Vercel/Heroku 的人；代价是你要自己维护 Coolify 这台服务器及其升级。",
+    scenes: ["engineering", "code", "tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["PaaS", "自托管", "部署", "Docker", "开源"],
+    body: "Coolify 是对标 Heroku / Netlify / Vercel 的开源自托管替代品。它不需要 agent，只要求目标机器能 SSH：VPS、裸金属、树莓派都行，你在自己硬件上拿到云平台的便利，同时保留对基础设施的控制。\n功能覆盖部署全链路：从 GitHub、GitLab、Bitbucket、Gitea 拉代码，用 Nixpacks、Railpack、Dockerfile、Docker Compose 或预构建镜像构建；git push 触发部署、PR 预览、部署 webhook、回滚到保留的镜像；网络侧配自定义域名、自动 HTTPS 证书、反向代理、健康检查与容器网络；运维侧管多台服务器、看部署与运行时日志、开容器终端、监控资源状态；还有数据库与存储备份、计划任务、环境变量与密钥、通知，以及通过面板 / API / CLI / MCP 管理资源与团队权限。\n一个容易被忽略的设计点：配置留在你自己的服务器上，**如果哪天不用 Coolify 了，正在跑的资源仍然照常工作且可管理**——它不把你的应用锁进专有格式。\n代价很实际：自托管的官方推荐架构是「一台跑 Coolify，另外一台或多台跑业务资源」，也就是说最小投入是两台机器；而且升级、备份、安全补丁都归你。不想维护就用付费的 Coolify Cloud（含邮件通知与额外支持）。核心承诺是功能不上付费墙，但项目靠捐赠与赞助维持。",
+    officialUrl: "https://coolify.io",
+    officialLabel: "coolify.io",
+    links: {
+      official: "https://coolify.io",
+      github: "https://github.com/coollabsio/coolify",
+    },
+    whoFor: "手里有一台或多台 VPS、想统一管理应用与数据库、又不愿被按用量计费的小团队与独立开发者；以及要求数据与服务不出自己机房的场景。",
+    whoNot: "只有一台机器且希望全部跑在一起的人（官方建议 Coolify 与业务分开部署）；也不适合不想管服务器升级与备份、只想 push 就完事的人——那种情况直接用 Coolify Cloud 或托管平台更省心。",
+    installTips: [
+      "在受支持的服务器上一条命令安装：`curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash`；跑之前可先读仓库里的 scripts/install.sh。",
+      "先看官方文档的安装要求（coolify.io/docs/installation），确认系统版本与端口占用情况再执行。",
+      "推荐拓扑是 Coolify 单独一台、业务资源另放一台或多台，通过 SSH 纳管；官方文档给了完整要求清单。",
+      "不想维护服务器就用 Coolify Cloud（app.coolify.io），定价见 coolify.io。",
+      "升级与运维走官方文档；有任何异常先看部署与运行时日志，面板里可直接开容器终端排查。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#4F46E5",
+    },
+    guide: {
+      intro: "按第一次自建的顺序讲：装 Coolify → 通过 SSH 纳管目标服务器 → 部署第一个应用 → 配域名与 HTTPS → 备份与回滚，并说明为什么建议与应用分开部署。",
+      markdown: `## 先决定放几台机器
+
+这是第一步就要想清楚的。官方推荐：**一台服务器跑 Coolify，一台或多台跑部署的资源**。Coolify 本身只是控制面，它通过 SSH 管理目标机器。
+
+好处是解耦——README 明确说配置留在你自己的服务器上，如果哪天停用 Coolify，正在跑的资源仍然照常工作且可管理。
+
+## 安装只有一条命令
+
+\`\`\`bash
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
+\`\`\`
+
+官方建议**先读一遍脚本**再执行（脚本在仓库 \`scripts/install.sh\`），安装要求与细节见官方文档的 installation 页。
+
+## 纳管服务器靠 SSH
+
+Coolify 不需要在被管机器上安装 agent，只要能 SSH 上去：VPS、裸金属服务器、树莓派，任何接受 SSH 连接的机器都行。
+
+在面板里把目标服务器加进来后，就能在那上面部署应用、数据库与 300+ 一键服务（带持久化存储与自动生成的凭据）。
+
+## 部署第一个应用
+
+支持的来源与构建方式很宽：
+
+- 代码源：GitHub、GitLab、Bitbucket、Gitea
+- 构建：Nixpacks、Railpack、Dockerfile、Docker Compose，或直接给预构建镜像
+
+配好之后可以做 git push 触发部署、PR 预览、部署 webhook，出问题就回滚到保留下来的镜像。网络侧自定义域名与自动 HTTPS 证书是内置的。
+
+## 别漏掉备份
+
+自托管意味着备份归你。面板里可配数据库与存储备份、计划任务、环境变量与密钥、通知。
+
+排障时用面板直接看部署与运行时日志，或开一个容器终端进去看——比 SSH 手动翻容器方便。
+
+## 不想维护就上云
+
+| 自托管 | Coolify Cloud |
+| --- | --- |
+| 装在自己服务器上 | 用官方维护的实例 |
+| 完全控制与维护平台 | 高可用、少维护 |
+| 免费且开源 | 付费，含邮件通知与额外支持 |
+
+项目承诺功能不上付费墙，靠捐赠与赞助维持，这点在评估长期可用性时要考虑。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Coolify 官网",
+          url: "https://coolify.io",
+          note: "产品概览与当前定价，决定自建还是用 Cloud 前先看。",
+        },
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://coolify.io/docs/installation",
+          note: "安装前提与详细步骤，跑一键脚本之前务必读完要求部分。",
+        },
+        {
+          kind: "link",
+          title: "安装脚本源码",
+          url: "https://github.com/coollabsio/coolify/blob/main/scripts/install.sh",
+          note: "一键安装脚本本体，官方建议执行前先读一遍，确认它对你机器做了什么。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "appwrite",
+    linksCheckedAt: "2026-10-21",
+    name: "Appwrite",
+    nameZh: "Appwrite 开源后端一体平台",
+    aliases: ["appwrite", "Appwrite", "开源 BaaS", "Firebase 替代", "后端即服务"],
+    summary: "开源后端一体平台：Auth、Databases、Storage、Functions、Messaging、Realtime、Sites 与 Firewall 打包在一起，还自带托管 MCP server 让 Cursor/Claude Code 直接操作线上项目。适合要替代 Firebase 又要能自托管的人；代价是整套容器较重，升级要走迁移工具。",
+    scenes: ["code", "data", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["BaaS", "Auth", "数据库", "Serverless", "MCP", "自托管"],
+    body: "Appwrite 现在把自己定位成「agents and developers 的开源云」，而且是 MCP 与 agent-first：自带托管 MCP server，让编码 agent 直接在一个活着的 Appwrite 项目上操作——查数据库、看流量、发变更。它既可以是官方托管云，也可以装在你自己的基础设施上。\n产品是模块化的但共用一套：Auth（邮箱、短信、OAuth、匿名会话、magic URL）、Databases（可用 Appwrite 自己的库，也可接管的 PostgreSQL / MySQL）、Storage（压缩、加密、图片变换、访问控制）、Functions（安全隔离运行时、事件驱动）、Sites（从 Git 部署静态 / SSR / CSR 前端并带即时预览）、Messaging（邮件、短信、推送统一出口）、Firewall（流量规则、滥用控制、边缘安全）、Realtime（订阅项目事件）。\n对 agent 场景的友好程度是它当前的主要差异点：托管 MCP 用 OAuth，不需要你创建或管理 API Key；把 `https://mcp.appwrite.io/` 加进 Cursor、Claude Code、Codex、VS Code 即可。另有 `npx skills add appwrite/agent-skills` 装语言专属 agent skills，让模型生成正确的 SDK 调用。\n代价要说清：自托管是 Docker 全家桶，容器数量不少；安装向导只监听 127.0.0.1:20080 并打印一次性 installer secret，远程机器要 SSH 隧道而不是把端口公开到所有网卡；Docker CLI 比宿主 Engine 新时会报 API version 不符，需要传 DOCKER_API_VERSION；从旧版本升级要用官方迁移工具。许可为 BSD-3-Clause。",
+    officialUrl: "https://appwrite.io",
+    officialLabel: "appwrite.io",
+    links: {
+      official: "https://appwrite.io",
+      github: "https://github.com/appwrite/appwrite",
+    },
+    whoFor: "想用一套东西解决登录、数据库、存储、函数与实时推送，又希望随时能搬回自己服务器的团队；以及让 AI 编码 agent 直接操作真实后端项目的场景。",
+    whoNot: "只要一个轻量数据库或只要认证的人——整套容器偏重；也不适合在远程安装时图省事把 20080 端口公开到公网的环境。",
+    installTips: [
+      "最快试法是注册 Appwrite Cloud（cloud.appwrite.io），有 Free 档可直接开始。",
+      "自托管（Unix）：`docker run -it --rm --publish 127.0.0.1:20080:20080 --volume /var/run/docker.sock:/var/run/docker.sock --volume \"$(pwd)\"/appwrite:/usr/src/code/appwrite:rw --entrypoint=\"install\" appwrite/appwrite:2.5.0`，然后打开终端打印的带一次性 secret 的 URL 完成向导。",
+      "远程主机请 SSH 隧道到 127.0.0.1:20080，不要把这个端口发布到所有网卡；装完从 http://localhost 进控制台，非 Linux 原生宿主可能要等几分钟才起来。",
+      "报 `client version 1.52 is too new` 这类 Docker API 版本错误时，加 `--env DOCKER_API_VERSION=1.42`（取报错里提示的最大版本），升级时同样带上。",
+      "从旧版本升级用 `--entrypoint=\"upgrade\"`，随后按官方迁移文档跑迁移工具。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#F02E65",
+      simpleIcon: "appwrite",
+    },
+    guide: {
+      intro: "按第一次上手讲：先决定云还是自托管 → 自托管的安装向导与安全注意 → 用 MCP 接上编码 agent → 升级要走迁移。",
+      markdown: `## 先选云还是自托管
+
+最快路径是注册 Appwrite Cloud（有 Free 档）。要数据在自己手里就自托管——Appwrite 从设计上就考虑了自托管，任何能跑 Docker CLI 的系统都可以。
+
+## 自托管：向导只听本机
+
+Unix 下一条命令：
+
+\`\`\`bash
+docker run -it --rm \\
+    --publish 127.0.0.1:20080:20080 \\
+    --volume /var/run/docker.sock:/var/run/docker.sock \\
+    --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \\
+    --entrypoint="install" \\
+    appwrite/appwrite:2.5.0
+\`\`\`
+
+两点容易出错：
+
+1. 向导只发布在 **localhost**，并在 STDOUT 打印**一次性 installer secret**。打开它打印的 URL 完成设置。
+2. 装在远程机器时，**SSH 隧道到 127.0.0.1:20080**，不要把这个端口发布到所有网卡。
+
+装完从 \`http://localhost\` 进控制台；非 Linux 原生宿主（Docker Desktop）可能要等几分钟服务才起来。
+
+## Docker API 版本不符的修法
+
+报错长这样：\`client version 1.52 is too new. Maximum supported API version is 1.42\`。原因是镜像里的 Docker CLI 比宿主 Engine 新。加环境变量即可：
+
+\`\`\`bash
+docker run -it --rm --env DOCKER_API_VERSION=1.42 \\
+    --publish 127.0.0.1:20080:20080 \\
+    --volume /var/run/docker.sock:/var/run/docker.sock \\
+    --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \\
+    --entrypoint="install" appwrite/appwrite:2.5.0
+\`\`\`
+
+升级时同样带上 \`--env DOCKER_API_VERSION=...\`，入口换成 \`--entrypoint="upgrade"\`，然后按官方迁移文档跑迁移工具。
+
+## 让编码 agent 接进来
+
+托管 MCP server 用 OAuth，**不需要创建或管理 API Key**。加到客户端配置：
+
+\`\`\`json
+{
+    "mcpServers": {
+        "appwrite": {
+            "url": "https://mcp.appwrite.io/"
+        }
+    }
+}
+\`\`\`
+
+自托管实例要改用本地 MCP server（见官方文档）。再装语言专属 skills，让模型生成正确的 SDK 调用：
+
+\`\`\`bash
+npx skills add appwrite/agent-skills
+\`\`\`
+
+Web、Flutter、Apple、Android、React Native 有客户端 SDK；Node、Python、Dart、PHP、Ruby、Deno、Kotlin、Swift、Go、Rust 等有服务端 SDK。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Appwrite 官网",
+          url: "https://appwrite.io",
+          note: "产品总览与定价，决定用云还是自托管前先看。",
+        },
+        {
+          kind: "link",
+          title: "AI 工具与 MCP 文档",
+          url: "https://appwrite.io/docs/tooling/ai",
+          note: "MCP server、agent skills、快速开始提示词的集中入口，接编码 agent 时看这里。",
+        },
+        {
+          kind: "link",
+          title: "自托管环境变量文档",
+          url: "https://appwrite.io/docs/advanced/self-hosting/configuration/environment-variables",
+          note: "生产与自定义安装的配置项，以及 docker-compose.yml 与 .env 的手动搭建方式。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "clickhouse",
+    linksCheckedAt: "2026-10-21",
+    name: "ClickHouse",
+    nameZh: "ClickHouse 列式分析数据库",
+    aliases: ["clickhouse", "ClickHouse", "列式数据库", "OLAP", "实时分析库"],
+    summary: "开源列式数据库管理系统，主打实时生成分析数据报表；一条 curl 就能在 Linux/macOS/FreeBSD 装好，也有官方托管的 ClickHouse Cloud。适合日志、埋点这类分析型查询；代价是它是分析库不是通用业务库，选型前先按官方教程跑一遍集群才算数。",
+    scenes: ["data", "engineering"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["数据库", "列式存储", "OLAP", "实时分析", "开源"],
+    body: "ClickHouse 是一个开源的列式（column-oriented）数据库管理系统，官方一句话定位是「允许实时生成分析数据报告」。这句话里的三个词都要当真：列式决定了它擅长大宽表聚合而不擅长按行改单条；分析决定了它的场景是查询与报表；实时是它的主打卖点。\n上手门槛被压得很低——Linux、macOS、FreeBSD 上 `curl https://clickhouse.com/ | sh` 就装好了，也可以完全跳过安装直接用 ClickHouse Cloud（由同一批创造者与维护者构建的托管服务，可免费试用）。官方 Tutorial 演示的是搭建并查询一个小型 ClickHouse 集群，这是判断它适不适合你的最有效一步：别先看特性清单，先按教程把数据和查询跑起来。\n维护节奏是月度发布 + 社区会议（README 里挂着 26.9、26.8、26.7、26.6 的 Release Call 录像与幻灯片，全部内容集中在 ClickHouse Theater 与 YouTube 播放列表）。想跟版本变化，这是最直接的渠道。\n代价：它是分析型数据库，不是用来承载事务型业务的通用库；把它当主库用会在按行更新、单行点查这些地方撞墙。另外许可为 Apache-2.0，但 ClickHouse® 是商标，商用命名要注意。",
+    officialUrl: "https://clickhouse.com",
+    officialLabel: "clickhouse.com",
+    links: {
+      official: "https://clickhouse.com",
+      github: "https://github.com/ClickHouse/ClickHouse",
+    },
+    whoFor: "有大量日志、埋点、指标数据要做聚合分析与实时报表的团队；以及想在自己机器上验证列式库性能、再决定要不要上云的人。",
+    whoNot: "要一个通用事务库来承载业务写入的人——列式存储不擅长按行更新与单行点查；也不适合不愿意先看官方教程就上生产的场景。",
+    installTips: [
+      "Linux / macOS / FreeBSD 一条命令安装：`curl https://clickhouse.com/ | sh`。",
+      "不想装就直接用 ClickHouse Cloud（console.clickhouse.cloud 可免费注册），几分钟内开始查询。",
+      "装完按官方 Tutorial 走一遍：它会带你搭建并查询一个小型 ClickHouse 集群，是判断是否适合自己的最快方式。",
+      "跟进版本看每月 Release Call 的录像与幻灯片（presentations.clickhouse.com），README 里挂着最近几次发布的链接。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#FFCC00",
+      simpleIcon: "clickhouse",
+    },
+    guide: {
+      intro: "按第一次接触的顺序讲：装还是用云 → 按官方教程跑通集群 → 判断它是不是你要的那类库 → 用文档与社区资源深入。",
+      markdown: `## 装，或者先不装
+
+两条路都官方支持：
+
+\`\`\`bash
+# Linux / macOS / FreeBSD 本地安装
+curl https://clickhouse.com/ | sh
+\`\`\`
+
+或者直接跳到托管版 ClickHouse Cloud（由 ClickHouse 的创造者与维护者构建），注册即可免费试用、几分钟内开始查询。
+
+第一次接触建议先上云：省掉环境折腾，把注意力放在数据模型与查询上。
+
+## 先跑官方教程，别先看特性清单
+
+官方文档里的 Tutorial 演示的是**搭建并查询一个小型 ClickHouse 集群**。这一步是判断它适不适合你的最有效方法——列式库的表现高度依赖表结构与数据分布，光看特性清单得不出结论。
+
+跑的时候重点体会：
+
+- 大宽表聚合扫描的速度
+- 只查少数几列时的表现（列式存储的核心优势）
+- 按行更新、单行点查的手感（它不擅长的部分）
+
+## 想清楚它是什么库
+
+官方定位是「开源的列式数据库管理系统，允许实时生成分析数据报告」。拆开看：
+
+- **列式**：适合扫描与聚合，不适合频繁按行改单条
+- **分析**：场景是报表与查询
+- **实时**：这是它的主打能力
+
+把它当成承载业务写入的通用事务库，会在按行更新与单行点查上撞墙。典型用法是作为分析侧的存储，与业务库分工。
+
+## 跟进版本
+
+项目是月度发布节奏，每月有 Release Call（录像与幻灯片都在 presentations.clickhouse.com）。README 里挂着最近几次发布的链接，升级前看对应的 release call 比看 changelog 快。
+
+## 有问题去哪
+
+Slack 与 Telegram 可以实时和其他用户聊；文档站提供深入内容；代码也可以用 github.dev 直接带高亮浏览。商用前注意 ClickHouse® 是商标。`,
+      resources: [
+        {
+          kind: "html",
+          title: "ClickHouse 官网",
+          url: "https://clickhouse.com/",
+          note: "首页有高层概览，也是安装命令与 Cloud 入口；第一次了解从这里开始。",
+        },
+        {
+          kind: "html",
+          title: "官方教程",
+          url: "https://clickhouse.com/docs/getting_started/tutorial/",
+          note: "搭建并查询一个小型集群的完整步骤，判断是否适合自己前务必跑一遍。",
+        },
+        {
+          kind: "link",
+          title: "ClickHouse Cloud",
+          url: "https://clickhouse.com/cloud",
+          note: "由创造者与维护者构建的托管版，不想自己装就用它，可免费试用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "gogs",
+    linksCheckedAt: "2026-10-21",
+    name: "Gogs",
+    nameZh: "Gogs 轻量自托管 Git 服务",
+    aliases: ["gogs", "Gogs", "自托管 Git", "私有 Git 服务器", "轻量代码托管"],
+    summary: "极轻量的自托管 Git 服务：Go 单二进制分发，SSH/HTTP/HTTPS 访问，带 issues、PR、wiki、Webhooks、Git LFS 与仓库镜像。适合树莓派或小内存 VPS 上建私有仓库；代价是定位就是简单稳定，API 仍标注为实验性。",
+    scenes: ["code", "engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Git", "自托管", "代码托管", "Go", "开源"],
+    body: "Gogs（读作 /gɑgz/）的目标写在 Vision 里：做一个简单、稳定、可扩展的自托管 Git 服务，并且「以最不痛苦的方式搭起来」。用 Go 实现带来的直接好处是独立二进制分发，覆盖 Go 支持的所有平台，包括 Linux、macOS、Windows 与 ARM。\n功能面：用户仪表盘、主页与活动时间线；SSH / HTTP / HTTPS 访问仓库；用户、组织与仓库管理；仓库与组织 Webhooks（含 Slack、Discord、钉钉）；Git hooks、deploy keys 与 Git LFS；issues、pull requests、wiki、保护分支与协作；从其他代码托管平台迁移与镜像仓库（含 wiki）；在线编辑仓库文件与 wiki；Jupyter Notebook 与 PDF 渲染；认证支持 SMTP、LDAP、反向代理、GitHub.com 与 GitHub Enterprise，并带 2FA；可自定义 HTML 模板与静态文件；数据库支持 PostgreSQL、MySQL、MariaDB、SQLite3 或任何说这些协议的后端；本地化覆盖 31 种语言。\n硬件门槛是它最大的优势：官方说一块树莓派或一个 5 美元的 DigitalOcean Droplet 就够起步，团队协作的基线是 2 核 CPU + 512MB 内存，团队变大主要加 CPU，内存占用始终很低。\n代价要提前知道：项目自己的定位是「简单、稳定、可扩展」，不是功能齐全的研发协作平台——没有内置 CI/CD，API 在 README 里明确标注为实验性（experimental）；浏览器最小支持分辨率是 1024*768。",
+    officialUrl: "https://gogs.io",
+    officialLabel: "gogs.io",
+    links: {
+      official: "https://gogs.io",
+      github: "https://github.com/gogs/gogs",
+    },
+    whoFor: "想在树莓派、旧电脑或小内存 VPS 上挂一个私有 Git 服务的人；以及只需要仓库托管、issues、PR 与 wiki 这一层的小团队。",
+    whoNot: "需要内置 CI/CD、精细权限模型或企业级研发流程的团队——Gogs 只做到 issues、PR、wiki 与保护分支；也不适合要把 REST API 作为正式集成依赖的场景，官方标注 API 仍是实验性支持。",
+    installTips: [
+      "先去 try.gogs.io/gogs/gogs 在线试用，确认功能面符合预期再动手装。",
+      "按官方文档的安装指南走（gogs.io/getting-started/installation），二进制覆盖 Linux、macOS、Windows 与 ARM 平台。",
+      "数据库可选 PostgreSQL、MySQL、MariaDB、SQLite3，或任何说这些协议的后端；单机最省事是 SQLite3。",
+      "从其他平台迁移直接用内置的仓库迁移/镜像功能（含 wiki），不必手动 git push --mirror。",
+      "想省事可走 Cloudron、YunoHost、alwaysdata 这类一键部署渠道。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#2F7B4F",
+      simpleIcon: "gogs",
+    },
+    guide: {
+      intro: "按第一次自建讲：先在线试用 → 选硬件与数据库 → 装起来 → 迁移旧仓库 → 配认证与 Webhook，并说清它的能力边界在哪。",
+      markdown: `## 先在线试，再决定装不装
+
+官方提供了在线试用：\`try.gogs.io/gogs/gogs\`。Gogs 的定位是「简单、稳定、可扩展」，不是功能齐全的研发协作平台——试用一遍能最快的确认它是否满足你的需求。
+
+## 硬件门槛比想象中低
+
+官方给的参考：
+
+- 一块树莓派，或一个 5 美元的 DigitalOcean Droplet 就够起步（甚至有人用 64MB RAM 的容器服务跑）
+- 团队协作基线：**2 核 CPU + 512MB 内存**
+- 团队变大主要加 CPU，内存占用始终很低
+
+## 安装与数据库选择
+
+按官方文档的安装指南走（gogs.io/getting-started/installation）。Go 带来的好处是单一二进制分发，覆盖 Linux、macOS、Windows 与 ARM。
+
+数据库后端很宽：PostgreSQL、MySQL、MariaDB、SQLite3，或任何说这些协议的数据库。单机自用选 SQLite3 最省事；多人协作建议 PostgreSQL 或 MySQL。
+
+不想手动装可以走 Cloudron、YunoHost、alwaysdata 这类一键部署渠道。
+
+## 迁旧仓库用内置功能
+
+不用手动 \`git push --mirror\`：内置的迁移与镜像功能支持从其他代码托管平台把仓库**连同 wiki** 一起搬过来。
+
+之后按需配：
+
+- **访问协议**：SSH / HTTP / HTTPS 都支持
+- **认证**：SMTP、LDAP、反向代理、GitHub.com、GitHub Enterprise，并支持 2FA
+- **Webhooks**：仓库与组织级，内置 Slack、Discord、钉钉
+
+## 边界在哪
+
+两点务必提前知道：
+
+1. **API 是实验性的** —— README 明确标注 experimental。别把正式集成建立在它上面。
+2. **没有内置 CI/CD** —— 需要流水线就外接（官方列出的生态里有 Jenkins 插件）。
+
+浏览器端最小支持分辨率是 1024*768，更小的分辨率不保证。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Gogs 官网与文档",
+          url: "https://gogs.io",
+          note: "用户文档首页，安装、排障与本地化说明都从这里进。",
+        },
+        {
+          kind: "link",
+          title: "安装指南",
+          url: "https://gogs.io/getting-started/installation",
+          note: "官方安装步骤，二进制分发的平台与依赖说明，动手前先看。",
+        },
+        {
+          kind: "link",
+          title: "在线试用",
+          url: "https://try.gogs.io/gogs/gogs",
+          note: "不用安装就能体验的在线实例，确认功能面是否符合预期再自建。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "reactive-resume",
+    linksCheckedAt: "2026-10-21",
+    name: "Reactive Resume",
+    nameZh: "Reactive Resume 开源简历构建器",
+    aliases: ["reactive-resume", "Reactive Resume", "rxresu", "简历生成器", "开源简历"],
+    summary: "开源简历与求职信构建器：17 套模板、ATS 检查、可读性校验与求职进度看板，导出 PDF/Word/Markdown/JSON，也能整套自托管。适合在意数据归属的人；代价是自托管要准备 PostgreSQL 与存储，AI 功能需自带模型供应商。",
+    scenes: ["office", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["简历", "求职", "PDF", "自托管", "开源"],
+    body: "Reactive Resume 是免费开源的简历构建器，除了写简历还覆盖求职信与投递进度跟踪。它的卖点不只是「免费」：代码 MIT、无追踪、无广告、没有付费档，数据归你自己；可选 AI 功能用的是你自己接的模型供应商，托管与模型调用各自可能有成本。\n编辑器是重做过的：页面内直接编辑、点选元素，旁边是实时 PDF 预览（v6 用 Forme 在后台 worker 里渲染，浏览器端与服务端都行，不再需要 Browserless、Chromium 或外部打印服务，旧的 PRINTER_* / BROWSERLESS_* 环境变量可以删掉）。支持富文本、自定义章节、拖拽排序，自动保存与本地恢复，最多 200 步撤销。\n简历检查是它区别于普通模板站的地方：可读性检查把问题定位到具体行；按招聘启事做关键词匹配，并展示「招聘软件读到的文本」；还能对导出的 PDF 做检查。另有一个公开的 ATS 检查器（rxresu.me/ats-checker），在浏览器里读 PDF，不需要账号。\n导入导出很全：可导入 Reactive Resume JSON、JSON Resume、LinkedIn 数据导出、PDF 与 Word（其中 JSON、LinkedIn、可读 PDF 不需要 AI，Word 需要接供应商），导出 PDF / Word / Markdown / JSON，还能用带密码的公开链接分享并统计查看与下载。REST API 与 MCP server 也在。\n代价：自托管要准备 PostgreSQL 与存储（官方给了 Hostinger、Vercel、Cloudflare Workers、Docker / Kubernetes 四条路），17 套模板选择虽多但定制化深度不如专业排版工具。",
+    officialUrl: "https://rxresu.me",
+    officialLabel: "rxresu.me",
+    links: {
+      official: "https://rxresu.me",
+      github: "https://github.com/reactive-resume/reactive-resume",
+    },
+    whoFor: "正在批量投简历、想一边改一边看 ATS 与可读性问题的人；以及不希望简历数据躺在别人服务器上、愿意自托管的求职者与学校就业中心。",
+    whoNot: "想要像素级排版自由的设计岗求职者——它是模板化编辑器不是排版工具；也不适合指望内置 AI 帮忙写的人，AI 功能要自己接 OpenAI / Anthropic / Gemini / OpenRouter / Ollama 等供应商。",
+    installTips: [
+      "不装也能用：直接注册 rxresu.me，导入已有简历或从零开始，随写随看成品。",
+      "自托管最省事是 Hostinger 一键部署（$6.49/月起，含每周备份与 Docker 管理界面）；也可走 Vercel、Cloudflare Workers。",
+      "自己用 Docker 起：`git clone --depth 1` 后 `cp .env.example .env`，用 `openssl rand -hex 32` 分别生成 AUTH_SECRET 与 ENCRYPTION_SECRET，再 `docker compose up -d --build`，打开 http://localhost:3000。",
+      "想用已发布的镜像而不是本地构建，照官方文档的 Docker 指南走；从 v5 升级看 upgrading-to-v6。",
+      "v6 的 PDF 用 Forme 渲染，不需要 Browserless / Chromium，旧的 PRINTER_* 与 BROWSERLESS_* 环境变量可以删掉。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#2563EB",
+    },
+    guide: {
+      intro: "按第一次使用讲：先决定用托管还是自托管 → 导入或新建 → 用检查功能改 → 导出与分享；重点讲自托管时两个密钥怎么生成。",
+      markdown: `## 先用托管版，确定要自托管再折腾
+
+最直接的路径是注册 rxresu.me：创建账号、导入已有简历或从头写，边写边看成品页面。
+
+它的隐私立场写在 README 里：MIT 许可、无追踪、无广告、无付费档，数据归你。**可选 AI 功能用的是你自己接的供应商**，所以模型调用是另一笔账。
+
+## 导入比从零写快
+
+支持的导入格式：
+
+- Reactive Resume JSON
+- JSON Resume
+- LinkedIn 数据导出
+- PDF
+- Word（**需要接一个 AI 供应商**）
+
+其中 JSON、LinkedIn 与可读 PDF 的导入**不需要 AI**。
+
+## 真正有用的是检查，不是模板
+
+17 套模板之外，值得花时间的是「Resume Checks」：
+
+- 可读性检查，问题会定位到具体行
+- 按招聘启事做关键词匹配
+- 展示**招聘软件实际读到的文本**——这一项最能暴露排版问题
+- 对导出 PDF 的检查，可选的 AI 写作评审
+
+另有一个公开的 ATS 检查器（rxresu.me/ats-checker），在浏览器里读 PDF，**不需要账号**。
+
+模板可按单栏 / 双栏 / ATS-safe 过滤，内容溢出时调密度、页边距与字号。
+
+## 要自托管就先生成两个密钥
+
+本地跑起来（这是构建当前 checkout）：
+
+\`\`\`bash
+git clone --depth=1 https://github.com/reactive-resume/reactive-resume.git reactive-resume
+cd reactive-resume
+cp .env.example .env
+# 编辑 .env：设置 AUTH_SECRET 和另一个独立的 ENCRYPTION_SECRET
+openssl rand -hex 32
+docker compose up -d --build
+# 打开 http://localhost:3000
+\`\`\`
+
+**两个密钥必须分别生成、不能复用同一个值**。要部署已发布镜像请按官方 Docker 指南，本地开发看 development setup 指南。
+
+v6 的 PDF 用 Forme 渲染，不需要 Browserless / Chromium / 外部打印服务；旧的 \`PRINTER_*\`、\`BROWSERLESS_*\` 环境变量可以删掉。
+
+## 投递跟踪与导出
+
+求职进度有 List / Board / Insights / Calendar 四种视图，可从 URL 或粘贴的启事保存职位，能针对某个职位改简历并起草求职信，还能导出日历事件与 CSV。
+
+导出支持 PDF、Word、Markdown、JSON；分享可用带密码的公开链接并统计查看与下载。REST API 与 MCP server 也对外开放。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Reactive Resume 官网",
+          url: "https://rxresu.me",
+          note: "托管版入口与公开 ATS 检查器；不注册也能先用 ATS 检查器看 PDF。",
+        },
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.rxresu.me",
+          note: "上手、简历检查、助手用法与 v6 新变化；从 v5 升级看 upgrading-to-v6。",
+        },
+        {
+          kind: "link",
+          title: "Docker 自托管指南",
+          url: "https://docs.rxresu.me/self-hosting/docker",
+          note: "用已发布镜像部署的方式，比本地构建更适合长期运行。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "tooljet",
+    linksCheckedAt: "2026-10-21",
+    name: "ToolJet",
+    nameZh: "ToolJet 开源低代码内部工具平台",
+    aliases: ["tooljet", "ToolJet", "低代码平台", "内部工具", "admin panel builder"],
+    summary: "开源低代码内部工具平台：80+ 组件、90+ 数据源、内置 ToolJet Database，还能让 Claude Code/Cursor 通过 MCP 生成「真正的 ToolJet 应用」。适合做后台与运维面板；代价是 AI 生成、RBAC 与多环境属企业版，社区版是 AGPL-3.0。",
+    scenes: ["code", "office", "data"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["低代码", "内部工具", "MCP", "数据源", "自托管"],
+    body: "ToolJet 用来搭内部工具：管理后台、仪表盘、跑在你现有数据库 / API / SaaS 之上的运营应用。它的差异化在 AI 这一段——ToolJet AI 能把一句描述变成页面、查询与组件，但更关键的是 MCP：你已经用的编码 agent（Claude Code、Codex、Grok Build 作为插件，或 Cursor 等任意 MCP 客户端）可以直接构建 ToolJet 应用。\n这里有个重要的设计取向：agent 是**对着 ToolJet 真实的组件与数据契约**来构建的，而不是吐出一段自由格式的代码。结果是产出的是一个真正的 ToolJet 应用——团队能在可视化构建器里继续编辑，并继承同一套权限、环境与版本历史。操作跑在你自己的模型订阅上，不消耗 ToolJet AI 额度。MCP 目前是 beta。\n社区版（CE）包含：可视化构建器与 80+ 响应式组件（表格、图表、表单、列表、进度条等）、内置 ToolJet Database、多页应用与多人协同编辑、90+ 数据源、Docker / Kubernetes / AWS / GCP / Azure 等灵活部署、行内评论与细粒度访问控制、用 CLI 做插件与连接器、在应用内跑 JavaScript 与 Python，以及 AES-256-GCM 加密、代理式数据流与 SSO。\n代价：AI 应用生成、AI 查询构建、Agent Builder、Workflows、Modules、GitSync、多环境、白标、RBAC 与 SCIM 等都在 ToolJet AI（企业版）里；CE 许可是 AGPL-3.0，对二次分发有约束。另外官方建议生产用 LTS 版本而不是 latest。",
+    officialUrl: "https://tooljet.com",
+    officialLabel: "tooljet.com",
+    links: {
+      official: "https://tooljet.com",
+      github: "https://github.com/ToolJet/ToolJet",
+    },
+    whoFor: "要快速堆出内部管理后台、运维面板或 CRUD 工具，又希望之后团队能自己改的团队；以及已经在用 Claude Code / Cursor、想让 agent 直接产出可维护应用的人。",
+    whoNot: "需要 SOC 2 / 审计日志 / SCIM / 多环境这类企业合规能力、又不打算买企业版的人；也不适合对 AGPL-3.0 的分发条款敏感、要闭源二次分发的场景。",
+    installTips: [
+      "最快试法是注册 ToolJet Cloud；要自托管照官方部署文档（docs.tooljet.com/docs/setup/）走。",
+      "本地一把梭体验：`docker run --name tooljet --restart unless-stopped -p 80:80 --platform linux/amd64 -v tooljet_data:/var/lib/postgresql/13/main tooljet/try:ee-lts-latest`。",
+      "**生产请选 LTS 版本而不是 latest**，官方说明 LTS 才带生产级的 bug 修复、安全补丁与性能改进。",
+      "让 agent 来建应用：装 MCP（docs.tooljet.com/docs/build-with-ai/mcp/overview），Claude Code / Codex / Grok Build 有打包了 app-builder skill 的插件，Cursor 等可直接配 MCP server。",
+      "要扩展数据源或连接器用 `@tooljet/cli`（npm 包）写插件。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#3B82F6",
+    },
+    guide: {
+      intro: "按第一次落地讲：先用 Cloud 或 Docker 试起来 → 建第一个数据源与页面 → 接 MCP 让 agent 参与构建 → 说清 CE 与企业版的分界。",
+      markdown: `## 先跑起来，别先纠结部署
+
+最容易的路径是注册 ToolJet Cloud。想在自己机器上试：
+
+\`\`\`bash
+docker run \\
+  --name tooljet \\
+  --restart unless-stopped \\
+  -p 80:80 \\
+  --platform linux/amd64 \\
+  -v tooljet_data:/var/lib/postgresql/13/main \\
+  tooljet/try:ee-lts-latest
+\`\`\`
+
+**生产环境请选 LTS 版本而不是 latest**——官方明确说明 LTS 才带生产级的 bug 修复、安全补丁与性能改进。
+
+长期自建有 Docker、Kubernetes、AWS EC2/ECS/EKS、GCP GKE、Azure AKS、DigitalOcean、OpenShift、Helm、Cloud Run 等一堆官方指南。
+
+## 第一个应用怎么搭
+
+顺序是：先连数据源，再拖组件，最后绑查询。
+
+- **数据源**：90+ 种，覆盖数据库、API、云存储与 SaaS 工具；不想接外部库就用内置的 **ToolJet Database** 这个 no-code 数据库。
+- **组件**：80+ 响应式组件（Tables、Charts、Forms、Lists、Progress Bars 等）。
+- **逻辑**：可以在应用里直接跑 JavaScript 与 Python。
+
+多页应用与多人协同编辑在社区版里就有。
+
+## 让编码 agent 来建，但要知道它建的是什么
+
+这是 ToolJet 现在最有意思的部分。配好 MCP 之后，Claude Code、Codex、Grok Build（有打包 app-builder skill 的插件）或 Cursor（纯 MCP 客户端）都能直接生成页面、查询与组件，也能就地改现有应用。
+
+关键在于：agent **对着 ToolJet 真实的组件与数据契约**工作，不是吐一段自由格式代码。所以产出的是一个能被团队继续在可视化构建器里编辑的**真正的 ToolJet 应用**，并且沿用同一套权限、环境与版本历史。操作走你自己的模型订阅，不消耗 ToolJet AI 额度。
+
+MCP 目前是 beta，配置见官方 MCP 指南。
+
+## 分清楚 CE 和企业版
+
+**社区版（CE）** 有：可视化构建器与 80+ 组件、ToolJet Database、多页与多人编辑、90+ 数据源、灵活部署、行内评论与细粒度访问控制、CLI 扩展、应用内 JS/Python、AES-256-GCM 加密 + 代理式数据流 + SSO。
+
+**ToolJet AI（企业版）** 才有的：AI 应用生成、AI 查询构建、AI 调试、Agent Builder、Workflows、Modules、多环境管理、GitSync 与 CI/CD、白标、RBAC / SCIM / 审计日志、细粒度到行与组件级的权限、嵌入式应用、SLA 支持。
+
+CE 许可是 AGPL-3.0，有分发约束；采购前先确认你的用法是否触碰条款。`,
+      resources: [
+        {
+          kind: "html",
+          title: "ToolJet 官网",
+          url: "https://tooljet.com",
+          note: "Cloud 注册入口与产品概览；自托管与云端的选择看这里。",
+        },
+        {
+          kind: "html",
+          title: "ToolJet 文档",
+          url: "https://docs.tooljet.com",
+          note: "上手、数据源与组件参考的集中入口，搭第一个应用时对照查。",
+        },
+        {
+          kind: "link",
+          title: "MCP 指南",
+          url: "https://docs.tooljet.com/docs/build-with-ai/mcp/overview",
+          note: "让 Claude Code / Cursor 通过 MCP 构建 ToolJet 应用的配置说明，当前为 beta。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "sharex",
+    linksCheckedAt: "2026-10-21",
+    name: "ShareX",
+    nameZh: "ShareX Windows 截图录屏工具",
+    aliases: ["sharex", "ShareX", "截图工具", "屏幕录制", "截图上传"],
+    summary: "Windows 上免费开源的截图、录屏、文件上传与效率工具：截完可直接标注、打码、OCR、上传并复制链接，全流程能绑热键串成任务链。适合天天写工单和文档的人；代价是只支持 Windows，且设置项极多需要花时间配。",
+    scenes: ["photo", "tools", "office"],
+    platforms: ["windows"],
+    source: "opensource",
+    tags: ["截图", "录屏", "上传", "OCR", "Windows", "开源"],
+    body: "ShareX 把通常分散在好几个软件里的能力凑到了一起：屏幕捕获、屏幕录制、图像编辑、文件上传与自动化。免费、开源、轻量、无广告、重视隐私，且**不需要注册账号**。\n捕获方式很全：全屏、活动窗口、活动显示器、区域、滚动截图、上次区域、自定义区域、屏幕录制、GIF 录制与自动捕获。捕获之后可以自动触发一连串「捕获后任务」：复制到剪贴板、存文件、在编辑器里打开、上传、打印、在资源管理器中显示、运行自定义动作、扫二维码或 OCR 识别文字——这让它是个截图工作流工具，而不只是一个裁剪工具。\n区域捕获自带的标注工具（矩形、椭圆、手绘、箭头、文字、对话气泡、步骤编号、高亮、模糊、像素化、放大、聚光灯）基本覆盖了写 bug 报告、教程与支持回复的场景，敏感信息可以在分享前用模糊、像素化或智能橡皮擦遮掉。内置图像编辑器让这些操作不必切换软件。\n上传侧支持图片、文本、文件、文件夹、剪贴板内容与 URL，上传后自动复制链接、打开链接、缩短链接或显示二维码；高级用户可以为未内置的服务写自定义 uploader，官方还给 Amazon S3、Google Cloud Storage、Cloudflare R2 写了指南——这也是它在团队场景里可控的原因。此外还有一堆效率工具：取色器、鼠标高亮、钉在屏幕上、标尺、OCR、二维码、哈希校验、图片比较/转换/加水印、GIF 制作与视频转换等。\n代价很直接：只支持 Windows；而它的强项（可配置工作流与热键）同时也是学习成本——第一次打开会被大量设置项劝退。",
+    officialUrl: "https://getsharex.com",
+    officialLabel: "getsharex.com",
+    links: {
+      official: "https://getsharex.com",
+      github: "https://github.com/ShareX/ShareX",
+    },
+    whoFor: "每天要产出大量截图与短录屏的开发者、设计师、支持与技术写作、QA 与重度 Windows 用户；以及需要把截图自动上传到自家 S3 / GCS / R2 的团队。",
+    whoNot: "macOS 或 Linux 用户——它只做 Windows；也不想花半小时配工作流的人，那种情况系统自带截图工具更省事。",
+    installTips: [
+      "从官网 getsharex.com/downloads 下载，也可走 GitHub Releases、Microsoft Store 或 Steam；有安装版、绿色便携版与开发版可选。",
+      "不用注册账号，装好即可用；先去设置里把「捕获后任务」配成你实际要做的事（比如自动保存 + 上传 + 复制链接）。",
+      "要上传到自己的对象存储，照官方的 Amazon S3 / Google Cloud Storage / Cloudflare R2 指南配自定义上传目标。",
+      "给常用操作绑热键（官方有 keybinds 文档），滚动截图、区域捕获与 GIF 录制各配一个会明显提速。",
+      "分享前用模糊、像素化或智能橡皮擦遮掉敏感信息，别指望事后撤回。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#E85324",
+      simpleIcon: "sharex",
+    },
+    guide: {
+      intro: "按第一次上手讲：装好后先配「捕获后任务」与热键 → 用区域捕获 + 标注 → 配上传到自己的存储 → 再用它内置的一堆效率工具。",
+      markdown: `## 第一件事：配捕获后任务
+
+ShareX 的真正威力不在「能不能截」，而在截完之后自动干什么。捕获后任务可以串成链：复制到剪贴板 → 保存文件 → 在编辑器打开 → 上传 → 复制链接 → 缩短链接。
+
+典型配置：
+
+1. 打开「捕获后任务」设置，勾选 \`保存图像到文件\` 与 \`上传图像到主机\`
+2. 再勾 \`复制URL到剪贴板\`
+3. 保存
+
+这样一次快捷键就能得到「本地留档 + 外链在剪贴板」。这一步没配好的话，ShareX 用起来就只是个普通截图工具。
+
+## 捕获方式按场景选
+
+- **全屏 / 活动窗口 / 活动显示器**：常规截图
+- **区域捕获**：最常用，自带标注
+- **滚动截图**：截长页面
+- **上次区域**：重复截同一块位置
+- **屏幕录制 / GIF 录制**：短演示与动图
+
+## 标注与打码在同一个界面里完成
+
+区域捕获里可直接画矩形、椭圆、手绘线、箭头、文字、对话气泡、步骤编号、高亮，以及**模糊、像素化、放大、聚光灯**。
+
+写 bug 报告、教程或支持回复时用步骤编号 + 箭头最省事；对外分享前用模糊或像素化遮掉账号、密钥、客户名——这一步别省。
+
+内置图像编辑器还能裁剪、插入图片与光标、加图片效果、抠背景，不必切到别的软件。
+
+## 想让文件落在自己的桶里
+
+ShareX 能把图片、文本、文件、文件夹、剪贴板内容与 URL 上传到很多目标，上传后自动复制链接、打开、缩短或出二维码。
+
+未内置的服务可以写自定义 uploader；官方给了三份现成指南：
+
+- Amazon S3
+- Google Cloud Storage
+- Cloudflare R2
+
+团队共用时这一步很重要——截图不会散落在第三方图床。
+
+## 顺手用起来的效率工具
+
+不止截图：取色器、鼠标高亮、钉在屏幕上、标尺、OCR、二维码、哈希校验、图片比较/转换/拆分/加水印、GIF 制作与剪辑、视频转换/缩略图/剪辑、索引文件夹、元数据查看、剪贴板查看器、无边框窗口、显示器测试、网络监控。
+
+最后提醒：它**只支持 Windows**；设置项很多，第一次建议只改热键与捕获后任务两处，其余默认。`,
+      resources: [
+        {
+          kind: "html",
+          title: "ShareX 官网",
+          url: "https://getsharex.com",
+          note: "下载入口与各功能文档索引；认准官网下载，避免第三方打包版。",
+        },
+        {
+          kind: "link",
+          title: "自定义上传目标指南（S3 / GCS / R2）",
+          url: "https://getsharex.com/docs/custom-uploader",
+          note: "把截图传到自己对象存储的配置入口，团队共用时先看这个。",
+        },
+        {
+          kind: "link",
+          title: "热键与命令行参数文档",
+          url: "https://getsharex.com/docs/keybinds",
+          note: "把常用操作绑到快捷键的说明；命令行参数文档可用来做自动化调用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "trilium",
+    linksCheckedAt: "2026-10-21",
+    name: "Trilium Notes",
+    nameZh: "Trilium Notes 层级知识库笔记",
+    aliases: ["trilium", "Trilium Notes", "TriliumNext", "个人知识库", "层级笔记"],
+    summary: "面向大型个人知识库的跨平台层级笔记应用：笔记克隆、笔记级加密、关系图/思维导图/画布、脚本与 ETAPI，可自托管同步。适合要组织几万条笔记的人；代价是服务端与客户端的同步版本必须匹配，跨大版本要留意。",
+    scenes: ["docs", "office", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["笔记", "知识库", "自托管", "加密", "开源"],
+    body: "Trilium Notes 是免费开源的跨平台层级笔记应用，重点明确：构建**大型**个人知识库。它的核心结构是任意深度的笔记树，而且一个笔记可以被放到树的多个位置（克隆）——这是它区别于「文件夹+文件」类笔记工具的根本设计。\n能力面很宽：富文本 WYSIWYG 编辑器（表格、图片、数学公式、Markdown 自动格式化）、带语法高亮的代码笔记、全文搜索与 note hoisting、无缝的笔记版本历史、可用来做组织/查询/脚本的属性与脚本系统、自托管同步服务器（也有第三方托管同步服务）、把笔记发布到公网、笔记级粒度的强加密、基于 Excalidraw 的 canvas 草图、关系图与笔记/链接地图、基于 Mind Elixir 的思维导图、带位置标记与 GPX 轨迹的地理地图、ETAPI（REST API）自动化。官方称在可用性与性能上能撑到 10 万条笔记以上。移动端有触屏优化的前端。\n这个项目现在是 TriliumNext：原作者 zadam 把仓库交给了社区。从 zadam/Trilium 迁移过来不需要特殊步骤——装好 TriliumNext 直接沿用现有数据库即可；但版本对应要小心：v0.90.4 及之前与 zadam 的 v0.63.7 兼容，之后 TriliumNext 提升了 sync version，就无法直接迁移了。\n代价：层级树+属性这套模型学习曲线不低；自托管同步时服务端与客户端版本要匹配（README 明确建议用 TriliumDroid 时关掉服务端的自动更新）；桌面端是 Electron 应用，内存占用不是轻量级的。许可 AGPL-3.0。",
+    officialUrl: "https://triliumnotes.org",
+    officialLabel: "triliumnotes.org",
+    links: {
+      official: "https://triliumnotes.org",
+      github: "https://github.com/TriliumNext/Trilium",
+    },
+    whoFor: "想把几年积累的几万条笔记组织成可检索结构、并希望数据握在自己手里的人；以及需要笔记级加密与自托管同步的场景。",
+    whoNot: "只想随手记两条待办的人——层级树与属性模型偏重；也不适合指望服务端随便升级、客户端随便跟的环境，同步版本不匹配会直接断同步。",
+    installTips: [
+      "Windows / macOS：从 Releases 页下载对应平台的二进制包，解压后运行 trilium 可执行文件；想要最新特性可用 nightly 构建（不稳定，每日更新）。",
+      "Linux：优先用发行版自带的包（README 里挂了 repology 版本表），也可直接下载二进制；另有 Flatpak，但尚未发布到 FlatHub。",
+      "自建服务端（含 Docker，镜像 triliumnext/trilium）照官方 server 安装文档走；服务端起来后用浏览器访问，界面与桌面端几乎一致（官方只测试最新版 Chrome 与 Firefox）。",
+      "从 zadam/Trilium 迁过来不用特殊步骤，装好直接用现有数据库；但要核对版本对应关系（v0.90.4 之前 ↔ zadam v0.63.7）。",
+      "用 TriliumDroid 时要在服务端关掉自动更新，因为同步版本必须与客户端一致。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#1F6FEB",
+    },
+    guide: {
+      intro: "按第一次搭建讲：选桌面端还是服务端 → 理解克隆与属性这两个核心概念 → 配自托管同步 → 以及从 zadam/Trilium 迁移的版本坑。",
+      markdown: `## 先选形态
+
+- **桌面端**：Windows / macOS 从 Releases 下载二进制，解压运行 \`trilium\`；Linux 优先用发行版包（README 挂了 repology 版本表），也可直接用二进制，另有 Flatpak（尚未上 FlatHub）。
+- **服务端**：自建服务器（Docker 镜像 \`triliumnext/trilium\`），浏览器访问，界面与桌面端几乎一致。**官方只测试最新版 Chrome 与 Firefox**。
+- **移动端**：用手机浏览器访问服务端移动界面；或选原生客户端 TriliumDroid（Android）、Pocket Trilium（完整 Android 实例）、Trinote（iOS）。
+
+## 两个必须先理解的概念
+
+这是 Trilium 与普通笔记工具真正的差别：
+
+1. **克隆（cloning）**：一条笔记可以同时出现在树的**多个位置**。所以它不是文件夹拷贝，组织维度可以重叠。
+2. **属性（attributes）**：给笔记打属性，用来做组织、查询与高级脚本。配合脚本能力，可以把知识库变成半结构化数据库。
+
+笔记类型也不止文本：代码笔记（带语法高亮）、canvas（基于 Excalidraw 的草图）、思维导图（Mind Elixir）、关系图与笔记/链接地图、带 GPX 轨迹的地理地图。
+
+## 加密是笔记级的
+
+「受保护笔记」提供**笔记级粒度**的强加密——可以只加密某一个子树，而不是全库加密一次。这是把工作笔记与生活笔记放同一个库里的前提。
+
+## 自托管同步的版本坑
+
+用自建同步服务器时，服务端与客户端的**同步版本必须匹配**。
+
+从原项目 zadam/Trilium 迁过来不需要特殊步骤——装好 TriliumNext 会直接用你现有的数据库。但版本对应要核对：
+
+- TriliumNext **v0.90.4 及之前** ↔ zadam/trilium **v0.63.7**
+- 之后的 TriliumNext 提升了 sync version，**无法直接迁移**
+
+另外用 TriliumDroid 时，README 建议在服务端**关掉自动更新**，否则版本一升级同步就断。
+
+## 自动化与迁移
+
+ETAPI（REST API）可用来做批量导入导出与自动化；支持 Evernote 与 Markdown 导入导出；Web Clipper 可以一键存网页内容。
+
+规模上官方称可撑到 10 万条以上笔记。第三方资源可看 awesome-trilium（主题、脚本、插件）与 TriliumRocks!（教程）。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Trilium Notes 官网",
+          url: "https://triliumnotes.org",
+          note: "项目主页与下载入口；注意规范拼写是 Trilium（一个 l），不是 Trillium。",
+        },
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.triliumnotes.org/",
+          note: "上手、安装、Docker、升级与核心概念的完整文档；应用内按 F1 可直接打开。",
+        },
+        {
+          kind: "link",
+          title: "服务端安装文档",
+          url: "https://docs.triliumnotes.org/user-guide/setup/server",
+          note: "自建同步服务器的部署方式，含 Docker 镜像 triliumnext/trilium 的说明。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "dokploy",
+    linksCheckedAt: "2026-10-21",
+    name: "Dokploy",
+    nameZh: "Dokploy 自托管 PaaS",
+    aliases: ["dokploy", "Dokploy", "自托管 PaaS", "Vercel 替代", "VPS 部署"],
+    summary: "免费可自托管的 PaaS：部署各类应用与 MySQL/PostgreSQL/MongoDB/MariaDB/libsql/Redis，内置 Traefik 路由、数据库备份、Docker Compose 与 Docker Swarm 多节点。适合一台 VPS 上管多个项目的人；代价是官方文档极简，排障主要靠 Discord。",
+    scenes: ["engineering", "code"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["PaaS", "自托管", "部署", "Docker", "数据库"],
+    body: "Dokploy 是一个免费、可自托管的 Platform as a Service，目标是简化应用与数据库的部署与管理。它覆盖的运行时很宽（Node.js、PHP、Python、Go、Ruby 等），数据库支持 MySQL、PostgreSQL、MongoDB、MariaDB、libsql 与 Redis，并且能把数据库自动备份到外部存储。\n基础设施侧：原生支持 Docker Compose 管理复杂应用；用 Docker Swarm 把应用扩展到多节点；内置 Traefik 集成做路由与负载均衡；实时监控每个资源的 CPU、内存、存储与网络；支持把应用远程部署到外部服务器（Multi Server）；部署成功或失败可以发通知到 Slack、Discord、Telegram、邮件等。还有一键模板（Plausible、Pocketbase、Calcom 等）和管理用的 CLI 与 API。\n上手只有一条命令：在一台 VPS 上跑 `curl -sSL https://dokploy.com/install.sh | bash`，文档在 docs.dokploy.com，不想自己装就直接用 Dokploy Cloud。\n代价要说清楚：这个项目的 README 本身非常简短，功能只列了要点，深度细节都在 docs.dokploy.com 与 Discord 里——也就是说排障时你不会有很厚的公开资料可查，社区规模也小于同类的老牌 PaaS。把它用在生产前，建议先把备份与回滚路径跑通。",
+    officialUrl: "https://dokploy.com",
+    officialLabel: "dokploy.com",
+    links: {
+      official: "https://dokploy.com",
+      github: "https://github.com/Dokploy/dokploy",
+    },
+    whoFor: "手里有一台 VPS、想在一处管理多个应用与数据库、并希望自带 Traefik 路由与备份的独立开发者与小团队。",
+    whoNot: "需要详尽官方文档与企业级支持的人——项目资料很薄，排障主要靠 Discord；也不适合没有 Linux 服务器、只想 push 就完事的场景（那就用 Dokploy Cloud 或托管平台）。",
+    installTips: [
+      "在一台 VPS 上执行：`curl -sSL https://dokploy.com/install.sh | bash`，之后按 docs.dokploy.com 做初始化配置。",
+      "不想自己装就用 Dokploy Cloud（app.dokploy.com）。",
+      "部署 Compose 应用直接用原生 Docker Compose 支持；要横向扩展再用 Docker Swarm 做多节点。",
+      "数据库建好就把自动备份配到外部存储，别等到出事才补。",
+      "自动化与脚本化走它自带的 CLI 或 API；部署结果接 Slack / Discord / Telegram / 邮件通知。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#0EA5E9",
+    },
+    guide: {
+      intro: "按第一次自建讲：装到 VPS → 建第一个应用与数据库 → 配 Traefik 路由与备份 → 需要时扩到多节点；并说明它的资料薄这一现实。",
+      markdown: `## 一台 VPS 一条命令
+
+\`\`\`bash
+curl -sSL https://dokploy.com/install.sh | bash
+\`\`\`
+
+在 VPS 上跑完这条就装好了，后续配置看 docs.dokploy.com。不想自己维护安装过程就直接用 Dokploy Cloud（app.dokploy.com）。
+
+## 先建数据库，再建应用
+
+支持的数据库：MySQL、PostgreSQL、MongoDB、MariaDB、libsql、Redis。应用侧覆盖 Node.js、PHP、Python、Go、Ruby 等运行时。
+
+顺序建议：
+
+1. 建数据库，拿到连接信息
+2. 建应用，填环境变量
+3. **立刻把数据库的自动备份配到外部存储**
+
+备份这项别拖——自托管里数据库是最容易丢的一环。
+
+## 路由由 Traefik 接管
+
+Dokploy 内置 Traefik 集成，负责路由与负载均衡。绑定域名与 HTTPS 都在这一层完成，不需要你手写反代配置。
+
+想省事还可以用一键模板（Plausible、Pocketbase、Calcom 等）。
+
+## 复杂应用与多节点
+
+- **复杂应用**：用原生 Docker Compose 支持管理多容器项目
+- **横向扩展**：用 Docker Swarm 把应用铺到多个节点
+- **多台机器**：Multi Server 支持把应用远程部署到外部服务器
+
+实时监控覆盖每个资源的 CPU、内存、存储与网络，先看监控再决定要不要扩。
+
+## 自动化与通知
+
+部署结果可以推到 Slack、Discord、Telegram、邮件等渠道；批量操作走自带的 CLI 或 API。
+
+## 心理准备：资料很薄
+
+这个项目的 README 极短，功能只有要点列表，深度内容在 docs.dokploy.com，排障讨论集中在 Discord。上生产前务必自己先把**备份与回滚**跑通一次——不要等到真出事才第一次演练。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Dokploy 官网",
+          url: "https://dokploy.com",
+          note: "产品概览与安装命令入口，也链接了 Discord 社区与云版。",
+        },
+        {
+          kind: "html",
+          title: "Dokploy 文档",
+          url: "https://docs.dokploy.com",
+          note: "唯一成体系的官方资料，初始化配置与各功能细节都在这里。",
+        },
+        {
+          kind: "link",
+          title: "Discord 社区",
+          url: "https://discord.gg/2tBnJ3jDJc",
+          note: "官方指定的求助与讨论渠道，文档没覆盖的问题主要靠这里与 YouTube 教程。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "glance",
+    linksCheckedAt: "2026-10-21",
+    name: "Glance",
+    nameZh: "Glance 自托管信息看板",
+    aliases: ["glance", "Glance", "自托管看板", "homelab dashboard", "RSS 仪表盘"],
+    summary: "Go 写的极轻自托管看板，用 YAML 拼出 RSS、Reddit、Hacker News、天气、行情、Docker 容器状态等 widget，单个二进制不到 20MB。适合做 homelab 首页；代价是所有配置都靠手写 YAML，没有可视化编辑器，且页面不会自动刷新。",
+    scenes: ["tools", "social"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["看板", "RSS", "自托管", "homelab", "Go", "开源"],
+    body: "Glance 是一个轻量、可高度定制的仪表盘，把你关心的各种信息流放在一个界面里。它的两个硬指标很能说明定位：单个二进制不到 20MB，Docker 镜像同样很小；未缓存页面通常在 1 秒内加载完（取决于网速与 widget 数量）；前端几乎只有原生 JS。\nwidget 覆盖 RSS、Subreddit 帖子、Hacker News、天气预报、YouTube 频道更新、Twitch 频道、行情价格、Docker 容器状态、服务器统计，还有自定义 widget 等。布局能力也够用：多种布局、任意数量的页面/标签页、每个 widget 大量配置项、部分 widget 有多种样式、支持自定义 CSS 与自定义主题。移动端是专门优化过的。\n自定义 widget 有四种方式：iframe 嵌入外部网页、html 插入自己的静态 HTML、extension 从 URL 抓 HTML、custom-api 从 URL 取 JSON 再用自定义 HTML 渲染——最后一种基本能把任何有 API 的东西接进来。\n代价很明确：配置全靠手写 YAML，没有可视化编辑器；而且**页面不会自动刷新**——官方 FAQ 说得很直接，信息只在加载页面时抓取然后缓存，只有时钟和相对时间这类会动态更新。另外几个已知坑：用 Pi-Hole / AdGuard 这类 DNS 广告拦截服务时，其默认速率限制很容易被 widget 数量打爆导致请求超时；浏览器装了 Dark Reader 会破坏 markets、bookmarks 等 widget 的布局；YAML 里 `pages` 键重复会出现 `cannot unmarshal !!map into []glance.page` 报错。",
+    officialUrl: "https://github.com/glanceapp/glance",
+    officialLabel: "github.com/glanceapp/glance",
+    links: {
+      official: "https://github.com/glanceapp/glance",
+      github: "https://github.com/glanceapp/glance",
+    },
+    whoFor: "有 homelab 或一台小服务器、想开浏览器就看到自己所有信息流的人；以及愿意写 YAML 换取极低资源占用的自托管玩家。",
+    whoNot: "想要拖拖拽拽配看板的人——它没有可视化编辑器；也不适合指望页面常开自动刷新的场景（信息只在加载时抓取并缓存）。",
+    installTips: [
+      "推荐用官方目录模板：`mkdir glance && cd glance && curl -sL https://github.com/glanceapp/docker-compose-template/archive/refs/heads/main.tar.gz | tar -xzf - --strip-components 2`，改完 docker-compose.yml、config/home.yml 与 config/glance.yml 后 `docker compose up -d`。",
+      "也可手写 compose：镜像 `glanceapp/glance`，挂载 `./config:/app/config`，端口 `8080:8080`；配置模板 `wget -O config/glance.yml https://raw.githubusercontent.com/glanceapp/glance/refs/heads/main/docs/glance.yml`。",
+      "用二进制就跑：`/opt/glance/glance --config /etc/glance.yml`（默认从所在目录找 glance.yml）；Linux / Windows / macOS 的 x86、x86_64、ARM、ARM64 都有预编译包。",
+      "还有 Proxmox VE Helper Script、NixOS 包、Hostinger 与 Coolify 等第三方安装渠道。",
+      "出问题先看 `docker compose logs`；装了 Dark Reader 记得给该域名关掉深色模式，否则布局会坏。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#F59E0B",
+    },
+    guide: {
+      intro: "按第一次搭看板讲：用模板起服务 → 理解 pages/columns/widgets 的 YAML 结构 → 加 RSS 与服务器类 widget → 讲清不自动刷新与 Pi-Hole 超时这两个坑。",
+      markdown: `## 用官方模板起服务
+
+推荐路径，一条命令把目录结构和模板文件都建好：
+
+\`\`\`bash
+mkdir glance && cd glance
+curl -sL https://github.com/glanceapp/docker-compose-template/archive/refs/heads/main.tar.gz | tar -xzf - --strip-components 2
+\`\`\`
+
+然后改三个文件：
+
+- \`docker-compose.yml\`：端口、卷等容器配置
+- \`config/home.yml\`：首页的 widget 与布局
+- \`config/glance.yml\`：主题与更多页面（可选 \`.env\` 与 \`assets/user.css\`）
+
+就绪后：
+
+\`\`\`bash
+docker compose up -d
+docker compose logs      # 排障
+\`\`\`
+
+## YAML 结构就三层
+
+\`\`\`yaml
+pages:
+  - name: Home
+    columns:
+      - size: small
+        widgets:
+          - type: rss
+            limit: 10
+            cache: 12h
+            feeds:
+              - url: https://selfh.st/rss/
+                title: selfh.st
+          - type: weather
+            location: London, United Kingdom
+            units: metric
+\`\`\`
+
+**pages → columns → widgets**。列有 \`size\`（small / full），widget 用 \`type\` 指定类型，多数还能用 \`title\` 改标题、用 \`cache\` 控制缓存时长。
+
+## 没有可视化编辑器
+
+这是选型前必须接受的：所有配置手写 YAML，改完重启或刷新生效。好处是极轻——单二进制 <20MB，前端几乎只有原生 JS，未缓存页面通常 1 秒内加载完。
+
+## 页面不会自动刷新
+
+官方 FAQ 说得很明确：**信息只在加载页面时抓取并缓存**，只有时钟和「多久之前」这类相对时间会动态更新。每个 widget 的默认缓存时长不同，也可以自己配。
+
+所以别把它当成实时监控面板——那是 Uptime Kuma 之类工具的活。
+
+## 三个已知坑
+
+1. **请求超时**：多半是 Pi-Hole / AdGuard Home 这类 DNS 拦截服务的默认速率限制被打爆（widget 一多很容易超）。去 DNS 服务里调高速率限制。用 Podman 时偶尔也有超时，可在 compose 末尾加 \`networks: podman: external: true\`。
+2. **布局错乱**：几乎都是浏览器扩展 Dark Reader 造成的，给托管域名关掉深色模式。
+3. **\`cannot unmarshal !!map into []glance.page\`**：\`pages\` 键重复了——主 glance.yml 里有 \`pages\`，被 include 的页面里又有一个。删掉子页面顶部的 \`pages\`。`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "配置文档",
+          url: "https://github.com/glanceapp/glance/blob/main/docs/configuration.md",
+          note: "pages / columns / widgets 的完整配置项，手写 YAML 时对着查。",
+        },
+        {
+          kind: "link",
+          title: "主题文档",
+          url: "https://github.com/glanceapp/glance/blob/main/docs/themes.md",
+          note: "内置主题列表与自制主题方法，改几个数值就能配出自己的配色。",
+        },
+        {
+          kind: "link",
+          title: "社区 widget",
+          url: "https://github.com/glanceapp/community-widgets",
+          note: "第三方贡献的 widget 集合，内置类型不够用时先来这里找。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "casaos",
+    linksCheckedAt: "2026-10-21",
+    name: "CasaOS",
+    nameZh: "CasaOS 家庭个人云系统",
+    aliases: ["casaos", "CasaOS", "个人云", "家庭服务器系统", "ZimaBoard 系统"],
+    summary: "给家庭场景做的开源个人云系统：在 ZimaBoard / NUC / 树莓派上一键装上，就能通过应用商店装 Docker 应用、管理硬盘与文件。适合想低成本自建私人云的人；代价是只支持 Debian 系 Linux，且安装脚本会接管系统层面的配置。",
+    scenes: ["tools", "data"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["个人云", "自托管", "家庭服务器", "Docker", "开源"],
+    body: "CasaOS 的出发点写在 README 里：团队 2020 年观察到三个趋势（算力与存储成本快速下降、部分云计算向边缘迁移、消费者数据资产归属问题被忽视），于是做了个思想实验——五年内能不能有 100 美元以下的个人云？它要当一台个人数据中心，为创作者与小组织存管数据，也能控制并连接家里的智能设备。\n功能围绕家庭场景设计：无代码、无表单的友好界面；支持多种硬件与基础系统（ZimaBoard、NUC、树莓派、旧电脑都行）；精选应用商店一键安装（Nextcloud、HomeAssistant、AdGuard、Jellyfin、*arr 系列等），还能从 Docker 生态里装十万级的应用；所见即所得的驱动器与文件管理；以及资源占用、应用状态等系统与应用小组件。\n硬件支持 amd64/x86-64、arm64、armv7。系统方面官方支持并测试过 Debian 12（推荐）、Ubuntu Server 20.04 与 Raspberry Pi OS；Elementary 6.1 与 Armbian 22.04 是社区支持；Alpine、OpenWrt、ArchLinux 尚未充分测试。\n代价要说清：它只跑在 Linux 上，且安装脚本（`wget -qO- https://get.casaos.io | sudo bash`）是在系统层面装东西的，建议在刚装好的干净系统上跑，别在你已经精心配置过的生产机器上试。卸载有 `casaos-uninstall`（v0.3.3+）。项目源自 ZimaBoard 众筹产品的预装系统，社区驱动属性明显。",
+    officialUrl: "https://casaos.zimaspace.com",
+    officialLabel: "casaos.zimaspace.com",
+    links: {
+      official: "https://casaos.zimaspace.com",
+      github: "https://github.com/IceWhaleTech/CasaOS",
+    },
+    whoFor: "想在家里用小主机或旧电脑搭一个私人云、装 Nextcloud / Jellyfin / HomeAssistant 这类应用、又不想学 Docker 命令行的人。",
+    whoNot: "非 Linux 用户；也不适合想在一台已投入生产、配置复杂的机器上加装的人——安装脚本会动系统层面的配置，应当先在干净系统上装。",
+    installTips: [
+      "在**全新安装**的受支持系统上执行：`wget -qO- https://get.casaos.io | sudo bash`（或 `curl -fsSL https://get.casaos.io | sudo bash`）。",
+      "官方支持并测试过的是 Debian 12（推荐）、Ubuntu Server 20.04 与 Raspberry Pi OS；Alpine、OpenWrt、ArchLinux 尚未充分测试。",
+      "硬件支持 amd64/x86-64、arm64、armv7，ZimaBoard、Intel NUC、树莓派与旧电脑都能用。",
+      "更新可从界面 Settings → Update 做；终端方式要经 SSH 或直接接显示器键盘，命令 `wget -qO- https://get.casaos.io/update | sudo bash`；查版本 `casaos -v`。",
+      "卸载用 `casaos-uninstall`（v0.3.3 及以上）；更早版本用 `curl -fsSL https://get.icewhale.io/casaos-uninstall.sh | sudo bash`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#2563EB",
+    },
+    guide: {
+      intro: "按第一次装机讲：挑干净的 Linux → 一条命令装 → 从应用商店装第一个应用 → 更新与卸载；重点是强调别在已投入生产的机器上试装。",
+      markdown: `## 先挑一台干净的机器
+
+这是最重要的一步。CasaOS 的安装脚本会动**系统层面的配置**，所以请在新装好的系统上跑，不要在你已经精心调过、正在跑业务的那台机器上试。
+
+受支持且测试过的系统：
+
+- **Debian 12**（官方推荐）
+- **Ubuntu Server 20.04**
+- **Raspberry Pi OS**
+
+社区支持：Elementary 6.1、Armbian 22.04。Alpine、OpenWrt、ArchLinux 尚未充分测试。
+
+硬件支持 amd64/x86-64、arm64、armv7——ZimaBoard、Intel NUC、树莓派、旧电脑都行。
+
+## 一条命令装完
+
+\`\`\`bash
+wget -qO- https://get.casaos.io | sudo bash
+# 或
+curl -fsSL https://get.casaos.io | sudo bash
+\`\`\`
+
+装完打开 Web 界面即可。它的定位是「无代码、无表单」，界面就是给家庭场景做的，不需要懂 Docker 命令。
+
+## 装应用走内置商店
+
+应用商店里有精选应用可一键安装：Nextcloud、HomeAssistant、AdGuard、Jellyfin、*arr 系列等。除此之外，Docker 生态里的十万级应用也能装。
+
+文件与驱动器管理是所见即所得的；首页小组件会显示资源占用与应用状态。
+
+## 更新与卸载
+
+- **更新**：界面里 Settings → Update 最省事。走终端的话必须经 SSH 或直接接显示器键盘（**不能**在 CasaOS 的 Web 终端里做）：
+
+\`\`\`bash
+wget -qO- https://get.casaos.io/update | sudo bash
+casaos -v          # 查版本
+\`\`\`
+
+- **卸载**：v0.3.3 及以上直接 \`casaos-uninstall\`；更早版本用 \`curl -fsSL https://get.icewhale.io/casaos-uninstall.sh | sudo bash\`。
+
+## 背景与定位
+
+项目源自 ZimaBoard 众筹产品的预装系统，由社区驱动开发。它的目标不只是「家庭 NAS 界面」，而是把个人数据的归属权拿回来——README 里把这个动机写得很清楚（算力与存储成本下降、计算向边缘迁移、数据归属被忽视）。
+
+想参与贡献或看开发文档：wiki.casaos.io。`,
+      resources: [
+        {
+          kind: "html",
+          title: "CasaOS 官网",
+          url: "https://casaos.zimaspace.com",
+          note: "产品主页与下载入口，也有在线 Demo 可以先看界面。",
+        },
+        {
+          kind: "link",
+          title: "CasaOS Wiki",
+          url: "https://wiki.casaos.io",
+          note: "贡献方式与开发文档；想做二次开发或排障深入时看这里。",
+        },
+        {
+          kind: "link",
+          title: "社区 Discord",
+          url: "https://discord.gg/knqAbbBbeX",
+          note: "官方指定的求助与讨论渠道，系统兼容性这类问题在这里问最快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "wails",
+    linksCheckedAt: "2026-10-21",
+    name: "Wails",
+    nameZh: "Wails Go 桌面应用框架",
+    aliases: ["wails", "Wails", "Go 桌面应用", "Go GUI", "Electron 替代"],
+    summary: "用 Go 写后端、任意前端技术写界面，打包成单个二进制的桌面应用框架，且用原生渲染引擎、不内嵌浏览器。适合已有 Go 项目要加 GUI 的人；代价是 v3 仍是 Beta，生产应先用稳定的 v2。",
+    scenes: ["code", "engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["桌面应用", "Go", "GUI", "跨平台", "开源"],
+    body: "Wails 解决的是一个具体痛点：传统上给 Go 程序配 Web 界面，是内置一个 Web 服务器再让用户开浏览器。Wails 走另一条路——把 Go 代码和 Web 前端一起打包进**单个二进制**，并提供工具处理项目创建、编译与打包。\n特性：后端用标准 Go；前端用你熟悉的任意技术；有预置模板快速起项目；能从 JavaScript 直接调用 Go 方法；自动为 Go 的 struct 与方法生成 TypeScript 定义；原生对话框与菜单；原生深色/浅色模式；支持现代半透明与「毛玻璃」窗口效果；Go 与 JavaScript 之间有统一的事件系统；强大的 CLI 工具；跨平台；**使用原生渲染引擎，不内嵌浏览器**。\n版本状态要分清，这是当前最大的坑：v2 是 Stable，v3 是 Beta，两者命令与文档站都不同——v2 是 `go install github.com/wailsapp/wails/v2/cmd/wails@latest` 与 wails.io，v3 是 `go install github.com/wailsapp/wails/v3/cmd/wails3@latest` 与 v3.wails.io。项目的新功能与公开行为变更走 WEP（Wails Enhancement Proposal），以 draft PR 形式提交而不是 issue。\n官方 FAQ 也把边界讲清楚了：它面向的是「Go 程序员想给自己的应用套一个 HTML/JS/CSS 前端，又不想起服务器开浏览器」，可以提供原生菜单与对话框，因此算得上轻量的 Electron 替代；但它的目标不是做一个完整的 Electron 对等物。许可 MIT。",
+    officialUrl: "https://wails.io",
+    officialLabel: "wails.io",
+    links: {
+      official: "https://wails.io",
+      github: "https://github.com/wailsapp/wails",
+    },
+    whoFor: "想给已有 Go 程序加图形界面、或想要轻量桌面应用（不想背一个 Chromium）的 Go 程序员。",
+    whoNot: "不是 Go 栈的团队——它的全部价值建立在 Go 后端上；也不适合需要 Electron 完整生态（大量现成插件与成熟打包链路）的场景，以及打算直接把 beta 的 v3 上生产的项目。",
+    installTips: [
+      "v2（Stable）：`go install github.com/wailsapp/wails/v2/cmd/wails@latest`，文档在 wails.io。",
+      "v3（Beta）：`go install github.com/wailsapp/wails/v3/cmd/wails3@latest`，文档在 v3.wails.io。",
+      "完整安装要求分别见 wails.io/docs/gettingstarted/installation 与 v3.wails.io——不同平台的前置依赖不一样，先读完再动手。",
+      "生产项目请用 v2；想跟新特性或参与 WEP 讨论再看 v3。",
+      "装完用 CLI 的模板起项目（wails 的 CLI 负责生成、编译与打包），前端技术可沿用 React / Vue / Svelte / Angular 等。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "W",
+      color: "#00ADD8",
+      simpleIcon: "wails",
+    },
+    guide: {
+      intro: "按第一次上手讲：先分清 v2 与 v3 该装哪个 → 装 CLI 与平台依赖 → 用模板起项目 → 理解 Go 与前端的调用与类型生成 → 打包成单二进制。",
+      markdown: `## 第一个决定：v2 还是 v3
+
+这是最容易踩的坑，两个版本的**命令和文档站都不一样**：
+
+| 版本 | 状态 | 安装 | 文档 |
+| --- | --- | --- | --- |
+| v2 | Stable | \`go install github.com/wailsapp/wails/v2/cmd/wails@latest\` | wails.io |
+| v3 | Beta | \`go install github.com/wailsapp/wails/v3/cmd/wails3@latest\` | v3.wails.io |
+
+生产项目用 v2。v3 还在 Beta，新功能与公开行为变更走 WEP（Wails Enhancement Proposal），以 draft PR 形式提交，roadmap 在仓库 discussions 里。
+
+## 装 CLI 之前先读平台依赖
+
+各平台的前置依赖不同，官方文档分别给了 v2 与 v3 的完整安装说明：
+
+- v2：wails.io/docs/gettingstarted/installation
+- v3：v3.wails.io
+
+先读完再装，能省掉大量编译期的奇怪报错。
+
+## 用模板起项目
+
+Wails 自带强大的 CLI，负责项目生成、编译与打包。模板里已经配好了 Go 后端 + Web 前端的骨架，前端可以用你熟悉的框架（React、Vue、Svelte、Angular 等）。
+
+## Go 与前端怎么接
+
+这是 Wails 的核心价值，记住三件事：
+
+1. **从 JavaScript 调用 Go 方法**——Go 侧暴露的方法前端可直接调
+2. **自动生成 TypeScript 定义**——为你的 Go struct 与方法生成对应类型，前端有类型提示
+3. **统一事件系统**——Go 与 JavaScript 之间双向通信
+
+另外还有原生对话框与菜单、原生深色/浅色模式、现代半透明与毛玻璃窗口效果。
+
+## 它和 Electron 的关系
+
+官方 FAQ 说得很克制：取决于你的需求。它面向的是「Go 程序员想给应用套个 HTML/JS/CSS 前端，而不想起服务器开浏览器」，并提供原生菜单与对话框，所以可以算**轻量版** Electron 替代。
+
+关键在于它**使用原生渲染引擎，不内嵌浏览器**——这是体积小得多的原因，也意味着你不能指望 Electron 那套生态与插件。
+
+## 打包
+
+最终产物是**单个二进制**：Go 代码 + Web 前端打在一起，由 CLI 的 build 流程完成。分发时不需要用户另外装运行时。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Wails v2 官网",
+          url: "https://wails.io/",
+          note: "稳定版文档首页，含安装指南与全部特性说明，生产项目从这里开始。",
+        },
+        {
+          kind: "html",
+          title: "Wails v3 文档",
+          url: "https://v3.wails.io/",
+          note: "v3（Beta）的文档站，跟进新特性或评估迁移时看这里。",
+        },
+        {
+          kind: "link",
+          title: "Roadmap 讨论区",
+          url: "https://github.com/wailsapp/wails/discussions/1484",
+          note: "官方 roadmap 与新功能讨论处，WEP 以 draft PR 形式提交而非 issue。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "next-ai-draw-io",
+    linksCheckedAt: "2026-10-21",
+    name: "Next AI Draw.io",
+    nameZh: "Next AI Draw.io AI 画 draw.io 图",
+    aliases: ["next-ai-draw-io", "Next AI Draw.io", "AI 画流程图", "drawio AI", "AI 架构图"],
+    summary: "用一句话让 AI 在真正的 draw.io 画布上画图，每次改动都是可对比可回滚的版本卡片，导出 .drawio/.png/.svg；有网页版、桌面版与 MCP server。代价是要自带 API Key，且小模型容易产出坏图。",
+    scenes: ["design", "tools", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图表", "draw.io", "MCP", "AI 绘图", "架构图", "开源"],
+    body: "Next AI Draw.io 做的是「聊天画图」，但关键差别在于它画在**真正的 draw.io 画布**上，而不是生成一张你没法改的图片。你可以双击改名字、拖拽、改样式、用多页，随时导出 .drawio、.png、.svg 或 .drawio.svg；也可以选中几个形状再让 AI 只改这几个。\n版本机制是它最实用的一块：每次 AI 改动都会生成一张带缩略图的版本卡片，可以和当前画布对比、恢复，画布上按 Ctrl+Z 也能一步撤回一次 AI 改动。另外内置的 AWS、Azure、GCP、Kubernetes 图标库可以直接用，连接器还能带流动动画；上传截图或手绘草图能让 AI 重画，上传 PDF、Markdown、代码等文本文件则能据其内容出图。\n三种用法：网页版（next-ai-drawio.jiang.jp，有使用额度限制，在设置里填自己的供应商与 Key 即可解除，Key 只留在浏览器里不上传服务器）、Windows/macOS/Linux 桌面版、以及 MCP server——Claude Code 一条 `claude mcp add drawio -- npx @next-ai-drawio/mcp-server@latest` 就能让 agent 直接画图，改动实时出现在浏览器里，包内自带 draw.io 编辑器所以预览可离线，还自动保存到 ~/.next-ai-drawio/。\n代价讲清楚：25 个模型供应商都支持（默认 AWS Bedrock，另有 OpenAI、Anthropic、Google、DeepSeek、Qwen 等及 OpenAI 兼容预设），但**Key 要自己出**；官方明确提醒这项任务是生成严格格式的 draw.io XML 长文本，小模型容易产出坏图，要选能力够的模型。自托管还要 Node 环境与若干环境变量。",
+    officialUrl: "https://next-ai-drawio.jiang.jp",
+    officialLabel: "next-ai-drawio.jiang.jp",
+    links: {
+      official: "https://next-ai-drawio.jiang.jp",
+      github: "https://github.com/DayuanJiang/next-ai-draw-io",
+    },
+    whoFor: "经常要画架构图、流程图、时序图又不想手摆形状的人；以及希望 Claude Code / Cursor 在写方案时顺手产出可编辑图表的开发者。",
+    whoNot: "指望不配任何 Key 就无限白嫖的人——在线 demo 有额度限制；也不适合用小模型硬跑的场景，README 明确说小模型容易产出坏图。",
+    installTips: [
+      "最省事：直接打开 next-ai-drawio.jiang.jp，什么都不用装；有额度限制，在聊天面板的设置图标里填自己的供应商与 API Key 即可解除。",
+      "桌面版从 Releases 页下载 Windows / macOS / Linux 安装包。",
+      "接进 Claude Code：`claude mcp add drawio -- npx @next-ai-drawio/mcp-server@latest`；其他客户端在 MCP 配置里加 `{\"mcpServers\":{\"drawio\":{\"command\":\"npx\",\"args\":[\"@next-ai-drawio/mcp-server@latest\"]}}}`。",
+      "自托管：`git clone` 后 `npm install`，`cp env.example .env.local` 填供应商与 Key，再 `npm run dev`，打开 http://localhost:6002。",
+      "多人共用可设 `ADMIN_PASSWORD` 后从 /admin 管理模型、访问码、功能开关与配额；多模型用 `AI_MODEL` 逗号分隔或 `ai-models.json`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "N",
+      color: "#F08705",
+    },
+    guide: {
+      intro: "按第一次上手讲：先用网页版画一张 → 理解版本卡片与选中修改 → 接 MCP 让 agent 来画 → 自托管要配什么；并说明模型选择的坑。",
+      markdown: `## 先用网页版画一张
+
+打开 next-ai-drawio.jiang.jp，什么都不用装，直接描述：
+
+\`\`\`
+Generate a RAG architecture diagram for chat application. Use connected diagram for data ingestion
+\`\`\`
+
+内置 AWS、Azure、GCP、Kubernetes 图标库；连接器可以带流动动画；还能上传截图或手绘草图让 AI 重画，上传 PDF / Markdown / 代码让它据内容出图。
+
+在线 demo **有使用额度限制**。点聊天面板的设置图标，填自己的供应商与 API Key 即可解除——**Key 只留在你的浏览器里，不会发到服务器存储**。
+
+## 改图靠选中，不要重新生成
+
+这是第二个要掌握的点：
+
+- 在画布上**选中几个形状**，告诉 AI 改什么，它只改那几个
+- 每次 AI 改动都会生成一张**带缩略图的版本卡片**，可与当前画布对比、恢复
+- 画布上按 **Ctrl+Z** 一步就能撤回一次 AI 改动
+
+它同时就是一个正常的 draw.io 图：双击改名、拖拽、改样式、用多页，随时导出 .drawio / .png / .svg / .drawio.svg。
+
+## 让编码 agent 来画
+
+MCP server 让 Claude Code、Cursor、VS Code 等客户端直接画图。Claude Code 一条命令：
+
+\`\`\`bash
+claude mcp add drawio -- npx @next-ai-drawio/mcp-server@latest
+\`\`\`
+
+其他客户端配置：
+
+\`\`\`json
+{
+  "mcpServers": {
+    "drawio": {
+      "command": "npx",
+      "args": ["@next-ai-drawio/mcp-server@latest"]
+    }
+  }
+}
+\`\`\`
+
+之后说「画一个含登录、MFA 与会话管理的用户认证流程图」，图会边画边出现在浏览器里。包内自带 draw.io 编辑器，**预览可离线**（可用 \`DRAWIO_BASE_URL\` 指向外部 draw.io）；自动保存到 \`~/.next-ai-drawio/\`，重启不丢；把你的画图规则写进 \`~/.next-ai-drawio/instructions.md\`。
+
+## 模型要选够强的
+
+官方提醒得很直接：这项任务是**生成严格格式的长文本（draw.io XML）**，小模型容易产出坏图。
+
+支持 25 个供应商（默认 AWS Bedrock，另有 OpenAI、Anthropic、Google AI / Vertex AI、Azure OpenAI、Ollama、OpenRouter、DeepSeek、SiliconFlow、智谱 GLM、Qwen、Kimi 等）以及一个 OpenAI 兼容预设（vLLM、LM Studio、网关都能接）。
+
+## 自托管
+
+\`\`\`bash
+git clone https://github.com/DayuanJiang/next-ai-draw-io
+cd next-ai-draw-io && npm install
+cp env.example .env.local   # 填供应商与 API Key
+npm run dev                 # 打开 http://localhost:6002
+\`\`\`
+
+多人共用时在 \`AI_MODEL\` 里用逗号列多个模型，或用 \`ai-models.json\`；设 \`ADMIN_PASSWORD\` 后可从 \`/admin\` 管模型、访问码与配额。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线演示",
+          url: "https://next-ai-drawio.jiang.jp/",
+          note: "免安装的网页版，先在这里确认效果再决定要不要自托管或接 MCP。",
+        },
+        {
+          kind: "link",
+          title: "MCP server 说明",
+          url: "https://github.com/DayuanJiang/next-ai-draw-io/blob/main/packages/mcp-server/README.md",
+          note: "VS Code、Cursor 等各客户端的 MCP 配置写法，以及自动保存与自定义规则路径。",
+        },
+        {
+          kind: "link",
+          title: "模型供应商配置指南",
+          url: "https://github.com/DayuanJiang/next-ai-draw-io/blob/main/docs/en/ai-providers.md",
+          note: "25 个供应商对应的环境变量与注意事项，自托管配 .env.local 时对照。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "changedetection-io",
+    linksCheckedAt: "2026-10-21",
+    name: "changedetection.io",
+    nameZh: "changedetection.io 网页变更监控",
+    aliases: ["changedetection", "changedetection io", "网页变更监控", "网页监测", "价格监控", "补货提醒"],
+    summary: "自建网页变更监控：定时抓页面、用 XPath/CSS/jq 定位到具体字段，改动经 apprise 推到 Discord、Telegram、邮件等几十个渠道。适合盯降价、补货、公告页的人；代价是要渲染 JS 的站点必须开 Chrome 抓取器，资源占用一下就上去。",
+    scenes: ["tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["网页监控", "价格监控", "自建服务", "通知推送"],
+    body: "changedetection.io 解决的是「等一个页面变」这件事：给它一个 URL 和检查频率，它定期抓取、比对，有变化就通知你。真正让它好用的是过滤器——XPath 1/2、CSS 选择器、JSONPath 与 jq 都能用，还能「按文本触发」「忽略文本」「正则提取」，所以你可以只盯商品价签那一块，而不是整页的导航栏与时间戳。JSON API 也能这么盯，启用 json: 或 jq: 过滤器后，它甚至会把 HTML 里内嵌的 ld+json 解析出来再比对。\n抓取有两种后端：默认的内置 HTTP 抓取器快但不执行 JS；需要 JS 渲染、可视化选区或「浏览器步骤」（登录、加购物车、接受 Cookie、填日期）就得切到 Chrome/Playwright 抓取器，docker-compose.yml 里的 sockpuppetbrowser 就是干这个的，去掉注释即可。通知走 apprise，写一行 URL 就能对接 Discord、Slack、Telegram、邮件、Office365、自定义 JSON API 等，标题和正文还能用 Jinja2 模板改。\n两个坑要提前知道。一是它默认没有鉴权——README 给的 docker run 示例是把端口绑在 127.0.0.1:5000 上的，直接改成 0.0.0.0 暴露出去，任何人都能看到你监控了什么、通知发到哪。二是升级：docker compose 用 pull + up -d，单容器则要先 pull 再 kill/rm/run 重建，别指望容器内部自更新。",
+    officialUrl: "https://changedetection.io",
+    officialLabel: "changedetection.io",
+    links: {
+      official: "https://changedetection.io",
+      github: "https://github.com/dgtlmoon/changedetection.io",
+    },
+    whoFor: "要盯商品降价与补货、跟踪政府或机构公告页、监控 JSON API 与 PDF 文本变化，或对自家页面被篡改做巡检的人。",
+    whoNot: "没有一台常开机器的人（它是服务端轮询，关了就不监控）；或者被监控的页面重度依赖登录态与 JS，又不愿意维护浏览器抓取器与代理的。",
+    installTips: [
+      "Docker 单机：`docker run -d --restart always -p \"127.0.0.1:5000:5000\" -v datastore-volume:/datastore --name changedetection.io dgtlmoon/changedetection.io`，然后访问 http://127.0.0.1:5000。端口保持绑在 127.0.0.1，要外网访问就套一层带鉴权的反向代理。",
+      "也可以 pip 装：`pip3 install changedetection.io`，再 `changedetection.io -d /path/to/empty/data/dir -p 5000`，数据目录必须是空目录。",
+      ":latest 是稳定版、:dev 是 master 分支；升级 docker compose 用 `docker compose pull && docker compose up -d`，单容器要先 `docker pull` 再 kill、rm、run 重建。",
+      "需要 JS 渲染或可视化选区时启用 Chrome 抓取器（docker-compose.yml 里 sockpuppetbrowser 那几行取消注释），纯静态页面用内置 HTTP 抓取器就够，别无脑全开。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "c",
+      color: "#C0392B",
+    },
+    guide: {
+      intro: "按第一次上手会卡住的顺序讲：先决定用哪种抓取后端，再写过滤器把噪音滤掉，然后配通知 URL，最后处理「默认没有鉴权」这个必须自己补的口子。",
+      markdown: `## 先选抓取后端
+
+新建 watch 时第一个要决定的是「这个页面要不要跑 JS」。
+
+- **内置 HTTP 抓取器**：快、省资源，适合静态页和 JSON API。
+- **Chrome / Playwright 抓取器**：能执行 JS，才能用可视化选区（Visual Selector）和浏览器步骤（登录、加购、接受 Cookie、填日期再检索）。docker-compose.yml 里的 \`sockpuppetbrowser\` 就是配套容器，去掉注释启用。
+
+判断方法很简单：先用 HTTP 抓取器抓一次，看看拿到的文本里有没有你要盯的那一块。抓不到再上 Chrome。别一上来全开浏览器，几十个 watch 一起跑 Chrome 会很吃内存。
+
+## 把噪音滤掉
+
+默认它比对整页，导航栏、时间戳、推荐位一变就告警，两天之后你就把所有通知关了。过滤器在 watch 的编辑页里填：
+
+- \`Remove text by selector\`：先删掉用 CSS/XPath 选中的部分
+- \`Ignore text\`：忽略包含某段文字的区块
+- \`Trigger on text\`：只有出现/消失这段文字才算变更
+- \`Extract text\`：只保留选中的内容再比对
+
+盯价格时 README 还专门给了一个开关：单品页的 _Re-stock & Price detection_，它会抽取页面里的元数据，让你设上限价、下限价、涨跌百分比等条件，并且能看价格走势图。JSON 用 JSONPath 或 \`jq:\` 前缀，逻辑判断（比如只取大于某个值的结果）用 jq 更顺手。
+
+## 通知是一行 URL
+
+通知用 apprise 的 URL 语法，填在编辑页里，一行一个：
+
+\`\`\`text
+discord://webhook_id/webhook_token
+mailto://user:pass@example.com?to=receivingAddress@example.com
+json://someserver.com/custom-api
+\`\`\`
+
+标题和正文支持 Jinja2 模板，想把「哪个页面、哪个字段、从什么变成什么」写清楚就靠它。
+
+## 别忘了它默认没锁
+
+这一条是底线：README 给的 \`docker run\` 示例是 \`-p "127.0.0.1:5000:5000"\`，只监听本机。它自带的管理界面没有强制鉴权，如果你把它改成对公网开放，等于把「你监控了哪些页面、通知发到哪个 webhook」公开出去。
+
+要远程访问就老老实实套反向代理（或 VPN）做鉴权与 TLS。另外 README 提到 AI 变更判定（用一句话写「价格低于 50 美元才通知」）与 AI 摘要，在订阅/托管服务里提供，自建版要接 LLM 就走 OpenAI 兼容端点（vLLM、LM Studio、Ollama 等）自己填。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与教程页",
+          url: "https://changedetection.io/tutorials",
+          note: "官方整理的用法示例，包括条件动作、关键词监控等。刚装好不知道该拿它盯什么时先看这里。",
+        },
+        {
+          kind: "html",
+          title: "项目 Wiki",
+          url: "https://github.com/dgtlmoon/changedetection.io/wiki",
+          note: "过滤器语法、代理配置、Windows 安装、JSON 选择器等都在这里。写 jq / JSONPath 前先查这页。",
+        },
+        {
+          kind: "html",
+          title: "PyPI 包页面",
+          url: "https://pypi.org/project/changedetection.io/",
+          note: "走 pip 安装时用来确认版本与发布说明，也适合不方便跑 Docker 的环境。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "homepage",
+    linksCheckedAt: "2026-10-21",
+    name: "Homepage",
+    nameZh: "Homepage 自建应用仪表盘",
+    aliases: ["homepage", "gethomepage", "起始页", "应用仪表盘", "startpage"],
+    summary: "自托管的起始页与仪表盘：用 YAML 排服务与书签，Docker 标签自动发现容器，100 多个服务集成直接显示状态与统计。适合已经有一堆自建服务要一眼看全的人；代价是它本身不带鉴权，暴露到不可信网络必须靠反代或 OIDC 补。",
+    scenes: ["tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["仪表盘", "自建服务", "Docker", "起始页"],
+    body: "Homepage 是一个 Next.js 写的静态生成仪表盘，把所有自建服务的入口、状态、统计摆在一页上。它的核心价值在集成：Docker 方面能靠容器标签自动发现服务并把容器状态与资源占用显示出来；服务方面内置 100 多个集成，覆盖 Sonarr/Radarr/Lidarr/Bazarr 这类 *arr 应用、Plex/Jellyfin/Emby、Transmission/qBittorrent/Deluge 等；信息类挂件有天气、时间、搜索、glances 等。\n安全模型要单独说：所有对后端服务的 API 请求都由它代理，所以 API key 不会落到浏览器里。但反过来说，它能读到你的家庭自动化等个人信息，因此 README 明确要求——只要 Homepage 能从任何不可信网络访问，就必须放在强制执行鉴权、TLS 并严格校验 Host 头的反向代理（或 VPN）后面；它自己另有一个可选的 OIDC 登录流程和简单密码登录，默认是关的，只是「登录了/没登录」这道粗粒度闸门。\n部署是 Docker 为主（ghcr.io/gethomepage/homepage，amd64/arm64 都有），配置全在挂载进 /app/config 的 YAML 里，改完即生效。想从源码跑要 pnpm install 再 pnpm build，第一次用得把 src/skeleton 目录拷到 config/ 才有示例配置。中文等 40 多种语言是内置的。",
+    officialUrl: "https://gethomepage.dev",
+    officialLabel: "gethomepage.dev",
+    links: {
+      official: "https://gethomepage.dev",
+      github: "https://github.com/gethomepage/homepage",
+    },
+    whoFor: "家里或小组里跑了十几个自建服务、需要一个统一入口和状态总览的人；愿意写 YAML，也愿意为它配一层反代。",
+    whoNot: "只有两三个服务、浏览器书签就够的人；或者不接受「先搭反向代理加鉴权」这一步就想直接公网打开的人——那等于把你的服务列表和家庭自动化信息敞开。",
+    installTips: [
+      "docker compose 起服务：镜像用 ghcr.io/gethomepage/homepage:latest，端口 3000，挂 /path/to/config:/app/config（本地目录要先建好）。",
+      "环境变量 HOMEPAGE_ALLOWED_HOSTS 必填，值填访问用的域名，带端口时要把端口写进去；用 docker run 时是 -e HOMEPAGE_ALLOWED_HOSTS=你的域名。",
+      "要用 Docker 集成就把 /var/run/docker.sock 以 :ro 只读方式挂进容器；PUID / PGID 设成你自己的 uid/gid，避免配置文件权限混乱。",
+      "从源码跑：git clone 后 pnpm install && pnpm build，首次把 src/skeleton 拷成 config/ 得到示例配置，再用 HOMEPAGE_ALLOWED_HOSTS=域名:端口 pnpm start 启动。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "H",
+      color: "#2F6FB0",
+    },
+    guide: {
+      intro: "按第一次部署会卡住的顺序讲：ALLOWED_HOSTS 到底填什么、config 目录里那几个 YAML 分别管什么、怎么让 Docker 服务自动出现、以及暴露到公网前必须先补的鉴权。",
+      markdown: `## 卡点一：HOMEPAGE_ALLOWED_HOSTS
+
+这是最常见的「启动了一访问就报错」。它是 Next.js 的 Host 头白名单，必须填你实际访问用的域名；如果不是标准端口，**端口也要写进去**。
+
+\`\`\`yaml
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev # 换成你的域名，必要时带端口
+      PUID: 1000
+      PGID: 1000
+    ports:
+      - 3000:3000
+    volumes:
+      - /path/to/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+\`\`\`
+
+第二件事是 \`/path/to/config\` 这个目录必须先手动创建。Docker 会自动建出不存在的挂载目录，但建出来的属主是 root，Homepage 写不进去，表现为「界面上改的配置重启就没了」。
+
+## 卡点二：config 目录里的文件
+
+挂载点下面通常有这几类 YAML：
+
+- \`services.yaml\` —— 页面上显示的服务卡片与分组
+- \`bookmarks.yaml\` —— 书签分组
+- \`widgets.yaml\` —— 天气、时间、搜索等信息挂件
+- \`settings.yaml\` —— 主题、语言、布局等全局设置
+- \`docker.yaml\` —— Docker 实例的连接方式
+
+服务条目里写 \`href\` 和 \`description\`，再挂一个 widget 就能显示该服务的统计数据。文档站 gethomepage.dev/configs/ 下每种都有示例，抄一份改比从空文件写快得多。
+
+## 卡点三：让 Docker 服务自动出现
+
+想要「启动容器就自动出现在页面上」，需要两件事：把 docker.sock 只读挂进容器，然后在目标容器上打标签。自动发现规则写在 gethomepage.dev/configs/docker/#automatic-service-discovery，标签里可以指定分组、名称、图标和用哪个 widget。
+
+注意 docker.sock 是只读挂载（:ro），它只读取状态与统计，不会去操作你的容器。不给这个 socket 也能用，只是 Docker 相关功能全部失效。
+
+## 卡点四：公网暴露之前
+
+README 的安全提示写得很重：widget 会访问你的家庭自动化等个人信息，所以只要能从不可信网络访问到它，就**必须**放在强制鉴权、TLS 且严格校验 Host 头的反向代理或 VPN 之后。
+
+它自带的 OIDC 登录与简单密码登录是 opt-in 的，只提供「有没有登录」这一层判断，不能替代反向代理那层的 TLS 与 Host 校验。别把它直接端口映射出去。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://gethomepage.dev/",
+          note: "配置、widget、Docker 自动发现、安装等全部文档。写 YAML 前基本都要来查一页。",
+        },
+        {
+          kind: "html",
+          title: "排错指南",
+          url: "https://gethomepage.dev/troubleshooting/",
+          note: "README 推荐的第一站，覆盖大多数配置与网络类问题。页面报错或 widget 不显示时先翻这里。",
+        },
+        {
+          kind: "html",
+          title: "Docker 服务自动发现",
+          url: "https://gethomepage.dev/configs/docker/",
+          note: "容器标签的写法与实例配置。想让新容器自动出现在仪表盘上就看这一页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "signoz",
+    linksCheckedAt: "2026-10-21",
+    name: "SigNoz",
+    nameZh: "SigNoz 开源可观测性平台",
+    aliases: ["signoz", "sig noz", "可观测性平台", "APM", "链路追踪", "日志管理"],
+    summary: "OpenTelemetry 原生的开源可观测性平台，日志、指标、链路、异常、告警放在同一个列式库里，一次埋点全打通。适合要替代 DataDog/New Relic 或 Prometheus+Jaeger+Loki 拼装栈的团队；代价是自托管要自己养 ClickHouse 与采集链路，数据量上来后存储成本由你承担。",
+    scenes: ["engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["可观测性", "APM", "OpenTelemetry", "日志", "链路追踪"],
+    body: "SigNoz 把过去要三四个工具拼起来的事收进一个平台：APM（延迟、错误率、吞吐、Apdex、Top 端点、数据库与外部调用）、日志管理（可视化查询构造器，并能与 trace、metric 互相关联）、指标与仪表盘（Query Builder、PromQL、ClickHouse SQL 三种写法）、基础设施监控（K8s 集群、Pod、节点与主机级 CPU/内存/磁盘/网络）、分布式追踪（火焰图、瀑布图、span 事件、trace 分析）、异常、告警，以及近两年补上的 LLM 可观测（trace LLM 应用、RAG 流水线、prompt、工具调用、token、延迟与成本）。\n它的技术主张是 OpenTelemetry 原生 + 单一列式数据库：埋点用开放标准，数据进列存，官方称相比 Elastic 在摄取时资源占用低约 50%，并给了与 Loki 的对比基准（Loki 在标签变多时会撞上 max stream 错误）。README 里也给了选型对照：只要指标那 Prometheus 就够；只要链路追踪那 Jaeger 就够——SigNoz 的价值在于「从一个服务的图表一路点到 trace、日志、基础设施指标、异常」，不用切工具。\n选型要算清账。三条路线：Cloud（30 天试用无需信用卡，按量计费 $49 起，可选区域托管）、Enterprise（BYOC / 自托管，带合规、RBAC、摄取控制、自定义留存）、Community（免费开源，自己用 Docker / Kubernetes / Linux 部署）。Cloud 上有 SigNoz MCP server 与 Noz 这个 AI 队友；自托管版要自己维护存储、升级与容量，且没有官方支持承诺。",
+    officialUrl: "https://signoz.io",
+    officialLabel: "signoz.io",
+    links: {
+      official: "https://signoz.io",
+      github: "https://github.com/SigNoz/signoz",
+    },
+    whoFor: "已经有多个服务、线上出问题时需要在日志/指标/链路之间来回跳的团队；想摆脱按主机或按席位计费的商业 APM，或受够了自建三件套互相对不上的工程团队。",
+    whoNot: "只要看几台机器 CPU 和内存的个人用户——轻量监控工具更划算；也不适合没有专人维护 ClickHouse 与采集器、却坚持完全自托管的团队。",
+    installTips: [
+      "先想清楚 Cloud 还是自托管：Cloud 有 30 天免费试用且不需要信用卡；自托管是完全免费的社区版，但要自己管升级、容量、备份与安全。",
+      "自托管三条路径：Docker、Kubernetes、Linux（另有 Foundry 部署工具），入口在 signoz.io/docs/install/self-host/。",
+      "数据接入统一走 OpenTelemetry：用官方的语言 SDK / 采集器把 trace、metric、log 送进来，也支持 Prometheus 与各类集成。",
+      "想让编码代理直接查遥测数据，用 SigNoz MCP server；README 注明 Noz（AI 队友）只在 SigNoz Cloud 上提供。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#E4694B",
+    },
+    guide: {
+      intro: "按第一次做选型会卡住的顺序讲：先定 Cloud 还是自托管，再决定数据怎么进来，然后理解它的列式存储与留存意味着什么，最后说清它今天的能力边界。",
+      markdown: `## 第一步：Cloud、Enterprise 还是 Community
+
+三条路线不是「功能多少」的区别，而是**谁负责运维**的区别。
+
+- **Cloud**：托管，30 天免费试用不用信用卡，用量计费 $49 起，可选区域托管数据。想先验证价值就用它。
+- **Enterprise**：Enterprise Cloud、BYOC 或 Enterprise 自托管，带合规认证、RBAC、摄取控制、自定义留存、数据驻留与区域选择。
+- **Community**：免费开源，跑在你自己的基础设施上，Docker / Kubernetes / Linux 都行，数据面完全自己掌控。
+
+README 的定位很清楚：自托管意味着安装、维护、升级、容量、可用性、备份、安全、稳定性全都归你。如果没有人愿意接这部分，就别为了「免费」选自托管。
+
+## 第二步：数据怎么进来
+
+SigNoz 是 OpenTelemetry 原生的，也就是说**埋点用 OTel 的 SDK 与采集器**，而不是各家私有协议。这带来两个好处：换后端不用重写埋点，trace / metric / log 天然带同一套上下文可以互相关联。
+
+官方 integrations 列表覆盖语言 SDK、应用框架、数据库、云厂商、Kubernetes 与 Prometheus。接入时先在非生产环境跑通一个服务的 trace，确认 span 属性、服务名、采样率都符合预期，再放量——否则一上来全量上报，既浪费存储也让面板没法看。
+
+## 第三步：搞清存储与留存
+
+它用的是单一列式数据库（ClickHouse），为高基数、大吞吐的可观测数据设计。这跟 Loki、Elastic 的取舍不一样：官方给的基准里，Loki 在标签数量增加时会撞上 max stream 错误，而 SigNoz 在测试环境里索引了全部键；与 Elastic 相比，摄取时资源占用约低一半。
+
+对你意味着两点：
+
+1. **高基数不是禁区**，但也不是免费的——自定义维度的数量直接决定存储与查询成本。
+2. **留存策略要早定**。自托管时日志无限期保存会把磁盘吃光，先决定各类信号的保留天数与降采样策略。
+
+## 第四步：知道它今天不做什么
+
+README 专门写了一节能力边界，值得照抄进你的预期管理：
+
+- 它是自主 / 辅助式的渗透与排查平台式可观测产品，**不是** CALDERA 那种带预定义剧本的 BAS / 对手模拟产品——这一条针对的是安全场景的类比，别把它当攻击模拟平台用。
+- 流程报告当前支持 Web 查看、复制到剪贴板、Markdown 与 PDF 下载，JSON 导出不是已记录的受支持格式。
+- Cloud 才有的东西（Noz、MCP server 里的部分能力）不要指望在社区版里出现。
+
+## 日常怎么用
+
+排查线上问题的动线是：APM 总览发现某个端点 P99 抬升 → 点进 trace 找慢 span → 从 span 跳到对应时间窗的日志 → 顺带看该时段的主机/容器指标。这条链路正是它「相关信号」卖点的落点，也是它跟 Prometheus + Jaeger 分开部署最大的体验差别。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "自托管安装文档",
+          url: "https://signoz.io/docs/install/self-host/",
+          note: "Docker、Kubernetes、Linux 三种部署路径的入口。决定自托管前先看这里的资源与维护要求。",
+        },
+        {
+          kind: "html",
+          title: "埋点与接入文档",
+          url: "https://signoz.io/docs/instrumentation/overview/",
+          note: "OpenTelemetry SDK 与采集器的接入方式，以及 APM 各项指标的含义。第一次接数据时按这个走。",
+        },
+        {
+          kind: "html",
+          title: "日志性能基准文章",
+          url: "https://signoz.io/blog/logs-performance-benchmark/",
+          note: "与 Elastic、Loki 的对比测试方法与结论。选型时要判断它的性能说法是否适用于你的数据形态。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "dokku",
+    linksCheckedAt: "2026-10-21",
+    name: "Dokku",
+    nameZh: "Dokku 自建迷你 PaaS",
+    aliases: ["dokku", "docker paas", "自建 Heroku", "mini heroku", "git 部署"],
+    summary: "把一台干净的 Linux 虚拟机变成自己的 Heroku：git push 上去就用 buildpack 或 Dockerfile 构建并跑起来。适合想在一台小 VPS 上托管几个个人项目的人；代价是它以系统级方式装进宿主机，必须是一台全新的 Ubuntu/Debian，不能当普通软件塞进现役服务器。",
+    scenes: ["code", "engineering"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["PaaS", "部署", "Docker", "git", "自建服务"],
+    body: "Dokku 的自我定位是「Docker 驱动的 mini-Heroku」——你在一台 VPS 上装好它，之后部署就是把代码 git push 到这台机器，由它完成构建与上线，省掉自己写 CI 脚本、配 Nginx、管进程守护这一整套。\n但它的前提相当硬：README 要求一台**全新**的虚拟机，系统限定 Ubuntu 22.04 / 24.04 / 26.04（amd64/arm64）或 Debian 11+（amd64/arm64），并且需要一个可用于部署的 SSH keypair——如果安装前这台机器已经有 keypair，安装脚本会自动导入；否则装完要自己用 dokku ssh-keys:add 补。换句话说，它不是「往现有服务器加个程序」，而是「这台机器从此归 Dokku 管」。\n安装是两条命令：wget 拉 bootstrap.sh，再用 sudo DOKKU_TAG=v0.38.31 bash bootstrap.sh 执行（版本号按当时最新稳定版替换，官方也提供无人值守安装文档）。装完之后还有两步才算完：dokku domains:set-global 配置服务器域名，dokku ssh-keys:add 配置使用者权限。升级另有一份独立文档，不要直接重跑 bootstrap 覆盖现有安装。\n什么情况下该考虑它：你有一台闲置 VPS，想以最低成本托管几个小项目，并且接受「部署体验简单、平台能力有限」这个交换。什么情况下不该：你需要多节点、自动伸缩、细粒度权限与审计，那应该直接上 Kubernetes 或商业 PaaS。",
+    officialUrl: "https://dokku.com",
+    officialLabel: "dokku.com",
+    links: {
+      official: "https://dokku.com",
+      github: "https://github.com/dokku/dokku",
+    },
+    whoFor: "有一台闲置 VPS、想用 git push 部署几个个人项目或小内部服务，且不想自己拼 CI/CD 与反向代理的人。",
+    whoNot: "想在现役服务器上顺手装一个的人（它要求全新 VM 且系统限定 Ubuntu/Debian）；或者需要多节点编排、自动伸缩与细粒度权限的生产团队——那是 Kubernetes 的地盘。",
+    installTips: [
+      "准备一台全新的虚拟机，系统为 Ubuntu 22.04 / 24.04 / 26.04 或 Debian 11+，amd64 或 arm64 均可；装之前先备好部署用的 SSH keypair。",
+      "以 v0.38.31 为例：`wget -NP . https://dokku.com/install/v0.38.31/bootstrap.sh`，然后 `sudo DOKKU_TAG=v0.38.31 bash bootstrap.sh`，必须用有 sudo 权限的用户执行。",
+      "装完还要补两步才算完成：用 `dokku domains:set-global` 设置全局域名，用 `dokku ssh-keys:add` 添加允许部署的 SSH key。",
+      "升级有独立文档（dokku.com/docs/getting-started/upgrading/），不要直接重跑 bootstrap.sh 覆盖；需要无人值守安装也另有文档入口。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#4B8BBE",
+    },
+    guide: {
+      intro: "按第一次部署会卡住的顺序讲：机器与系统要求怎么满足、安装的两条命令、装完必须补的域名与 SSH key、升级为什么不能重跑安装脚本，以及它到底适合托管什么。",
+      markdown: `## 先确认机器合不合格
+
+Dokku 的安装是系统级的，README 的要求写得很具体：
+
+- **一台全新的 VM**，不是往现有服务器里加一个程序
+- **Ubuntu 22.04 / 24.04 / 26.04**（amd64/arm64）或 **Debian 11+**（amd64/arm64）
+- 一个**可用于部署的 SSH keypair**
+
+第三点决定你装完之后能不能立刻推代码。如果安装前机器上已经有 keypair，脚本会自动导入；没有的话，装完必须自己跑：
+
+\`\`\`shell
+dokku ssh-keys:add <name> /path/to/key.pub
+\`\`\`
+
+建议动手前先把 \`ssh-copy-id\` 打通，能免密登录 root（或有 sudo 的用户）再开始。
+
+## 安装：两条命令
+
+以当前稳定版 v0.38.31 为例：
+
+\`\`\`shell
+wget -NP . https://dokku.com/install/v0.38.31/bootstrap.sh
+sudo DOKKU_TAG=v0.38.31 bash bootstrap.sh
+\`\`\`
+
+两点要注意：
+
+1. **版本号成对出现**。wget 的 URL 里和 \`DOKKU_TAG\` 环境变量里是同一个版本，改的时候别只改一处。
+2. 要用**有 sudo 权限的用户**跑，不是直接 root 也行，但权限必须够。
+
+安装前可选但推荐的一步：先 \`sudo apt-get update && sudo apt-get dist-upgrade\` 并重启，避免装到一半因为内核或依赖变更出问题。
+
+## 装完还没完
+
+bootstrap 跑完只是软件就位，还要补两件事：
+
+\`\`\`shell
+dokku domains:set-global <你的域名>
+dokku ssh-keys:add <name> ~/.ssh/id_rsa.pub
+\`\`\`
+
+全局域名决定后续应用的默认访问地址；没有它，应用起来之后你会对着一个不知道该用什么主机名访问的端口发呆。
+
+## 升级不要重跑安装脚本
+
+这是最容易踩的坑：升级有专门文档（dokku.com/docs/getting-started/upgrading/），**不是**再跑一次 bootstrap.sh。安装脚本假设的是一台干净机器，在已有安装上重跑可能把现有配置与应用搞乱。
+
+要自动化部署 Dokku 本身（比如做镜像或批量装机），README 另给了 unattended installation 文档入口，那才是无人值守场景该走的路径。
+
+## 它适合托管什么
+
+把它想成「一台机器上的 Heroku」：适合个人项目、小内部工具、原型验证——也就是你能接受「这台机器挂了，上面所有应用一起挂」的东西。
+
+不适合：需要多节点、自动伸缩、细粒度权限与审计的生产系统。真到了那个规模，运维复杂度已经不是 Dokku 的设计目标能覆盖的了，直接上 Kubernetes 或商业 PaaS 更省心。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://dokku.com/docs/getting-started/installation/",
+          note: "含完整安装与高级安装说明，也有无人值守安装入口。动手前先把系统要求这一节看完。",
+        },
+        {
+          kind: "html",
+          title: "升级文档",
+          url: "https://dokku.com/docs/getting-started/upgrading/",
+          note: "从旧版本升级的正确步骤。注意升级不走 bootstrap.sh，别直接重跑安装脚本。",
+        },
+        {
+          kind: "html",
+          title: "排错文档",
+          url: "https://dokku.com/docs/getting-started/troubleshooting/",
+          note: "部署失败、域名不通等常见问题的排查清单。push 上去没起来时先看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "meetily",
+    linksCheckedAt: "2026-10-21",
+    name: "Meetily",
+    nameZh: "Meetily 本地 AI 会议助手",
+    aliases: ["meetily", "meetly", "本地会议纪要", "会议转写", "AI 会议助手"],
+    summary: "完全在本地跑的 AI 会议助手：Whisper / Parakeet 做实时转写，Ollama 或自建 OpenAI 兼容端点生成摘要，录音与文本都不出机器。适合会议内容不能上云的律师、医疗、政企场景；代价是 Linux 没有现成安装包，只能从源码构建。",
+    scenes: ["office", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["会议纪要", "语音转写", "本地 AI", "隐私保护"],
+    body: "Meetily 是用 Tauri 做的桌面应用（Rust 后端 + Next.js 前端），主打「会议内容不出本机」：采集麦克风与系统音频，本地跑 Whisper 或 Parakeet 实时转写，再用你选的模型生成会议纪要与摘要。README 明确写了所有处理都在你的机器上完成，转写模型、录音和文本都存在本地，不往云端发。\n模型后端可以换：推荐 Ollama（本地），也支持 Claude、Groq、OpenRouter，以及任意 OpenAI 兼容端点——有自建 AI 基础设施的组织可以填自己的地址。转写方面它还支持导入已有音频文件重新转写（Import & Enhance，Beta 功能），也能换模型或换语言再转一遍。音频采集是麦克风与系统声音同时录，带智能闪避与防削波。\n平台差异是最大的坑。macOS 有现成的 aarch64 dmg，且自动启用 Metal 与 CoreML；Windows 是 x64-setup.exe，内带的 Whisper 是 Vulkan 版本，要求 CPU 支持 AVX2（不需要 AVX-512），想要 CUDA 加速得自己用 NVIDIA 工具链从源码构建；Linux 完全没有现成包，README 只给了从源码构建的路径（frontend 里 pnpm install --frozen-lockfile 再 ./build-gpu.sh）。\n另外要分清版本：Community Edition 永久免费开源，包含本地转写与 AI 摘要等核心功能；PRO 是另一套代码库，卖点是更高准确率、自定义摘要模板、PDF/DOCX/Markdown 导出、自动检测入会、团队自托管部署等，说话人分离（diarization）在 README 里是 PRO 的规划功能。",
+    officialUrl: "https://meetily.ai",
+    officialLabel: "meetily.ai",
+    links: {
+      official: "https://meetily.ai",
+      github: "https://github.com/Zackriya-Solutions/meetily",
+    },
+    whoFor: "会议内容涉及客户隐私、合规要求或商业机密，不能交给云端纪要工具的人；以及想在离线环境里做转写与纪要的人。",
+    whoNot: "只想要「开箱即用、别人帮我维护」的会议机器人——Linux 用户尤其不适合，没有现成安装包；也不适合指望它自动入会、自动区分说话人的场景，那些属于 PRO 或规划中能力。",
+    installTips: [
+      "Windows：从 Releases 下载最新的 x64-setup.exe 直接安装；内带的是 Vulkan 版 Whisper，需要支持 AVX2 的 x64 CPU，CUDA 加速要自己用 NVIDIA CUDA 工具链从源码构建。",
+      "macOS：下载 meetily_0.4.1_aarch64.dmg，打开后把 Meetily 拖进 Applications 再启动；Metal 与 CoreML 在官方包里已自动启用。",
+      "Linux：没有现成安装包，按 docs/building_in_linux.md 从源码构建，快速路径是 clone 后在 frontend 目录跑 `pnpm install --frozen-lockfile` 再执行 `./build-gpu.sh`。",
+      "摘要模型可选：本地用 Ollama，或填 Claude / Groq / OpenRouter / 自建 OpenAI 兼容端点；不想接云端就先装好 Ollama 再开应用。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#5B4B8A",
+    },
+    guide: {
+      intro: "按第一次用会卡住的顺序讲：先按你的平台选对安装方式，再理解转写模型与摘要模型是两件事，然后处理系统声音采集这个最常见的「只有我说话被记下来」问题。",
+      markdown: `## 平台决定了你的安装难度
+
+三个系统的体验差距很大，先看清楚再动手：
+
+- **macOS**：直接下 \`meetily_0.4.1_aarch64.dmg\`，拖进 Applications。官方包已启用 Metal 与 CoreML，开箱就有硬件加速。
+- **Windows**：下 \`x64-setup.exe\`。注意 README 的兼容性说明：内带的是 Vulkan 版 Whisper 构建，要求 CPU 支持 **AVX2**（不需要 AVX-512）。想要 CUDA 加速，标准安装包不会自动切，需要你用匹配的 NVIDIA CUDA 工具链从源码构建。
+- **Linux**：**没有现成安装包**。按 \`docs/building_in_linux.md\` 从源码构建，快速路径：
+
+\`\`\`bash
+git clone https://github.com/Zackriya-Solutions/meeting-minutes
+cd meeting-minutes/frontend
+pnpm install --frozen-lockfile
+./build-gpu.sh
+\`\`\`
+
+Linux 上的加速方式要按你的硬件自己选构建配置。
+
+## 两件事要分开配：转写 与 摘要
+
+新手最容易混的就是这两个模型，它们是独立的两块：
+
+1. **转写（语音 → 文字）**：本地跑 Whisper 或 Parakeet，不需要联网，也是最吃本地算力的部分。
+2. **摘要（文字 → 纪要）**：交给 LLM。可以是本地 Ollama，也可以是 Claude、Groq、OpenRouter 或任意 OpenAI 兼容端点。
+
+追求「一点数据都不出机器」的话，两块都要落在本地：转写用自带的 Whisper/Parakeet，摘要接 Ollama。组织里有自建 OpenAI 兼容网关的，填自己的端点即可。
+
+## 卡点：系统声音没录上
+
+「会开完了，纪要里只有我自己的发言」——这不是识别坏了，是**系统音频没有被采集**。
+
+Meetily 支持麦克风与系统音频同时采集，并带智能闪避与防削波，但系统音频的采集方式取决于操作系统：macOS 上通常需要额外的虚拟声卡/音频路由组件才能把会议软件的声音送进来，Windows 上则依赖系统的立体声混音。装完之后先做三十秒自测：放一段别人说话的录音，看转写里有没有内容，再正式开会用。
+
+已有的录音也能补救：Import & Enhance（Beta）支持导入音频文件生成转写，或者换一个模型/语言对已录制的会议重新转写，全程仍在本地完成。
+
+## 别把 PRO 的功能算进社区版
+
+社区版永久免费开源，包含本地转写、AI 摘要与核心功能。PRO 是另一套代码库，卖点是更高准确率、自定义摘要模板、PDF/DOCX/Markdown 导出、自动检测并入会、团队自托管等；**说话人分离（diarization）在 README 里属于 PRO 的规划功能**，别指望社区版现在能自动区分谁说了什么。
+
+如果你的核心诉求是「谁在会上说了什么」，那它现在不是最合适的选择，先去官网确认 PRO 的当前状态再决定。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与 PRO 说明",
+          url: "https://meetily.ai/pro/",
+          note: "社区版与 PRO 的功能对照，以及说话人分离等规划功能的当前状态。判断要不要付费先看这页。",
+        },
+        {
+          kind: "html",
+          title: "Linux 构建文档",
+          url: "https://github.com/Zackriya-Solutions/meeting-minutes/blob/main/docs/building_in_linux.md",
+          note: "Linux 没有现成安装包，这是唯一的安装路径。动手前先读完依赖要求。",
+        },
+        {
+          kind: "html",
+          title: "Releases 下载页",
+          url: "https://github.com/Zackriya-Solutions/meeting-minutes/releases/latest",
+          note: "Windows 的 x64-setup.exe 与 macOS 的 dmg 都在这里，也是查更新与兼容说明的地方。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "proxmoxve",
+    linksCheckedAt: "2026-10-21",
+    name: "Proxmox VE Helper-Scripts",
+    nameZh: "Proxmox VE 一键安装脚本集",
+    aliases: ["proxmox helper scripts", "ProxmoxVE", "PVE 脚本", "community scripts", "tteck scripts"],
+    summary: "Proxmox VE 上的一键装服务脚本集：在宿主机 shell 粘一条命令，回答几个问题就得到一个配好的 LXC 或 VM。适合家里跑 PVE、想快速试各种自建服务的人；代价是脚本以 root 跑在宿主机上，装之前你得知道它到底往你的机器写了什么。",
+    scenes: ["tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["Proxmox", "LXC", "自建服务", "Homelab", "一键脚本"],
+    body: "这个仓库是一大堆在 Proxmox VE 上安装服务的 Shell 脚本，延续自 @tteck 的原始工作，由社区维护。用法极简：去 community-scripts.org 搜你想装的服务，复制页面上的一行命令，粘到 Proxmox 的 Shell 里执行，选 Default 还是 Advanced，跟着提示走，几分钟后一个能用的容器或虚拟机就在那了——省掉手动找包、翻配置文件的过程。\n每个脚本都有两种模式。Default 直接用合理的 CPU、内存、存储默认值，只问最少必要的问题，多数安装五分钟内完成；Advanced 则在装任何东西之前让你自己定容器规格、网络、存储后端和应用层配置。装完之后每个容器里都带一个 post-install helper，在 Proxmox shell 里就能调，用来更新服务、改应用设置、看日志和做基本排错，不用手动编辑配置文件。\n覆盖范围是它最大的卖点：家庭自动化（Home Assistant、Zigbee2MQTT、ESPHome、Node-RED）、媒体（Jellyfin、Plex、Radarr、Sonarr、Immich）、网络（AdGuard Home、Nginx Proxy Manager、Pi-hole、Traefik）、监控（Grafana、Prometheus、Uptime Kuma、Netdata）、数据库（PostgreSQL、MariaDB、Redis、InfluxDB）、安全（Vaultwarden、CrowdSec、Authentik）、开发工具（Gitea、Portainer、VS Code Server、n8n）等几百个。\n前提是硬的：PVE 必须是 8.4 / 9.0 / 9.1 / 9.2，要有宿主机的 root shell，安装过程需要联网。另外它是社区项目，新脚本先在 DevScripts 仓库测试，直接往主仓提新脚本的 PR 会被关闭。",
+    officialUrl: "https://community-scripts.org",
+    officialLabel: "community-scripts.org",
+    links: {
+      official: "https://community-scripts.org",
+      github: "https://github.com/community-scripts/ProxmoxVE",
+    },
+    whoFor: "家里有一台 Proxmox VE、想快速部署和试错各种自建服务的 Homelab 玩家；不想为每个服务手搓 LXC 与配置的人。",
+    whoNot: "没有 Proxmox、或 PVE 版本低于 8.4 的人；以及把「不了解脚本内容就不执行」当原则的人——这些脚本以 root 在宿主机上运行，盲跑是有代价的。",
+    installTips: [
+      "前提：Proxmox VE 8.4 / 9.0 / 9.1 / 9.2，拿到宿主机的 root shell，安装期间保持联网。",
+      "用法：去 community-scripts.org 搜索服务（例如 Home Assistant、Nginx Proxy Manager、Jellyfin），从脚本页复制那一行安装命令。",
+      "粘到 Proxmox 的 Shell 里执行后选模式：Default 用默认 CPU/内存/存储、问最少的问题；Advanced 让你先定容器规格、网络、存储后端与应用配置。",
+      "装完用容器内的 post-install helper（从 Proxmox shell 进入）做更新、改设置、查日志，不要手动翻配置文件。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#E57000",
+    },
+    guide: {
+      intro: "按第一次用会卡住的顺序讲：先确认你的 PVE 版本合不合格，再理解 Default 与 Advanced 的差别，然后知道装完之后那个 post-install helper 能干什么，最后说清以 root 跑脚本这件事的边界。",
+      markdown: `## 先对一遍前提
+
+README 给了一张要求表，缺一样就别开始：
+
+| 项目 | 要求 |
+| --- | --- |
+| Proxmox VE | 8.4、9.0、9.1 或 9.2 |
+| 宿主系统 | Proxmox VE（Debian 系） |
+| 权限 | 宿主机的 root shell |
+| 网络 | 安装期间需要联网 |
+
+版本不对是最常见的失败原因。PVE 7 或更旧的 8.x 上跑新脚本，报错往往出现在很后面，看起来像「脚本坏了」，其实是版本不匹配。
+
+## 找到那条命令
+
+站点 community-scripts.org 是入口，按服务名搜索（比如 “Home Assistant”、“Nginx Proxy Manager”、“Jellyfin”）。每个脚本页面会写明：
+
+- 这个容器里装了什么
+- 默认的资源分配（CPU / 内存 / 磁盘）
+- 安装后的注意事项
+
+复制页面上的一行命令，回到 Proxmox 的 Web 界面，打开节点的 Shell，粘贴执行。
+
+## Default 还是 Advanced
+
+这一步决定你后面要不要重新来一遍：
+
+- **Default**：脚本挑一套合理默认值，只问最少必要的问题，多数安装五分钟内结束。想快速试一个服务就选它。
+- **Advanced**：在装任何东西之前，先把容器规格、网络、存储后端和应用层配置都过一遍。要指定固定 IP、要用特定存储池、要改应用初始配置时选它。
+
+第一次装某个服务建议用 Default 看它默认给什么，不满意再用 Advanced 重装——容器重建的成本远低于手改一个不熟悉的服务的配置。
+
+## 装完之后：post-install helper
+
+这是很多人装完就忘的东西。每个脚本装好的容器里都带一个安装后辅助菜单，从 Proxmox shell 里就能打开，用来：
+
+- 更新已安装的服务
+- 改应用设置（不用手动编辑配置文件）
+- 查日志和做基本排错
+
+别急着 \`apt upgrade\` 或者手改配置，先看看这个 helper 里有没有现成选项。
+
+## 边界：这是 root 脚本
+
+必须说清楚的一点：这些脚本是以 root 身份在你的 PVE 宿主机上执行的。它的便利正是来自这一点——它能直接建 LXC、改网络、挂存储。
+
+所以合理的用法是：从 community-scripts.org 复制命令（而不是第三方博客转载的版本），装之前看一眼脚本页说明。另外这是社区项目，新脚本先在 DevScripts 仓库测试，往主仓直接提新脚本的 PR 会被关掉；遇到坏脚本去 Issues 报，想加脚本去 DevScripts。
+
+Proxmox® 是 Proxmox Server Solutions GmbH 的注册商标，这个项目与官方无关。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "脚本目录与分类",
+          url: "https://community-scripts.org/categories",
+          note: "按分类浏览全部脚本，也是复制安装命令的入口。想装什么先来这里搜。",
+        },
+        {
+          kind: "html",
+          title: "项目 README",
+          url: "https://community-scripts.org",
+          note: "版本要求、Default / Advanced 两种模式与 post-install helper 的说明。第一次用之前先看要求表。",
+        },
+        {
+          kind: "html",
+          title: "DevScripts 仓库",
+          url: "https://github.com/community-scripts/DevScripts",
+          note: "新脚本先在这里测试，想贡献脚本要走这个仓库，直接向主仓提新脚本的 PR 会被关闭。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "karakeep",
+    linksCheckedAt: "2026-10-21",
+    name: "Karakeep",
+    nameZh: "Karakeep 自建书签库",
+    aliases: ["karakeep", "hoarder", "稍后读", "书签管理", "read it later"],
+    summary: "自托管的「什么都存」书签应用：链接、笔记、图片、PDF 都能存，AI 自动打标签，全文与语义检索。适合从 Pocket 迁移、或担心链接失效想把内容真正存下来的人；代价是完整体验要跑 Meilisearch、Puppeteer、yt-dlp 一整套，小机器吃力。",
+    scenes: ["tools", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["书签管理", "稍后读", "自建服务", "AI 标签", "全文检索"],
+    body: "Karakeep（前身 Hoarder）是给「数据囤积症」做的自托管书签应用，口号是 bookmark-everything：链接、随手笔记、图片和 PDF 都能往里丢，自动抓取标题、描述与预览图，再按列表归类、可与人共享列表协作。检索是它的强项——全文检索之外还有语义搜索，LLM 会自动打标签和生成摘要，并且支持用 Ollama 跑本地模型，不一定要把内容送去云端。\n它不只是收藏夹，还带归档能力：整页存档用 monolith 防链接腐烂，视频可以用 yt-dlp 自动存档，图片走 OCR 提取文字，还能标记和存储正文里的高亮。收集端很全：Chrome / Firefox / Safari 扩展、iOS 与 Android 应用（支持离线阅读）、RSS 自动收集、REST API；迁移方面支持从 Chrome、Pocket、Linkwarden、Omnivore、Tab Session Manager 导入，也能用 floccus 与浏览器书签双向同步。\n技术栈决定了它的体型：Next.js（app router）+ Drizzle + Better Auth + tRPC，抓取用 Puppeteer，全文检索依赖 Meilisearch，还带规则引擎、SSO 与多语言。所以自托管不是一个容器跑完的事，机器太小吃不消。作者自己也说这是从 Pocket 转到自建后、嫌 memos 缺链接预览和自动 tagging 才做的。\n协议是 AGPL-3.0，另有官方托管版 cloud.karakeep.app（订阅收入用于支持开发），以及只读的演示站 try.karakeep.app。涉及权限与暴露面时先看官方的 Security Considerations 文档再上线。",
+    officialUrl: "https://karakeep.app",
+    officialLabel: "karakeep.app",
+    links: {
+      official: "https://karakeep.app",
+      github: "https://github.com/karakeep-app/karakeep",
+    },
+    whoFor: "从 Pocket 关停后需要自建替代品的人；想把论文、商品页、政策页真正存档而不只是存个链接的人；以及希望书签能被 AI 自动分类、全文搜得出来的人。",
+    whoNot: "只要浏览器原生书签就够的人——它要跑 Meilisearch + Puppeteer + yt-dlp，资源开销与维护成本都不低；也不适合不愿处理自托管鉴权与暴露面的用户。",
+    installTips: [
+      "自托管入口是官方文档的安装页 docs.karakeep.app/Installation/docker，按它准备容器与依赖，别自己拼 compose。",
+      "想先看效果再决定，用只读演示站 try.karakeep.app（demo@karakeep.app / demodemo），注意它是只读的、内容也不属于你。",
+      "不想自己运维就用官方托管 cloud.karakeep.app，订阅费用于支持开发。",
+      "迁移已有数据：支持从 Chrome、Pocket、Linkwarden、Omnivore、Tab Session Manager 导入；想跟浏览器书签保持同步用 floccus。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "K",
+      color: "#3E7B6A",
+    },
+    guide: {
+      intro: "按第一次自建会卡住的顺序讲：先看清它到底由哪些组件构成，再决定 AI 标签用本地模型还是云端，然后处理导入与浏览器同步，最后说暴露到公网前要看的安全文档。",
+      markdown: `## 它不是一个容器
+
+Karakeep 自称 self-hosting first，但完整体验依赖的可不止一个进程。README 给出的技术栈是：
+
+- **Next.js**（app router）做 Web 应用
+- **Drizzle** 做数据库与迁移
+- **Better Auth** 做认证
+- **tRPC** 做前后端通信
+- **Puppeteer** 抓取书签内容
+- **Meilisearch** 做全文检索
+
+此外，整页归档用 monolith、视频归档用 yt-dlp、图片 OCR 各自还有依赖。所以第一件事是照官方文档的安装页准备环境，而不是自己拼一个 compose 文件——少一个组件，表现往往是「能用，但搜索/归档/预览不动」。
+
+评估机器配置时按这套栈来算：一台 1C1G 的小 VPS 会很勉强。
+
+## AI 标签：本地还是云端
+
+自动打标签与自动摘要是它区别于普通书签工具的地方，但这两件事需要 LLM。README 明确支持 **Ollama 本地模型**，也有云端选项。
+
+选择依据很简单：如果你要存的是论文草稿、内部文档、私人收藏，就用本地 Ollama，代价是 tagging 质量取决于你跑得动多大的模型，速度也慢一些。只存公开链接、且不在意内容过一遍云端模型，才考虑云端 provider。
+
+规则引擎（rule-based engine）是另一个省事的点：可以按条件自动归类、打标签，比让 LLM 每次都判断更可控。
+
+## 导入与浏览器同步
+
+迁移是它有备而来的部分：
+
+- 支持从 **Chrome、Pocket、Linkwarden、Omnivore、Tab Session Manager** 导入
+- 通过 **floccus** 与浏览器书签自动同步
+- 日常收集用 Chrome / Firefox / Safari 扩展，移动端有 iOS 与 Android 应用，且支持离线阅读
+- RSS 也能自动收集（auto hoarding）
+
+顺序建议：先导入历史数据，再配 floccus 同步，最后装扩展。三套一起开容易出现重复条目，先分批验证。
+
+## 归档是可选但值得开的
+
+跟「只存链接」的工具最大的差别在这里：
+
+- **整页归档**（monolith）把整页存下来，链接失效了内容还在
+- **视频归档**（yt-dlp）自动存视频
+- **OCR** 把图片里的文字也变成可搜索内容
+- **高亮**可以标记并保存
+
+代价是存储增长快。建议按列表区分：真正重要的才开整页与视频归档，其余只存链接和正文。
+
+## 上线前先看安全文档
+
+官方有专门的 Security Considerations 页。自托管一个带 Puppeteer、能抓取任意 URL、又存着你所有收藏的服务，暴露面比一般书签工具大：抓取器可能被诱导访问内网地址，管理界面也不能裸奔。配好认证（它自带 Better Auth，也支持 SSO）后再考虑外部访问。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "Docker 安装文档",
+          url: "https://docs.karakeep.app/Installation/docker",
+          note: "官方自托管安装步骤。它依赖 Meilisearch 等多个组件，按这页准备环境，别自己拼 compose。",
+        },
+        {
+          kind: "html",
+          title: "安全注意事项",
+          url: "https://docs.karakeep.app/security-considerations",
+          note: "抓取器与管理界面的暴露面说明。把它放到公网可访问之前必读。",
+        },
+        {
+          kind: "html",
+          title: "命令行与代理集成",
+          url: "https://docs.karakeep.app/integrations/command-line",
+          note: "CLI 与官方 agentic skills 的用法，适合把 Karakeep 接进 OpenClaw、Hermes 这类 LLM 代理。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "analytics",
+    linksCheckedAt: "2026-10-21",
+    name: "Plausible Analytics",
+    nameZh: "Plausible 隐私优先网站统计",
+    aliases: ["plausible", "plausible analytics", "网站统计", "Google Analytics 替代", "无 Cookie 统计"],
+    summary: "轻量、无 Cookie 的网站统计，一屏看完全部核心指标，是 Google Analytics 的开源替代。适合只要流量趋势、不要用户画像的站点；代价是自托管社区版一年只发两个长期版本，漏斗、电商收入、SSO 这些是付费云版才有的。",
+    scenes: ["data"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["网站统计", "隐私", "Google Analytics 替代", "自建服务"],
+    body: "Plausible 卖的是「少」：脚本极小、不用 Cookie、不存个人数据与 IP，因此 GDPR / CCPA / PECR 合规不需要弹 consent 横幅；界面没有层层菜单和自定义报表，关键指标一页看完。技术上它是 Elixir + Phoenix 后端，PostgreSQL 存一般数据、ClickHouse 存分析数据，前端 React + Tailwind。\n功能并不单薄：目标与转化追踪、自定义事件与自定义维度、收入归因与漏斗、无代码跟踪（外链点击、表单提交、文件下载、404 页）、邮件或 Slack 的周/月报与流量异常通知、团队成员按角色邀请、公开分享仪表盘链接、Google Search Console 集成拿关键词数据、stats API 与 CSV 导出、实时流量，以及对 SPA 的开箱支持（pushState 与 hash 路由都认）。从 GA 迁移也有历史数据导入通道。\n真正的分岔口是 Cloud 与 Community Edition 的对照。自托管 CE 完全免费，但：它是长期发布版本、一年发两次，新功能不会马上到；漏斗、电商收入目标、SSO、sites API 这些付费功能被有意保留在云版之外（官方说是为项目的可持续性）；机器人过滤只有基础的 User-Agent 与 referrer spam 过滤，云版才有排除约 32K 数据中心 IP 段的进阶过滤；支持只有社区论坛，没有官方承诺；服务器、CDN、备份全都自己出钱出人。反过来，自托管能拿到 ClickHouse 里的原始数据、能把实例放在任意国家。\n还有个容易被忽略的点：为避免 AGPL 传染，它的 JS tracker 是单独以 MIT 许可发布的，服务端才是 AGPLv3。",
+    officialUrl: "https://plausible.io",
+    officialLabel: "plausible.io",
+    links: {
+      official: "https://plausible.io",
+      github: "https://github.com/plausible/analytics",
+    },
+    whoFor: "博客、文档站、独立产品这类只需要知道「访客从哪来、看了什么」的站点；以及受 GDPR 约束、不想为统计弹 Cookie 横幅的团队。",
+    whoNot: "需要用户级行为分析、广告归因与受众分群的市场团队——Plausible 刻意不做这些；也不适合没人维护服务器却坚持自托管的团队，CE 只提供社区支持。",
+    installTips: [
+      "最快是官方托管云：注册后约两分钟就能开始统计，含全球 CDN、高可用、备份与安全，维护全包。",
+      "自托管走 Community Edition 仓库的安装说明（github.com/plausible/community-edition/），服务器、升级、备份、安全、容量全部自己负责。",
+      "法律合规要分清：服务端是 AGPLv3，但你站点上引用的 JS tracker 是单独以 MIT 发布的，这是官方为了避免 AGPL 传染特意拆的。",
+      "自托管遇到问题只有社区支持：官方在仓库 Discussions 里开了 self-hosted-support 版块，不要指望付费支持。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#5850EC",
+    },
+    guide: {
+      intro: "按第一次做决定的顺序讲：先在你自己的站点上验证它够不够用，再决定 Cloud 还是自托管，然后把目标与自定义事件配起来，最后说清 CE 被有意保留掉的功能。",
+      markdown: `## 先确认它真的够用
+
+Plausible 的产品哲学是「少即是多」，所以第一件事不是装，而是确认你的需求在它的范围内。它给出的是流量层面的答案：
+
+- 访客数、访问次数、浏览量、停留时长、跳出率
+- 来源与引荐、设备与地域、热门页面与入口页
+- 目标与转化（自定义事件）、自定义维度、收入归因
+- 实时访客
+
+它**不给**的是：跨站点用户画像、广告受众分群、个体级行为路径。需要这些的话它是刻意不做的，别指望靠自托管「解锁」。
+
+判断标准很简单：你问的问题如果都能用「多少人来、从哪来、看了哪页、有没有转化」回答，它就够；如果你要问「某个具体用户做了什么」，它不适合。
+
+## Cloud 还是 Community Edition
+
+官方给了一张很诚实的对照表，核心差异是这几条：
+
+| | Cloud | Community Edition |
+| --- | --- | --- |
+| 运维 | 全部托管，约 2 分钟上线 | 服务器、安装、升级、备份、安全、容量全归你 |
+| 发布节奏 | 每周多次更新 | 长期版本，一年两次，新功能不会马上到 |
+| 付费功能 | 全部可用 | 漏斗、电商收入目标、SSO、sites API 不提供 |
+| 机器人过滤 | 进阶过滤，默认排除约 32K 数据中心 IP 段 | 仅基础 User-Agent 与 referrer spam 过滤 |
+| 数据 | 只看仪表盘里的聚合数据，可 CSV / stats API 导出 | 可以直接从 ClickHouse 取原始数据 |
+| 支持 | 官方人工支持 | 社区支持，无官方承诺 |
+
+一句话总结：**自托管买到的是原始数据主权与任意部署位置，代价是运维与功能滞后**。如果没人愿意维护 ClickHouse 与升级，就别为了免费选自托管。
+
+## 把目标与事件配好
+
+默认只有页面浏览。想让它真正有用，至少配这几类：
+
+- **自定义事件**：注册成功、订阅、加购、点击关键按钮
+- **自定义维度**：按作者、按分类、按套餐等拆分看
+- **无代码跟踪**：外链点击、表单提交、文件下载、404 页面，这几个开关式打开即可，不用改代码
+- **Search Console 集成**：接上之后仪表盘里能看到真实的关键词数据
+
+从 GA 迁过来的，官方提供历史数据导入，可以先导入再对比一两周，确认口径一致再彻底切。
+
+## 自托管要注意的两件事
+
+第一，**tracker 与服务端许可不同**：为避免 AGPL 传染，站点上引用的 JS tracker 是单独以 MIT 发布的，服务端才是 AGPLv3。二次分发时不要混为一谈。
+
+第二，**CE 缺的不是 bug，是刻意保留**：漏斗、电商收入、SSO、sites API 是官方为了项目可持续性留在云版的。评估时不要当成「以后会补上」的功能来计。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://plausible.io/docs",
+          note: "安装、自定义事件与维度、API 与导出等全部文档。配目标和事件时按这个查。",
+        },
+        {
+          kind: "html",
+          title: "自托管安装说明（CE 仓库）",
+          url: "https://github.com/plausible/community-edition/",
+          note: "社区版的实际安装步骤与要求。决定自托管前先看这里，确认自己能接受全部运维责任。",
+        },
+        {
+          kind: "html",
+          title: "Cloud 与 CE 功能对照",
+          url: "https://plausible.io/self-hosted-web-analytics",
+          note: "发布节奏、付费功能、机器人过滤、支持等差异的官方说明。选型时以这一页为准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "archivebox",
+    linksCheckedAt: "2026-10-21",
+    name: "ArchiveBox",
+    nameZh: "ArchiveBox 自建网页归档",
+    aliases: ["archivebox", "网页归档", "web archive", "网页快照", "链接存档"],
+    summary: "自建网页归档：喂进去 URL 就存下 HTML、单文件 HTML、截图 PNG、PDF、WARC、正文、媒体等多种格式，输出是普通文件，将来不用 ArchiveBox 也能读。适合要留存证据或对抗链接失效的人；代价是默认会同时往 archive.org 存一份，且存档体积增长很快。",
+    scenes: ["tools", "docs"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["网页归档", "数字保存", "自建服务", "链接失效"],
+    body: "ArchiveBox 的定位是「让你关心的那部分互联网不会消失」。你给它 URL——可以一条条加，也可以定时从书签、浏览历史、RSS、Pocket/Pinboard、浏览器扩展导入——它就为每个 URL 存一批冗余格式的快照：原始 HTML+CSS+JS、单文件 HTML、截图 PNG、PDF、WARC、标题、正文、favicon、请求头，社交媒体存正文与评论，音视频站点用 yt-dlp 存 MP3/MP4 与字幕，代码仓库直接 git clone，文档类存 PDF/DOCX/PPTX。\n它的设计取舍很明确：依赖 Chrome、wget、yt-dlp 这类标准工具，数据落在**普通文件与文件夹**里（外加 SQLite），格式都是能读几十年的开放格式——不需要跑 ArchiveBox 也能打开那些文件。使用方式 CLI、Web UI、Python API、REST API 与桌面端都等价，都能加标签、定时抓取、看日志。\n实践里有三个坑。一是**默认会往 archive.org 也存一份**（archivedotorg_enabled），要纯本地就在配置里关掉。二是**体积**：截图、PDF、WARC、媒体全开的话，几千个 URL 就能吃掉几十 GB，归档策略要提前定。三是**访问地址**：BASE_URL 默认 auto，会用 web. 和 admin. 两个子域（本地默认 *.localhost），BIND_ADDR 只管监听地址，别把两者搞混。\n另外镜像渠道要分清：dev 是 CI 全绿后才推进的，dev-unstable 不等 CI 跑完就跟进新构建，sha-<12位提交> 是同一时间发布的固定版本——日常用全量测试的渠道，别为了追新上 dev-unstable。",
+    officialUrl: "https://archivebox.io",
+    officialLabel: "archivebox.io",
+    links: {
+      official: "https://archivebox.io",
+      github: "https://github.com/ArchiveBox/ArchiveBox",
+    },
+    whoFor: "要长期保存研究资料、政策文件、新闻报道的人；需要为法律或合规留存网页证据的组织；以及被链接失效坑过、想把收藏真正存下来的人。",
+    whoNot: "只想给书签做个备份的人——它一套快照十几个文件，太重；也不适合磁盘吃紧又不做归档策略的场景，或者要求纯本地却忘了关 archive.org 同步的人。",
+    installTips: [
+      "Docker Compose（官方推荐）：`mkdir -p ~/archivebox/data && cd ~/archivebox`，`curl -fsSL 'https://docker-compose.archivebox.io' > docker-compose.yml`，`docker compose pull`，`docker compose up -d --wait`，再打开 http://admin.archivebox.localhost:5797 完成初始化。",
+      "不用 Docker 就用 uv：`uv tool install --python 3.13 --prerelease explicit --upgrade 'archivebox>=0.9.0rc0,<0.10'`，然后 `archivebox init` 与 `archivebox install`；一键脚本是 `curl -fsSL 'https://get.archivebox.io' | bash`。",
+      "加内容用 `archivebox add 'https://example.com'`；Docker 里是 `docker compose exec archivebox archivebox add 'https://example.com'`；要开 Web 服务用 `archivebox server 0.0.0.0:5797`。",
+      "只想本地留存、不想默认上传到 archive.org，改配置里的 archivedotorg_enabled 关掉它。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#8B5A2B",
+    },
+    guide: {
+      intro: "按第一次部署会卡住的顺序讲：先选安装方式，再搞清 admin 与 web 两个访问地址是怎么来的，然后决定存哪些格式、要不要往 archive.org 同步，最后说清存储增长这件事。",
+      markdown: `## 选安装方式
+
+官方把 Docker Compose 列为推荐，理由是安装/升级体验最好、安全性更好、且自带全部可选依赖：
+
+\`\`\`bash
+mkdir -p ~/archivebox/data && cd ~/archivebox
+curl -fsSL 'https://docker-compose.archivebox.io' > docker-compose.yml
+docker compose pull
+docker compose up -d --wait
+\`\`\`
+
+不加 Docker 就用 uv：
+
+\`\`\`bash
+uv tool install --python 3.13 --prerelease explicit --upgrade 'archivebox>=0.9.0rc0,<0.10'
+mkdir -p ~/archivebox/data && cd ~/archivebox/data
+archivebox init
+archivebox install
+\`\`\`
+
+一键脚本是 \`curl -fsSL 'https://get.archivebox.io' | bash\`。日常加内容与起服务：
+
+\`\`\`bash
+archivebox add 'https://example.com'
+archivebox server 0.0.0.0:5797
+\`\`\`
+
+## admin 与 web 是两个地址
+
+这一点最容易让人以为装失败了。BASE_URL 默认的 auto 模式会用两个子域：
+
+- \`http://web.archivebox.localhost:5797\`（公开 UI）
+- \`http://admin.archivebox.localhost:5797\`（管理 UI）
+
+**第一次要去 admin 那边创建管理员账号**。BASE_URL 设成普通 DNS 名字时则只用一个 host。注意 \`BIND_ADDR\` 只控制本地监听地址，跟外部访问用的域名不是一回事，别改错了还以为没生效。
+
+镜像渠道也别乱选：\`dev\` 要等完整 CI 通过，\`dev-unstable\` 不等 CI 就跟进新构建，另有 \`sha-<12位提交>\` 的固定标签。日常用全量测试的渠道，别为了追新上 dev-unstable。
+
+## 决定存什么
+
+同一个 URL 它会存一堆格式：原始 HTML+CSS+JS、单文件 HTML、截图 PNG、PDF、WARC、标题、正文、favicon、headers，媒体类还会走 yt-dlp 存音视频与字幕，代码仓库直接 clone。
+
+冗余是它刻意的设计（一种格式将来读不出来，还有别的），但**每一种都要占空间**。建议先按用途分档：重要的开全格式，普通的只留 HTML + 正文 + 截图。几千个 URL 全开格式，几十 GB 很快就没了。
+
+## 关掉 archive.org 同步（如果你要纯本地）
+
+README 明确写了：默认会**同时把页面存到 archive.org** 做冗余。这是好事也是风险——你归档的 URL 会提交给第三方，如果归档内容里有不该公开的链接（内网地址、带 token 的 URL、私人页面），就不该开着。
+
+要纯本地模式，改配置里的 \`archivedotorg_enabled\` 关掉它。同理，需要归档登录/付费墙内容时要配 chrome_user_data_dir，但官方 wiki 对这一项给了安全注意事项，先读再用。
+
+## 长期可用性才是重点
+
+它用 Chrome、wget、yt-dlp 这些标准工具，输出是 HTML、JSON、PDF、PNG、MP4、TXT、WARC，数据落在普通文件与文件夹里。这意味着**十年后不装 ArchiveBox 也能打开那些文件**——这是它跟一些私有格式归档工具最大的差别，也是选型时最该看重的点。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "Quickstart 文档",
+          url: "https://github.com/ArchiveBox/ArchiveBox/wiki/Quickstart",
+          note: "各平台安装方式与使用入口。第一次装建议照这一页而不是第三方教程。",
+        },
+        {
+          kind: "html",
+          title: "用法文档（CLI / UI / API）",
+          url: "https://github.com/ArchiveBox/ArchiveBox/wiki/Usage",
+          note: "add、定时抓取、标签、Python shell 与 SQL 访问等用法。装完之后查操作主要看这里。",
+        },
+        {
+          kind: "html",
+          title: "配置项说明",
+          url: "https://github.com/ArchiveBox/ArchiveBox/wiki/Configuration",
+          note: "archivedotorg_enabled、BASE_URL、BIND_ADDR、chrome_user_data_dir 等配置的含义。要纯本地归档必须查这页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "setup-ipsec-vpn",
+    linksCheckedAt: "2026-10-21",
+    name: "setup-ipsec-vpn",
+    nameZh: "IPsec VPN 一键部署脚本",
+    aliases: ["setup ipsec vpn", "vpnsetup", "libreswan", "自建 VPN", "IKEv2"],
+    summary: "一条命令在一台 Linux 服务器上装好 Libreswan + xl2tpd，提供 IPsec/L2TP、Cisco IPsec 与 IKEv2 三种接入。适合有 VPS、想在公共网络里加密自己流量并把凭据握在手里的人；代价是脚本以 root 跑在服务端，且必须自己放行 UDP 500 与 4500。",
+    scenes: ["tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["VPN", "IPsec", "IKEv2", "自建服务", "网络安全"],
+    body: "这是一组把 IPsec VPN 服务器装起来的自动化脚本，用 Libreswan 做 IPsec 服务端、xl2tpd 提供 L2TP。它的用途写在 README 第一句：VPN 会加密你和服务器之间的网络流量，让中间没人能窃听——README 举的场景是咖啡店、机场、酒店这些不安全的网络。\n装完同时支持三种模式：IPsec/L2TP、IPsec/XAuth（Cisco IPsec）与 IKEv2（用 AES-GCM 这类强而快的加密套件），并会生成可直接导入 iOS、macOS、Android 的配置文件；Windows、macOS、iOS、Android、Chrome OS 和 Linux 都能当客户端。安装全程自动化，不需要交互输入，凭据可以随机生成（结束时显示在屏幕上），也可以自己指定。\n常量要记牢：客户端默认用 Google Public DNS，可用 VPN_DNS_SRV1 / VPN_DNS_SRV2 换成 Cloudflare、Quad9、OpenDNS 等；IPsec PSK 至少 20 个随机字符；服务器有外部防火墙（EC2 / GCE 之类）时必须放行 UDP 500 与 4500，否则表现为「怎么都连不上」。\n两条硬约束：README 用警告框写明**只能在承载 VPN 的那台 Linux 服务器上跑，不要在你的个人 PC 或 Mac 上跑**；系统支持 Ubuntu 26.04/24.04/22.04、Debian 13/12、CentOS Stream 10/9、Rocky、AlmaLinux、Oracle Linux，另有树莓派等发行版在折叠项里。作者还维护了 WireGuard、OpenVPN、Headscale 的同系列脚本和 Docker 镜像。请在你有权限的网络与所在司法辖区允许的范围内使用。",
+    officialUrl: "https://github.com/hwdsl2/setup-ipsec-vpn",
+    officialLabel: "github.com/hwdsl2/setup-ipsec-vpn",
+    links: {
+      official: "https://github.com/hwdsl2/setup-ipsec-vpn",
+      github: "https://github.com/hwdsl2/setup-ipsec-vpn",
+    },
+    whoFor: "有一台 VPS、想在不可信的公共网络里保护自己流量、并且希望凭据与日志都在自己服务器上的人；也适合需要给 iOS/macOS 快速下发配置文件的场景。",
+    whoNot: "没有服务器、只想点开就用的人（那应该选成熟的商业 VPN 服务）；以及不愿意管理一台暴露在公网的 VPN 服务器的人——它不会自己打补丁，安全维护是你的责任。",
+    installTips: [
+      "在目标服务器上执行：`wget https://get.vpnsetup.net -O vpn.sh && sudo sh vpn.sh`；wget 下不动就用 `curl -fL https://get.vpnsetup.net -o vpn.sh`。凭据会随机生成并在结束时显示。",
+      "要自己定凭据就别改脚本内容去硬编码：用环境变量，值必须用单引号包裹且不能含 \\ \" ' 三个字符——`sudo VPN_IPSEC_PSK='你的PSK' VPN_USER='用户名' VPN_PASSWORD='密码' sh vpn.sh`。",
+      "云主机有外部防火墙时（EC2 / GCE 等）必须放行 UDP 500 与 UDP 4500，这是「连不上」最常见的原因。",
+      "装之前先更新系统：Ubuntu/Debian 用 `sudo apt-get update && sudo apt-get dist-upgrade`，CentOS/RHEL 系用 `sudo yum update`，然后重启；想换 DNS 就加 `sudo VPN_DNS_SRV1=1.1.1.1 VPN_DNS_SRV2=1.0.0.1 sh vpn.sh`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "s",
+      color: "#2E5A88",
+    },
+    guide: {
+      intro: "按第一次部署会卡住的顺序讲：先确认服务器与系统合不合格，再选一种安装方式并想好凭据怎么给，然后处理防火墙端口与 DNS，最后说清它不该被用在哪里。",
+      markdown: `## 它跑在哪、能跑在什么系统上
+
+**跑在哪**：一台云主机、VPS 或独立服务器。README 用警告框写得很直白——只能在承载 VPN 的那台 Linux 服务器上运行，**不要**在你的个人 PC 或 Mac 上跑。
+
+**系统要求**：Ubuntu 26.04 / 24.04 / 22.04、Debian 13 / 12、CentOS Stream 10 / 9、Rocky Linux、AlmaLinux、Oracle Linux；折叠项里还有 Raspberry Pi OS、Kali、Alpine、RHEL。公有云上的 Linux 虚拟机同样可以，DigitalOcean、Vultr、Linode、OVH、Azure 都在支持列表里。
+
+## 安装：一条命令，三种给凭据的方式
+
+最简单的方式是让脚本随机生成，装完把凭据打印出来：
+
+\`\`\`bash
+wget https://get.vpnsetup.net -O vpn.sh && sudo sh vpn.sh
+\`\`\`
+
+要自己指定凭据，**推荐用环境变量**，而不是去改脚本内容：
+
+\`\`\`bash
+sudo VPN_IPSEC_PSK='你的预共享密钥' \\
+VPN_USER='你的用户名' \\
+VPN_PASSWORD='你的密码' \\
+sh vpn.sh
+\`\`\`
+
+三个值的规矩：必须放在**单引号**里，且**不能包含 \\ " '** 这三个字符。PSK 至少要有 20 个随机字符。
+
+第三种方式是下载脚本后用编辑器替换脚本里的 YOUR_IPSEC_PSK、YOUR_USERNAME、YOUR_PASSWORD 再执行，适合要把安装过程固化下来的场景。
+
+## 连不上？先查端口
+
+最常见的失败原因不是配置，是防火墙。服务器在公有云上时，除了系统内的 iptables，还有一层外部防火墙（AWS 的安全组、GCP 的 VPC 防火墙规则），必须放行：
+
+- **UDP 500**
+- **UDP 4500**
+
+症状是客户端一直转圈或者直接超时，而服务本身看起来是运行的。先确认这两个端口通了，再排查别的。
+
+## DNS 与 IKEv2 的定制
+
+客户端默认用 Google Public DNS（8.8.8.8 / 8.8.4.4）。想换成 Cloudflare（1.1.1.1 / 1.0.0.1）、Quad9、OpenDNS 等，安装时加变量：
+
+\`\`\`bash
+sudo VPN_DNS_SRV1=1.1.1.1 VPN_DNS_SRV2=1.0.0.1 sh vpn.sh
+\`\`\`
+
+IKEv2 有几个专属变量：\`VPN_DNS_NAME\`（服务器域名，必须是完整 FQDN）、\`VPN_CLIENT_NAME\`（第一个客户端名，默认 vpnclient）、\`VPN_PROTECT_CONFIG=yes\`（给客户端配置文件加随机密码保护）。
+
+想跳过 IKEv2 只装另外两种模式，用 \`VPN_SKIP_IKEV2=yes\`，之后再单独跑 \`sudo ikev2.sh\` 交互式配置。**注意**：如果 IKEv2 已经装好了，这些变量不再生效，要先移除 IKEv2 再重配。
+
+## 边界与维护
+
+装完会生成可导入 iOS、macOS、Android 的配置文件，Windows、Chrome OS、Linux 也能连。但服务器从此归你维护：系统补丁、Libreswan 升级、凭据管理都要自己做。
+
+请使用在你有权限的网络与所在司法辖区允许的范围内。作者另有 WireGuard、OpenVPN、Headscale 的同系列脚本和 Docker 镜像，如果你只是想要一个现代协议的个人 VPN，WireGuard 那条线可能更轻。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目 README",
+          url: "https://github.com/hwdsl2/setup-ipsec-vpn",
+          note: "系统要求、三种安装方式与全部环境变量、客户端配置说明。安装前先看 Requirements 一节。",
+        },
+        {
+          kind: "html",
+          title: "高级用法文档",
+          url: "https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/docs/advanced-usage.md",
+          note: "装完之后改 DNS、管理用户与证书等操作的说明。日常维护查这一页。",
+        },
+        {
+          kind: "html",
+          title: "IKEv2 使用说明",
+          url: "https://github.com/hwdsl2/setup-ipsec-vpn/blob/master/docs/ikev2-howto.md",
+          note: "ikev2.sh 的交互式配置，以及如何移除并重建 IKEv2。想定制 IKEv2 时按这里走。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pentagi",
+    linksCheckedAt: "2026-10-21",
+    name: "PentAGI",
+    nameZh: "PentAGI 自主渗透测试代理",
+    aliases: ["pentagi", "pentagi agent", "AI 渗透测试", "自主安全测试", "多代理安全"],
+    summary: "自建的自主渗透测试多代理系统：用自然语言给出目标与目的，代理在隔离 Docker 沙箱里跑 nmap、Metasploit、sqlmap 等 20 多款工具并产出报告。只能用于自有或书面授权的目标；代价是要自备 LLM 与一整套 Docker 服务，跑一次的时间和费用都不低。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["安全测试", "渗透测试", "AI 代理", "多代理系统"],
+    body: "PentAGI 是 VXControl 开发的自托管多代理系统：你用自然语言描述目标与目的，一组专职代理（研究、开发、执行等）自己拆解任务、调用 20 多款专业工具（nmap、Metasploit、sqlmap 等）在一个隔离的 Docker 沙箱里执行，把学到的东西记住，最后给你一份带利用指引的漏洞报告。README 在开头就把目标用户写清楚了：安全工程师、渗透测试人员、研究员和红队，且明确标注用于**授权测试**。\n工程上的几个设计值得注意：结果是 PostgreSQL + pgvector 长期存储的（命令、输出、成功经验都能复用）；可选的 Neo4j + Graphiti 知识图谱用来追踪主机、服务与发现之间的关系；整套服务带 Grafana / Prometheus / VictoriaMetrics / Jaeger / Loki / OpenTelemetry 的监控，以及 Langfuse 做 LLM 可观测；外部搜索可接 Tavily、Firecrawl、Perplexity、DuckDuckGo、Google CSE、Sploitus、SearXNG 等；对外提供 REST 与 GraphQL（Bearer token 鉴权）。模型侧非常灵活：10 多家云厂商、任意 OpenAI 兼容网关，或用 Ollama / vLLM 跑本地模型（官方另有 vLLM + Qwen3.5-27B-FP8 的本地部署指南），小模型还能靠执行监控与任务规划来兜底。\n能力边界必须读：README 专门强调它**不是** CALDERA 那类带预定义剧本的 BAS（入侵与攻击模拟）/对手模拟产品，代理自己写的攻击脚本属于概念性或未来工作；流程报告当前支持 Web 查看、复制到剪贴板、Markdown 与 PDF 下载，JSON 导出不是已记录的受支持格式。\n安装走 Linux / macOS / Windows 的交互式安装器，用 Docker Compose 拉起整套服务——也就是说，成本和复杂度都在你自己的机器上。",
+    officialUrl: "https://pentagi.com",
+    officialLabel: "pentagi.com",
+    links: {
+      official: "https://pentagi.com",
+      github: "https://github.com/vxcontrol/pentagi",
+    },
+    whoFor: "有授权范围的安全工程师与红队：想让 AI 承包重复性的侦察、验证与报告初稿，同时把数据留在自己的基础设施上。",
+    whoNot: "没有明确书面授权就想跑的人——这是渗透测试工具，对未授权目标使用是违法的；也不适合只想跑个扫描器看个结果的人，它要自备 LLM、Docker 与可观的时间预算。",
+    installTips: [
+      "安装走官方交互式安装器，Linux、macOS、Windows 都支持，用 Docker Compose 拉起整套服务；动手前先备好可用的 Docker 环境。",
+      "必须自备模型：10 多家云 LLM provider、任意 OpenAI 兼容网关，或 Ollama / vLLM 本地模型；本地生产部署官方另有 vLLM + Qwen3.5-27B-FP8 指南。",
+      "知识图谱是可选的：要启用才需要 Neo4j + Graphiti，默认不开也能跑，别为了图好看多背一套数据库。",
+      "REST 与 GraphQL 用 Bearer token 鉴权，不要把管理界面或 API 网关直接暴露在公网。",
+      "只对自有或已取得书面授权的目标运行；先把测试范围、时间窗和应急联系人写清楚再启动。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#7B2D26",
+    },
+    guide: {
+      intro: "按第一次部署会卡住的顺序讲：先把授权这件事摆在配置之前，再准备 Docker 与模型，然后决定要不要开知识图谱，最后说清它今天的能力边界与看结果的方式。",
+      markdown: `## 第一件事不是安装，是授权
+
+PentAGI 是自主渗透测试系统：它会真的对目标发起扫描与利用尝试。README 在 Overview 里就把目标用户限定为「安全工程师、渗透测试人员、研究员与红队」，并注明**用于授权测试**。
+
+启动任何一次任务之前，至少要有：
+
+- 一份明确的目标清单（IP、域名、应用范围）
+- 书面授权（自有资产的内部审批也算）
+- 约定的时间窗与禁止使用的手法
+- 出事时能联系到的人
+
+这一条不是免责声明的套话。自主代理会按自己的判断执行动作，范围写得含糊，它就可能越过你心里的边界。
+
+## 准备 Docker 与模型
+
+安装走官方交互式安装器，Linux、macOS、Windows 都支持，底层是 Docker Compose 拉起一整套服务。所以先确认宿主机有可用的 Docker 与足够资源——它不是单个容器，而是前端、后端、数据库、队列、代理、监控与工具沙箱的组合。
+
+模型也要自己备，三种路线：
+
+- 10 多家云 LLM provider（OpenAI、Anthropic、Gemini、Bedrock、DeepSeek、GLM、Kimi、Qwen 等）或聚合网关（OpenRouter、DeepInfra 等）
+- 任意 OpenAI 兼容端点（含 Azure OpenAI）
+- **本地模型**：Ollama 或 vLLM；官方另有 vLLM + Qwen3.5-27B-FP8 的生产本地部署指南
+
+用较小模型时，README 建议开启执行监控与任务规划来提升可靠性。预算上要有心理准备：一次完整流程会消耗可观的 token。
+
+## 知识图谱是可选的
+
+Graphiti + Neo4j 的知识图谱用来追踪主机、服务与发现之间的语义关系，是**可选组件**。默认不装也能跑完整流程。
+
+建议的做法是先不开，跑几次熟悉输出之后，如果你确实需要跨任务复用「哪些主机、哪些服务、哪些发现互相关联」，再启用。多一套 Neo4j 就意味着多一份备份与版本维护。
+
+## 知道它今天不做什么
+
+README 有一节 Current Capability Boundaries，值得逐条读完再设定预期：
+
+- 它是自主 / 辅助式的渗透测试平台，**不是** CALDERA 那种带预定义剧本的 BAS 或对手模拟产品。
+- 代理自己写的攻击脚本（BAS 式）属于概念性或未来工作，不是今天已实现的功能。
+- 流程报告当前支持 Web 查看、复制到剪贴板、Markdown 与 PDF 下载；**JSON 导出不是已记录的受支持格式**，别把自动化流水线建在它上面。
+
+把这几条写进给领导的预期里，能省掉很多解释成本。
+
+## 看结果与日常运维
+
+跑起来之后可以看的东西：Web UI 管理任务与监控，Grafana 看系统指标，Langfuse 看 LLM 调用与成本，最终产出是带利用指引的漏洞报告。
+
+对外集成走 REST 与 GraphQL，用 Bearer token 鉴权——不要把网关暴露在公网。历史命令、输出与成功经验都存在 PostgreSQL + pgvector 里，可以跨任务复用，所以**这个库本身也是敏感资产**，按生产数据库的标准做备份与访问控制。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目 README",
+          url: "https://github.com/vxcontrol/pentagi",
+          note: "安装入口、全部 LLM provider 配置、能力边界一节。决定要不要上之前先读 Current Capability Boundaries。",
+        },
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://pentagi.com",
+          note: "产品与 Enterprise 版本的能力说明（agent 档案、插件与 MCP server、实时攻击链视图等）。",
+        },
+        {
+          kind: "html",
+          title: "本地模型部署指南（vLLM + Qwen）",
+          url: "https://github.com/vxcontrol/pentagi/blob/main/examples/guides/vllm-qwen35-27b-fp8.md",
+          note: "官方给的生产环境本地部署示例。想在离线或数据不出网的场景跑时照这个配。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "wox",
+    linksCheckedAt: "2026-10-21",
+    name: "Wox",
+    nameZh: "Wox 跨平台启动器",
+    aliases: ["wox", "wox launcher", "启动器", "Raycast 替代", "Alfred 替代"],
+    summary: "原生渲染的开源启动器，Raycast / Alfred 的替代品：一个输入框里开应用、找文件、跑动作，日常内存占用约 150MB。适合想要键盘优先工作流的人；代价是插件生态比 Raycast 小，很多能力得自己写或去商店碰运气。",
+    scenes: ["tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["启动器", "效率工具", "键盘操作", "插件"],
+    body: "Wox 是一个跨 Windows、macOS、Linux 的开源启动器，对标 Raycast 与 Alfred。它的主张是「fully native」：三个平台都做原生 GPU 渲染，不是 Electron 也不是套个浏览器壳，因此日常使用约 150MB 内存，可以常驻后台而不觉得又开了一个重家伙。\n能力集中在那一个输入框里：本地搜索、开应用、找文件、跑动作，全程键盘优先，不用离开输入框就能把下一步做完。扩展靠插件——内置一批，再按需要从商店装；README 说明插件可以用 Node.js、Python 或脚本来写，所以想把自己的常用动作接进来并不难。\n安装方式按平台分得很清楚，基本都能走包管理器：macOS 用 brew install --cask wox，Windows 有 winget install -e --id Wox.Wox、scoop install extras/wox、choco install wox 三条路，Arch Linux 用 yay -S wox-bin，其余情况从 Releases 下载稳定包直接运行。README 标注的当前版本是 v2.4.6（2026 年 10 月）。\n要认清的取舍：它比 Raycast 轻、开源、跨平台，但插件与主题的丰富度不是同一个量级；Raycast 上随手就能装到的一堆现成扩展，在这里可能要自己写。官方另有插件商店与主题商店，装之前先去逛一圈，确认你依赖的那几个动作有没有人做过了。",
+    officialUrl: "https://www.woxlauncher.com",
+    officialLabel: "www.woxlauncher.com",
+    links: {
+      official: "https://www.woxlauncher.com",
+      github: "https://github.com/Wox-launcher/Wox",
+    },
+    whoFor: "习惯键盘操作、想用一个输入框完成「开应用 / 找文件 / 跑动作」的人；以及不想为一个启动器付 Raycast 订阅费、或需要在 Linux 上获得同等体验的人。",
+    whoNot: "重度依赖 Raycast 现成插件生态的人——这里很多能力得自己写；也不适合只想要系统自带搜索（Spotlight / 开始菜单搜索）就够的轻度用户。",
+    installTips: [
+      "macOS：`brew install --cask wox`。",
+      "Windows 三选一：`winget install -e --id Wox.Wox`、`scoop install extras/wox`（scoop 需要先加 extras bucket）、`choco install wox`。",
+      "Arch Linux：`yay -S wox-bin`；其他发行版从 GitHub Releases 下载最新的稳定包直接运行。",
+      "需要更多能力就去官方插件商店与主题商店（woxlauncher.com/store/plugins 与 /store/themes）看看有没有现成的，没有再用 Node.js 或 Python 写自己的插件。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "W",
+      color: "#3C6E9F",
+    },
+    guide: {
+      intro: "按第一次用会卡住的顺序讲：先用包管理器装对版本，再弄清唤起快捷键与「一个输入框跑动作」的用法，然后去商店找插件，最后说清它跟 Raycast 的生态差距该怎么补。",
+      markdown: `## 先按平台选安装方式
+
+README 给了一张安装表，优先走包管理器，省去手动更新：
+
+| 平台 | 方式 | 命令 |
+| --- | --- | --- |
+| macOS | Homebrew | \`brew install --cask wox\` |
+| Windows | Winget | \`winget install -e --id Wox.Wox\` |
+| Windows | Scoop | \`scoop install extras/wox\` |
+| Windows | Chocolatey | \`choco install wox\` |
+| Arch Linux | AUR | \`yay -S wox-bin\` |
+| 通用 | 手动 | 从 Releases 下载最新稳定包直接运行 |
+
+Windows 上 scoop 那条要求你已经加了 extras bucket（\`scoop bucket add extras\`），否则会找不到包。装完先在终端里确认版本，README 标注的当前版本是 v2.4.6。
+
+## 理解它的工作模式
+
+Wox 的用法跟 Alfred / Raycast 是一套心智：一个输入框，敲关键词，回车执行。差别在于它想让你**不要离开这个输入框**——开应用、找文件、跑某个动作，都在同一个输入里完成，而不是打开一层又一层的面板。
+
+所以上手的第一件事不是装插件，而是把唤起快捷键固定下来，并且跟系统自带的搜索（macOS 的 Spotlight、Windows 的开始菜单搜索）区分开：两套都留着很容易打架，要么改掉系统的，要么改掉 Wox 的。
+
+## 插件是它的上限
+
+内置功能只覆盖基础，真正让它有用的在插件。官方商店在：
+
+- 插件：woxlauncher.com/store/plugins
+- 主题：woxlauncher.com/store/themes
+
+README 说明插件可以用 **Node.js、Python 或脚本**来写，也就是说门槛不高：你平时在终端里敲的那串命令，包装一下就能变成 Wox 里的一个动作。
+
+建议的用法是「先想动作，再找插件」：把你想让它干的三五件事列出来（比如查某个内部系统、起某个开发环境、翻译剪贴板内容），去商店找；找不到再自己写，比漫无目的地装一堆插件有效得多。
+
+## 关于资源占用
+
+它主打的一点是常驻也不重：三个平台都是原生 GPU 渲染，不是 Electron，日常约 150MB 内存。这对「要不要让它开机自启」这个决定很关键——它本来就是设计成一直在后台的，不需要你因为怕占内存而每次手动开。
+
+## 生态差距要自己补
+
+说清取舍：Wox 轻、开源、跨平台，但插件与主题的丰富度跟 Raycast 不是一个量级。从 Raycast 迁过来的人，最可能遇到的不是功能缺失，而是「那个我天天用的插件这里没有」。
+
+评估办法很直接：把你依赖的插件列出来，去商店一个个搜。核心的几个都在，就值得迁；缺得多，就先双跑一阵，把自己写的部分补上再切。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://www.woxlauncher.com/",
+          note: "使用说明与文档入口。装完之后查快捷键、配置与开发插件都从这里进。",
+        },
+        {
+          kind: "html",
+          title: "插件商店",
+          url: "https://www.woxlauncher.com/store/plugins",
+          note: "现成插件列表。迁移前先确认你依赖的动作有没有人做过。",
+        },
+        {
+          kind: "html",
+          title: "Releases 下载页",
+          url: "https://github.com/Wox-launcher/Wox/releases",
+          note: "各平台稳定包与更新记录。包管理器装不上或要指定版本时来这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "beszel",
+    linksCheckedAt: "2026-10-21",
+    name: "Beszel",
+    nameZh: "Beszel 轻量服务器监控",
+    aliases: ["beszel", "服务器监控", "轻量监控", "homelab 监控", "Docker 统计"],
+    summary: "轻量服务器监控：hub + agent 两段式，自带 Docker/容器统计、历史数据与告警，界面基于 PocketBase。适合几台小机器想看 CPU、磁盘、温度、SMART 又不想上 Prometheus 那套的人；代价是它只做指标，日志与链路排查还得另配。",
+    scenes: ["engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["服务器监控", "Homelab", "Docker", "告警", "自建服务"],
+    body: "Beszel 由两部分组成：hub 是一个基于 PocketBase 的 Web 应用，负责看板、用户与存储；agent 跑在每台被监控的机器上，把系统指标送回 hub。README 强调的卖点是轻量——比主流方案更小、更省资源，配置少、开箱即用。\n指标覆盖得比「轻量」这个词听起来要全：CPU 与内存（内存还含 swap 与 ZFS ARC）、磁盘占用与磁盘 IO（支持多分区多设备）、网络、负载、温度、风扇转速（Linux 走 /sys/class/hwmon）、GPU 使用率与功耗（Nvidia / AMD / Intel 都支持）、电池电量，每个 Docker/Podman 容器的独立 CPU/内存/网络历史，S.M.A.R.T. 磁盘健康（含 eMMC 磨损与 Linux mdraid 阵列健康），以及 ZFS 池容量、健康、IO、scrub 与数据集用量。网络监控还能从 agent 侧直接测响应时间和中断。\n运维相关的功能也不缺：多数指标都能配告警，支持很多通知服务；多用户（各自管自己的系统，管理员可共享系统给他人）；OAuth / OIDC 登录（支持多家 provider，密码登录可以关掉）；自动备份到磁盘或 S3 兼容存储并能恢复。\n要认清边界：它是指标监控与告警，不是日志平台也不是 APM。想从「CPU 飙了」一路查到「哪个请求导致的」，它给不了，得另配日志与链路工具。上手看 beszel.dev 的 quick start 指南，几分钟就能跑起来。",
+    officialUrl: "https://beszel.dev",
+    officialLabel: "beszel.dev",
+    links: {
+      official: "https://beszel.dev",
+      github: "https://github.com/henrygd/beszel",
+    },
+    whoFor: "有几台 VPS、NAS 或家里小服务器，想看资源曲线、磁盘健康并在出问题时收到告警的人；想要 Prometheus 之外的轻量选项的 Homelab 玩家。",
+    whoNot: "需要日志检索、链路追踪或复杂 PromQL 编排的团队——它只做指标；也不适合几十台以上、需要分层联邦与长期集中存储的生产集群。",
+    installTips: [
+      "先看官方 quick start（beszel.dev/guide/getting-started），hub 与 agent 是两个镜像（henrygd/beszel 与 henrygd/beszel-agent），先起 hub 再在每台机器上装 agent。",
+      "每台要监控的机器都得跑 agent，容器统计要 agent 能访问 Docker 的统计接口。",
+      "想看磁盘健康（S.M.A.R.T.）要确保 agent 所在机器能读到磁盘 SMART 数据，否则这一项会是空的。",
+      "备份在 hub 侧配置，可存到磁盘或 S3 兼容存储；登录可以接 OAuth / OIDC 多家 provider，接好后把密码登录关掉。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "b",
+      color: "#467A6B",
+    },
+    guide: {
+      intro: "按第一次部署会卡住的顺序讲：先分清 hub 与 agent 的职责，再按指标清单确认你要看的项是否支持，然后把告警和通知配起来，最后说清它不做日志这件事。",
+      markdown: `## 先分清 hub 和 agent
+
+Beszel 是两段式的，搞清楚这个就不会装错：
+
+- **hub**：Web 应用，基于 PocketBase，提供看板、管理与存储，通常只部署一份。
+- **agent**：跑在**每台**你想监控的机器上，把系统指标送回 hub。
+
+所以最小可用配置是「一个 hub + N 个 agent」。只装 hub 的话，看板是空的；只装 agent 没有任何意义。上手照 beszel.dev/guide/getting-started 走，README 说几分钟能跑完。
+
+两个 Docker 镜像分别是 \`henrygd/beszel\`（hub）与 \`henrygd/beszel-agent\`（agent），别拉错。
+
+## 确认你要看的指标它有没有
+
+README 列了完整指标清单，装之前先对一遍，避免装完才发现缺关键项：
+
+- CPU、内存（含 swap 与 ZFS ARC）、磁盘占用与磁盘 IO、网络、负载
+- 温度、风扇转速（Linux，走 \`/sys/class/hwmon\`）
+- GPU 使用率与功耗：Nvidia、AMD、Intel 都支持
+- 电池电量（主机与部分外设）
+- 容器状态与指标：Docker / Podman
+- **S.M.A.R.T.** 磁盘健康，含 eMMC 磨损与 Linux mdraid 阵列健康
+- **ZFS**：池容量、用量、健康、IO、scrub 状态与数据集用量
+- 网络监控：从 agent 侧直接测响应时间与中断
+
+其中 S.M.A.R.T. 是最容易「装完发现是空的」的一项：它需要 agent 所在机器能真正读到磁盘健康数据（虚拟机、部分 RAID 卡、USB 硬盘盒常常读不到）。如果你就是为了看硬盘健康才装它，先在目标机器上确认能读到 SMART 再投入。
+
+## 告警要配通知才有用
+
+多数指标都能配告警，支持的通知服务很多。建议的做法是先只开三四个真正会打电话把你叫醒的条件（磁盘快满、温度异常、主机离线、容器挂了），其余都先只记录不看通知——告警泛滥的结果是所有人都把通知静音。
+
+多用户场景下，用户可以各自管理自己的系统，管理员能把系统共享给别人。登录可以接 OAuth / OIDC（支持多家 provider），接好之后把密码登录关掉，比自己维护口令更安全。
+
+## 备份别忘配
+
+hub 侧支持自动备份，可以存到磁盘或 S3 兼容存储，也能从备份恢复。因为是自托管的监控系统，历史数据都在你自己的库里，丢了就真没了——配一个异地或 S3 的备份目标，比事后补数据划算。
+
+## 它不做的事
+
+Beszel 是**指标**监控与告警，不做日志检索，也不做链路追踪。它能告诉你「这台机器磁盘 IO 在凌晨三点飙了」，但没法告诉你「是哪个请求、哪条 SQL 造成的」。
+
+需要后者的话，它是 Prometheus 的轻量替代，不是 Elastic / Loki / APM 的替代。把定位想清楚再决定要不要引入。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "快速开始指南",
+          url: "https://beszel.dev/guide/getting-started",
+          note: "hub 与 agent 的部署步骤。第一次装照这一页走，别自己拼 compose。",
+        },
+        {
+          kind: "html",
+          title: "官网文档",
+          url: "https://beszel.dev",
+          note: "告警、OAuth/OIDC、备份等完整文档。配通知与登录方式时查这里。",
+        },
+        {
+          kind: "html",
+          title: "Docker Hub 上的 agent 镜像",
+          url: "https://hub.docker.com/r/henrygd/beszel-agent",
+          note: "agent 镜像的标签与说明。每台被监控机器都要跑它。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "nocobase",
+    linksCheckedAt: "2026-10-21",
+    name: "NocoBase",
+    nameZh: "NocoBase 无代码业务系统平台",
+    aliases: ["nocobase", "无代码平台", "低代码", "内部工具搭建", "业务系统"],
+    summary: "开源无代码平台：数据模型、权限、工作流、审计日志都是现成基础设施，AI 在这之上用 CLI 与 skills 帮你搭，人也能用所见即所得界面改。适合要快速堆内部业务系统、又怕 AI 生成一堆黑盒代码的人；代价是插件化的概念不少，上手先得理解数据模型与界面区块的关系。",
+    scenes: ["office", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["无代码", "业务系统", "工作流", "AI 代理", "自建服务"],
+    body: "NocoBase 的定位不是「AI 从零生成一套系统」，而是「AI 在生产验证过的基础设施上帮你搭」。它把数据模型、权限、工作流、审计日志这些最容易写错的部分做成内置能力，AI 与人都在这套结构上工作，所以速度来自 AI、可靠性来自既有基础设施。\n三条主线。协作：编码代理拿到完整 CLI 与 skills（支持 Claude Code、Cursor、Codex、OpenCode、TRAE 等），人则有一键切换「使用模式 / 配置模式」的所见即所得界面，两边可以交替改——AI 先建数据模型和页面，人再手工调交互，反过来也成立。智能：内置 AI 员工能直接进业务流程（前端做分析、问答、辅助填表，后端做文档识别、风险监测、任务路由），对外通过 MCP、HTTP API、CLI 与 skills 接 OpenClaw、Hermes、Dify、Coze、n8n 等，也能连 Telegram、WhatsApp、Slack、Gmail；每个 AI 员工有自己的角色与字段级读写权限，改动都有审计日志。可靠：数据模型驱动、数据与界面解耦，数据留在你自己的数据库（也支持外部数据库与第三方 API 作为数据源），微内核 + 插件架构，功能都能通过插件组合扩展。\n上手是三条命令：npm install -g @nocobase/cli 装 CLI，nb --version 验证，nb init --ui 建应用；想让编码代理一起搭，README 的示例是在项目里跑 codex（或 claude、opencode）。不想装也能先去 demo.nocobase.com/new 试。\n代价要说清：它概念多（数据模型、区块、工作流、角色、插件），第一次上手比纯表单类工具陡；AI 建的部分仍然需要人来审，尤其是权限与工作流这种出错代价高的配置。",
+    officialUrl: "https://www.nocobase.com",
+    officialLabel: "www.nocobase.com",
+    links: {
+      official: "https://www.nocobase.com",
+      github: "https://github.com/nocobase/nocobase",
+    },
+    whoFor: "需要快速搭 CRM、工单、审批、库存这类内部业务系统的小团队；以及想让编码代理参与搭建、但要求结果可被人接手维护的团队。",
+    whoNot: "只想要一个在线表单或简单表格的人——它的概念成本偏高；也不适合不愿审 AI 产出的权限与工作流配置的团队，错了就是数据事故。",
+    installTips: [
+      "装 CLI：`npm install -g @nocobase/cli`，用 `nb --version` 确认装好。",
+      "建应用：`nb init --ui`，交互式完成初始化；详细步骤见官方文档 docs.nocobase.com/ai/install-nocobase-app。",
+      "想让编码代理一起搭，README 的示例是在项目目录里直接跑 `codex`（也支持 `claude`、`opencode`）；AI 集成指引见 docs 的 quick-start。",
+      "先不装也行：官方有在线演示 demo.nocobase.com/new，可以先验证是不是你要的东西。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "N",
+      color: "#2E6F9E",
+    },
+    guide: {
+      intro: "按第一次上手会卡住的顺序讲：先理解「数据模型驱动、数据与界面解耦」这句话意味着什么，再决定 AI 与手工怎么分工，然后把 AI 员工的权限收紧，最后说清插件与数据源的边界。",
+      markdown: `## 先理解它的结构
+
+NocoBase 反复强调一句：数据模型驱动，**数据与 UI 解耦**。这不是宣传语，它决定了你的操作顺序。
+
+在这类工具里，常见的错误做法是先拖一个好看的页面，再往里塞字段。在 NocoBase 里应该反过来：先把数据模型（有哪些表、字段、关系）定下来，再在上面配页面、视图与工作流。
+
+好处是换界面不丢数据，AI 与人改的是同一份模型；坏处是**上手曲线陡**——你得先接受「数据表」「区块」「工作流」「角色」这一堆概念，才能开始做出东西。
+
+## 上手：三条命令
+
+\`\`\`bash
+npm install -g @nocobase/cli
+nb --version
+nb init --ui
+\`\`\`
+
+\`nb init --ui\` 是交互式建应用。想让编码代理一起搭，README 给的示例是装好之后在项目里直接跑你常用的代理：
+
+\`\`\`bash
+codex   # 也可以是 claude、opencode
+\`\`\`
+
+正式走这条路的说明在 docs.nocobase.com/ai/install-nocobase-app 与对应的 quick-start 文档里。另外不想本地装也有在线演示 demo.nocobase.com/new。
+
+## AI 与手工怎么分工
+
+它支持的是「两种模式来回切」：一键在使用模式与配置模式之间切换，AI 建的可以被人接着改，人配的 AI 也能继续做。
+
+实践中比较稳的分工是：
+
+- **AI 做**：批量建数据模型、生成页面骨架、写工作流初稿
+- **人做**：调 UI 与交互细节、定义权限边界、审核工作流分支
+
+理由很实际：UI 与交互的返工成本低，权限与工作流的错误代价高。让 AI 出速度，让人守住边界。
+
+## AI 员工的权限要当真
+
+NocoBase 提供了「AI 员工」：前端能做分析、问答、辅助填表，后端能做文档识别、风险监测、任务路由，还能接进工作流参与决策与执行。对外通过 MCP、HTTP API、CLI 与 skills 连 OpenClaw、Hermes、Dify、Coze、n8n 等平台，也能连 Telegram、WhatsApp、Slack、Gmail。
+
+它自己也给了兜底设计：**每个 AI 员工有自己的角色，权限是字段级读写，所有数据改动与工作流触发都进审计日志，管理员随时可调整权限**。
+
+用的时候不要图省事给一个宽角色。按「它能读哪些字段、能写哪些字段」逐个收紧，并定期看审计日志——这是把自主能力放进业务系统时唯一可靠的护栏。
+
+## 插件与数据源
+
+它是微内核架构，一切皆插件：功能靠可组合的插件叠加，官方插件与自定义插件混用，AI 建的插件和人工建的插件走同一套架构。
+
+数据源方面，除了主数据库，也能接外部数据库和第三方 API 作为数据源；业务数据保持在标准关系结构里，存在你自己的数据库，不锁进平台。
+
+引入插件前先看维护状态：插件越多升级面越大，别为了一个小功能拉进一个没人维护的依赖。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.nocobase.com/",
+          note: "安装、数据模型、工作流、权限与插件开发的完整文档。概念不清楚时查这里。",
+        },
+        {
+          kind: "html",
+          title: "AI 代理集成指引",
+          url: "https://docs.nocobase.com/ai/quick-start",
+          note: "让 Claude Code、Codex、OpenCode 这类编码代理参与搭建的配置步骤。想用 AI 建系统就看这页。",
+        },
+        {
+          kind: "html",
+          title: "在线演示",
+          url: "https://demo.nocobase.com/new",
+          note: "不用本地安装就能体验的演示环境。决定投入之前先去点一圈，确认交互是不是你团队能接受的。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "dash",
+    linksCheckedAt: "2026-10-21",
+    name: "Dash",
+    nameZh: "Dash Python 数据应用框架",
+    aliases: ["dash", "plotly dash", "Python 数据看板", "数据应用框架"],
+    summary: "用纯 Python 写交互式数据应用的框架：下拉框、滑块、图表直接绑到你的分析代码上，底层是 Plotly.js + React + Flask。适合分析师不想碰前端又要交付可交互看板；代价是开源版只方便本机跑，要给同事用得自己部署或上 Dash Enterprise。",
+    scenes: ["data", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["数据可视化", "Python", "仪表盘", "Plotly", "Web 应用"],
+    body: "Dash 是 Plotly 出的 Python 框架，README 自称是下载量最大、最受信任的 ML 与数据科学 Web 应用框架。它把现代 UI 组件（下拉框、滑块、图表）直接和你的分析用 Python 代码绑在一起，写的人不需要碰 JavaScript——底层由 Plotly.js、React 与 Flask 承担。\n它的代码是声明式与响应式的，这让复杂交互反而好写：README 举的例子里，一个把下拉框连到 Plotly 图表、从 Google Finance 取数进 Pandas DataFrame 的应用只有 43 行；另一个 5 个输入、3 个输出、带交叉过滤的应用也只有 160 行纯 Python。图表由 Plotly.js 提供，约 50 种图表类型，包含地图。\n它也不只是看板：外观可以完全控制，README 里有一个被做成 PDF 报告样式的例子。但开源版的边界很清楚——应用跑在你的笔记本或工作站上，**不容易给组织里的其他人访问**。要变成部门级或公司级的服务，Plotly 卖的是 Dash Enterprise：App Manager 点选式部署、Kubernetes 伸缩、无代码鉴权（LDAP / AD / PKI / Okta / SAML / OpenID Connect / OAuth / SSO）、Job Queue 把重计算移到后台、Design Kit、Snapshot Engine、Dashboard Toolkit，以及不靠 iframe 的嵌入能力。\n选型判断就一条：如果只是你自己或少数几个人看，开源版足够，装个 dash 包再照官方教程写；一旦要给别人长期用，先算清楚部署与鉴权谁来负责——开源版不含这两块。",
+    officialUrl: "https://plotly.com/dash",
+    officialLabel: "plotly.com/dash",
+    links: {
+      official: "https://plotly.com/dash",
+      github: "https://github.com/plotly/dash",
+    },
+    whoFor: "数据分析师与数据科学家：手里是 Pandas/NumPy 的代码，想交付一个别人能点的交互式看板，又不想写前端。",
+    whoNot: "需要给全公司长期托管、带统一登录与权限的应用——开源版不管部署与鉴权，得自己补或买 Enterprise；也不适合追求像素级定制前端体验的前端团队。",
+    installTips: [
+      "装包用 PyPI 上的 dash（pypi.org/project/dash/），官方教程 dash.plotly.com/getting-started 号称五分钟做出第一个应用。",
+      "不知道该怎么写就去画廊 dash.gallery 抄——里面有大量 Dash 应用的 Python 与 R 源码。",
+      "要给别人访问就得自己解决部署：开源版跑在本地工作站，README 明确说它不容易被组织内其他人访问；评估 Dash Enterprise 时重点看 App Manager、K8s 伸缩与无代码鉴权。",
+      "重计算别塞进同步回调：Enterprise 有 Job Queue 做异步后台处理，开源场景下也要自己把耗时任务挪出回调。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#1F3B63",
+    },
+    guide: {
+      intro: "按第一次写 Dash 会卡住的顺序讲：先建立「layout + callback」的心智模型，再理解自动等待之外的性能陷阱，然后处理部署与鉴权这件开源版不管的事。",
+      markdown: `## 心智模型：layout 加 callback
+
+Dash 应用只有两块东西，理解清楚就能写：
+
+1. **layout**：页面上有什么组件，用 Python 对象描述
+2. **callback**：某个输入变了，哪个输出要重算
+
+一个最小骨架大概是这样：
+
+\`\`\`python
+from dash import Dash, html, dcc, callback, Output, Input
+
+app = Dash(__name__)
+app.layout = html.Div([
+    dcc.Dropdown(["北京", "上海"], "北京", id="city"),
+    html.Div(id="summary"),
+])
+
+@callback(Output("summary", "children"), Input("city", "value"))
+def render(city):
+    return f"当前城市：{city}"
+
+if __name__ == "__main__":
+    app.run(debug=True)
+\`\`\`
+
+关键在于**回调是声明式的**：你只说「summary 的内容由 city 的值决定」，不写事件监听，也不用手动操作 DOM。这也是 README 说它 declarative and reactive 的意思——组件多了以后，这种写法比命令式的前端代码好维护得多。
+
+## 图表与交互
+
+图表由 Plotly.js 提供，约 50 种类型，含地图。交互复杂度可以很高：README 举的例子里，5 个输入、3 个输出、带交叉过滤的应用只用了 160 行 Python。
+
+写回调时注意两点：
+
+- **回调的输入输出用组件 id 关联**，id 重复会导致回调不生效或行为诡异，动态生成的组件 id 要保证唯一。
+- **重计算要挪出回调**。回调是同步的，里面跑一个几秒钟的查询，整个页面就卡住。开源场景下把耗时任务放到后台任务里，Enterprise 则有现成的 Job Queue。
+
+## 外观是可以完全改的
+
+别被「看板」两个字限制住。README 明确说 Dash 不只用于仪表盘，你对应用的外观有完全的控制权——官方示例里就有一个被样式化成 PDF 报告的 Dash 应用。
+
+想省事可以看 Enterprise 的 Design Kit（不写 CSS 就能排版与换品牌样式），开源场景下就是自己写 CSS。
+
+## 开源版不管部署与鉴权
+
+这一条是选型的分水岭，README 说得很直白：**Dash 开源版的应用跑在你的本地笔记本或工作站上，不容易被组织里的其他人访问**。
+
+也就是说，部署、域名、TLS、登录与权限全都不在开源版的范围里。要变成给部门或全公司用的服务，要么自己补这一整套，要么上 Dash Enterprise，它提供：
+
+- **App Manager**：点选式部署与管理，号称不需要 IT 或 DevOps 团队
+- **Kubernetes 伸缩**：高可用与水平扩展
+- **无代码鉴权**：LDAP、AD、PKI、Okta、SAML、OpenID Connect、OAuth、SSO 与简单邮件认证
+- **Job Queue**：把重计算移出同步回调
+- **Snapshot Engine / Dashboard Toolkit / Embedding**：快照分享、拖拽布局与免 iframe 嵌入
+
+如果只是你自己看，开源版完全够用；一旦要「给同事一个链接就能打开」，先算清楚这部分谁来做。
+
+## 上手路径
+
+官方文档 dash.plotly.com/getting-started 是五分钟上手的入口，画廊 dash.gallery 有大量带源码的现成应用。建议先照教程跑通一个最小应用，再从画廊里找一个跟你的需求接近的例子改，比从零设计快得多。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方上手教程",
+          url: "https://dash.plotly.com/getting-started",
+          note: "号称五分钟做出第一个 Dash 应用，教程本身也是用 Dash 写的。第一步看这里。",
+        },
+        {
+          kind: "html",
+          title: "Dash 应用画廊",
+          url: "https://dash.gallery",
+          note: "大量 Dash 应用示例，附 Python 与 R 源码。不知道某类交互怎么实现时来抄。",
+        },
+        {
+          kind: "html",
+          title: "PyPI 包页面",
+          url: "https://pypi.org/project/dash/",
+          note: "dash 包的版本与发布信息。确认当前可用版本与依赖要求。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ohmyzsh",
+    linksCheckedAt: "2026-10-21",
+    name: "Oh My Zsh",
+    nameZh: "Oh My Zsh 终端配置框架",
+    aliases: ["oh my zsh", "ohmyzsh", "omz", "zsh 配置框架", "终端美化"],
+    summary: "管理 zsh 配置的社区框架，自带几百个插件和一百五十多个主题，装完就有别名、补全和好看的提示符。适合天天泡终端、愿意折腾配置的人；代价是插件开太多会明显拖慢启动，很多主题还要另装 Nerd 或 Powerline 字体才不乱码。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Shell", "zsh", "终端", "插件", "效率工具"],
+    body: "Oh My Zsh 是一个社区驱动的 zsh 配置管理框架，两千五百多名贡献者，自带 300 多个可选插件（rails、git、macOS、docker、homebrew、node、php、python 等）和 140 多个主题，外加一个自动更新工具。装它本质上就是：把一堆别人写好的别名、补全、提示符和函数一次性接进你的 shell。\n前置条件很简单：zsh（v4.3.9 以上能跑，官方建议 5.0.8+）、curl 或 wget、git（建议 2.4.11+）。安装是一条命令（curl / wget / fetch 三种写法都有），国内如果 raw.githubusercontent.com 被拦，README 给了镜像地址 install.ohmyz.sh 替换即可。旧配置不会丢——原有的 .zshrc 会被改名为 .zshrc.pre-oh-my-zsh，装完把要保留的部分搬进新的 .zshrc。\n日常改动基本都在 ~/.zshrc 里：插件写在 plugins=(...) 里，用**空白分隔**（空格、Tab、换行都行），用逗号会直接报错——这是最常见的新手坑；主题改 ZSH_THEME，默认是 robbyrussell，也可以设成 random 并配合 ZSH_THEME_RANDOM_CANDIDATES 与 ZSH_THEME_RANDOM_IGNORED 做偏好筛选。\n两个必须提前知道的代价。一是**主题乱码**：很多主题需要 Powerline 或 Nerd 字体才能正常渲染提示符符号，没装就会看到一堆怪字符；主题只管提示符长什么样，不管终端配色和字体，后者要去终端模拟器里改。二是**启动变慢**：插件不是越多越好，每多一个插件就多一段初始化，开几十个之后每次开新标签页都能感觉到延迟。",
+    officialUrl: "https://ohmyz.sh",
+    officialLabel: "ohmyz.sh",
+    links: {
+      official: "https://ohmyz.sh",
+      github: "https://github.com/ohmyzsh/ohmyzsh",
+    },
+    whoFor: "每天在终端里干活、想要开箱即用的别名补全和好看提示符的人；愿意花半小时挑插件和主题、之后长期受益的人。",
+    whoNot: "只想装完就别管的人——插件和主题都需要自己挑和维护；也不适合在意 shell 启动速度、又不愿意精简插件的人。",
+    installTips: [
+      "先确认前置：`zsh --version`（建议 5.0.8+）、curl 或 wget 可用、git 建议 2.4.11+。",
+      "安装：`sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\"`，wget 与 fetch 也有对应写法。",
+      "raw.githubusercontent.com 访问不了就换镜像：`sh -c \"$(curl -fsSL https://install.ohmyz.sh/)\"`（README 特别提到中国和印度的部分 ISP）。",
+      "装完旧的 .zshrc 会被改名为 .zshrc.pre-oh-my-zsh，把要保留的配置手动搬进新的 .zshrc；自动化安装可加 --unattended，它不会改默认 shell 也不会在结束时启动 zsh。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#B4443C",
+    },
+    guide: {
+      intro: "按第一次装会卡住的顺序讲：先满足前置并把旧配置保住，再改对 plugins 的写法，然后处理主题乱码与启动变慢这两个最常见的抱怨，最后说升级与卸载。",
+      markdown: `## 装之前：三样前置
+
+\`\`\`sh
+zsh --version     # v4.3.9 以上可用，官方建议 5.0.8 或更新
+\`\`\`
+
+另外两样是 **curl 或 wget**，以及 **git**（建议 2.4.11 或更高）。缺哪个先装哪个。
+
+然后是一条命令：
+
+\`\`\`sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+\`\`\`
+
+用 wget 或 fetch 也有对应写法。如果 \`raw.githubusercontent.com\` 拉不动（README 特别点名中国、印度的部分 ISP），把 URL 换成镜像：
+
+\`\`\`sh
+sh -c "$(curl -fsSL https://install.ohmyz.sh/)"
+\`\`\`
+
+**旧配置不会丢**：安装会把你已有的 \`.zshrc\` 改名为 \`.zshrc.pre-oh-my-zsh\`，装完把想保留的部分搬进新文件即可。不放心的可以先 \`cp ~/.zshrc ~/.zshrc.orig\`。
+
+## 插件：用空白分隔，别用逗号
+
+改 \`~/.zshrc\`，找到这一段：
+
+\`\`\`sh
+plugins=(
+  git
+  bundler
+  dotenv
+  macos
+  rake
+  rbenv
+  ruby
+)
+\`\`\`
+
+README 特意加粗提醒：插件之间用**空白**分隔（空格、Tab、换行都可以），**不要写逗号**，写了会直接出错。这是新手最高频的故障。
+
+每个内置插件目录里都有 README，写了它提供哪些别名和额外能力，开之前花半分钟看一眼，比猜强。
+
+## 主题乱码：先装字体
+
+很多人换完主题看到一堆方块或怪符号，第一反应是主题坏了，其实是字体没装。
+
+README 的解释是：很多主题需要 **Powerline 字体**或 **Nerd 字体**才能正常渲染提示符里的特殊符号。另外要分清三件事——
+
+- **主题**控制提示符长什么样（光标前后的那段文字）
+- **配色（color scheme）**和**字体**属于终端模拟器的设置，不在主题管辖范围内
+
+所以换了主题发现「跟截图不一样」，先看字体，再看终端配色。
+
+默认主题是 \`robbyrussell\`。想换就改 \`ZSH_THEME="agnoster"\`；想每次随机，用 \`ZSH_THEME="random"\`，再用 \`ZSH_THEME_RANDOM_CANDIDATES\` 限定候选、\`ZSH_THEME_RANDOM_IGNORED\` 排除不喜欢的。
+
+## 启动变慢：插件不是越多越好
+
+第二个高频抱怨是「装了 Oh My Zsh 之后开新标签页变慢」。原因几乎总是插件太多——每个插件都要在启动时初始化一段脚本。
+
+处理办法很直接：只留真正每天用的（大部分人 git 加一两个就够），剩下的需要时再手动加载。先量一下 \`time zsh -i -c exit\`，精简前后对比，别凭感觉猜。
+
+## 升级与卸载
+
+自动更新是默认开着的，也可以手动更新（README 有 Getting Updates 一节，并能设置更新提示的详细程度）。真要彻底移除，仓库提供了卸载脚本，卸载前记得把 \`.zshrc\` 里你自己加的内容备份出来。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://ohmyz.sh",
+          note: "项目主页与安装入口。想先看看它是什么再决定装不装就从这里进。",
+        },
+        {
+          kind: "html",
+          title: "Wiki：主题列表",
+          url: "https://github.com/ohmyzsh/ohmyzsh/wiki/Themes",
+          note: "一百五十多个主题的截图与说明。挑主题前先逛一圈，注意哪些需要 Nerd / Powerline 字体。",
+        },
+        {
+          kind: "html",
+          title: "Wiki：安装 ZSH",
+          url: "https://github.com/ohmyzsh/ohmyzsh/wiki/Installing-ZSH",
+          note: "各系统安装 zsh 本身的说明。第一步的前置条件不满足时看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "gemini-cli",
+    linksCheckedAt: "2026-10-21",
+    name: "Gemini CLI",
+    nameZh: "Gemini CLI 终端 AI 代理",
+    aliases: ["gemini cli", "gemini-cli", "终端 AI 代理", "Gemini 命令行"],
+    summary: "把 Gemini 带进终端的开源 AI 代理：用个人 Google 账号登录就有每分钟 60 次、每天 1000 次的免费额度，内置 Google Search grounding、文件操作、shell 与联网抓取，还能挂 MCP。适合想在命令行里改代码又不想付 API 费的人；代价是数据走 Google，模型也被绑在 Gemini 上。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI 代理", "CLI", "Gemini", "MCP", "终端工具"],
+    body: "Gemini CLI 是 Google 开源的终端 AI 代理，Apache 2.0 许可。它的价值主张很直接：从你的 prompt 到模型之间路径最短——装上就能在终端里问问题、改代码、跑命令。\n额度是它最现实的卖点。用个人 Google 账号 OAuth 登录（免费档）可享每分钟 60 次、每天 1000 次请求，并接入 Gemini 3 模型与 100 万 token 上下文；用 Gemini API key 则是每天 1000 次请求（Gemini 3 的 flash 与 pro 混合）；企业场景走 Vertex AI，配合 GOOGLE_API_KEY 与 GOOGLE_GENAI_USE_VERTEXAI=true，用组织付费的 Code Assist 许可时还要设 GOOGLE_CLOUD_PROJECT。\n能力上，它内置 Google Search grounding（拿实时信息）、文件操作、shell 命令与网页抓取，支持 MCP 扩展自定义工具，还有会话 checkpointing（保存与恢复复杂会话）和 GEMINI.md 项目上下文文件。非交互用法是脚本化自动化的关键：`gemini -p \"...\"` 直接拿文本结果，加 --output-format json 得到结构化输出，加 --output-format stream-json 拿换行分隔的实时事件流。目录范围可以用 --include-directories 指定，模型用 -m 切换。\n发布通道要分清：preview 每周二 UTC 23:59 发（未充分验证，可能有回归）、stable 每周二 UTC 20:00 发（上周 preview + 修复）、nightly 每天 UTC 00:00 发（最激进）。日常用 stable。另外它还能以 GitHub Action 形式做 PR 自动评审与 issue 分诊。\n代价：数据要过 Google，模型锁定 Gemini，想在 air-gap 或强合规环境里用不适用；代理会执行 shell 命令，生产仓库里要配合 sandbox 与 trusted folders 使用。",
+    officialUrl: "https://geminicli.com",
+    officialLabel: "geminicli.com",
+    links: {
+      official: "https://geminicli.com",
+      github: "https://github.com/google-gemini/gemini-cli",
+    },
+    whoFor: "常在终端里改代码的开发者：想让代理读代码库、跑命令、查最新资料，又希望用免费额度起步的人。",
+    whoNot: "需要本地或第三方模型、且数据不能出网的人——它绑定 Gemini 且数据走 Google；也不适合在没配沙箱与可信目录的生产仓库里直接放开跑。",
+    installTips: [
+      "免安装直接跑：`npx @google/gemini-cli`；长期用就 `npm install -g @google/gemini-cli`。",
+      "macOS/Linux 可以 `brew install gemini-cli`，macOS 也能 `sudo port install gemini-cli`；受限环境可用 conda 建一个带 nodejs 的环境再 npm 全局装。",
+      "发布通道：`@latest`（稳定，每周二 UTC 20:00）、`@preview`（每周二 UTC 23:59，可能有回归）、`@nightly`（每天 UTC 00:00，最激进），日常用 latest。",
+      "认证三选一：直接 `gemini` 走 Google 账号登录（60 次/分钟、1000 次/天）；或 `export GEMINI_API_KEY=\"...\"` 用 API key；或 `export GOOGLE_API_KEY=\"...\"` 加 `export GOOGLE_GENAI_USE_VERTEXAI=true` 走 Vertex AI。",
+      "非交互用法：`gemini -p \"解释这个代码库的架构\"`，加 `--output-format json` 拿结构化输出，`--output-format stream-json` 拿实时事件流。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#4285F4",
+    },
+    guide: {
+      intro: "按第一次用会卡住的顺序讲：先选对认证方式与配额，再掌握非交互与结构化输出，然后用 GEMINI.md 和 MCP 把它接进项目，最后说清沙箱与可信目录这个安全边界。",
+      markdown: `## 先选认证方式
+
+三种方式对应三种场景，选错了会以为「额度怎么这么小」：
+
+**1. Google 账号登录（推荐起步）**——直接跑 \`gemini\`，在提示里选 Sign in with Google，走浏览器 OAuth。
+
+- 免费档：60 次/分钟、1000 次/天
+- Gemini 3 模型，100 万 token 上下文
+- 不用管 API key，模型自动更新
+- 如果你用的是组织买的 Code Assist 许可，先 \`export GOOGLE_CLOUD_PROJECT="你的项目ID"\` 再启动
+
+**2. Gemini API key**——从 aistudio.google.com/apikey 取，然后：
+
+\`\`\`bash
+export GEMINI_API_KEY="YOUR_API_KEY"
+gemini
+\`\`\`
+
+免费档 1000 次/天（Gemini 3 的 flash 与 pro 混合），好处是可以精确选模型。
+
+**3. Vertex AI**——企业场景：
+
+\`\`\`bash
+export GOOGLE_API_KEY="YOUR_API_KEY"
+export GOOGLE_GENAI_USE_VERTEXAI=true
+gemini
+\`\`\`
+
+## 装哪个版本
+
+\`\`\`bash
+npx @google/gemini-cli              # 免安装，直接跑
+npm install -g @google/gemini-cli   # 全局安装
+brew install gemini-cli             # macOS / Linux
+\`\`\`
+
+发布通道每周都在动，**日常用 \`@latest\`**：
+
+- \`preview\`：每周二 UTC 23:59 发布，未充分验证，可能有回归
+- \`latest\`：每周二 UTC 20:00 发布，等于上周 preview + 修复与验证
+- \`nightly\`：每天 UTC 00:00 发布，最新也最不稳
+
+受限环境（没有全局 npm 权限）可以用 conda：\`conda create -y -n gemini_env -c conda-forge nodejs\` 后在环境里 npm 全局装。
+
+## 非交互模式才是自动化的入口
+
+交互模式是给人用的，真正把它接进脚本要靠 \`-p\`：
+
+\`\`\`bash
+gemini -p "Explain the architecture of this codebase"
+gemini -p "Explain the architecture of this codebase" --output-format json
+gemini -p "Run tests and deploy" --output-format stream-json
+\`\`\`
+
+三种输出各有用途：纯文本直接看；\`json\` 给程序解析；\`stream-json\` 是换行分隔的事件流，适合长时间任务做进度监控。
+
+其他常用参数：\`--include-directories ../lib,../docs\` 扩大多目录上下文，\`-m gemini-2.5-flash\` 指定模型。
+
+## 让它懂你的项目：GEMINI.md 与 MCP
+
+两件事决定了它能不能真的帮上忙：
+
+- **GEMINI.md**：项目级的上下文文件，把构建命令、代码规范、目录约定写进去，它每次都会带上。这比每次在 prompt 里重复有效得多。
+- **MCP**：在 \`~/.gemini/settings.json\` 里配置 MCP server，接上你自己的工具（GitHub、Slack、数据库等），之后就能在会话里直接调用。
+
+另外会话 checkpointing 可以保存与恢复复杂会话，长任务中断了不用从头再来。
+
+## 安全边界：沙箱与可信目录
+
+它内置 Google Search grounding、文件操作、**shell 命令执行**与网页抓取。这意味着它能真的改动你的文件系统并执行命令。
+
+在重要仓库里用之前，先看官方文档里的 Sandboxing & Security 与 Trusted Folders 两节：按目录控制执行策略，把不可信的项目放进沙箱或者干脆不允许自动执行。
+
+另外 GitHub 集成（Gemini CLI GitHub Action）能自动做 PR 评审与 issue 分诊，接入前先确认代码是否允许送出到该服务。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://www.geminicli.com/docs/get-started/installation",
+          note: "推荐的系统规格与详细安装步骤，含各发布通道说明。装之前先确认环境要求。",
+        },
+        {
+          kind: "html",
+          title: "认证配置文档",
+          url: "https://www.geminicli.com/docs/get-started/authentication",
+          note: "三种认证方式与各自配额，含 Google Workspace 账号等其他方式。额度不够用时先看这里。",
+        },
+        {
+          kind: "html",
+          title: "沙箱与安全文档",
+          url: "https://www.geminicli.com/docs/cli/sandbox",
+          note: "执行环境与 Trusted Folders 的配置。在真实仓库里放开 shell 执行之前必读。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "playwright",
+    linksCheckedAt: "2026-10-21",
+    name: "Playwright",
+    nameZh: "Playwright 浏览器自动化与测试",
+    aliases: ["playwright", "端到端测试", "e2e", "浏览器自动化", "Microsoft Playwright"],
+    summary: "一套 API 驱动 Chromium、Firefox、WebKit 三个浏览器的自动化与端到端测试框架，自动等待与 web-first 断言是标配。适合要跨浏览器跑 E2E 的团队；代价是要额外下载浏览器二进制，CI 首次安装较慢，且它只管浏览器、不管移动端原生应用。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["端到端测试", "浏览器自动化", "测试框架", "E2E"],
+    body: "Playwright 是微软的 Web 测试与自动化框架，一套 API 同时驱动 Chromium、Firefox 与 WebKit，三个浏览器在 Linux、macOS、Windows 上都支持 headed 与 headless。README 现在把它分成四条使用路径：做端到端测试用 Playwright Test（`npm init playwright@latest`）；给编码代理用 Playwright CLI（`npm i -g @playwright/cli@latest`，官方说它比 MCP 更省 token，因为命令不会把庞大的工具 schema 和无障碍树塞进模型上下文）；给 AI 代理与 LLM 驱动的自动化用 Playwright MCP（`npx @playwright/mcp@latest`）；只想写自动化脚本就用 Library（`npm i playwright`）。\n它解决的是 E2E 测试的老问题：不用自己写 sleep。自动等待会一直等到元素可操作，web-first 断言会自动重试直到条件满足。定位器也按「用户怎么看见页面」来设计——getByRole、getByLabel、getByPlaceholder、getByTestId，比 XPath 稳。每个测试跑在独立的 browser context 里（相当于全新浏览器配置），登录态可以用 storageState 存一次再复用。失败排查靠 trace：配置 `trace: 'on-first-retry'`，之后 `npx playwright show-trace trace.zip` 能看到每一步的 DOM 快照、网络请求与控制台消息。\n除 TypeScript/JavaScript 外，Python、.NET、Java 都有官方版本；VS Code 扩展能一键跑测试与断点调试、用 CodeGen 录操作生成代码、悬停拾取定位器，并集成 Trace Viewer。\n代价也要算：它需要下载自己的浏览器二进制（约几百 MB），CI 里首次安装明显慢，要做缓存；Chromium 默认用的是 Chrome for Testing。另外它只覆盖浏览器，移动端原生应用不在范围内。",
+    officialUrl: "https://playwright.dev",
+    officialLabel: "playwright.dev",
+    links: {
+      official: "https://playwright.dev",
+      github: "https://github.com/microsoft/playwright",
+    },
+    whoFor: "需要跨浏览器跑端到端测试的团队；想让编码代理或 AI 代理稳定操作网页的人；以及要做截图、PDF、爬取这类浏览器自动化的开发者。",
+    whoNot: "只要跑单元测试的人——它是重量级的浏览器方案；也不适合移动端原生应用的 UI 测试，那不在它的范围内。",
+    installTips: [
+      "做 E2E 测试：`npm init playwright@latest`；或手动 `npm i -D @playwright/test` 再 `npx playwright install` 下载浏览器。",
+      "给编码代理用：`npm install -g @playwright/cli@latest`，可选 `playwright-cli install --skills` 装技能；跑测试用 `npx playwright test`。",
+      "给 AI 代理用 MCP：在客户端配置里加 command 为 npx、args 为 @playwright/mcp@latest 的 server；Claude Code 里可直接 `claude mcp add playwright npx @playwright/mcp@latest`。",
+      "只写脚本就 `npm i playwright`；用 VS Code 的话装官方扩展，能录操作生成代码、拾取定位器并直接看 trace。",
+      "CI 里记得缓存浏览器二进制，首次 `npx playwright install` 下载量不小。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#2EAD33",
+    },
+    guide: {
+      intro: "按第一次用会卡住的顺序讲：先选对你的场景该用哪条路径，再理解自动等待与断言的用法，然后配 trace 做失败排查，最后处理 CI 里的浏览器下载。",
+      markdown: `## 四条路径，先选对
+
+Playwright 现在不是一个东西，是四个入口，选错会多走很多弯路：
+
+| 路径 | 适合 | 安装 |
+| --- | --- | --- |
+| **Playwright Test** | 端到端测试 | \`npm init playwright@latest\` |
+| **Playwright CLI** | 编码代理（Claude Code、Copilot） | \`npm i -g @playwright/cli@latest\` |
+| **Playwright MCP** | AI 代理与 LLM 驱动自动化 | \`npx @playwright/mcp@latest\` |
+| **Playwright Library** | 浏览器自动化脚本 | \`npm i playwright\` |
+
+给 AI 代理用时有个取舍值得注意：官方说 **CLI 比 MCP 更省 token**——MCP 会把大段工具 schema 和无障碍树塞进模型上下文，CLI 用命令就不会。让代理干活优先考虑 CLI。
+
+## 别写 sleep
+
+新手从 Selenium 转过来最常见的习惯是加 \`waitForTimeout\`。Playwright 的设计就是要你**不这么写**：
+
+- **自动等待**：操作会一直等到元素真正可操作
+- **web-first 断言**：断言自动重试直到条件满足或超时
+
+配合按用户视角设计的定位器：
+
+\`\`\`TypeScript
+page.getByRole('button', { name: 'Submit' })
+page.getByLabel('Email')
+page.getByPlaceholder('Search...')
+page.getByTestId('login-form')
+\`\`\`
+
+这比 XPath 稳得多，重构页面时不容易碎。
+
+## 登录态：存一次，到处复用
+
+每个测试都跑在**独立的 browser context** 里（相当于全新浏览器 profile），隔离性很好，但也意味着每个测试都要重新登录。
+
+正确做法是登录一次把状态存下来：
+
+\`\`\`TypeScript
+// 登录后保存
+await page.context().storageState({ path: 'auth.json' });
+
+// 其他测试直接复用
+test.use({ storageState: 'auth.json' });
+\`\`\`
+
+## 失败排查靠 trace
+
+测试挂了只看报错信息通常不够。配置一次 trace：
+
+\`\`\`TypeScript
+// playwright.config.ts
+export default defineConfig({
+  use: {
+    trace: 'on-first-retry',
+  },
+});
+\`\`\`
+
+\`\`\`bash
+npx playwright show-trace trace.zip
+\`\`\`
+
+Trace Viewer 里能看到每一步的动作、DOM 快照、网络请求和控制台消息——基本等价于把失败的那一刻重放给你看。VS Code 扩展里也集成了它。
+
+## CI 里的浏览器二进制
+
+它要下载自己的浏览器（Chromium 默认用 Chrome for Testing，另有 Firefox 与 WebKit），首次 \`npx playwright install\` 的下载量不小，CI 第一次跑会明显变慢。
+
+处理办法是缓存浏览器安装目录，或者把安装步骤做成镜像的一层。别在每次流水线里重新下载。
+
+## 边界
+
+它覆盖 Chromium、Firefox、WebKit 三个内核在三大桌面系统上的 headed / headless 执行，也有 Python、.NET、Java 版本。
+
+它**不覆盖**移动端原生应用——那是另一类工具（Appium 等）的活。别把它当成「UI 自动化的全部答案」引入。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://playwright.dev/docs/intro",
+          note: "测试编写、定位器、trace、并行与配置的完整文档。第一次写测试按这个走。",
+        },
+        {
+          kind: "html",
+          title: "CLI 文档（面向编码代理）",
+          url: "https://playwright.dev/agent-cli/introduction",
+          note: "playwright-cli 的命令与 skills 用法。想让编码代理操作网页时看这里。",
+        },
+        {
+          kind: "html",
+          title: "MCP 文档",
+          url: "https://playwright.dev/mcp/introduction",
+          note: "Playwright MCP server 的配置与各客户端接入方式。接 AI 代理时用这一页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "agent-reach",
+    linksCheckedAt: "2026-10-21",
+    name: "Agent-Reach",
+    nameZh: "Agent Reach 上网能力层",
+    aliases: ["agent-reach", "Agent Reach", "agent reach", "给 Agent 装上网能力", "Agent 上网插件"],
+    summary: "给编码 Agent 装一层上网能力：网页、YouTube、B站、GitHub、RSS 装好即用，小红书与 Twitter 要登录态才解锁。适合不想逐个平台配 API 的人；代价是依赖平台 Cookie，有封号风险。",
+    scenes: ["tools", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI Agent", "CLI", "信息获取", "开源"],
+    body: "Agent Reach 不是又一个抓取工具，而是比具体工具高一层的「能力层」：它替你选型、安装、体检与路由，真正的读取由 Agent 直接调上游工具完成。README 把每个平台写成「首选 + 备选」的有序后端列表，doctor 会逐个真实探测，第一个完整可用的当选。\n装好即用的一档覆盖网页（Jina Reader）、YouTube（yt-dlp 提字幕）、B站（bili-cli）、GitHub（gh CLI）与 RSS（feedparser），不需要任何配置。需要登录态的一档——Twitter、小红书、Reddit、Facebook、Instagram——得先配 Cookie 或桌面浏览器会话才会解锁，Reddit 明确写明没有零配置路径，因为匿名接口已经被封。\n它最值得称道的是换代这件事不用你操心：2026 年 6 月 yt-dlp 被 B站风控封死后项目切到 bili-cli，用户零操作。代价有两个。一是需要 Cookie 的平台存在封号风险，README 直接建议你用专用小号而不是主账号；二是默认安装只做只读检查，要真正装系统依赖得显式加 --system，指望「一键全装好」的人会卡在这一步。",
+    officialUrl: "https://github.com/Panniantong/Agent-Reach",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/Panniantong/Agent-Reach",
+      github: "https://github.com/Panniantong/Agent-Reach",
+    },
+    whoFor: "天天让 Claude Code、OpenClaw、Cursor 这类 Agent 去查资料的人：读网页、扒 YouTube 字幕、搜 B站、看 GitHub issue、追 RSS。",
+    whoNot: "只是偶尔查一次网页的人——为它装一整套 CLI 不划算；也不适合不愿为 Twitter、小红书单独准备小号的人，这类平台必须登录态才读得到。",
+    installTips: [
+      "最快的方式是把这句话丢给你的 Agent：「帮我安装 Agent Reach：https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md」，它会自己走完剩下流程。",
+      "手动装用 `agent-reach install --env=auto`：默认只检查环境、列出缺失项，不动系统。要真正装依赖并写入配置必须显式加 `--system`，只想先看看会做什么就加 `--dry-run`。",
+      "装完跑 `agent-reach doctor`，它会告诉你每个渠道当前走哪个后端、哪里不通、怎么修。更新是把安装句里的 install.md 换成 update.md，卸载是 `agent-reach uninstall`（`--keep-config` 保留 token 方便重装）。",
+      "OpenClaw 用户必须先开 exec 权限：`openclaw config set tools.profile \"coding\"`，否则默认的 messaging 配置下 Agent 执行不了 pip / mcporter 这类命令。",
+      "Python 包是从本仓库装的（自带 yt-dlp、feedparser），PyPI 上的同名包不是本项目，别装错。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#3E7BFA",
+    },
+    guide: {
+      intro: "按第一次上手会卡在哪讲：Agent 的 exec 权限、默认只检查不安装、doctor 怎么看体检结果、以及需要登录的平台为什么必须准备小号。",
+      markdown: `## 装之前：确认你的 Agent 能执行命令
+
+Agent Reach 整个安装过程依赖 Agent 自己跑 shell 命令。Claude Code、Cursor、Windsurf 这类本来就有命令行的 Agent 不受限制，但 **OpenClaw 默认的 \`messaging\` 工具配置下 Agent 执行不了命令** —— 这是最常见的第一步就卡死的原因。
+
+先开权限再装：
+
+\`\`\`bash
+openclaw config set tools.profile "coding"
+\`\`\`
+
+或直接在 \`~/.openclaw/openclaw.json\` 里写 \`"tools": { "profile": "coding" }\`。改完要 \`openclaw gateway restart\` 并开一个新对话才生效。
+
+## 装：默认只体检，不装东西
+
+把这句丢给你的 Agent：
+
+\`\`\`text
+帮我安装 Agent Reach：https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
+\`\`\`
+
+它会安装 CLI、检查 Node.js / gh CLI / mcporter 是否齐全、判断你是在本地还是服务器。**默认走的是安全检查路径，不会装系统包也不会写配置** —— 很多人以为跑完就装好了，其实它只列了缺失项。
+
+三档行为要分清：
+
+\`\`\`bash
+agent-reach install --env=auto              # 只读检查，列出缺失项
+agent-reach install --env=auto --system     # 明确允许改系统，才真正安装并写入配置
+agent-reach install --env=auto --dry-run    # 只预览，不做任何改动
+\`\`\`
+
+\`--safe\` 与默认行为相同，只是写法更明确。
+
+## 体检：doctor 是核心
+
+安装完最重要的一条命令：
+
+\`\`\`bash
+agent-reach doctor
+\`\`\`
+
+它按渠道列出状态，并告诉你**当前在用哪个后端**。每个渠道是有序的候选列表，doctor 会真实探测（不只看命令存不存在），第一个完整可用的当选，坏掉的给出修复处方。比如 B站是 \`bili-cli ▸ OpenCLI ▸ 搜索 API\`，yt-dlp 因为被风控封死已经退役；读 Twitter 是 \`twitter-cli ▸ OpenCLI ▸ bird\`。
+
+## 零配置渠道 vs 需要登录的渠道
+
+装好就能用的六个：网页、YouTube、RSS、B站搜索与详情、V2EX、GitHub 公开仓库。
+
+需要登录态才解锁的：Twitter/X、小红书、Reddit、Facebook、Instagram、LinkedIn、Boss直聘、小宇宙。README 特别注明 **Reddit 没有零配置路径**，匿名接口已被封，只剩登录态路线；小红书走 OpenCLI 时只使用用户已经存在且明确控制的 Chrome 会话，项目不替你登录。
+
+## 封号风险：用小号
+
+这一条不是玄学。用 Cookie 登录的平台（Twitter、小红书等）通过脚本或 API 调用，存在被平台检测并封号的风险。README 的建议很直接：**准备专用小号，不要用主账号**。原因有两条——平台可能判定非正常浏览器行为，以及 Cookie 等同于完整登录权限，小号能在凭据泄露时限制影响范围。
+
+凭据落在 \`~/.agent-reach/config.yaml\`，文件权限 600，不上传不外传。
+
+## 卸载
+
+\`\`\`bash
+agent-reach uninstall                # 清 ~/.agent-reach/、各 Agent 的 skill 文件、mcporter 里的 MCP 配置
+agent-reach uninstall --dry-run      # 只预览
+agent-reach uninstall --keep-config  # 只删 skill 文件，保留 token（重装时用）
+pip uninstall agent-reach            # 卸 Python 包本身
+\`\`\`
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库与 README",
+          url: "https://github.com/Panniantong/Agent-Reach",
+          note: "含支持平台矩阵、每个渠道的当前选型与 doctor 的用法。想知道某个平台现在走哪条路，看这一页的表。",
+        },
+        {
+          kind: "html",
+          title: "安装文档（原始 Markdown）",
+          url: "https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md",
+          note: "给 Agent 的安装指令原文。让 Agent 照着做之前，自己先扫一遍它到底会改什么。",
+        },
+        {
+          kind: "link",
+          title: "问题反馈",
+          url: "https://github.com/Panniantong/Agent-Reach/issues",
+          note: "某个渠道失效时的报障入口。平台改反爬后一般先在这里有反馈，比自己排查快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "puppeteer",
+    linksCheckedAt: "2026-10-21",
+    name: "puppeteer",
+    nameZh: "Puppeteer 浏览器自动化库",
+    aliases: ["puppeteer", "puppeteer-core", "无头浏览器", "headless chrome", "浏览器自动化"],
+    summary: "Node 里用高级 API 驱动 Chrome / Firefox，走 DevTools 协议或 WebDriver BiDi，默认无头。适合做端到端测试与页面抓取；代价是 npm 装完可能没下载浏览器，得手动补一步。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["浏览器自动化", "测试", "Node.js", "开源"],
+    body: "Puppeteer 是给 Node.js 用的浏览器控制库，通过 DevTools Protocol 或 WebDriver BiDi 驱动 Chrome 与 Firefox，默认跑无头模式。它把「起浏览器、开页面、跳 URL、设视口、按键、点元素、取文本」这套动作收成十几行代码，定位元素可以用无障碍语义（::-p-aria(Search)）或文本（::-p-text(...)），不用自己拼 XPath。\n真正会绊住新人的不是 API，是安装。装 puppeteer 时它会在安装阶段下载配套 Chrome，但 npm、pnpm、Yarn、Bun、Deno 这些较新的包管理器默认屏蔽依赖的安装脚本，脚本被拦掉就不会下载浏览器，运行时才报找不到 Chrome。解决办法是装完手动跑 `npx puppeteer browsers install`，或者在 package.json 的 allowScripts 里放行 puppeteer。\n如果你不需要它替你管浏览器版本（比如已经有自己的 Chrome，或者跑在容器里），装 puppeteer-core 更干净——它只是一个库，不下载任何浏览器。另外官方还维护基于 Puppeteer 的 chrome-devtools-mcp，用于把浏览器自动化与调试能力接给 MCP 客户端。",
+    officialUrl: "https://pptr.dev",
+    officialLabel: "pptr.dev",
+    links: {
+      official: "https://pptr.dev",
+      github: "https://github.com/puppeteer/puppeteer",
+    },
+    whoFor: "要给 Web 应用写端到端测试、跑页面截图与 PDF、或做结构化抓取的 Node 开发者；也适合需要「真实浏览器」才能复现的场景。",
+    whoNot: "只想发几个 HTTP 请求拿数据的人——上 Puppeteer 意味着背一个浏览器进程，慢且吃内存；纯爬虫场景先看能不能用 fetch 加解析库解决。",
+    installTips: [
+      "`npm i puppeteer` 会在安装时顺带下载配套的 Chrome；`npm i puppeteer-core` 只装库、不下载浏览器，适合你自己管浏览器版本的场景。",
+      "如果运行时报找不到浏览器，八成是包管理器屏蔽了安装脚本（npm、pnpm、Yarn、Bun、Deno 默认都拦）。补跑一次 `npx puppeteer browsers install`，或在 package.json 里把 puppeteer 加进 allowScripts。",
+      "最小可跑例子：`const browser = await puppeteer.launch(); const page = await browser.newPage(); await page.goto('https://developer.chrome.com/');`，用完记得 `await browser.close()`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#40A87F",
+      simpleIcon: "puppeteer",
+    },
+    guide: {
+      intro: "讲三件第一次用会卡住的事：浏览器为什么没被下载、puppeteer 与 puppeteer-core 怎么选、以及一个能跑通的最小脚本长什么样。",
+      markdown: `## 先决定装哪个包
+
+两个包，别装错：
+
+\`\`\`bash
+npm i puppeteer        # 装库，并在安装阶段下载一份配套 Chrome
+npm i puppeteer-core   # 只装库，不下载任何浏览器
+\`\`\`
+
+如果你没有自己维护浏览器的打算，**装 \`puppeteer\` 最省事**。反过来，容器镜像里已经固定了 Chrome 版本、或者你要连别人提供的浏览器，用 \`puppeteer-core\` 更干净，不会被偷偷塞一个浏览器进来。
+
+## 装完跑不起来？先查浏览器
+
+最常见的报错不是代码问题，是**浏览器根本没下载**。
+
+npm（见其 RFC）、pnpm、Yarn、Bun、Deno 这些现代包管理器默认屏蔽依赖的安装脚本。Puppeteer 正是靠安装脚本下载浏览器的，脚本被拦就静默跳过，等你要 launch 时才炸。
+
+两种修法：
+
+\`\`\`bash
+# 装完之后手动补下载
+npx puppeteer browsers install
+\`\`\`
+
+或者让包管理器放行这一段脚本（npm 的写法是在 package.json 里加）：
+
+\`\`\`json
+{
+  "allowScripts": ["puppeteer"]
+}
+\`\`\`
+
+在 CI 里推荐第一种，显式、可复现，也不依赖包管理器版本的行为差异。
+
+## 一个能跑通的最小脚本
+
+\`\`\`ts
+import puppeteer from 'puppeteer';
+// 或者 import puppeteer from 'puppeteer-core';
+
+const browser = await puppeteer.launch();      // 默认 headless
+const page = await browser.newPage();
+
+await page.goto('https://developer.chrome.com/');
+await page.setViewport({ width: 1080, height: 1024 });
+
+// 用键盘打开搜索框
+await page.keyboard.press('/');
+
+// 按无障碍语义定位，比 CSS 选择器稳
+await page.locator('::-p-aria(Search)').fill('automate beyond recorder');
+
+// 等结果再点第一条
+await page.locator('.devsite-result-item-link').click();
+
+// 按可见文本定位并取内容
+const textSelector = await page
+  .locator('::-p-text(Customize and automate)')
+  .waitHandle();
+const fullTitle = await textSelector?.evaluate(el => el.textContent);
+
+console.log('The title of this blog post is "%s".', fullTitle);
+
+await browser.close();
+\`\`\`
+
+这段代码里有两个值得记住的点：**定位优先用 \`::-p-aria()\` 和 \`::-p-text()\`**，它们贴着用户实际看到的东西，页面改个 class 名不会全崩；以及 \`locator(...).click()\` 自带等待，不用手写 waitForSelector。
+
+## 关于 Firefox 与 MCP
+
+Puppeteer 不止支持 Chrome，Firefox 走的是 WebDriver BiDi。另外官方维护了 \`chrome-devtools-mcp\`，一个基于 Puppeteer 的 MCP 服务器，把浏览器自动化与调试能力暴露给 MCP 客户端；还有实验性的 WebMCP API。
+
+## 别忘了收尾
+
+\`browser.close()\` 不是可选项。脚本里漏掉它，CI 上会攒出一堆僵尸 Chrome 进程，最终表现为「跑着跑着机器没内存了」。用 try/finally 包住主流程是个便宜的保险。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档 Get started",
+          url: "https://pptr.dev/docs",
+          note: "安装、首个脚本与常见配置的入口。装哪个包、怎么下载浏览器都以这一页为准。",
+        },
+        {
+          kind: "html",
+          title: "API 参考",
+          url: "https://pptr.dev/api",
+          note: "Browser / Page / Locator 的完整方法签名。写复杂交互时查这里，比搜博客准。",
+        },
+        {
+          kind: "html",
+          title: "排错页 Troubleshooting",
+          url: "https://pptr.dev/faq",
+          note: "浏览器下载失败、容器里跑不起来、headless 相关的已知问题都在这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "sherlock",
+    linksCheckedAt: "2026-10-21",
+    name: "sherlock",
+    nameZh: "Sherlock 用户名检索",
+    aliases: ["sherlock", "sherlock-project", "sherlock project", "用户名检索", "社工库替代", "OSINT"],
+    summary: "拿一个用户名去 400+ 社交网站批量查这个ID在不在，结果落成 txt / CSV / xlsx。适合公开情报调查与自查自己的ID暴露面；别拿它做人肉搜索或骚扰。",
+    scenes: ["tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["OSINT", "CLI", "公开情报", "开源"],
+    body: "Sherlock 做的事很单一：给你一个用户名，去 400 多个社交网络挨个探测该 ID 是否存在，把命中的站点列出来。它不是搜索引擎，也不需要登录任何平台——查的是公开可见的账号存在性，所以结果只是「这个 ID 在某站被占用了」，不等于确认了真人身份。\n典型用法是公开情报（OSINT）里的账号关联，以及反过来自查：看自己的常用 ID 在哪些平台被冒用。输出默认按用户名写进独立的 txt 文件，也可以 --csv 或 --xlsx 导出便于后续处理；--site 能把范围限定到几个指定站点，--proxy 支持走代理（如 socks5://127.0.0.1:1080），--timeout 默认 60 秒。\n两个坑要提前知道。一是有些发行版的第三方打包是坏的——README 明确警告 ParrotOS 与 Ubuntu 24.04 的包有问题，这类系统请改用 uv / pipx / pip 或 Docker；Debian 13+、Ubuntu 22.10+、Homebrew、Kali、BlackArch 的社区包不由官方维护。二是 --nsfw 会把 NSFW 站点纳入检查，--ignore-exclusions 会忽略上游排除规则、可能返回更多误报，两者默认都不开是有原因的。",
+    officialUrl: "https://sherlockproject.xyz",
+    officialLabel: "sherlockproject.xyz",
+    links: {
+      official: "https://sherlockproject.xyz",
+      github: "https://github.com/sherlock-project/sherlock",
+    },
+    whoFor: "做公开情报调查、事件溯源、品牌冒用排查的人；以及想查自己常用 ID 在哪些平台被占用的普通用户。",
+    whoNot: "想用它定位、骚扰某个真实个体的人——工具只确认账号存在性，拿去做人肉搜索既越界也不可靠；只想查一两个站点的话，手动打开网站更快。",
+    installTips: [
+      "推荐 `pipx install sherlock-project`（pip 或 uv 也可以），装完直接用 `sherlock user123`；一次查多个就 `sherlock user1 user2 user3`。",
+      "不想污染本机 Python 环境可以跑容器：`docker run -it --rm sherlock/sherlock`。Fedora 上也可以 `dnf install sherlock-project`。",
+      "ParrotOS 与 Ubuntu 24.04 的第三方打包已知损坏，这两个系统请绕开系统包，改用 uv / pipx / pip 或 Docker。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#5B4B8A",
+    },
+    guide: {
+      intro: "按第一次跑会卡在哪讲：装哪个包才不会踩到坏打包、结果落在哪个文件、以及那几个容易误用的开关到底干了什么。",
+      markdown: `## 装：别用系统包
+
+官方推荐的是 Python 侧的独立安装：
+
+\`\`\`bash
+pipx install sherlock-project
+\`\`\`
+
+\`pip\` 或 \`uv\` 也能用，Docker 也可以：
+
+\`\`\`bash
+docker run -it --rm sherlock/sherlock
+\`\`\`
+
+Fedora 系有 \`dnf install sherlock-project\`。Debian（>= 13）、Ubuntu（>= 22.10）、Homebrew、Kali、BlackArch 也有社区维护的包，但这些**不由 Sherlock 官方维护**。
+
+README 里有一条明确的警告：ParrotOS 和 Ubuntu 24.04 的第三方包看起来是坏的，这两个系统的用户应该改用 uv / pipx / pip 或 Docker。如果你装完发现命令行为异常，先怀疑包源，而不是怀疑自己。
+
+## 跑第一条查询
+
+\`\`\`bash
+sherlock user123              # 查一个
+sherlock user1 user2 user3    # 查多个
+\`\`\`
+
+结果会**按用户名写进对应的 txt 文件**（比如 \`user123.txt\`）。查多个用户名又不想让文件散在当目录，用 \`--folderoutput\` 指定输出目录；查单个想改文件名用 \`--output\`。
+
+导出格式：
+
+\`\`\`bash
+sherlock user123 --csv     # CSV
+sherlock user123 --xlsx    # Excel
+sherlock user123 --txt     # 明确生成 txt
+\`\`\`
+
+## 收窄范围与提速
+
+四百多个站点全跑一遍不快。只关心某几个站就显式指定：
+
+\`\`\`bash
+sherlock user123 --site Twitter --site GitHub
+\`\`\`
+
+其他常用开关：
+
+- \`--timeout 60\`：单个请求的等待秒数，默认 60
+- \`--proxy socks5://127.0.0.1:1080\`：走代理
+- \`--print-found\`：只输出命中的站点（导出成文件时也生效）
+- \`--print-all\`：连没命中的一起输出，排查时用
+- \`--no-color\`：关掉终端彩色，重定向到文件时用得上
+- \`--local\`：强制使用本地的 data.json，不拉远端
+- \`--browse\`：用默认浏览器打开所有命中的结果
+
+## 用户名里的变体
+
+很多人不知道 \`{?}\` 这个语法：它会把用户名里的 \`_\`、\`-\`、\`.\` 互相替换着再试一轮。想查一个 ID 的各种写法时，这一个参数能省掉你手写三遍。
+
+## 两个别乱开的开关
+
+- \`--nsfw\`：把 NSFW 站点纳入检查。默认不开。
+- \`--ignore-exclusions\`：忽略上游的排除规则。**后果是返回更多误报** —— 某些站点的「存在/不存在」判断本来就不干净，官方靠排除规则压着。想要数字好看而开它，只会得到一份不可信的结果。
+
+## 边界
+
+Sherlock 查的是公开可见的账号存在性，不登录任何平台，也不绕过任何访问控制。它回答的是「这个 ID 在某站被占用」，不回答「这个 ID 属于谁」。把它当身份确认工具用，结论一定会错。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档：安装",
+          url: "https://sherlockproject.xyz/installation",
+          note: "各系统安装方式与已知损坏的第三方包清单。装之前先看，能避开 ParrotOS / Ubuntu 24.04 那个坑。",
+        },
+        {
+          kind: "html",
+          title: "官方文档：用法",
+          url: "https://sherlockproject.xyz/usage",
+          note: "完整参数说明与输出格式。想收窄站点范围或导出 xlsx 时查这一页。",
+        },
+        {
+          kind: "html",
+          title: "支持的站点列表",
+          url: "https://sherlockproject.xyz/sites",
+          note: "当前覆盖的 400+ 社交网络清单。怀疑某站不在覆盖范围内时先来这里确认。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "orca",
+    linksCheckedAt: "2026-10-21",
+    name: "orca",
+    nameZh: "Orca 并行 Agent 工作台",
+    aliases: ["orca", "Orca ADE", "onorca", "并行 agent 工作台", "agent orchestrator"],
+    summary: "把 Codex、Claude Code、OpenCode 等 CLI Agent 并排跑在各自 git worktree 里，一个提示分发给五个 Agent 再挑结果合并。适合已经在重度用 CLI Agent 的人；代价是它更新极快，功能清单永远落后于 changelog。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI Agent", "并行开发", "git worktree", "开源"],
+    body: "Orca 自称 ADE（Agent Development Environment）：它不是又一个编码 Agent，而是装在你已有 Agent 外面的一层编排。README 的第一句话就是「Run Codex, ClaudeCode, OpenCode or Pi side-by-side — each in its own worktree, tracked in one place」，支持清单里列了三十多个 CLI Agent，原则写得很直白——能在终端跑的，就能在 Orca 里跑。\n核心卖点是并行 worktree：一个提示扇出到五个 Agent，各自在隔离的 git worktree 里改，你对比结果再合并赢的那个。配套的还有 Ghostty 级别的 WebGL 终端与无限分屏、能从手机上监控并追加指令的 Mobile Companion、点页面上任意元素就把 HTML/CSS/截图塞进 Agent 提示的 Design Mode、SSH worktree（把 Agent 跑在远程大机器上）、以及原生内嵌的 GitHub 与 Linear（在应用内看 PR、issue、看板并直接从任务开 worktree）。\n代价写在这里：项目几乎每天发版，README 自己承认「功能清单永远落后于 changelog」；桌面端是 Electron 系的重客户端，不是轻量工具；Mobile Companion 依赖中继服务把手机和桌面配对（仓库里 cloud/ 是这块的实现）。如果你还没形成稳定的 Agent 工作流，先别上编排层。",
+    officialUrl: "https://onorca.dev",
+    officialLabel: "onorca.dev",
+    links: {
+      official: "https://onorca.dev",
+      github: "https://github.com/stablyai/orca",
+    },
+    whoFor: "已经在天天用 Claude Code / Codex / OpenCode，并且开始需要「同一个任务让多个 Agent 各做一版再挑」的人。",
+    whoNot: "还处在「偶尔让 Agent 改几行」阶段的人——编排层的收益要等你已经有稳定 Agent 工作流才兑现；也不适合无法接受应用频繁大改的用户。",
+    installTips: [
+      "桌面端从 onorca.dev/download 下载，也可以直接取构建：macOS Apple Silicon 是 orca-macos-arm64.dmg、Intel 是 orca-macos-x64.dmg、Windows 是 orca-windows-setup.exe、Linux 是 orca-linux.AppImage。",
+      "macOS 可 `brew install --cask stablyai/orca/orca`；Arch Linux 用 `yay -S stably-orca-bin`（或从源码构建的包 stably-orca-git）。",
+      "手机端是配套的监控与追加指令入口：iOS 在 App Store 搜 Orca IDE，Android 从 onorca.dev/download/android 下 APK，需要和桌面端配对。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#1F6F8B",
+    },
+    guide: {
+      intro: "讲清楚 Orca 到底替你管什么：worktree 是怎么隔离的、Agent 怎么接进来、手机端配对是什么关系，以及为什么功能清单要去看 changelog 而不是 README。",
+      markdown: `## 先理清它管什么、不管什么
+
+Orca **不提供模型，也不替代你现有的编码 Agent**。它装在外面，负责的是三件事：给每个 Agent 一个独立的 git worktree、把它们的进度收在一处、以及让你在应用内做 review。
+
+README 的支持清单列了三十多个 CLI Agent——Claude Code、Codex、Grok、Cursor、GitHub Copilot、OpenCode、Kimi、Qwen Code、Goose、Cline、CodeBuddy 等等，最后一行是 \`+ any CLI agent\`。判断标准就一条：**能在终端跑，就能在 Orca 里跑**。
+
+所以装 Orca 之前，你本机上那个 Agent 应该已经能正常用了。Orca 不会替你解决 Agent 本身的登录、额度或配置问题。
+
+## 装桌面端
+
+从官网下：
+
+- macOS Apple Silicon：\`orca-macos-arm64.dmg\`
+- macOS Intel：\`orca-macos-x64.dmg\`
+- Windows：\`orca-windows-setup.exe\`
+- Linux：\`orca-linux.AppImage\`
+
+包管理器路线：
+
+\`\`\`bash
+# macOS
+brew install --cask stablyai/orca/orca
+
+# Arch Linux（或 stably-orca-git 从源码构建）
+yay -S stably-orca-bin
+\`\`\`
+
+Windows 构建由 SignPath.io 提供代码签名，装的时候遇到 SmartScreen 提示属于正常流程。
+
+## 真正的核心：Parallel Worktrees
+
+这是 Orca 区别于普通终端复用器的地方。**一个提示扇出给五个 Agent，每个在各自的 git worktree 里改，你对比结果再合并赢的那个。**
+
+为什么必须是 worktree 而不是五个编辑器窗口？因为同一个工作目录上多个 Agent 同时写，改动会互相覆盖，最后你分不清哪段是谁写的。worktree 让每个 Agent 拿到独立的检出目录，冲突推迟到你主动合并时才发生——这也是它敢让 Agent 并行跑的前提。
+
+配套的 Quick open 可以跨 worktree 搜索文件、Agent、命令与仓库上下文，不然五个 worktree 开起来之后你会先迷路。
+
+## 手机端是配角，不是另一个客户端
+
+Mobile Companion 的定位是**监控与追加指令**：Agent 跑完给你推送，你在手机上发一句 follow-up。它不是让你在手机上写代码。
+
+- iOS：App Store 搜 Orca IDE
+- Android：从 onorca.dev/download/android 装 APK
+
+配对依赖一个中继服务，把手机和桌面主机连起来。这块的实现就在本仓库的 \`cloud/\` 目录（独立的 pnpm workspace）。如果你在意「我的代码会不会经过别人的服务器」，这一块值得先读一遍。
+
+## 其他几个值得知道的能力
+
+- **Design Mode**：在真实的 Chromium 窗口里点任意 UI 元素，把它的 HTML、CSS 和裁剪后的截图直接塞进 Agent 的提示。改样式时比用文字描述半天有效。
+- **Annotate AI Diffs**：在 diff 的任意一行上留评论并把评论送回给 Agent，review、改、commit 都不出 Orca。
+- **SSH Worktrees**：把 Agent 跑在一台远程大机器上，带完整文件编辑、git 与终端，含自动重连与端口转发。
+- **Orca CLI**：\`orca worktree create\`、\`snapshot\`、\`click\`、\`fill\`——意思是 Agent 反过来也能驱动 Orca，工作流可以脚本化。
+- **Terminal Splits**：WebGL 渲染的终端，无限分屏，滚动缓冲能在重启后保留。
+
+## 功能清单看 changelog，不看 README
+
+README 结尾写着：we ship daily, so this list is perpetually behind，**changelog 才是真正的功能列表**。这不是自谦——项目 2026 年 3 月才创建，更新极快。遇到「README 说有但我没找到」或「我看到了但 README 没写」，以 GitHub Releases 为准。
+
+另外注意隐私：官方有 telemetry 文档说明收集哪些匿名使用数据以及如何退出。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://onorca.dev",
+          note: "桌面端各平台构建与 Mobile Companion 的下载入口。挑构建版本前先看这一页。",
+        },
+        {
+          kind: "html",
+          title: "Worktrees 文档",
+          url: "https://www.onorca.dev/docs/model/worktrees",
+          note: "并行 worktree 的工作方式与合并路径。这是 Orca 的核心机制，用之前必读。",
+        },
+        {
+          kind: "link",
+          title: "版本发布记录",
+          url: "https://github.com/stablyai/orca/releases",
+          note: "官方承认 README 的功能清单永远落后，changelog 才是真实功能列表。遇到功能对不上就来这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "storybook",
+    linksCheckedAt: "2026-10-21",
+    name: "storybook",
+    nameZh: "Storybook 组件工作台",
+    aliases: ["storybook", "Storybook", "组件文档", "UI workshop", "组件隔离开发"],
+    summary: "把 UI 组件从应用里拔出来单独开发、测试、写文档的行业标配工作台。适合有设计系统或多端复用组件的团队；代价是它是一个要长期维护的额外工程。",
+    scenes: ["code", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["前端", "组件库", "UI 测试", "开源"],
+    body: "Storybook 是前端的「组件工作台」：把 UI 组件和页面从应用里隔离出来开发、测试与文档化，README 的定位就是 frontend workshop for building UI components and pages in isolation。这么做的好处很实际——一个按钮的三十种状态不用起整个应用、登录、跳到那一页才能看到。\n覆盖面是它最大的优势。官方 renderer 覆盖 React、Vue 3、Angular、Web Components、HTML、Ember、Svelte、Preact，React Native 在独立仓库 storybookjs/react-native，Android、iOS、Flutter 在 storybookjs/native。addon 体系则把 a11y 检查、文档、事件模拟、视口切换、布局测量、CSS 轮廓调试这些做成插件，API 也开放到可以自己扩展。\n代价要讲清楚：Storybook 不是装完就完事的依赖，它是一套并行工程。stories 要写、要跟着组件改、升级有 breaking change、addon 之间还有兼容矩阵。README 自己就列了一串迁移建议——notes/info 迁到 docs、contexts 迁到 toolbars、storyshots 迁到 test-runner——说明生态一直在动。小项目或者只有一个页面的应用，直接写页面可能更快。",
+    officialUrl: "https://storybook.js.org",
+    officialLabel: "storybook.js.org",
+    links: {
+      official: "https://storybook.js.org",
+      github: "https://github.com/storybookjs/storybook",
+    },
+    whoFor: "维护设计系统或组件库的前端团队，以及需要在多个页面/多个端复用同一批组件、并想让设计与 QA 能独立查看组件状态的人。",
+    whoNot: "单页应用或一次性项目——为几个组件搭一套 Storybook 的维护成本高于收益；也不适合指望它自动产出合格文档、自己一行 story 都不写的人。",
+    installTips: [
+      "跟着官方文档的 Getting Started 走：https://storybook.js.org/docs 。想先看效果再决定，直接打开 https://storybook.new ，它会在 StackBlitz 里生成一个示例项目。",
+      "官方 renderer 覆盖 React、Vue 3、Angular、Web Components、HTML、Ember、Svelte、Preact；React Native 在 storybookjs/react-native，Android / iOS / Flutter 在 storybookjs/native。",
+      "要改 Storybook 本身：仓库是 monorepo，`yarn start` 起带测试 story 的沙盒，`yarn task` 可选框架，`yarn test` 跑 jest，`yarn lint` 跑 eslint 与 remark。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#FF4785",
+      simpleIcon: "storybook",
+    },
+    guide: {
+      intro: "先讲清 Storybook 解决的是什么问题，再讲第一步该做什么、renderer 与 addon 怎么挑，最后讲它的长期维护代价和几个正在被替代的旧 addon。",
+      markdown: `## 它到底解决什么问题
+
+在没有 Storybook 的项目里，想看一个组件的罕见状态（空数据、超长文本、加载失败、禁用态），往往要起整个应用、登录、一路导航到那一页，还得手动构造数据。
+
+Storybook 把组件从应用里**拔出来单独跑**。每个状态写成一个 story，点开就能看，不需要应用上下文。这带来三个连带收益：开发时反馈快、QA 和设计能自己打开看、以及文档和测试可以挂在同一个东西上。
+
+## 第一步：先看，再装
+
+不要一上来就在自己的项目里折腾。官方提供了两个更轻的入口：
+
+- 打开 \`https://storybook.new\`，它会在 StackBlitz 里直接生成一个示例项目，浏览器里就能玩。
+- 看 \`https://storybook.js.org/showcase\`（Component Encyclopedia），看看成熟团队把它用成什么样。
+
+确认这是你要的东西之后，再照着 \`https://storybook.js.org/docs\` 的 Getting Started 装进自己的项目。
+
+## 挑 renderer 和 addon
+
+Renderer 决定 Storybook 怎么渲染你的组件：
+
+| 场景 | 去哪 |
+| --- | --- |
+| React / Vue 3 / Angular / Svelte / Preact / Web Components / HTML / Ember | 主仓库自带 renderer |
+| React Native | \`storybookjs/react-native\` |
+| Android / iOS / Flutter | \`storybookjs/native\` |
+
+Addon 决定你能在这个工作台里做什么。几个真正常用的：
+
+- **a11y** —— 在 Storybook 里跑无障碍检查
+- **docs** —— 给组件生成高质量文档页
+- **actions** —— 把用户交互打成日志
+- **viewport** —— 切视口尺寸看响应式
+- **measure / outline** —— 可视化排查盒模型与 CSS 对齐
+- **jest** —— 把单测结果直接显示在 Storybook UI 里
+
+完整的框架 × 特性支持情况看官方的 Addon / Framework Support Table，不同 renderer 支持的 addon 并不一致。
+
+## 它的代价：这是一套并行工程
+
+这一节比功能介绍重要。Storybook 不是 \`npm i\` 完就消失的依赖，它是**要长期维护的第二套工程**：
+
+- 每个组件要写 story，组件改了 story 要跟着改；
+- 大版本升级有 breaking change，addon 之间还有兼容矩阵；
+- CI 里要不要跑、跑什么（视觉回归 / 交互测试 / a11y）都得自己定。
+
+几个组件的小项目，直接写页面可能更快。判断标准很简单：**这些组件会不会被第二个页面或第二个人复用**。会，才值得。
+
+## 几个正在被替代的旧 addon
+
+README 自己列了迁移建议，说明生态一直在动，别照着旧教程装：
+
+- 用 \`info\` / \`notes\` 的 —— 迁到 **docs**
+- 用 \`contexts\` 的 —— 迁到 **toolbars**
+- 用 \`addon-storyshots\` 的 —— 迁到 **test-runner**
+
+新项目直接按新方案做，不要走一遍弯路。
+
+## 社区与求助
+
+官方 Discord 在 \`https://discord.gg/storybook\`，问题也可以发在仓库的 GitHub Discussions 的 help 分类。想参与贡献的话，仓库里带 \`good first issue\` 标签的 issue 是给新人留的。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://storybook.js.org/docs",
+          note: "Getting Started 与全部配置说明。装进自己项目前看这一页，不要照着第三方旧教程做。",
+        },
+        {
+          kind: "html",
+          title: "Component Encyclopedia（案例）",
+          url: "https://storybook.js.org/showcase",
+          note: "成熟团队实际用法的展示。决定要不要投入之前，先看别人把它用成什么样。",
+        },
+        {
+          kind: "link",
+          title: "GitHub Discussions（求助）",
+          url: "https://github.com/storybookjs/storybook/discussions",
+          note: "官方指定的求助入口，比在 issue 里问更合适。升级踩坑时先搜这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "fzf",
+    linksCheckedAt: "2026-10-21",
+    name: "fzf",
+    nameZh: "fzf 命令行模糊查找器",
+    aliases: ["fzf", "fuzzy finder", "模糊查找", "命令行模糊搜索", "junegunn fzf"],
+    summary: "通用命令行模糊查找器，兼做交互式终端工具箱：读 STDIN、把选中项写到 STDOUT，能嵌进任何 shell 脚本。适合愿意配 shell 集成的人；只装二进制不配集成等于只用了一半。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["终端", "CLI", "效率工具", "开源"],
+    body: "fzf 是一个单二进制的通用模糊查找器，README 现在的定位比「找文件」更宽：interactive terminal toolkit。它读 STDIN 的列表、让你交互式挑、把选中项写到 STDOUT，因此能塞进任何管道——`find * -type f | fzf > selected`、`vim $(fzf)`、甚至用 `--bind 'enter:become(vim {})'` 让 fzf 直接变成另一个进程。\n它自带的 shell 集成才是真正让人回不去的部分：CTRL-T 找文件、CTRL-R 搜历史、ALT-C 跳目录，外加 `**<Tab>` 形式的模糊补全。bash 用 `eval \"$(fzf --bash)\"`、zsh 用 `source <(fzf --zsh)`、fish 用 `fzf --fish | source`，Nushell 因为不支持管道进 source，要手动把脚本写进 autoload 目录。\n几个值得早点知道的点。一是显示模式：默认全屏，但 `--height 40% --layout reverse --border` 更好用，`--popup` 能在 tmux 3.3+ / Zellij 0.44+ 里弹窗（不在 tmux/Zellij 里会被静默忽略）。二是键位可以单独关掉，把对应的 `FZF_CTRL_R_COMMAND` 置空再 source，注意必须在 source 之前设置。三是搜索语法是扩展模式，多个空格分隔的词是「与」，`^`、`$`、`!`、`'` 都有含义，学会了才知道为什么有时搜不出东西。",
+    officialUrl: "https://junegunn.github.io/fzf",
+    officialLabel: "junegunn.github.io",
+    links: {
+      official: "https://junegunn.github.io/fzf",
+      github: "https://github.com/junegunn/fzf",
+    },
+    whoFor: "天天泡在终端里的人：找文件、翻命令历史、跳目录、以及想用几行 shell 脚本搭出交互式菜单的人。",
+    whoNot: "几乎不用终端的用户；或者装了二进制却不愿意往 .bashrc / .zshrc 里加一行 source 的人——那样只会得到一个需要手动管道的模糊过滤器。",
+    installTips: [
+      "`brew install fzf`（macOS 与 Linux 均可）、Debian/Ubuntu `sudo apt install fzf`、Arch `sudo pacman -S fzf`、Fedora `sudo dnf install fzf`、Alpine `sudo apk add fzf`、openSUSE `sudo zypper install fzf`；也有 MacPorts、Nix、Conda、Spack。",
+      "Windows 上 `choco install fzf`、`scoop install fzf`、`winget install fzf`，MSYS2 用 `pacman -S $MINGW_PACKAGE_PREFIX-fzf`。",
+      "也可以 `git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install`，安装脚本会自动往你的 shell 配置里写 PATH 与集成；或者直接去 Releases 页下二进制。",
+      "装完一定要配 shell 集成，否则键位与补全都不生效：bash 加 `eval \"$(fzf --bash)\"`，zsh 加 `source <(fzf --zsh)`，fish 加 `fzf --fish | source`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#D9534F",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：装完为什么键位没生效、shell 集成四种写法、显示模式怎么配，以及把 fzf 当工具箱用的几个进阶姿势。",
+      markdown: `## 装完第一件事：配 shell 集成
+
+这是最高频的踩坑点。**装了二进制 ≠ 有了键位**。CTRL-T / CTRL-R / ALT-C 和模糊补全全部来自 shell 集成脚本，不配就一个都没有。
+
+各 shell 的写法不同，加进对应的配置文件：
+
+\`\`\`bash
+# bash
+eval "$(fzf --bash)"
+
+# zsh
+source <(fzf --zsh)
+\`\`\`
+
+\`\`\`fish
+# fish
+fzf --fish | source
+\`\`\`
+
+\`\`\`nu
+# Nushell 不支持管道进 source，要落成文件
+mkdir ($nu.default-config-dir | path join "autoload")
+fzf --nushell | save -f ($nu.default-config-dir | path join "autoload" "_fzf_integration.nu")
+\`\`\`
+
+\`--bash\` / \`--zsh\` / \`--fish\` / \`--nushell\` 只在较新版本里有。老版本要手动 source \`/shell\` 目录里的脚本文件，具体路径取决于你的包管理器（\`apt show fzf\` 能看到）。
+
+用 \`~/.fzf/install\` 装的会自动帮你写这几行，所以**用 git 方式装反而是最省事的**。
+
+## 升级
+
+按安装方式升级，别混：
+
+\`\`\`bash
+cd ~/.fzf && git pull && ./install   # git
+brew update; brew upgrade fzf        # Homebrew
+sudo port upgrade fzf                # MacPorts
+choco upgrade fzf                    # Chocolatey
+\`\`\`
+
+## 改显示模式
+
+默认全屏。多数人更喜欢从光标下方展开一小块：
+
+\`\`\`bash
+fzf --height 40% --layout reverse --border
+\`\`\`
+
+高度前面加 \`~\` 表示「最大高度但尽量占少几行」，\`seq 3 | fzf --height ~100%\` 和 \`seq 3000 | fzf --height ~100%\` 会得到不同行数。负值表示「屏幕高度减 N」，\`fzf --height -3\`。
+
+如果你在 tmux 3.3+ 或 Zellij 0.44+ 里，可以弹窗：
+
+\`\`\`bash
+fzf --popup center         # 居中，50% 宽高
+fzf --popup 80%            # 居中，80% 宽高
+fzf --popup left,40%       # 靠左，40% 宽
+fzf --popup bottom,80%,40% # 靠下，80% 宽 40% 高
+\`\`\`
+
+**不在 tmux / Zellij 里时 \`--popup\` 会被静默忽略**，不是报错。老版本 tmux 想开独立 pane 用 \`bin/fzf-tmux\` 脚本。
+
+把常用选项写进环境变量一劳永逸：
+
+\`\`\`bash
+export FZF_DEFAULT_OPTS='--height 40% --popup bottom,40% --layout reverse --border top'
+\`\`\`
+
+## 关掉某个键位
+
+键位和别的插件冲突时，把对应的 \`*_COMMAND\` 置空，**并且必须在 source 之前**：
+
+\`\`\`bash
+FZF_CTRL_R_COMMAND= FZF_ALT_C_COMMAND= eval "$(fzf --bash)"     # bash
+FZF_CTRL_R_COMMAND= FZF_ALT_C_COMMAND= source <(fzf --zsh)      # zsh
+\`\`\`
+
+source 之后再设置这些变量是无效的。
+
+## 当工具箱用
+
+基础形态就是管道：
+
+\`\`\`bash
+find * -type f | fzf > selected      # 选一个文件写进 selected
+vim $(fzf)                           # 不给 STDIN 时自己遍历当前目录
+\`\`\`
+
+README 自己提醒，\`vim $(fzf)\` 只是好懂，更稳的写法是：
+
+\`\`\`bash
+fzf --print0 | xargs -0 -o vim
+\`\`\`
+
+进阶一点，fzf 能把自己变成另一个进程：
+
+\`\`\`bash
+fzf --bind 'enter:become(vim {})'
+\`\`\`
+
+配合预览窗口，这是它最像「工具箱」的一面：
+
+\`\`\`bash
+fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
+\`\`\`
+
+还可以在候选列表里按 CTRL-R 重新加载（比如刷新进程列表），或者用 CTRL-D / CTRL-F 在多个数据源之间切换。
+
+## 搜索语法
+
+默认扩展模式，空格分隔多个词是「与」。\`^\` 匹配行首、\`$\` 匹配行尾、\`!\` 取反、\`'\` 精确匹配、\`.\` 前后加表示首尾。搜不出东西时，先怀疑自己不小心用了这些语法，而不是怀疑 fzf。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方站点与文档",
+          url: "https://junegunn.github.io/fzf",
+          note: "安装、shell 集成、搜索语法与进阶主题的完整说明。配键位前先看这一页。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/junegunn/fzf",
+          note: "shell 集成四种写法、--popup 用法与关掉单个键位的方法都在 README 里，配置出问题回来查这里。",
+        },
+        {
+          kind: "link",
+          title: "二进制发布页",
+          url: "https://github.com/junegunn/fzf/releases",
+          note: "各平台预编译二进制。用包管理器装不了或版本太旧时从这里取。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "lazygit",
+    linksCheckedAt: "2026-10-21",
+    name: "lazygit",
+    nameZh: "lazygit 终端 Git 界面",
+    aliases: ["lazygit", "lazy git", "终端 git UI", "git TUI", "git 图形化终端"],
+    summary: "给 git 套一层终端界面：逐 hunk / 逐行暂存、交互式 rebase、cherry-pick、bisect 都变成几个按键。适合被 git 命令行细节劝退的人；代价是它是另一套键位记忆。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["git", "终端", "CLI", "开源"],
+    body: "lazygit 的 README 开头是一段毫不客气的吐槽：交互式 rebase 要你去编辑器里改 TODO 文件、只暂存半个 hunk 要手写 patch 文件——这些操作本身不难，但门槛高到让人干脆不去做。lazygit 把它们变成按键。\n具体能干什么：对改动文件按 `0` 聚焦它的 diff，`<space>` 暂存整个 hunk 并跳到下一个，按 `a` 进入逐行选择、按 `v` 选范围，`<tab>` 在两个面板之间切，下方面板里 `<space>` 是取消暂存，`c` 直接提交；提交视图按 `i` 进交互式 rebase，然后 `s` squash、`f` fixup、`d` drop、`e` edit、`ctrl+k`/`ctrl+j` 上下移动，`m` 调出菜单选 continue；`shift+c` 复制提交、`shift+v` 粘贴（cherry-pick）；`b` 标记 good/bad 开始 bisect；`shift+d` 调重置菜单选 nuke 可以清掉工作区（含脏 submodule）。\n对老手的价值主要是两类：把平时嫌麻烦而跳过的操作（拆 hunk、改历史提交）变成顺手的；以及自定义命令系统（docs/Custom_Command_Keybindings.md）能把你的固定套路做成按键。代价是它是另一套需要记忆的键位，刚上手会比敲命令慢；另外它主打个人工作流，团队统一流程时别指望它替你规范。",
+    officialUrl: "https://github.com/jesseduffield/lazygit",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/jesseduffield/lazygit",
+      github: "https://github.com/jesseduffield/lazygit",
+    },
+    whoFor: "会用 git 但讨厌记参数的人，以及经常需要拆 hunk、改历史提交、cherry-pick 这类「知道能做但懒得做」的操作的人。",
+    whoNot: "git 命令已经形成肌肉记忆、每天只用五六个子命令的人——换一套键位短期内只会变慢；也不适合想靠它给团队定流程的场景。",
+    installTips: [
+      "官方提供三种安装路径：GitHub Releases 的预编译二进制、系统包管理器、以及 Go / Manual 从源码构建，README 的 Installation 一节按发行版列出了全部命令。",
+      "macOS 走 Homebrew（formulae.brew.sh 上有 lazygit）或 MacPorts；Linux 覆盖 Arch、Fedora / Amazon Linux 2023 / CentOS Stream、Solus、Debian/Ubuntu、Funtoo、Gentoo、openSUSE、NixOS、Flox、Void、FreeBSD、Conda；Windows 有 Scoop、Chocolatey、Winget（需 Windows 10 1709+）。",
+      "还有 Dev container feature 这条路，想在容器化开发环境里直接用可以看 README 的对应小节。Termux 上也能装。",
+      "装完直接在仓库目录里跑 `lazygit`；常用键位：改动区 `0` 聚焦 diff、`<space>` 暂存、`a` 逐行、`<tab>` 切面板、`c` 提交；提交区 `i` 进交互式 rebase、`shift+c`/`shift+v` 复制粘贴提交。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#4B8BBE",
+    },
+    guide: {
+      intro: "按第一次打开会懵的顺序讲：界面怎么分面板、最常用的暂存与提交按键、交互式 rebase 的完整流程，以及那个能救命的 undo。",
+      markdown: `## 它想解决的是什么
+
+README 的吐槽很精准：交互式 rebase 要你去编辑器里改 TODO 文件；只暂存半个 hunk 要启动一个命令行程序逐个 hunk 走，遇到不能再拆的 hunk 还得**手写 patch 文件**。
+
+这些操作不难，难在门槛。结果就是大家干脆不做——提交历史一团糟，或者干脆把不该提交的东西一起提交了。
+
+lazygit 把这些变成按键。
+
+## 界面：两个面板加一个主视图
+
+打开后大致是左边侧栏（文件、分支、提交、stash 等视图，用数字或方向键切换）、右边主视图（当前选中项的内容）、下方是暂存区。
+
+**\`<tab>\` 在面板之间切换**，这是第一个要记住的键。
+
+## 暂存：从 hunk 到单行
+
+在改动文件上按 \`0\`，主视图聚焦它的 diff。此时：
+
+- \`<space>\` —— 暂存当前 hunk，并自动跳到下一个
+- \`a\` —— 切到逐行选择模式
+- \`v\` —— 选一个范围
+- \`<tab>\` —— 切到下方暂存面板，那里的 \`<space>\` 是**取消暂存**
+- \`c\` —— 直接提交，不用离开 diff 视图
+
+这套流程把「只提交这个文件里的两处改动」从手写 patch 变成十几秒的事。
+
+## 交互式 rebase：不用再改 TODO 文件
+
+在提交视图按 \`i\` 开始交互式 rebase，然后：
+
+| 键 | 作用 |
+| --- | --- |
+| \`s\` | squash |
+| \`f\` | fixup |
+| \`d\` | drop |
+| \`e\` | edit |
+| \`ctrl+k\` / \`ctrl+j\` | 上下移动该提交 |
+| \`m\` | 调出 rebase 选项菜单（选 continue） |
+
+也可以不显式进 rebase，直接对某个提交按 \`s\` 就地 squash。用 shift+方向键可以选中一段提交批量移动或 fixup。
+
+想改一个旧提交：在它上面按 \`shift+a\`，会用当前暂存的改动 amend 那个提交（后台跑一次交互式 rebase）。
+
+## 其他几个高频操作
+
+- **cherry-pick**：提交上按 \`shift+c\` 复制，到目标分支按 \`shift+v\` 粘贴
+- **bisect**：提交视图按 \`b\` 标记 good/bad
+- **过滤**：任意视图按 \`/\` 过滤，回车进入该项
+- **worktree**：分支视图按 \`w\` 从选中分支建 worktree 并切过去——这样切分支不用 stash，也不用写 WIP 提交
+- **nuke 工作区**：\`shift+d\` 调出重置菜单，选 nuke，把 \`git status\` 里出现的全部东西清掉（包含脏 submodule）。这个操作不可撤销，用之前先确认没漏东西
+
+## 撤销
+
+lazygit 有 undo / redo。改历史这类操作出错时，这是你的第一道保险。**但不要把它当备份**——真正重要的分支在动历史之前先打个 tag。
+
+## 值得配的东西
+
+- **自定义命令**：README 有 docs/Custom_Command_Keybindings.md，可以把你重复的套路做成按键
+- **自定义 diff 渲染器**：可以接外部的 diff 工具
+- **Git flow 支持**：配置里可开
+
+## 它的代价
+
+lazygit 是**另一套键位记忆**。头一两周你一定会比敲命令慢，而且会不自觉地在终端里敲 git 命令。要不要坚持，取决于你平时有多频繁做「拆 hunk、改历史、cherry-pick」这类操作——如果一周一次都不到，收益撑不过学习成本。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/jesseduffield/lazygit",
+          note: "功能演示（每个都带视频）与按发行版分类的安装命令。装哪条路、键位怎么用都以这里为准。",
+        },
+        {
+          kind: "html",
+          title: "Homebrew 包页",
+          url: "https://formulae.brew.sh/formula/lazygit",
+          note: "macOS 与 Linux 上用 Homebrew 安装的说明与当前版本。",
+        },
+        {
+          kind: "link",
+          title: "自定义命令文档",
+          url: "https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Command_Keybindings.md",
+          note: "把自己的固定套路做成按键的说明。用熟之后这是最值钱的一节。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "payloads-all-the-things",
+    linksCheckedAt: "2026-10-21",
+    name: "PayloadsAllTheThings",
+    nameZh: "PayloadsAllTheThings 安全测试手册",
+    aliases: ["payloads all the things", "PayloadsAllTheThings", "PATT", "Web 安全 payload 手册", "渗透速查"],
+    summary: "Web 应用安全的 payload 与方法论速查库，每章含原理说明、payload 与 Burp Intruder 字典。适合授权渗透测试与 CTF；只对自己有授权的目标使用，别拿它扫别人的系统。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["安全测试", "渗透测试", "CTF", "开源"],
+    body: "PayloadsAllTheThings 是一份社区维护的 Web 应用安全速查库，README 一句话概括：a list of useful payloads and bypasses for Web Application Security。它不是工具，不需要安装，本质是一本按漏洞类型分章的手册。\n每个章节的目录结构是固定的四样：README.md 讲漏洞原理、怎么利用、并给出若干 payload；Intruder 目录放的是可以直接喂给 Burp Intruder 的文件；Images 与 Files 是配图与配套素材。想新增章节就复制 _template_vuln 目录改。除了主库，同一家族还有 InternalAllTheThings（Active Directory 与内网渗透速查）和 HardwareAllTheThings（硬件 / IoT 渗透 Wiki）。\n用法上最实际的两种：打开网页版 swisskyrepo.github.io/PayloadsAllTheThings 直接检索，或者把仓库 clone 到本地，用 grep / ripgrep 在 Markdown 里搜，配合编辑器离线看。\n必须说清的边界：这份库里的东西只有在你拥有或拿到书面授权的目标上才能用。它同时是防守方的学习材料——知道 payload 长什么样，才知道自己的输入校验和 WAF 规则该挡什么。",
+    officialUrl: "https://swisskyrepo.github.io/PayloadsAllTheThings/",
+    officialLabel: "swisskyrepo.github.io",
+    links: {
+      official: "https://swisskyrepo.github.io/PayloadsAllTheThings/",
+      github: "https://github.com/swisskyrepo/PayloadsAllTheThings",
+    },
+    whoFor: "做授权渗透测试、红队、CTF 的安全从业者；以及想从攻击者视角理解输入校验该怎么写、WAF 规则该怎么配的开发与防守人员。",
+    whoNot: "没有明确授权就想扫别人系统的人——那是违法的；也不适合把它当扫描器用，它是手册不是工具，不会替你发现漏洞。",
+    installTips: [
+      "不用安装，最快的用法是打开网页版 https://swisskyrepo.github.io/PayloadsAllTheThings/ 直接检索。",
+      "想离线或批量检索就 `git clone https://github.com/swisskyrepo/PayloadsAllTheThings.git`，然后用 ripgrep 在 Markdown 里搜关键词，比在浏览器里翻目录快得多。",
+      "每个漏洞目录固定四样内容：README.md（原理 + 利用方式 + payload）、Intruder（给 Burp Intruder 用的字典）、Images 与 Files（配套素材）。新增章节复制 _template_vuln 目录再改，规范见 CONTRIBUTING.md。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#8B2E2E",
+    },
+    guide: {
+      intro: "先讲清它是什么（手册而非工具）与使用边界，再讲目录结构怎么读、Burp Intruder 字典怎么用，最后是贡献与同系列项目。",
+      markdown: `## 它是什么，不是什么
+
+**它是一份手册，不是一个扫描器。**
+
+PayloadsAllTheThings 里全是 Markdown 文件与配套素材，没有一个可执行文件，也不会替你发现漏洞。它的价值在于：当你已经怀疑某个点有问题（比如一个回显点的输出编码没做对），来这里能立刻拿到成型的测试载荷与利用思路，而不是从零开始试。
+
+判断该不该用它，标准只有一条：**目标是不是你自己的，或者你有没有书面授权**。这份库的内容在授权渗透测试、红队演练和 CTF 里是标准参考资料；拿去扫别人的系统就是另一回事了。
+
+## 两种用法
+
+**在线检索** —— 打开网页版 \`https://swisskyrepo.github.io/PayloadsAllTheThings/\`，左侧按漏洞类型导航，比在 GitHub 上翻目录直观。
+
+**本地检索** —— 想离线用、或者要批量搜，就 clone 下来：
+
+\`\`\`bash
+git clone https://github.com/swisskyrepo/PayloadsAllTheThings.git
+cd PayloadsAllTheThings
+rg -i "your keyword" --glob '*.md'
+\`\`\`
+
+用 ripgrep 在 Markdown 里搜，比在浏览器里一层层点快一个数量级，也方便把命中结果贴进自己的报告。
+
+## 目录结构怎么读
+
+每个漏洞章节都是同一个套路，熟悉一次后面全通用：
+
+| 文件 / 目录 | 内容 |
+| --- | --- |
+| \`README.md\` | 漏洞描述、利用方式、若干 payload |
+| \`Intruder/\` | 给 Burp Intruder 用的字典文件 |
+| \`Images/\` | README 里引的图片 |
+| \`Files/\` | README 里引用的配套文件 |
+
+**Intruder 目录是很多人忽略的宝贝**。Burp Suite 的 Intruder 模块需要一份候选列表来做批量尝试，这里直接给了按漏洞类型整理好的版本，省掉自己拼字典的时间。
+
+## 想加内容怎么做
+
+复制 \`_template_vuln\` 目录当骨架，照着四件套填，然后提 PR。流程与格式规范写在 \`CONTRIBUTING.md\`。
+
+这个项目是全靠社区供稿撑起来的，README 第一句就是「Feel free to improve with your payloads and techniques」—— 你手上那份内部整理的 payload，很可能正是别人缺的那一章。
+
+## 同系列的另外两本
+
+- **InternalAllTheThings** —— Active Directory 与内网渗透速查
+- **HardwareAllTheThings** —— 硬件 / IoT 渗透 Wiki
+
+主库之外还有官方整理的书籍与 YouTube 频道清单（README 里的 Books 与 YouTube 链接），想系统学而不是临时查的时候从那里进。
+
+## 给防守方的一句话
+
+这份库对开发和安全运维同样有用。你想知道自己写的输入校验漏了什么、WAF 规则挡不挡得住，最快的方法就是看攻击者手上现成的载荷长什么样。用它来做对照测试，比拍脑袋列清单实在得多。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "网页版检索入口",
+          url: "https://swisskyrepo.github.io/PayloadsAllTheThings/",
+          note: "按漏洞类型导航的在线版本，比在 GitHub 上翻目录直观。临时查一个 payload 用这个最快。",
+        },
+        {
+          kind: "html",
+          title: "贡献指南",
+          url: "https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/CONTRIBUTING.md",
+          note: "新增章节的格式规范与 PR 流程。想提交自己的 payload 前先看。",
+        },
+        {
+          kind: "link",
+          title: "InternalAllTheThings（同系列）",
+          url: "https://swisskyrepo.github.io/InternalAllTheThings/",
+          note: "同作者的内网与 Active Directory 渗透速查，主库主要覆盖 Web，内网方向看这本。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "hoppscotch",
+    linksCheckedAt: "2026-10-21",
+    name: "hoppscotch",
+    nameZh: "Hoppscotch API 调试生态",
+    aliases: ["hoppscotch", "Hoppscotch", "Postwoman", "API 调试工具", "Postman 替代"],
+    summary: "开源 API 开发生态，Web / 桌面 / CLI 都有，可离线也可自托管，是 Postman 与 Insomnia 的开源替代。适合想让请求集合留在自己手里的人；代价是团队功能要上付费档。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["API 工具", "HTTP 客户端", "开源", "自托管"],
+    body: "Hoppscotch 是一个开源 API 开发生态，定位是 Postman / Insomnia 的替代品。它既是一个可以直接在 hoppscotch.io 上用的 Web 应用，也有 Windows / Linux / macOS 的桌面版和命令行版（hoppscotch-cli），还能自己托管。\n协议覆盖是它比同类强的地方：除了 REST，还原生支持 WebSocket、Server-Sent Events、Socket.IO、MQTT 和 GraphQL（含 schema 拉取与多列文档）。鉴权支持 None、Basic、Bearer Token、OAuth 2.0 与 OIDC Access Token/PKCE。请求侧有 pre-request script 与 post-request test（都是 JavaScript），环境变量、无限层级的集合与文件夹、以及从 cURL 导入和生成 10+ 语言的代码片段。\n两个必须提前知道的点。一是浏览器的同源策略：在网页版上直接打没有 CORS 头的接口会失败，官方给出的解法是开 Proxy Mode（官方代理服务器是开源的 proxyscotch）或装浏览器扩展，README 明确说「Extensions fix CORS issues」。二是部分能力是 enterprise edition（README 里标 [^EE] 的，如 SSO 登录），自托管不等于所有功能都在。",
+    officialUrl: "https://hoppscotch.io",
+    officialLabel: "hoppscotch.io",
+    links: {
+      official: "https://hoppscotch.io",
+      github: "https://github.com/hoppscotch/hoppscotch",
+    },
+    whoFor: "需要调 REST / GraphQL / WebSocket 等多种协议的前端与后端开发者；想把 API 集合放在自己能掌控的地方、或要求自托管的团队。",
+    whoNot: "只需要偶尔发一个 GET 的人，网页版就够了不必装桌面端；以及以为自托管就等价于完整商业版的人——SSO 等标 [^EE] 的能力不在开源部分里。",
+    installTips: [
+      "最快是直接用网页版 hoppscotch.io；它支持 PWA，可以在设备上「添加到主屏幕」离线使用。Windows / Linux / macOS 也有桌面端，下载地址在 docs.hoppscotch.io 的 desktop 文档里。",
+      "命令行跑集合用官方 CLI（仓库 packages/hoppscotch-cli），适合自动化与 CI。",
+      "在网页版上打没有 CORS 头的接口会失败：去 Settings 开 Proxy Mode，或者装官方浏览器扩展（Firefox 与 Chrome 都有），README 明确写着扩展是用来修 CORS 问题的。",
+      "要自托管看官方 docs.hoppscotch.io 的 self-host getting started，按 GitHub Flow 提 PR 参与贡献。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "H",
+      color: "#4CBB7B",
+    },
+    guide: {
+      intro: "讲第一个请求怎么发出去、为什么网页版会撞 CORS 以及两种解法、多协议（WebSocket/SSE/MQTT/GraphQL）怎么用，最后是环境变量与脚本。",
+      markdown: `## 三个入口，先挑一个
+
+- **网页版** —— 打开 \`https://hoppscotch.io\` 就能用，还能装成 PWA（Service Worker + 离线支持 + 添加到主屏幕）
+- **桌面端** —— Windows / Linux / macOS 都有，下载地址见 \`docs.hoppscotch.io\` 的 desktop 文档
+- **CLI** —— \`packages/hoppscotch-cli\`，把集合跑在命令行与 CI 里
+
+只是临时调一下接口，网页版就够了。
+
+## 发第一个请求
+
+三步：选 method、填 URL、点 Send。
+
+HTTP 方法除了 GET / POST / PUT / PATCH / DELETE / HEAD / CONNECT / OPTIONS / TRACE，还支持自定义方法（有些 API 会用 \`LIST\` 这类），直接敲进去就行。
+
+拿到响应之后可以：复制到剪贴板、下载成文件、看响应头、以及在 raw / preview 之间切换查看 HTML、图片、JSON、XML。
+
+## 一定会撞上的 CORS
+
+这是网页版最高频的困惑：**接口明明能用 curl 打，在 Hoppscotch 里就是失败**。原因是浏览器同源策略，不是 Hoppscotch 的问题。
+
+两种解法：
+
+1. **开 Proxy Mode** —— 在 Settings 里启用。官方代理服务器是开源项目 \`proxyscotch\`，你也可以填自己的 Proxy URL
+2. **装浏览器扩展** —— Firefox 与 Chrome 都有官方扩展。README 里那句写得很直白：**Extensions fix CORS issues**
+
+顺带一提，Proxy Mode 还能访问 \`http://\` 非 HTTPS 的接口，以及隐藏你的 IP。
+
+## 不止 REST
+
+这是它比一般 API 客户端强的地方，五种协议都内建：
+
+- **WebSocket** —— 单 TCP 连接上的全双工通信
+- **Server-Sent Events** —— 不用轮询就能收服务端推送
+- **Socket.IO** —— 与 SocketIO server 收发数据
+- **MQTT** —— 订阅 / 发布 topic
+- **GraphQL** —— 设 endpoint 拉 schema，多列文档，自定义请求头，查 schema 拿响应
+
+## 鉴权与变量
+
+鉴权支持 None、Basic、Bearer Token、OAuth 2.0、OIDC Access Token/PKCE。
+
+环境变量值得早点用起来：把 host、token 这类值存成变量，在请求里引用，换环境只改一处。环境支持导出 / 从 GitHub gist 导入，也能在 pre-request script 里初始化。
+
+## 脚本：请求前后的两段 JavaScript
+
+- **Pre-Request Scripts** —— 请求发出前执行。设环境变量、往请求头里塞时间戳、在 URL 参数里放随机串，或者任何 JavaScript
+- **Post-Request Tests** —— 收到响应后执行。断言状态码、过滤响应头、解析响应数据、回填环境变量
+
+有了这两段，一个请求就能变成一条可重复的检查项，而不只是一次手点。
+
+## 组织方式与协作
+
+集合（Collections）支持无限层级、无限文件夹嵌套，可导出成文件或 GitHub gist。工作区（Workspaces）用来把个人与团队的集合、环境分开管理。
+
+团队功能里，SSO 登录在 README 中标了 \`[^EE]\`，属于 enterprise edition —— **自托管开源版不等于完整商业版**，规划时要留这个心眼。
+
+## 键盘与主题
+
+官方有完整的快捷键文档（docs.hoppscotch.io 的 shortcuts 页）。主题支持系统 / 亮 / 暗 / 黑四种，加九种强调色，还有免打扰的 Zen mode；自定义主题会跟着你的云或本地会话同步。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.hoppscotch.io",
+          note: "特性说明、快捷键、桌面端下载与自托管指南。第一次用从这里进，不要照第三方教程配。",
+        },
+        {
+          kind: "html",
+          title: "自托管 Getting Started",
+          url: "https://docs.hoppscotch.io/documentation/self-host/getting-started",
+          note: "自建部署与开发环境搭建。团队要内网部署或评估 EE 功能时看这一页。",
+        },
+        {
+          kind: "link",
+          title: "hoppscotch-cli（命令行）",
+          url: "https://github.com/hoppscotch/hoppscotch/tree/main/packages/hoppscotch-cli",
+          note: "官方 CLI 的源码与使用说明。想把集合跑进 CI 时用这个。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "career-ops",
+    linksCheckedAt: "2026-10-21",
+    name: "career-ops",
+    nameZh: "career-ops 求职 Agent",
+    aliases: ["career-ops", "career ops", "careerops", "求职 Agent", "AI 找工作"],
+    summary: "跑在你本地 AI 编码 CLI 里的开源求职 Agent：先给岗位打分、再按 JD 改简历和写求职信，但永远不替你点提交。适合海投无效的人；代价是前几次跑得糙，得先和它聊透你的背景。",
+    scenes: ["office", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["求职", "AI Agent", "简历", "开源"],
+    body: "career-ops 是一个开源求职 Agent，跑在你本机的 AI 编码 CLI 里（Claude Code、Codex、OpenCode 等）。它的核心主张写在 README 顶部：公司用 AI 筛候选人，那就给候选人一个 AI 来挑公司。\n流程是：你贴一个岗位，它先确认这个 posting 还开着，再拿你的真实简历给这个角色打分——低于 4.0/5 会直接建议你别投，你可以覆盖它。值得投的话，它按 JD 生成 ATS 可读的简历 PDF、求职信、以及面试准备；还能用 deep 模式做公司调研、用 contacto 模式找到该联系的人并起草一条 300 字以内的 LinkedIn 消息。所有申请记录留在本机。\n它的边界写得比大多数同类清楚：绝不自动提交申请（prepare-application.mjs 里根本不 POST）、不发邮件（整个代码库没有邮件传输）、不回传数据（无遥测无后端，简历只从你的机器发往你选的模型服务商）。另一个必须说的点是它会改写简历但绝不许编造——代码里有一道检查拦住那些数字或事实既不在你简历也不在你文章摘要里的 PDF，但 README 承认它还没法判断每一种改写措辞，所以每份简历发出前你自己要看一遍。第一次跑它并不认识你，得在聊天里把简历、想要什么、拒绝什么说清楚。",
+    officialUrl: "https://career-ops.org",
+    officialLabel: "career-ops.org",
+    links: {
+      official: "https://career-ops.org",
+      github: "https://github.com/career-ops-hq/career-ops",
+    },
+    whoFor: "正在海投却收不到回音、想先筛掉不匹配的岗位再决定投不投的人；已经在用 Claude Code / Codex 这类 CLI 的求职者上手最快。",
+    whoNot: "指望它一键批量投递的人——它明确不自动提交，提交必须由你点；也不适合不愿意花时间先把自己的简历和偏好讲清楚的求职者，前几次的输出会很糙。",
+    installTips: [
+      "一条命令起步：`npx @santifer/career-ops init`，它会把最新 release 克隆到 ./career-ops 并装依赖。npx 随 Node.js 附带，没装 Node 先装它（已经在用 Claude Code / Gemini / Codex CLI 的话本来就有）。",
+      "然后 `cd career-ops`，再启动你常用的 AI CLI：`claude`，或 codex / qwen / opencode / agy / grok。首次启动它会在聊天里带过一遍设置（你的简历、画像、目标岗位），不用手改配置。",
+      "PDF 生成需要 Chromium：`npx playwright install chromium`。注意在非 Debian/Ubuntu 的发行版（Fedora、Arch 等）上，Chromium 的系统库不会自动装上，需要自己补。",
+      "不想用 npx 引导就手动装：`git clone https://github.com/career-ops-hq/career-ops.git && cd career-ops && npm install`。预算有限可以看仓库里的 docs/RUNNING_ON_A_BUDGET.md，用免费或本地模型跑。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#2E6E8E",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：一条命令装好、首次启动的聊天式设置、PDF 依赖那个坑，以及它「绝不替你提交」这条硬边界意味着什么。",
+      markdown: `## 一条命令起步
+
+\`\`\`bash
+npx @santifer/career-ops init
+\`\`\`
+
+这条命令会把最新 release 克隆到当前目录下的 \`./career-ops\` 并装好依赖。\`npx\` 随 Node.js 附带，不需要全局安装任何东西；如果你已经在用 Claude Code / Gemini / Codex CLI，Node 本来就有。
+
+然后进目录，开你常用的 AI CLI：
+
+\`\`\`bash
+cd career-ops
+claude        # 或 codex / qwen / opencode / agy / grok
+\`\`\`
+
+**首次启动它会通过聊天带着你把设置走一遍** —— 你的简历、你的画像、你想找什么岗位。README 特意强调：nothing to configure by hand。别跳过这段对话，后面所有评估的质量都依赖它。
+
+想手动装也可以：
+
+\`\`\`bash
+git clone https://github.com/career-ops-hq/career-ops.git
+cd career-ops && npm install
+npx playwright install chromium   # 只有生成 PDF 才需要
+\`\`\`
+
+## PDF 那个坑
+
+简历与求职信的 PDF 走的是 HTML + Playwright 渲染，所以需要 Chromium：
+
+\`\`\`bash
+npx playwright install chromium
+\`\`\`
+
+在非 Debian/Ubuntu 的发行版（Fedora、Arch 等）上，Chromium 依赖的系统库不会自动装好，这一步之后可能仍然报错——按提示补对应的系统库即可。
+
+预算有限的话，仓库里的 \`docs/RUNNING_ON_A_BUDGET.md\` 讲了怎么接免费或本地模型。
+
+## 它的核心动作：先判断值不值得投
+
+贴一个岗位进去，它依次回答几个问题：
+
+- **还开着吗？** —— 在你写一个字之前先确认 posting 仍然有效（Block G 的 posting-legitimacy 检查，还会看是不是 repost；给出的是观察而非判定）
+- **适合你吗？** —— 拿你的真实简历打分。评分里会写明每条要求对这个岗位有多重要、这个权重是来自 JD 原文、JD 结构还是估算，并且**估算值永远不能进最高档**
+- **值得投吗？** —— 值得的话才起草简历、求职信与回答
+
+一个重要的行为特征：**低于 4.0/5 它会直接告诉你别投**。你可以覆盖它，但它会把你覆盖这件事也一并说明。
+
+## 硬边界：它绝不替你提交
+
+这一节比功能更重要。README 用了一整段列「career-ops 不会做什么」：
+
+- **不自动提交申请** —— 它把每个字段的答案起草好，你 review，你点 Submit。\`prepare-application.mjs\` 里没有任何 POST
+- **不发邮件** —— 只起草。整个代码库里没有邮件传输
+- **不回传** —— 没有遥测，没有它的后端。你的简历只从你的机器发往你选的 AI 服务商
+- **不push你投低于 4.0/5 的岗位** —— 会劝你别投
+
+换句话说，它是个「把申请表填好、把提交键留给你」的工具。想找一键海投的人会失望，但这正是它刻意的设计。
+
+## 另一个必须知道的风险
+
+它会**改写**你的简历，但绝不允许**编造**。代码里有一道检查，拦住那些数字或事实既不在你简历、也不在你文章摘要里的 PDF。
+
+但 README 很诚实地补了一句：它还没法判断每一种改写措辞。所以——**每份简历发出前，你自己读一遍**。这不是免责声明式的套话，是实际会出问题的地方。
+
+## 后面能玩到哪一步
+
+- \`/career-ops cover\` —— 按需生成求职信（每次评估其实都会自动起草）
+- \`deep\` 模式 —— 公司调研：AI 策略、近期动向、工程文化，以及你的画像该走什么角度
+- \`contacto\` 模式 —— 找出值得联系的招聘经理 / 招聘官 / 团队同事，并起草 300 字以内的 LinkedIn 消息
+- \`email\` 模式 —— 从评估报告或粘贴的 JD 生成正式申请邮件的主题、正文与附件清单（同样不发送）
+- \`interview\` / \`interview-redflag\` —— 限时备考计划、模拟练习与复盘，以及公司红旗检测
+- \`offer-prep\` —— 合同条款走读与要给律师的问题清单，还有期望薪资 / 挂牌薪资 / 实际薪资的差距分析
+- \`analyze-patterns.mjs\` / \`stats.mjs\` —— 被拒模式与各渠道通过率、漏斗统计
+- Dashboard TUI —— 在终端里浏览、筛选、排序你的投递管道
+
+插件系统（Gmail、Notion、Apify 与社区注册表）默认全部关闭，需要的话看 \`docs/PLUGINS.md\`。
+
+## 前几次会很糙
+
+README 直接说了：the first runs are rough, it does not know you yet. 把它当成「招聘专员入职的第一周」——你得跟它聊你的简历、想要什么、拒绝什么。聊透了之后输出质量会有明显跃升。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://career-ops.org",
+          note: "项目主页与宣言。想先判断它的价值观和使用方式是否合你口味，从这一页开始。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/career-ops-hq/career-ops",
+          note: "完整功能表、快速开始与各 modes 文档入口。装完之后按这里的 modes 清单逐个试。",
+        },
+        {
+          kind: "markdown",
+          title: "低成本运行指南",
+          url: "https://github.com/career-ops-hq/career-ops/blob/main/docs/RUNNING_ON_A_BUDGET.md",
+          note: "如何用免费或本地模型跑，降低 API 开销。长期跑评估又不想到处烧 token 时看这个。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ripgrep",
+    linksCheckedAt: "2026-10-21",
+    name: "ripgrep",
+    nameZh: "ripgrep 代码搜索",
+    aliases: ["ripgrep", "rg", "代码搜索", "grep 替代", "正则搜索"],
+    summary: "按正则递归搜目录的命令行工具，默认尊重 gitignore、跳过隐藏与二进制文件，比 grep / ag 快一个量级。适合天天在代码库里搜东西的人；代价是它不符合 POSIX，写可移植脚本还得用 grep。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["终端", "CLI", "搜索", "开源"],
+    body: "ripgrep（命令名 rg）是行导向的递归正则搜索工具。它默认就做三件 grep 不会替你做的事：遵守 .gitignore / .ignore / .rgignore、跳过隐藏文件、跳过二进制文件。这三条正是「搜代码」时最想要的默认行为——不想在 node_modules 和构建产物里捞结果。想关掉全部自动过滤就用 `rg -uuu`。\n快是它的招牌。README 里在 Linux 内核源码树上搜 `[A-Z]+_SUSPEND`，rg 用 0.082s，ag 是 0.443s，GNU grep（Unicode）是 2.670s，ack 是 2.935s。它快的原因是 Rust 正则引擎的有限自动机、SIMD 与literal 优化，外加无锁并行目录遍历，以及自动在内存映射与增量缓冲之间选策略。\n功能上，它能按文件类型过滤（`rg -tpy foo` 只搜 Python，`rg -Tjs foo` 排除 JavaScript，还能自定义类型）、搜压缩文件（`-z`，支持 brotli/bzip2/gzip/lz4/lzma/xz/zstd）、搜非 UTF-8 编码（`-E`，支持 UTF-16、latin-1、GBK、EUC-JP、Shift_JIS）、以及可选的 PCRE2 引擎（`-P` 或 `--auto-hybrid-regex`）来拿到环视与反向引用。\n不想用它的理由 README 自己也列了：需要可移植且无处不在的工具时，还是老 grep 合适——rg 不遵循 POSIX 也不是到处都有。",
+    officialUrl: "https://github.com/BurntSushi/ripgrep",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/BurntSushi/ripgrep",
+      github: "https://github.com/BurntSushi/ripgrep",
+    },
+    whoFor: "每天要在大代码库里搜符号、错误串、配置项的开发者，以及受够了 grep 在 node_modules 里打转的人。",
+    whoNot: "写需要到处跑的可移植 shell 脚本的人——rg 不符合 POSIX 也不保证预装，那种场景用 grep；另外要用某些 GNU grep 独有特性的也要先确认 rg 有没有。",
+    installTips: [
+      "macOS / Linux：`brew install ripgrep`；Arch `sudo pacman -S ripgrep`、Fedora `sudo dnf install ripgrep`、Gentoo `sudo emerge sys-apps/ripgrep`、openSUSE `sudo zypper install ripgrep`、MacPorts `sudo port install ripgrep`、CentOS Stream 10 要走 EPEL。",
+      "Windows 三种包管理器都行：`choco install ripgrep`、`scoop install ripgrep`、`winget install BurntSushi.ripgrep.MSVC`。",
+      "其他平台直接去 Releases 页下预编译二进制，Linux 与 Windows 的是静态可执行文件。",
+      "命令名是 `rg` 不是 ripgrep；装完跑 `rg --version` 确认，`rg -uuu` 才会关掉 gitignore / 隐藏文件 / 二进制的全部自动过滤。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#C0392B",
+    },
+    guide: {
+      intro: "讲它默认替你过滤了什么（以及为什么这既是优点也是困惑来源）、按文件类型和编码搜的常用开关、PCRE2 什么时候才需要，最后是不该用它的场景。",
+      markdown: `## 默认行为先搞懂
+
+\`rg\` 默认做三件 grep 不会做的事，这也解释了「为什么我明明有这个文件却搜不到」：
+
+1. **遵守 \`.gitignore\` / \`.ignore\` / \`.rgignore\`**
+2. **跳过隐藏文件与目录**
+3. **跳过二进制文件**
+
+搜代码时这正是你想要的——不用再手动 \`--exclude-dir=node_modules\`。但排查「这个文件怎么没被搜到」时，八成是这三条之一。
+
+要关掉全部自动过滤：
+
+\`\`\`bash
+rg -uuu
+\`\`\`
+
+## 按文件类型搜
+
+不用手写 \`--include\`：
+
+\`\`\`bash
+rg -tpy foo     # 只搜 Python 文件
+rg -Tjs foo     # 排除 JavaScript
+\`\`\`
+
+类型不只看扩展名，也支持自定义匹配规则（比如把某类文件名也归到某个 type 下）。
+
+## 搜压缩文件与非 UTF-8 编码
+
+压缩文件里也能直接搜：
+
+\`\`\`bash
+rg -z pattern
+\`\`\`
+
+\`-z/--search-zip\` 支持 brotli、bzip2、gzip、lz4、lzma、xz、zstandard。
+
+非 UTF-8 的文本要显式指定编码：
+
+\`\`\`bash
+rg -E UTF-16 pattern
+rg -E GBK pattern
+\`\`\`
+
+\`-E/--encoding\` 支持 UTF-16、latin-1、GBK、EUC-JP、Shift_JIS 等。UTF-16 有一定自动检测能力，其他编码必须手动指定——这是很多人「搜出来是乱码」的原因。
+
+## PCRE2：什么时候才需要
+
+rg 默认的 Rust 正则引擎**不支持环视（look-around）和反向引用**。需要这两个能力时才开 PCRE2：
+
+\`\`\`bash
+rg -P '(?<=foo)bar'          # 一直用 PCRE2
+rg --auto-hybrid-regex '...'  # 只在需要时才切到 PCRE2
+rg --engine pcre2 '...'       # 等价写法
+\`\`\`
+
+\`--auto-hybrid-regex\` 是更省心的选择：它只在默认引擎搞不定时才动用 PCRE2，避免无谓的性能损失。
+
+## 其他值得知道的能力
+
+- **替换输出** —— 支持基于匹配结果重写输出（基础能力，README 用词是 rudimentary）
+- **配置文件** —— 可以把常用选项固化下来
+- **预处理过滤器** —— \`--pre\` 接任意预处理命令，可以做 PDF 文本抽取、非常规解压、解密、编码自动检测之类的
+- **多文件类型与 glob** —— 配合 \`-g\` 用
+
+## 为什么这么快
+
+README 给了几条原因，知道这些有助于判断什么时候它会变慢：
+
+- Rust 正则引擎的有限自动机 + SIMD + 激进的 literal 优化
+- Unicode 支持是内置的（UTF-8 解码直接编进 DFA），不像 GNU grep 开了 Unicode 就慢
+- 自动在内存映射（适合单文件）与增量缓冲（适合大目录）之间选策略
+- \`.gitignore\` 用 \`RegexSet\` 匹配，一个路径可以同时对多个 glob 求值
+- 基于 crossbeam 与 ignore 的无锁并行递归目录遍历
+
+**但它也有性能悬崖**。README 明确列了一组反例：搜 \`[A-Za-z]{30}\` 这种没有 literal 可优化的模式时，rg 也要 15 秒以上；匹配数极高时（8300 万行）各工具差距会被抹平，因为瓶颈变成了「处理匹配」而不是「发现匹配」。
+
+## 什么时候别用它
+
+README 的「Why shouldn't I use ripgrep」一节很坦诚：
+
+- **你要可移植且无处不在的工具** —— rg 在 Windows / macOS / Linux 上都能跑，但它不是到处都预装，也不遵循 POSIX。写要分发给别人的脚本，用 grep
+- **你依赖某个 rg 没有的特性或行为**
+- **某个性能边界场景 rg 表现不如别的工具**（作者让你提 issue）
+
+想先试再装，官方 README 提到了非官方的 playground 与交互式教程（codapi.org）。
+
+## 想对比的话
+
+Andy Lester（ack 作者）维护了一份 ack / ag / git-grep / GNU grep / rg 的特性对比表：\`https://beyondgrep.com/feature-comparison/\`。注意那份表还没收录 rg 后来加的配置文件、passthru、压缩文件搜索、多行搜索与 PCRE2。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GUIDE（用户指南）",
+          url: "https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md",
+          note: "递归搜索、自动过滤、文件类型、替换、编码与预处理器的详细说明。想系统学 rg 看这份。",
+        },
+        {
+          kind: "html",
+          title: "FAQ",
+          url: "https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md",
+          note: "能不能替代 grep、shell 补全怎么装等高频问题。「某文件为什么搜不到」一般能在这里找到答案。",
+        },
+        {
+          kind: "link",
+          title: "二进制发布页",
+          url: "https://github.com/BurntSushi/ripgrep/releases",
+          note: "各平台预编译二进制，Linux 与 Windows 版是静态可执行文件。包管理器没有的平台从这里下。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "tldr",
+    linksCheckedAt: "2026-10-21",
+    name: "tldr",
+    nameZh: "tldr 命令速查页",
+    aliases: ["tldr", "tldr pages", "tldr-pages", "命令速查", "cheatsheet"],
+    summary: "社区维护的命令行速查页，用 `tldr tar` 拿到几个能直接抄的例子，替代翻 man 页。适合记不住 tar / lsof 参数的人；代价是例子覆盖不到偏门用法，深挖还得回 man。",
+    scenes: ["code", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["命令行", "速查表", "文档", "开源"],
+    body: "tldr-pages 是一套社区维护的命令行帮助页，定位是传统 man page 的「更简单、更亲民」的补充。README 举的例子很到位：man tar 里第一个解释的选项是 -b blocksize，讲的是磁带机的 512 字节块——你只是想解压个文件而已。tldr 的做法是只给最常用的几个真实例子。\n它覆盖 UNIX、Linux、macOS、FreeBSD、NetBSD、OpenBSD、SunOS、Android、Windows、Cisco IOS 与 DOS 的命令行工具，不只是一个 Linux 速查表。\n客户端有三类可选：官方 Python 客户端（`pipx install tldr`，从 PyPI 的 tldr 包）、官方 Rust 客户端 tlrc（macOS/Linux `brew install tlrc`，或 `cargo install tlrc --locked`，Windows `winget install tldr-pages.tlrc`）、以及 Node.js 客户端（`npm install -g tldr`）——README 明确说 Node 客户端「已经落后于更新」，所以别优先选它。不想装任何东西也可以用网页版 tldr.inbrowser.app（支持 PWA 离线）或下载 PDF 版。\n要提醒的是它的边界：每个页面只有几个常见用法，遇到非常规需求依然要回 man 或官方文档。把它当「快速想起怎么敲」，别当完整文档。",
+    officialUrl: "https://tldr.sh",
+    officialLabel: "tldr.sh",
+    links: {
+      official: "https://tldr.sh",
+      github: "https://github.com/tldr-pages/tldr",
+    },
+    whoFor: "经常忘记 tar、lsof、find 这类命令参数的人，以及刚接触命令行的新手。也适合想快速给同事一个可用例子的场景。",
+    whoNot: "需要完整参数说明和边界行为的人——每页只有几个常见例子，非常规用法还得查 man；另外 Node.js 客户端已落后于更新，别选它。",
+    installTips: [
+      "Python 客户端（官方推荐之一）：`pipx install tldr`，pip 或 uv 也可以；装完直接 `tldr tar` 替代 `man tar`。",
+      "Rust 客户端 tlrc：macOS/Linux `brew install tlrc` 或 `cargo install tlrc --locked`，Windows `winget install tldr-pages.tlrc`。",
+      "不想装任何东西：用网页版 https://tldr.inbrowser.app（支持 PWA 离线），或下载 PDF 版 https://github.com/tldr-pages/tldr/releases/latest/download/tldr-book.pdf。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#2C9678",
+    },
+    guide: {
+      intro: "讲清它和 man 的分工、三个官方客户端怎么选（以及哪个别选）、不想装客户端时的两条路，最后是顺手改一页怎么提。",
+      markdown: `## 它和 man 不是替代关系
+
+man page 追求完整，tldr 追求「你现在要敲的那一行」。
+
+README 举的例子说明了这个差异：\`man tar\` 里第一个被解释的选项是 \`-b blocksize\`，讲的是磁带机的 512 字节块——而你只是想解压一个压缩包。
+
+\`tldr tar\` 给的是几条能直接抄的命令。
+
+所以分工很清楚：**想不起怎么敲 → tldr；要知道某个参数的边界行为、退出码、历史包袱 → man**。把 tldr 当完整文档用一定会踩坑，因为每页刻意只放最常见的几个例子。
+
+## 装哪个客户端
+
+官方维护了三个，但**不建议一律选**：
+
+**Python 客户端**（稳妥）：
+
+\`\`\`bash
+pipx install tldr
+\`\`\`
+
+**Rust 客户端 tlrc**（推荐，更新跟得上）：
+
+\`\`\`bash
+brew install tlrc           # macOS / Linux
+cargo install tlrc --locked # 或者用 Cargo
+winget install tldr-pages.tlrc   # Windows
+\`\`\`
+
+**Node.js 客户端**：
+
+\`\`\`bash
+npm install -g tldr
+\`\`\`
+
+README 对它的评价很直白：**它已经落后于更新（fallen behind in updates）**。除非你环境里只有 Node，否则别选它。
+
+装完之后用法都一样：
+
+\`\`\`bash
+tldr tar
+\`\`\`
+
+## 不装客户端的两条路
+
+**网页版** —— \`https://tldr.inbrowser.app\`，支持 PWA，装到主屏幕后能离线用。临时在别人机器上查的时候特别方便。
+
+**PDF 版** —— \`https://github.com/tldr-pages/tldr/releases/latest/download/tldr-book.pdf\`，整本速查手册。多数语言的翻译版也有对应的 PDF，都在最新 release 的 assets 里。
+
+## 覆盖范围比想象中广
+
+不只是 Linux。tldr 收录了这些平台的命令行工具：UNIX、Linux、macOS、FreeBSD、NetBSD、OpenBSD、SunOS、Android、Windows、Cisco IOS，甚至 DOS。
+
+所以在 Windows 上查命令也能用，不是只有类 Unix 用户才有收益。
+
+## 顺手改一页
+
+所有页面都是 Markdown，改起来门槛极低，四种贡献方式任选：
+
+- 补一个还没收录的命令
+- 给已有页面加例子或改进内容
+- 认领带 \`help wanted\` 标签的 issue
+- 把页面翻译成别的语言
+
+可以用命令行 Git 提 PR，也可以直接在 GitHub 网页界面上改。第一次贡献先看 CONTRIBUTING.md。想看翻译进度，\`https://lukwebsforge.github.io/tldri18n/\` 有各语言的完成度与哪些页面已过时。
+
+## 类似的替代品
+
+README 自己列了一串同类：cheat.sh（聚合多来源，含 tldr）、devhints、eg、kb、navi、Cheat、Command Line Interface Pages、bropages（已废弃）。各有侧重，tldr 的优势在于**页面数量与社区活跃度**，以及几乎每个语言都有客户端。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://tldr.sh",
+          note: "项目主页与各客户端下载入口。选客户端前先看这里的最新推荐。",
+        },
+        {
+          kind: "html",
+          title: "网页版检索",
+          url: "https://tldr.inbrowser.app",
+          note: "不用安装就能查，支持 PWA 离线。在别人机器上临时查命令时最方便。",
+        },
+        {
+          kind: "pdf",
+          title: "PDF 速查手册",
+          url: "https://github.com/tldr-pages/tldr/releases/latest/download/tldr-book.pdf",
+          note: "整本速查页打包成的 PDF，可离线翻阅。多数语言另有对应版本，在最新 release 的 assets 里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "bat",
+    linksCheckedAt: "2026-10-21",
+    name: "bat",
+    nameZh: "bat 语法高亮 cat",
+    aliases: ["bat", "batcat", "cat 替代", "语法高亮查看器", "sharkdp bat"],
+    summary: "带语法高亮、Git 改动标记和自动分页的 cat 替代品，还能给 fzf 当预览器。适合天天在终端看代码的人；代价是 Debian/Ubuntu 上命令可能叫 batcat。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["终端", "CLI", "语法高亮", "开源"],
+    body: "bat 是 cat(1) 的克隆，加了语法高亮、Git 集成和自动分页。直接在终端里 `bat README.md` 就能看到带高亮的行号视图，左侧栏会标出相对 Git index 的改动。\n它最讨喜的一点是「知道自己什么时候该当 cat」：只要检测到输出不是交互式终端（管道给另一个进程或重定向到文件），它就退回打印纯文本，完全当 cat 用。所以 `bat a.md b.md > out.md` 这种拼接不会被行号和颜色污染。反过来，输出太大时它会自动接 pager（比如 less）；想让它永远不分页就用 `--paging=never`，或者把 cat 别名成 `bat --paging=never`。\n和别的工具串起来才是它真正的价值：`fzf --preview \"bat --color=always --style=numbers --line-range=:500 {}\"` 让它当 fzf 的预览窗口；`export MANPAGER=\"bat -plman\"` 让它给 man 上色；`git show v0.6.0:src/main.rs | bat -l rs` 看历史版本；还有 bat-extras 里的 batgrep（给 ripgrep 当打印机）、batdiff、batman。\n一个真实的坑：在较老的 Ubuntu/Debian 上，因为和另一个包重名，可执行文件叫 `batcat` 而不是 `bat`。装完发现 `bat --version` 不存在时试 `batcat --version`，或者建个软链接 `ln -s /usr/bin/batcat ~/.local/bin/bat`。",
+    officialUrl: "https://github.com/sharkdp/bat",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/sharkdp/bat",
+      github: "https://github.com/sharkdp/bat",
+    },
+    whoFor: "经常在终端里看源码、看配置文件、看日志的人；以及用 fzf 的人——给它配个 bat 预览器体验提升最明显。",
+    whoNot: "只是想快速打印一个文件的人，cat 更轻；另外在必须保证输出纯净的脚本里，记得用 -p/--plain 或干脆别用 bat，行号和 Git 标记会混进结果。",
+    installTips: [
+      "Ubuntu/Debian：`sudo apt install bat`（Ubuntu 20.04+、Debian 11+ 才有）。较老版本上命令被装成 `batcat`，这时 `ln -s /usr/bin/batcat ~/.local/bin/bat` 建个软链接，或 `alias bat=\"batcat\"`。",
+      "macOS：`brew install bat` 或 `port install bat`；Arch `pacman -S bat`、Fedora `dnf install bat`、Alpine `apk add bat`、Gentoo `emerge sys-apps/bat`、openSUSE `zypper install bat`、FreeBSD `pkg install bat`、OpenBSD `pkg_add bat`、Nix `nix-env -i bat`。",
+      "Windows：`winget install sharkdp.bat`、`choco install bat` 或 `scoop install bat`，前提是先装好 Visual C++ Redistributable。",
+      "从源码装需要 Rust 1.79.0+：`cargo install --locked bat`；shell 补全用 `bat --completion <shell>` 生成。装完先跑 `bat --list-themes` 看看有哪些主题。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "B",
+      color: "#3B6EA5",
+    },
+    guide: {
+      intro: "讲最常卡住的一点（为什么命令叫 batcat）、分页行为怎么控制、主题怎么换，以及把它接进 fzf / man / git 的几条实用配方。",
+      markdown: `## 第一个坑：命令叫什么
+
+在较老的 Ubuntu / Debian 上，因为和另一个包重名，bat 的可执行文件被装成了 \`batcat\`。
+
+装完先确认：
+
+\`\`\`bash
+bat --version      # 正常的话有输出
+batcat --version   # 上一条没有就试这个
+\`\`\`
+
+解决方法二选一：
+
+\`\`\`bash
+mkdir -p ~/.local/bin
+ln -s /usr/bin/batcat ~/.local/bin/bat
+\`\`\`
+
+或者直接在 shell 配置里 \`alias bat="batcat"\`。新版本 Ubuntu/Debian 上已经就叫 \`bat\` 了。
+
+## 分页行为：什么时候它当 cat
+
+默认输出超过一屏时，bat 会把自己的输出接给 pager（比如 less）。这是它最聪明也最容易让人困惑的设计。
+
+规则是：**一旦检测到非交互式终端（你把它管道给别的进程，或重定向到文件），它就退回纯 cat 行为**，不管 \`--pager\` 设了什么。
+
+\`\`\`bash
+bat header.md content.md footer.md > document.md   # 拼接，不会被行号污染
+bat main.cpp | xclip                               # 复制出来的也是纯文本
+\`\`\`
+
+想让它永远不分页：
+
+\`\`\`bash
+bat --paging=never
+\`\`\`
+
+想直接把 cat 换掉，README 给的别名是这个：
+
+\`\`\`bash
+alias cat='bat --paging=never'
+\`\`\`
+
+## 常用参数
+
+\`\`\`bash
+bat README.md        # 看单个文件
+bat src/*.rs         # 一次看多个
+bat -A /etc/hosts    # 显示并高亮不可打印字符
+bat -n main.rs       # 只显示行号
+bat > note.md        # 快速建文件（读到 EOF）
+bat f - g            # 输出 f，再读 stdin，再输出 g
+\`\`\`
+
+从 stdin 读时，语法只有在能从第一行判断出来才高亮（通常靠 shebang）；判断不出来就手动指定：
+
+\`\`\`bash
+yaml2json .travis.yml | json_pp | bat -l json
+\`\`\`
+
+## 换主题
+
+\`\`\`bash
+bat --list-themes                 # 列出全部主题
+bat --theme=TwoDark file.rs       # 临时换
+export BAT_THEME="TwoDark"        # 写进 shell 启动文件永久生效
+\`\`\`
+
+默认用 Monokai Extended（暗色）/ Monokai Extended Light（亮色），并且**会根据终端背景色自动挑合适的主题**。经常在深浅色之间切换的，用 \`--theme-dark\` / \`--theme-light\`（或 \`BAT_THEME_DARK\` / \`BAT_THEME_LIGHT\`）分别指定。
+
+想可视化挑主题，配合 fzf：
+
+\`\`\`bash
+bat --list-themes | fzf --preview="bat --theme={} --color=always /path/to/file"
+\`\`\`
+
+## 接进别的工具
+
+这几条是 bat 真正的价值所在：
+
+**给 fzf 当预览器**（体验提升最明显的一条）：
+
+\`\`\`bash
+fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
+\`\`\`
+
+\`--color=always\` 必须加，否则管道下颜色会被关掉；\`--line-range=:500\` 是给大文件兜底，避免打开慢。
+
+**给 man 上色**：
+
+\`\`\`bash
+export MANPAGER="bat -plman"
+man 2 select
+\`\`\`
+
+**看 git 里的历史版本**：
+
+\`\`\`bash
+git show v0.6.0:src/main.rs | bat -l rs
+\`\`\`
+
+**看 diff 涉及的文件**：
+
+\`\`\`bash
+batdiff() {
+    git diff --name-only --relative --diff-filter=d -z | xargs -0 bat --diff
+}
+\`\`\`
+
+**跟踪日志**：
+
+\`\`\`bash
+tail -f /var/log/pacman.log | bat --paging=never -l log
+\`\`\`
+
+（必须关掉分页，且这里语法无法自动识别，要手动 \`-l log\`）
+
+**给 --help 上色**：
+
+\`\`\`bash
+alias bathelp='bat --plain --language=help'
+help() { "$@" --help 2>&1 | bathelp; }
+\`\`\`
+
+这样 \`help cp\`、\`help git commit\` 都有高亮。
+
+## 想复制内容时
+
+行号和 Git 改动标记会混进你复制的文本。两种解法：加 \`-p/--plain\`，或者干脆管道出去（bat 自己会退回纯文本）。
+
+## 顺便
+
+还有个 \`bat-extras\` 项目，把上面那些配方做成了现成命令：batgrep（给 ripgrep 当打印机）、batdiff、batman、prettybat。不想自己写函数的话直接用它。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/sharkdp/bat",
+          note: "各系统安装方式、batcat 的说明、与 fzf / git / man 的集成配方都在这里。",
+        },
+        {
+          kind: "html",
+          title: "二进制发布页",
+          url: "https://github.com/sharkdp/bat/releases",
+          note: "多架构预编译二进制，含 musl 静态链接版。发行版包太旧或非主流平台从这里下。",
+        },
+        {
+          kind: "link",
+          title: "bat-extras",
+          url: "https://github.com/eth-p/bat-extras",
+          note: "把 batgrep、batdiff、batman、prettybat 等常用组合做成现成脚本。不想自己写 shell 函数时用这个。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "win11debloat",
+    linksCheckedAt: "2026-10-21",
+    name: "Win11Debloat",
+    nameZh: "Win11Debloat 精简脚本",
+    aliases: ["Win11Debloat", "win11 debloat", "Windows 精简", "去预装", "关遥测"],
+    summary: "一个不用安装的 PowerShell 脚本，批量卸预装应用、关遥测、清掉 Copilot 与 Recall 等侵入式功能。适合刚装好系统的 Windows 10/11；代价是作者明说「后果自负」。",
+    scenes: ["tools"],
+    platforms: ["windows"],
+    source: "opensource",
+    tags: ["Windows", "系统优化", "隐私保护", "开源"],
+    body: "Win11Debloat 是一个轻量 PowerShell 脚本，免安装，用来批量清掉 Windows 预装应用、关掉遥测、移除侵入式界面元素。名字叫 Win11Debloat，但 Windows 10 与 11 都支持。\n它的覆盖面比「卸载几个应用」大得多：隐私侧关遥测、诊断数据、活动历史记录、应用启动跟踪与定向广告，关掉锁屏与 Edge 里的提示与广告，还能关位置服务与查找我的设备；AI 侧能卸掉并禁用 Copilot、Windows Recall 与 Click to Do，并阻止 WSAIFabricSvc 自动启动，还能关掉 Edge、Chrome、画图与记事本里的 AI 功能；系统侧从恢复 Win10 风格右键菜单、关鼠标加速度，到关 BitLocker 自动设备加密、关 Modern Standby 期间的网络连接；还有开始菜单、任务栏、文件资源管理器、多任务的一整套定制。\n两条反过来的实用设计值得说：所有改动都能还原，几乎所有被卸的应用都能从 Microsoft Store 装回来（见 wiki 的 Reverting Changes）；管理员还能用 Sysprep 模式把改动写进 Default 用户配置，让之后新建的每个用户都自动生效。\n风险说在前面：README 顶部就挂着警告——作者很小心地避免弄坏系统功能，但「use at your own risk」。另外它默认要管理员权限，Xbox Game Bar 那一项会连带关掉游戏录屏。",
+    officialUrl: "https://github.com/Raphire/Win11Debloat",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/Raphire/Win11Debloat",
+      github: "https://github.com/Raphire/Win11Debloat",
+    },
+    whoFor: "刚装好或重置完 Windows 10/11、想一次性把遥测与预装清干净的个人用户；以及要给一批机器统一起始配置的系统管理员。",
+    whoNot: "系统里已经装着重要工作环境的机器——脚本改动面很广且作者明说后果自负；也不要在没读明白每一项就无脑全选，更别指望它替代正常的镜像管理。",
+    installTips: [
+      "最快一条命令：在 PowerShell 或终端里执行 `& ([scriptblock]::Create((irm \"https://debloat.raphi.re/\")))`，脚本会自动下载并启动，然后按屏幕提示逐项选。",
+      "传统方法：从 Releases 页下载最新 ZIP 解压，双击 Run.bat，接受 UAC 提权（脚本必须管理员权限才能工作）。如果控制台一闪就没了，改用下面的高级方法。",
+      "高级方法：解压后以管理员身份开 PowerShell，先 `Set-ExecutionPolicy Bypass -Scope Process -Force` 临时放开执行策略，再 `cd` 到解压目录跑 `.\\Win11Debloat.ps1`。这两种方法都支持命令行参数（参数表在 wiki 的 Command-line Interface 页）。",
+      "所有改动都能还原，绝大多数被卸的应用可以从 Microsoft Store 重装回来；要给其他用户或 Default 配置套用，看 wiki 的 Advanced Features（含 Sysprep 模式）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "W",
+      color: "#0078D4",
+    },
+    guide: {
+      intro: "讲三种运行方式分别适合谁、执行前必须做的准备、脚本到底会改哪些类别的东西，以及出问题怎么回滚。",
+      markdown: `## 先读这条警告
+
+README 在 Usage 开头就挂着：**作者很小心地确保脚本不会意外弄坏系统功能，但 use at your own risk**。
+
+这不是套话。这个脚本动的东西非常多（遥测、注册表、应用卸载、更新策略、加密设置），而且默认需要管理员权限。建议：
+
+- **在系统还干净的时候跑**（刚装完或刚重置完），不要在装着重要工作环境的机器上跑
+- 跑之前有系统还原点或完整备份
+- 逐项看清楚再选，别一路回车全选
+
+## 三种运行方式
+
+**1. 快速方式**（适合大多数人）：打开 PowerShell 或终端，粘这一行：
+
+\`\`\`powershell
+& ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
+\`\`\`
+
+脚本会自动下载并启动，然后按屏幕提示操作。
+
+**2. 传统方式**：从 Releases 页下载最新 ZIP，解压到任意位置，双击 \`Run.bat\`，**接受 UAC 提权**（脚本没有管理员权限无法工作）。
+
+如果控制台窗口一闪而过什么都没发生，改用方式 3。
+
+**3. 高级方式**（推荐给熟手）：
+
+\`\`\`powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force   # 临时放开执行策略
+cd c:\\Win11Debloat
+.\\Win11Debloat.ps1
+\`\`\`
+
+注意 \`-Scope Process\` 意味着只影响当前这个 PowerShell 进程，关掉就恢复，不会永久改你的执行策略。
+
+方式 1 和 3 都支持命令行参数，参数表在 wiki 的 **Command-line Interface → Parameters** 页。批量部署时应该用带参数的方式，而不是交互式点选。
+
+## 它到底改什么
+
+按 README 的分类，改动面比大多数人预期的宽：
+
+**隐私与推荐内容** —— 遥测、诊断数据、活动历史记录、应用启动跟踪、定向广告；Windows / 锁屏 / Edge 上的提示技巧建议与广告；位置服务、应用位置访问、查找我的设备；设置「主页」上的 Microsoft 365 广告。
+
+**AI 功能** —— 禁用并移除 Copilot、Windows Recall、Click to Do；阻止 AI 服务（WSAIFabricSvc）自动启动；关掉 Edge、Chrome、画图、记事本里的 AI 功能。
+
+**系统** —— 关掉拖拽托盘、恢复 Win10 风格右键菜单、关鼠标加速度（Enhance Pointer Precision）、关粘滞键快捷键、关 Storage Sense 自动清理、关快速启动以保证真正关机、**关 BitLocker 自动设备加密**、关 Modern Standby 期间的网络连接以省电。
+
+**Windows 更新** —— 推迟更新、登录时不被自动重启、关传递优化（把下载的更新共享给别的电脑）、阻止自动安装设备伴侣应用。
+
+**外观 / 开始菜单 / 任务栏 / 资源管理器 / 多任务** —— 深色模式、关透明与动画、自定义开始菜单固定项与推荐、任务栏对齐与按钮、加「结束任务」右键项、显示文件扩展名与隐藏文件、隐藏 Home/Gallery/OneDrive 导航项、关窗口贴靠与 Snap 建议……每一项都是可单独选的。
+
+**可选 Windows 功能** —— 可以顺手开启 Windows Sandbox 和 WSL。
+
+**其他** —— 关 Xbox Game Bar 集成与游戏/屏幕录制（注意这会一并关掉录屏能力）。
+
+## 两条容易被忽略的实用设计
+
+**1. 改动可还原。** README 明确：所有改动都能轻松还原，几乎所有被卸的应用都能从 Microsoft Store 重装。具体步骤在 wiki 的 **Reverting Changes** 页。出问题时先去那里。
+
+**2. 能作用于别的用户。** 高级功能里有两条：
+
+- 把改动应用到**另一个用户**（而不是当前登录用户）
+- **Sysprep 模式** —— 把改动写进 Windows 的 Default 用户配置，这样以后新建的每个用户都自动带上这些设置
+
+做批量镜像时这两条才是重点，交互式点选反而不重要。
+
+## 出问题怎么办
+
+先去 wiki 的 Reverting Changes 页按步骤还原；还原不了或脚本本身有问题，到仓库的 Issues 报——README 说遇到问题请报在那里。
+
+另外别忽略版本：脚本一直在更新以适配新的 Windows 版本，用旧脚本跑新系统可能命中已经失效的注册表项。每次用之前从 Releases 页拿最新版。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目 Wiki",
+          url: "https://github.com/Raphire/Win11Debloat/wiki",
+          note: "完整功能说明、命令行参数表、高级功能与还原步骤。批量部署或要回滚时以 Wiki 为准。",
+        },
+        {
+          kind: "html",
+          title: "Wiki：还原改动",
+          url: "https://github.com/Raphire/Win11Debloat/wiki/Reverting-Changes",
+          note: "把脚本造成的改动退回原状的步骤。跑完发现不对劲时先看这一页，别自己乱改注册表。",
+        },
+        {
+          kind: "html",
+          title: "GitHub Releases",
+          url: "https://github.com/Raphire/Win11Debloat/releases/latest",
+          note: "最新版 ZIP 下载。脚本需要跟随 Windows 版本更新，别用旧版跑新系统。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "i-have-adhd",
+    linksCheckedAt: "2026-10-21",
+    name: "i-have-adhd",
+    nameZh: "i-have-adhd 直给输出技能",
+    aliases: ["i-have-adhd", "i have adhd", "ADHD 输出", "直给输出 skill", "编码助手输出规范"],
+    summary: "一个给编码助手装的 skill：10 条规则把「Great question! 让我先想想」式回答压成「先说下一步、步骤编号、结尾给一个具体动作」。适合受够了 AI 绕圈子的人；代价是它会牺牲解释性。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI Agent", "Claude Code", "输出格式", "开源"],
+    body: "i-have-adhd 是一个装给编码助手的 skill，只做一件事：别把答案埋起来。README 的副标题写得很直白——Action first, steps numbered, no \"Hope this helps!\"。\n它给的对比例子很好懂。改动前：一大段铺陈「好问题！让我思考一下，你的认证流程有几个部分……一种方案是……顺便你可能还想……希望有帮助！」；改动后：「编辑 src/auth.ts:42 更新 token 校验」，然后三条编号步骤，最后一句「如果有测试失败，把第一条失败的行贴给我」。\n规则一共 10 条，全文在 skills/i-have-adhd/SKILL.md：先说下一个动作、多步骤要编号、结尾给一个具体的下一步、压住跑题、每轮重述当前状态、时间估算要给具体分钟数而不是「一会儿」、让进展可见、报错就事论事、列表最多 5 条、以及不要开场白不要复述不要结束语。\n要提醒的是这不是什么医疗或生产力方案——README 说它 loosely based on《The Adult ADHD Tool Kit》，但明确是「改编成 LLM 该怎么回答」，不是教人怎么安排一天。另外把解释压掉的代价是真实的：想让 AI 讲清为什么这么改的时候，这个 skill 会碍事。想改规则就 fork 后编辑 SKILL.md 再换上自己的副本。",
+    officialUrl: "https://github.com/ayghri/i-have-adhd",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/ayghri/i-have-adhd",
+      github: "https://github.com/ayghri/i-have-adhd",
+    },
+    whoFor: "已经被 AI 助手的开场白、复述和「希望有帮助」劝退的人，尤其是拿它改代码、只想立刻知道下一步干什么的人。",
+    whoNot: "正在学习某个领域、需要 AI 解释原理和权衡的人——这个 skill 会主动删掉铺垫与解释；也别把它当成 ADHD 的自我管理工具，它管的是 LLM 的输出格式。",
+    installTips: [
+      "把这句话贴进你的 CLI 提示里即可：「Install the i-have-adhd skill/plugin from https://github.com/ayghri/i-have-adhd, refer to the repo's AGENTS.md for instructions.」；详细的分步说明在仓库的 INSTALL.md。",
+      "改规则要 fork：编辑 skills/i-have-adhd/SKILL.md，然后换掉上游副本——`claude plugin uninstall i-have-adhd` → `claude plugin marketplace remove i-have-adhd`（fork 与 upstream 同名）→ `claude plugin marketplace add <your-username>/i-have-adhd` → `claude plugin install i-have-adhd@i-have-adhd`。",
+      "换完副本要重启你的编码助手，再调用 /i-have-adhd 才生效。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "I",
+      color: "#E4572E",
+    },
+    guide: {
+      intro: "讲它改的到底是什么（输出格式而非能力）、10 条规则的具体内容、怎么装，以及想自己改规则时的完整换源步骤。",
+      markdown: `## 它改的是格式，不是能力
+
+i-have-adhd 不会让你的编码助手变聪明。它只做一件事：**把答案从一堆铺垫里挖出来放在最前面**。
+
+README 给的 before / after 对比最能说明问题。
+
+**Before：**
+
+> 好问题！让我思考一下。你的认证流程有几个活动部件：中间件、token 校验和 cookie 处理。看 \`src/auth.ts\`，\`verifyToken\` 函数（大约 42–58 行）似乎在用较老的 jsonwebtoken API。一种方案是升级这个包并重写该函数。改完之后你可能想跑一下认证测试确认没坏。顺便你可能也想整体看一下依赖版本。希望有帮助！想深入的话告诉我。
+
+**After：**
+
+> 编辑 \`src/auth.ts:42\` 更新 token 校验。
+>
+> 1. 打开 \`src/auth.ts\`
+> 2. 把 \`verifyToken\`（42–58 行）替换成下面的代码
+> 3. 跑 \`npm test -- auth.spec.ts\`
+>
+> 下一步：如果有测试失败，把第一条失败的行贴给我。
+
+信息量其实差不多，差异全在组织方式。
+
+## 那 10 条规则
+
+全文在 \`skills/i-have-adhd/SKILL.md\`，README 列了摘要：
+
+1. **先说下一个动作** —— Lead with the next action
+2. **多步骤要编号**
+3. **结尾给一个具体的下一步**
+4. **压住跑题** —— Suppress tangents
+5. **每轮重述当前状态**
+6. **时间估算要给具体数字**（分钟，不要「一会儿」）
+7. **让进展可见**
+8. **报错就事论事** —— 不铺垫不安慰
+9. **列表最多 5 条**
+10. **不要开场白、不要复述、不要结束语**
+
+第 5 条容易被低估：让模型每轮重述当前状态，对长任务特别有用——你不用往上翻十轮去回忆改到哪了。
+
+## 怎么装
+
+把这句贴进你的 CLI 提示：
+
+\`\`\`text
+Install the i-have-adhd skill/plugin from https://github.com/ayghri/i-have-adhd, refer to the repo's AGENTS.md for instructions.
+\`\`\`
+
+仓库的 \`INSTALL.md\` 里有分步说明，装不上时去那里看。
+
+## 想改规则：fork 再换源
+
+十条规则不见得全合你口味（比如你觉得列表最多 5 条太紧）。改法是自己维护一份 \`SKILL.md\`。
+
+README 给的顺序很关键，**fork 与 upstream 同名，所以必须先摘掉上游那份**：
+
+\`\`\`bash
+claude plugin uninstall i-have-adhd
+claude plugin marketplace remove i-have-adhd
+claude plugin marketplace add <your-username>/i-have-adhd
+claude plugin install i-have-adhd@i-have-adhd
+\`\`\`
+
+然后**重启你的编码助手**，再调用 \`/i-have-adhd\` 才生效。
+
+## 代价：它会删掉解释
+
+这一点要提前想清楚。这些规则的目标是快，而快是靠砍掉铺垫换来的。
+
+当你在学一个新东西、需要模型讲清「为什么这么改」「有哪些权衡」的时候，这个 skill 是碍事的——它会把你想看的那部分也一起压掉。
+
+比较务实的用法是**按需开关**，而不是常驻。
+
+## 它不是什么
+
+README 的 Credits 说得很清楚：它 loosely based on《The Adult ADHD Tool Kit》（J. Russell Ramsay 与 Anthony L. Rostain），但改编的目标是「**LLM 应该怎么回答**」，而不是「人应该怎么安排一天」。
+
+也就是说，这是一个输出格式规范，不是 ADHD 的自我管理工具。别指望它帮你规划日程。
+
+另外 README 首页就写着：**No ADHD diagnosis needed!** —— 用不着任何诊断，纯粹是觉得 AI 废话多就能装。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "SKILL.md 规则原文",
+          url: "https://github.com/ayghri/i-have-adhd/blob/main/skills/i-have-adhd/SKILL.md",
+          note: "10 条规则的完整文本。想自己改或者想知道每条具体约束什么，看这个文件。",
+        },
+        {
+          kind: "html",
+          title: "安装说明 INSTALL.md",
+          url: "https://github.com/ayghri/i-have-adhd/blob/main/INSTALL.md",
+          note: "分步骤的安装指引。一句话装不上时按这里的流程走。",
+        },
+        {
+          kind: "link",
+          title: "效果拆解视频",
+          url: "https://youtu.be/NEl8kPWZP_Y",
+          note: "Kacper Rutkiewicz 对早期版本的拆解视频，讲它到底改了哪些输出行为。装之前想先看效果的可以看这个。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "x64dbg",
+    linksCheckedAt: "2026-10-21",
+    name: "x64dbg",
+    nameZh: "x64dbg Windows 调试器",
+    aliases: ["x64dbg", "x32dbg", "x96dbg", "Windows 调试器", "逆向调试"],
+    summary: "Windows 上开源的用户态二进制调试器，专为逆向与恶意代码分析优化，带完整插件体系。适合没有源码的二进制分析；代价是它是纯 Windows 工具且有学习曲线。",
+    scenes: ["code"],
+    platforms: ["windows"],
+    source: "opensource",
+    tags: ["逆向工程", "调试器", "二进制分析", "开源"],
+    body: "x64dbg 是 Windows 平台的开源二进制调试器，README 的定位是 aimed at malware analysis and reverse engineering of executables you do not have the source code for。它分 32 位与 64 位两个可执行文件，配一个完善的插件系统（plugins.x64dbg.com）。\n上手很简单：从 GitHub Releases 或 SourceForge 的 snapshots 下一个快照，解压到你有写权限的目录，然后按需跑 x32\\x32dbg.exe（32 位）或 x64\\x64dbg.exe（64 位）。不确定目标架构就跑 x96dbg.exe，它会让你选；x96dbg.exe 也用来注册 shell 扩展和加桌面快捷方式。\n它的底层是几个开源组件拼起来的：调试核心是 TitanEngine Community Edition，反汇编用 Zydis，汇编用 XEDParse 与 asmjit，导入表重建用 Scylla，JSON 用 Jansson，数据库压缩用 lz4。想自己编译也可以，wiki 上有 Compiling the whole project。\n要说清楚边界：这是给逆向工程、漏洞分析和恶意代码分析用的专业工具，学习成本不低；它只跑 Windows，macOS / Linux 上要用别的方案（如 GDB、radare2 系）。另外分析恶意样本时应该在隔离的虚拟机里做，别在宿主机上跑。",
+    officialUrl: "https://x64dbg.com",
+    officialLabel: "x64dbg.com",
+    links: {
+      official: "https://x64dbg.com",
+      github: "https://github.com/x64dbg/x64dbg",
+    },
+    whoFor: "做逆向工程、漏洞分析、恶意代码分析的 Windows 安全研究者，以及需要调试没有源码的可执行文件的开发者。",
+    whoNot: "有源码的常规开发调试——用 Visual Studio 或 WinDbg 更合适；macOS / Linux 用户也用不上，它是纯 Windows 工具。分析未知样本时务必在隔离虚拟机里做。",
+    installTips: [
+      "从 GitHub Releases 或 SourceForge 的 snapshots 页下载快照，解压到**当前用户有写权限**的目录——这点很重要，放到 Program Files 下会因为写不了数据库而异常。",
+      "32 位目标跑 `x32\\x32dbg.exe`，64 位目标跑 `x64\\x64dbg.exe`；不确定架构就跑 `x96dbg.exe`，它会在启动时让你选。",
+      "可选：跑一次 `x96dbg.exe` 注册 shell 扩展并加桌面快捷方式，之后就能在资源管理器里右键直接调试。",
+      "想自己编译见 wiki 的 Compiling the whole project；插件去 plugins.x64dbg.com 找。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "X",
+      color: "#3B4E7A",
+    },
+    guide: {
+      intro: "讲清它面向什么场景、三个 exe 分别是什么、解压位置那个必踩的坑，以及它由哪些开源组件构成、去哪找插件与帮助。",
+      markdown: `## 它面向什么场景
+
+README 一句话定位：**为恶意代码分析和逆向工程设计的**——针对那些**你没有源码的可执行文件**。
+
+这决定了它和 Visual Studio 调试器、WinDbg 的分工不同。有源码、有符号、要断点单步看变量，用常规调试器更顺手；面对一个剥了符号的二进制、要看它到底在哪做了什么，才是 x64dbg 的主场。
+
+## 装：三个 exe 分别是什么
+
+下载快照（GitHub Releases 或 SourceForge 的 snapshots），解压，然后：
+
+| 文件 | 用途 |
+| --- | --- |
+| \`x32\\x32dbg.exe\` | 调试 32 位可执行文件 |
+| \`x64\\x64dbg.exe\` | 调试 64 位可执行文件 |
+| \`x96dbg.exe\` | 启动时让你选架构；也用于注册 shell 扩展和加桌面快捷方式 |
+
+不确定目标是多少位，直接跑 \`x96dbg.exe\`。
+
+## 解压到哪儿：一个真实的坑
+
+README 特意强调要**解压到当前用户有写权限的位置**。
+
+x64dbg 会在自己的目录里写数据库文件（存断点、注释、标签等，用 lz4 压缩）。如果解压到 \`Program Files\` 这类受保护目录，写入会被拦，表现为各种莫名其妙的异常——注释存不住、断点下次打开没了。
+
+放用户目录下最省事。
+
+## 它由哪些组件构成
+
+知道这些有助于理解它的能力边界和排查问题：
+
+- **TitanEngine Community Edition** —— 调试核心
+- **Zydis** —— 反汇编
+- **XEDParse** 与 **asmjit** —— 汇编
+- **Scylla** —— 导入表重建
+- **Jansson** —— JSON 处理
+- **lz4** —— 数据库压缩
+
+## 插件系统
+
+x64dbg 的能力很大一部分在插件上，官方的插件站点是 \`plugins.x64dbg.com\`。做某类具体分析（比如特定壳、特定协议）之前，先去看看有没有现成插件，比自己写脚本划算。
+
+## 想自己编译
+
+wiki 上有 \`Compiling the whole project\`，README 说 with a few easy steps。改源码或要在特殊环境里跑时走这条路。
+
+## 边界与注意事项
+
+两条实用提醒：
+
+1. **它是纯 Windows 工具。** macOS / Linux 上没有 x64dbg，那些平台要用别的方案。
+2. **分析未知样本要在隔离环境里做。** 这个工具的典型用途就是分析恶意代码，而分析意味着你会主动执行它。在宿主机上直接跑未知样本是拿自己的机器开玩笑——用一次性的虚拟机，断网或严格限制网络。
+
+## 求助渠道
+
+README 顶部列了一串社区入口：Discord、Slack、Gitter、Matrix、以及 Libera.Chat 上的 IRC 频道 \`#x64dbg\`。遇到问题也可以直接在仓库开 issue。想参与贡献的话，\`https://easy.x64dbg.com/\` 收集了适合新手的 good first issue。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方网站与博客",
+          url: "https://x64dbg.com",
+          note: "项目主页、博客与联系方式。插件、下载与社区入口都从这里进。",
+        },
+        {
+          kind: "html",
+          title: "插件站点",
+          url: "https://plugins.x64dbg.com",
+          note: "官方插件目录。做具体分析前先看看有没有现成插件，通常比自己写脚本快。",
+        },
+        {
+          kind: "link",
+          title: "源码编译指南（Wiki）",
+          url: "https://github.com/x64dbg/x64dbg/wiki/Compiling-the-whole-project",
+          note: "从源码构建 x64dbg 的步骤。要改源码或在特殊环境部署时看这一页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "obsidian-skills",
+    linksCheckedAt: "2026-10-21",
+    name: "obsidian-skills",
+    nameZh: "obsidian-skills 笔记 Agent 技能",
+    aliases: ["obsidian-skills", "obsidian skills", "Obsidian agent skills", "Obsidian CLI 技能", "kepano skills"],
+    summary: "让 Agent 正确读写 Obsidian 的开放格式：Markdown、Bases、JSON Canvas 与 Obsidian CLI。适合用 Obsidian 又想让 AI 直接改库的人；代价是技能会随 Obsidian 语法变化而需要跟进。",
+    scenes: ["docs", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Obsidian", "Agent Skills", "笔记", "开源"],
+    body: "obsidian-skills 是 kepano（Obsidian 的 CEO）维护的一组 Agent 技能，教你的编码 Agent 正确地操作 Obsidian 的开放格式。它遵循 Agent Skills 规范，所以任何兼容该规范的 Agent 都能用——README 点名 Claude Code、Codex 和 Open Code。\n一共六个技能：obsidian-markdown 处理 Obsidian Flavored Markdown（wikilink、嵌入、callout、properties 等 Obsidian 特有语法）；obsidian-bases 处理 .base 文件的视图、筛选、公式与汇总；json-canvas 处理 .canvas 的节点、边、分组与连接；obsidian-cli 通过官方 Obsidian CLI 与 vault 交互（含插件与主题开发）；defuddle 把网页抽成干净 Markdown 省 token；knap 用 JSON 或 CSV 数据渲染 Markdown 模板并批量生成文件。\n它解决的是一个很实际的问题：让 Agent 直接改 Obsidian 库时，模型往往按通用 Markdown 写，结果 wikilink、callout、Bases 公式这些语法全写错，你还得手工修。\n三条装法：Claude Code 用 marketplace 两条命令；`npx skills add https://github.com/kepano/obsidian-skills`（或 ssh 地址）；手动复制。手动装 OpenCode 时 README 特别提醒要 clone 整个仓库而不是只拷内层 skills/ 目录，否则目录结构不对、SKILL.md 发现不了。",
+    officialUrl: "https://github.com/kepano/obsidian-skills",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/kepano/obsidian-skills",
+      github: "https://github.com/kepano/obsidian-skills",
+    },
+    whoFor: "用 Obsidian 管笔记、又想让 Claude Code / Codex 之类的 Agent 直接读写库的人；尤其是用到 Bases 与 Canvas 的用户。",
+    whoNot: "不用 Obsidian 的人——这些技能全是围绕 Obsidian 特有格式的，普通 Markdown 库用不上；也不适合期望装完就能自动整理笔记的人，它只是让 Agent 写对格式。",
+    installTips: [
+      "Claude Code 走 marketplace：`/plugin marketplace add kepano/obsidian-skills`，然后 `/plugin install obsidian@obsidian-skills`。",
+      "或者用 npx：`npx skills add https://github.com/kepano/obsidian-skills`（偏好 ssh 就用 `npx skills add git@github.com:kepano/obsidian-skills.git`）。",
+      "手动装要按宿主区分：Claude Code 把仓库内容放进 vault 根目录的 /.claude；Codex 把 skills/ 目录拷到 ~/.codex/skills；OpenCode 要 clone 整个仓库到 ~/.opencode/skills/obsidian-skills（不能只拷内层 skills/，否则 SKILL.md 发现不了），装完重启即可，不需要改 opencode.json。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#7C3AED",
+    },
+    guide: {
+      intro: "讲它解决的是什么问题、六个技能分别管什么格式，然后按宿主分三条安装路径写清楚，最后点出手动安装最容易错的一步。",
+      markdown: `## 它解决什么问题
+
+让 Agent 直接读写 Obsidian 库时，最常见的失败不是「它不会写 Markdown」，而是**它按通用 Markdown 的写法来写**。
+
+后果很具体：内部链接写成了 \`[[]]\` 之外的形式、callout 的 \`> [!note]\` 写错、frontmatter 里的 properties 不符合 Obsidian 的习惯、Bases 的公式语法根本不对。你还得手工一个个改回来。
+
+obsidian-skills 就是把这些 **Obsidian 特有的语法约定**教给 Agent。它遵循 Agent Skills 规范（agentskills.io/specification），所以不止 Claude Code，任何兼容该规范的 Agent 都能用。
+
+## 六个技能分别管什么
+
+| 技能 | 管什么 |
+| --- | --- |
+| \`obsidian-markdown\` | Obsidian Flavored Markdown（\`.md\`）：wikilinks、嵌入、callouts、properties 与其他 Obsidian 特有语法 |
+| \`obsidian-bases\` | Obsidian Bases（\`.base\`）：视图、筛选、公式、汇总 |
+| \`json-canvas\` | JSON Canvas（\`.canvas\`）：节点、边、分组、连接 |
+| \`obsidian-cli\` | 通过官方 Obsidian CLI 与 vault 交互，含插件与主题开发 |
+| \`defuddle\` | 把网页抽成干净的 Markdown，去掉噪音以省 token |
+| \`knap\` | 用 JSON / CSV 数据渲染 Markdown 模板，支持批量生成文件 |
+
+用不到 Bases 和 Canvas 的话，其实核心就是 \`obsidian-markdown\` 加 \`obsidian-cli\`。
+
+## 装法一：Claude Code 走 marketplace
+
+在 Claude Code 里执行两条：
+
+\`\`\`text
+/plugin marketplace add kepano/obsidian-skills
+/plugin install obsidian@obsidian-skills
+\`\`\`
+
+## 装法二：npx skills
+
+\`\`\`bash
+npx skills add https://github.com/kepano/obsidian-skills
+\`\`\`
+
+偏好 ssh 就把地址换掉：
+
+\`\`\`bash
+npx skills add git@github.com:kepano/obsidian-skills.git
+\`\`\`
+
+## 装法三：手动（按宿主区分）
+
+**Claude Code** —— 把仓库内容放进 vault 根目录的 \`/.claude\`（或者你实际用 Claude Code 打开的那个目录）。细节看官方 Claude Skills 文档。
+
+**Codex** —— 把 \`skills/\` 目录拷进你的 Codex 技能路径，通常是 \`~/.codex/skills\`。
+
+**OpenCode** —— README 给的命令是 clone 整个仓库：
+
+\`\`\`bash
+git clone https://github.com/kepano/obsidian-skills.git ~/.opencode/skills/obsidian-skills
+\`\`\`
+
+## 手动安装最容易错的一步
+
+README 用加粗强调过：**不要只拷内层的 \`skills/\` 目录**，要 clone 整个仓库，让目录结构变成：
+
+\`\`\`text
+~/.opencode/skills/obsidian-skills/skills/<skill-name>/SKILL.md
+\`\`\`
+
+只拷内层的话路径少一层，OpenCode 的自动发现找不到 \`SKILL.md\`，表现为「装了但技能一个都没生效」。
+
+好消息是 OpenCode 会自动发现 \`~/.opencode/skills/\` 下的所有 \`SKILL.md\`，**不需要改 \`opencode.json\` 或任何配置文件**，重启 OpenCode 后即可用。
+
+## 用起来的样子
+
+装完之后，你跟 Agent 说的还是人话——「把这条笔记链接到昨天的会议记录」「在这个 base 里加一列算剩余天数」——它会在背后按正确的 Obsidian 语法写。
+
+\`defuddle\` 那一条非 Obsidian 专属但也很好用：让 Agent 抓网页时先过一遍 defuddle，抽成干净 Markdown，能明显省 token。
+
+## 代价
+
+这些技能紧贴 Obsidian 的语法，而 Obsidian（尤其 Bases）本身还在演进。**语法变了技能就得跟着更新**，否则 Agent 会按过时的约定写。遇到 Agent 写出来的 Bases 语法报错，先怀疑是不是技能版本旧了。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/kepano/obsidian-skills",
+          note: "六个技能的清单与三条安装路径。装哪个宿主就照哪一节做，别混着来。",
+        },
+        {
+          kind: "html",
+          title: "Agent Skills 规范",
+          url: "https://agentskills.io/specification",
+          note: "技能的标准格式说明。想自己写技能，或给别的 Agent 适配时用得上。",
+        },
+        {
+          kind: "html",
+          title: "Obsidian Flavored Markdown 官方说明",
+          url: "https://help.obsidian.md/obsidian-flavored-markdown",
+          note: "wikilink、callout、properties 等语法的权威说明。判断 Agent 写得对不对，对照这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "shannon",
+    linksCheckedAt: "2026-10-21",
+    name: "shannon",
+    nameZh: "Shannon 自主渗透 Agent",
+    aliases: ["shannon", "Shannon pentester", "AI 渗透测试", "keygraph shannon", "自动化渗透"],
+    summary: "跑在你本机的自主 AI 渗透测试 Agent：读源码找攻击路径，再真实利用一遍，「没有可复现利用就不写进报告」。只该跑在你拥有或书面授权的系统上，别碰生产环境。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["安全测试", "AI Agent", "DevSecOps", "开源"],
+    body: "Shannon 是 Keygraph 做的自主 AI 渗透测试工具：先分析你的 Web 应用源码找出攻击路径，再用浏览器自动化和命令行工具对正在运行的应用及其 API 执行真实利用，报告里只保留拿到可复现 PoC 的漏洞——README 把这条写成 No exploit, no report。\n它想填的是那个很现实的缺口：团队用 Claude Code 之类的工具天天发版，渗透测试却一年才一次，剩下 364 天里可能一直在往生产环境送漏洞。Shannon 的定位是把渗透左移到 SDLC，对着 staging 环境和每次发版跑，README 也明确说它不是来替代人类渗透测试师的——它解决的是「要测的软件远多于安全团队时间」这个长尾问题。\n能做什么：认证扫描（凭据、登录流程、TOTP、邮件认证、focus 区域与 engagement rules 都能配）、OWASP 向的注入 / XSS / SSRF / 失效认证与授权、可断点续跑的工作区、以及 PDF / Markdown / JSON / SARIF 2.1.0 多格式报告。官方还有 GitHub Action（KeygraphHQ/shannon-action@v1）与 GitLab CI 组件，能在 PR、发版或定时触发，并按 severity 卡流水线——但只有 status 为 exploited 的发现才算数。\n三条硬约束必须写在前面：它真的会执行利用，只能打你自己拥有或有书面授权的系统，**不要对生产环境跑**；跑之前需要在 Anthropic / OpenAI 完成网络安全验证，否则中途可能被实时 safeguards 打断；依赖 Docker 与 Node 18+。",
+    officialUrl: "https://keygraph.io",
+    officialLabel: "keygraph.io",
+    links: {
+      official: "https://keygraph.io",
+      github: "https://github.com/KeygraphHQ/shannon",
+    },
+    whoFor: "有 staging / 开发环境、想在每次发版都跑一遍利用级安全测试的开发与安全团队；以及源码在手、想低成本覆盖内部长尾应用的人。",
+    whoNot: "没有明确书面授权就别用——它会真的执行利用；也不要对生产环境跑；另外别指望它替代人类渗透测试师，业务逻辑与跨系统的攻击链仍需要人。",
+    installTips: [
+      "前置条件三样：Docker（跑 worker 容器）、Node.js 18+（npx 流程需要）、以及你自己的 AI 服务商凭据（Anthropic、OpenAI、xAI、AWS Bedrock 或兼容 API，也支持 Ollama / vLLM / LM Studio 的本地模型），BYOK，Keygraph 不代理你的模型流量。",
+      "跑之前先完成 Anthropic / OpenAI 的网络安全验证（cyber verification），否则实时 safeguards 可能让扫描中途失败或被模型拒绝。",
+      "配置凭据用交互式向导：`npx @keygraph/shannon@latest setup`；开跑：`npx @keygraph/shannon@latest start -u https://your-app.com -r /path/to/your/repo`。直接 `npx @keygraph/shannon@latest` 会进交互式启动器。",
+      "接 CI 用官方 GitHub Action `KeygraphHQ/shannon-action@v1` 或 GitLab CI 组件，需要私有仓库、带 Docker 与 Docker Compose v2 的 runner，以及存为 secret 的模型凭据。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#9B2C2C",
+    },
+    guide: {
+      intro: "先把授权与运行环境这条红线讲透，再讲前置条件、两条核心命令、CI 集成怎么配，最后是它的能力边界和报告口径。",
+      markdown: `## 先读这条红线
+
+README 在 Quick Start 里挂了一条 WARNING，用词没有回旋余地：
+
+> Shannon actively executes exploits. Run it only against applications and environments you own or have explicit written authorization to test. **Do not run Shannon against production systems.**
+
+翻译成操作纪律就三条：
+
+1. 只打你自己的系统，或者你有**书面授权**的系统
+2. **不打生产环境** —— 目标是 staging / 开发环境
+3. 它是真的在利用，不是「扫一遍给个提示」
+
+这不是法律免责套话。它会真的发攻击请求、真的尝试注入。搞错目标就是事故。
+
+## 前置条件
+
+三样东西缺一不可：
+
+- **Docker** —— worker 容器要靠它
+- **Node.js 18+** —— 官方推荐的 npx 流程需要
+- **AI 服务商凭据** —— 支持 Anthropic、OpenAI、xAI、AWS Bedrock，以及目录里的其他服务商；可以指向代理或 LLM 网关（自定义 base URL），目录里没有的模型可以用自定义模型配置描述。**BYOK，Keygraph 不代理你的模型流量**。本地模型走 Ollama / vLLM / LM Studio 也行
+
+**还有一条最容易漏的**：Anthropic 和 OpenAI 会对网络安全类负载施加实时 safeguards，可能让扫描跑到一半断掉。README 要求你在第一次跑之前**完成它们面向合法安全测试人员的 cyber verification**。跑一半失败，八成是这一条没做。
+
+## 两条命令
+
+**配置凭据**（交互式向导）：
+
+\`\`\`bash
+npx @keygraph/shannon@latest setup
+\`\`\`
+
+**开跑**：
+
+\`\`\`bash
+npx @keygraph/shannon@latest start \\
+  -u https://your-app.com \\
+  -r /path/to/your/repo
+\`\`\`
+
+也可以直接 \`npx @keygraph/shannon@latest\`，交互式启动器会带你走完设置和第一次渗透。
+
+跑起来之后它会：从 Docker Hub 拉 worker 镜像、启动所需的本地基础设施、把目标仓库**以只读方式**挂载进一次性的 worker 容器，然后把结果写到本地工作区。
+
+## 它的核心口径：No exploit, no report
+
+这是 Shannon 与普通扫描器最大的区别。
+
+它先做代码分析——梳理架构、信任边界、接口、数据流与关键资产，再把可信的攻击路径交给实际执行利用的 Agent。**只有拿到可复现 PoC 的漏洞才会进最终报告**。
+
+这直接解决了安全工具的老毛病：一堆「可能有问题」的推测性告警，最后没人看。
+
+## 接进 CI
+
+官方有两个集成：**GitHub Action** \`KeygraphHQ/shannon-action@v1\` 和 **GitLab CI/CD** 组件。
+
+\`\`\`yaml
+name: Shannon Pentest
+
+on:
+  workflow_dispatch:
+
+permissions:
+  security-events: write
+
+jobs:
+  pentest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Shannon
+        uses: KeygraphHQ/shannon-action@v1
+        with:
+          url: https://staging.example.com
+          api-key: \${{ secrets.SHANNON_AI_API_KEY }}
+          fail-on-severity: high
+          upload-sarif: true
+\`\`\`
+
+要点：
+
+- \`repo\` 默认是 checkout 出来的 GitHub workspace
+- 会产出两个 artifact：一个是安全评估报告 + SARIF，另一个是扫描与 Agent 日志（含未完成的运行）
+- \`upload-sarif\` 会把支持的发现发布到 GitHub code scanning
+- 支持 PR 触发、发版触发与定时触发
+- **能区分「评估未完成」和「扫完了但没发现」**
+
+流水线要求：私有仓库、带 Docker 与 Docker Compose v2 的 runner、能访问到运行中的 staging / 开发目标、以及存成 GitHub Actions secret 的模型凭据。
+
+## 关于 fail-on-severity 的一个细节
+
+很容易误解：**代码分析的假设不会让流水线失败**。severity 门禁只统计 \`status: exploited\` 的发现——也就是真的被利用成功的那些。
+
+这个设计是对的，否则每次 PR 都会被一堆「可能有」的假设卡住。
+
+## 报告
+
+多格式输出：PDF 与 Markdown（带证据）、JSON、以及 SARIF 2.1.0。exploit 模式的扫描默认开启 SARIF。
+
+## 能力边界
+
+README 有一节专门讲它**不替代人类渗透测试师**，理由很实在：优秀的渗透师理解业务、能以没人预料到的方式串联攻击、并且带着模型目前不具备的多年判断力。
+
+Shannon 解决的是另一个问题——**要测的软件远多于安全团队的时间**。关键系统仍然要定期做专家评估；那些内部应用、API 和快速迭代的服务，才是它的用武之地。
+
+## 授权与成本
+
+开源版是 AGPL-3.0，你自己跑，只付自己的模型费用。Keygraph 另有 Pro 与 Enterprise 商业版。订阅制替代 API 额度方面：支持 OpenAI Codex（ChatGPT Plus / Pro 订阅）与 xAI（Grok）订阅；Claude Code 订阅在最新版不支持，要用订阅得退回 \`1.9.0\`（最后一个基于 Claude Agent SDK 的版本）。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://keygraph.io",
+          note: "产品页与各版本对比（开源 / Pro / Enterprise）。评估要不要上商业版时看这里。",
+        },
+        {
+          kind: "html",
+          title: "GitHub Action",
+          url: "https://github.com/KeygraphHQ/shannon-action",
+          note: "官方 GitHub Action 的参数与要求。要把 Shannon 接进流水线时用这个，别自己拼命令。",
+        },
+        {
+          kind: "markdown",
+          title: "AI 服务商与安全验证说明",
+          url: "https://github.com/KeygraphHQ/shannon/blob/main/docs/ai-providers.md",
+          note: "支持的模型、自定义 base URL 与 cyber safeguards 的前置步骤。扫描跑到一半失败时先查这一节。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "agentic-awesome-skills",
+    linksCheckedAt: "2026-10-21",
+    name: "agentic-awesome-skills",
+    nameZh: "AAS 技能目录与控制面",
+    aliases: ["agentic-awesome-skills", "AAS", "AAS Core", "agent skills 目录", "SKILL.md 库"],
+    summary: "2,688+ 个可安装的 SKILL.md 剧本库，AAS Core 让 Codex / Claude 自己检索目录、选定技能并产出可审查的计划。适合想让 Agent 挑技能的人；代价是安装与恢复仍是实验特性。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI Agent", "Agent Skills", "技能库", "开源"],
+    body: "Agentic Awesome Skills（AAS）是一个 2,688+ 个可安装 SKILL.md 剧本的库，当前版本 V19.5.0。README 的定位写得很克制：帮你找到可复用的指令、查看完整文件、并保留一份你可以审查和复用的确切技能集。它明确不做排名和推荐。\n分两条路走。AAS Core 是「Agent 优先」的路径：把本地 MCP 配好之后，让 Codex 或 Claude 自己看你的项目、比较相关技能、把选中的 ID 存下来，再用 `aas stack validate` 校验清单、`aas stack plan` 生成一份不可变的预览供你审阅。清单技术上最多 128 个技能。另一条是直接安装：你已经有 ID 了，就用带 `--dry-run` 的命令先预览再落盘。\nREADME 里那句 IMPORTANT 值得原文记住：结构和身份有效**不等于**语义合适、兼容、安装正确、操作安全或应用安全——Apply 与 recovery 需要实验性 opt-in，不在受支持的预览范围内。\n其他要注意的：宿主适配很全（Claude Code、Codex、Cursor、Gemini CLI、Kiro、Antigravity、OpenCode、GitHub Copilot、AdaL 等，各有自己的命令），但 Antigravity 的 watched 目录会撑爆上下文，默认必须给选定集合、过滤器或显式 `--all`；另外这是独立社区项目，与 Google 无隶属关系。",
+    officialUrl: "https://aaskills.tech",
+    officialLabel: "aaskills.tech",
+    links: {
+      official: "https://aaskills.tech",
+      github: "https://github.com/sickn33/agentic-awesome-skills",
+    },
+    whoFor: "已经在用 Codex / Claude Code，又不想靠猜去挑社区技能的人：想让 Agent 自己检索全量目录并给出一份可审查的选定清单。",
+    whoNot: "指望它推荐「最好的技能」的人——Core 明确不排名不推荐；也不要把 Apply 当稳定功能用，它是实验性的，装之前先看 dry-run 预览。",
+    installTips: [
+      "Core 路径先配本地 MCP（以 Codex 为例）：`npm exec --yes --ignore-scripts --package=agentic-awesome-skills@19.5.0 -- aas mcp configure --host codex --scope user --config /absolute/path/to/codex/config.toml --cache-root /absolute/path/to/aas-cache`；Claude 换 `--host claude` 和它的配置路径。",
+      "已知 ID 就直接装（先预览）：`npm exec --yes --ignore-scripts --package=agentic-awesome-skills@19.5.0 -- agentic-awesome-skills --release 19.5.0 --path .agents/skills --skills brainstorming,systematic-debugging --dry-run`，看过没问题再去掉 `--dry-run`。",
+      "按宿主简化：Cursor `npx agentic-awesome-skills --cursor`、Gemini CLI `--gemini`、Codex `--codex`、Kiro CLI `--kiro`、Antigravity CLI `--agy`、AdaL `--path .adal/skills`、自定义目录 `--path ./my-skills`。",
+      "清单与计划：`aas stack validate` 校验 manifest，`aas stack plan` 写一份不可变预览；把审阅过的 ID 交给直接安装器用 `aas stack install-preview`（它只生成 --dry-run 预览，不会应用 Core 计划）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#6D4A9C",
+    },
+    guide: {
+      intro: "先讲清两条路（Core 与直接安装）的分工和那条 IMPORTANT 边界，再按宿主给命令，最后是几个会真的卡住人的点（Antigravity 上下文、版本锁定、Windows 截断）。",
+      markdown: `## 先分清两条路
+
+**AAS Core** —— Agent 优先的路径。配好本地 MCP 后，让 Codex 或 Claude **自己**看你的项目、比较相关技能、把选中的 ID 存下来，然后你校验清单、审阅计划。
+
+**直接安装** —— 你已经知道 ID 了，直接把技能装进宿主的技能目录。
+
+两条路的分工很明确：**Core 负责选，直接安装器负责装**。Core 在受支持的预览路径里**不会替你安装技能**，也不会给技能排名或推荐——README 反复强调这一点。
+
+## 那条必须记住的 IMPORTANT
+
+README 里加了 IMPORTANT 标记的一句：
+
+> Structural and identity validity does not certify semantic fit, compatibility, setup correctness, operational safety, or safety to apply.
+
+翻成白话：**清单校验通过 ≠ 这些技能适合你、互相兼容、装得对、或者可以安全应用**。
+
+配套的另一句是：**Apply 与 recovery 需要实验性 opt-in，不在受支持的预览范围内**。
+
+所以实操纪律是——让 Core 帮你选和排计划，真正的落盘用带 \`--dry-run\` 的直接安装器，看过预览再去掉 dry-run。
+
+## 路径一：配 AAS Core 的本地 MCP
+
+以 Codex 为例（注意版本号是钉死的）：
+
+\`\`\`bash
+npm exec --yes --ignore-scripts --package=agentic-awesome-skills@19.5.0 -- aas mcp configure \\
+  --host codex \\
+  --scope user \\
+  --config /absolute/path/to/codex/config.toml \\
+  --cache-root /absolute/path/to/aas-cache
+\`\`\`
+
+用 Claude 就把 \`--host\` 换成 \`claude\` 并换成它的配置路径。
+
+配好之后让 Agent 做这几步：看项目 → 比较技能 → 保存选定结果 → \`aas stack validate\` 校验 → \`aas stack plan\` 生成预览。**第一条配置命令本身会先给一个变更预览并返回 approval digest**，不是直接写入。
+
+清单的技术上限是 **128 个技能**。
+
+## 路径二：已知 ID 就直接装
+
+\`\`\`bash
+npm exec --yes --ignore-scripts --package=agentic-awesome-skills@19.5.0 -- \\
+  agentic-awesome-skills --release 19.5.0 --path .agents/skills \\
+  --skills brainstorming,systematic-debugging --dry-run
+\`\`\`
+
+先看预览，确认无误后**把 \`--dry-run\` 去掉再跑一遍**。
+
+注意：直接安装器**不会消费或应用 Core 的计划**。要把审阅过的 ID 交过去，用 \`aas stack install-preview\`，而它也只准备 dry-run 预览。
+
+## 按宿主的简化命令
+
+| 工具 | 命令 |
+| --- | --- |
+| Cursor | \`npx agentic-awesome-skills --cursor\` |
+| Gemini CLI | \`npx agentic-awesome-skills --gemini\` |
+| Codex CLI | \`npx agentic-awesome-skills --codex\` |
+| Kiro CLI | \`npx agentic-awesome-skills --kiro\` |
+| Kiro IDE | \`npx agentic-awesome-skills --path ~/.kiro/skills\` |
+| Antigravity CLI (agy) | \`npx agentic-awesome-skills --agy\` |
+| Antigravity IDE | \`npx agentic-awesome-skills --antigravity --skills <ids> --dry-run\` |
+| OpenCode | \`npx agentic-awesome-skills --path .agents/skills --category development,backend --risk safe,none\` |
+| Autohand Code | \`npx agentic-awesome-skills --path .autohand/skills\` |
+| AdaL CLI | \`npx agentic-awesome-skills --path .adal/skills\` |
+| GitHub Copilot | \`gh skill install sickn33/agentic-awesome-skills skills/brainstorming/SKILL.md --agent github-copilot --scope user --pin v14.2.0\`（预览） |
+| 自定义路径 | \`npx agentic-awesome-skills --path ./my-skills\` |
+
+## Antigravity 那个坑
+
+README 专门提了一句：**Antigravity 的 watched 技能目录会把它的上下文撑爆**。
+
+所以它的默认目标要求你必须给一个选定集合、一个过滤器，或者显式的 \`--all\`。给其他宿主时，也建议先装一小批精确的，或者用安装器的 \`--risk\`、\`--category\`、\`--tags\` 过滤。
+
+装太多技能导致 Agent 变笨，是这类技能库最常见的自我伤害方式。
+
+## 版本要钉死
+
+README 里所有示例都带了 \`@19.5.0\`。这不是保守：README 跟踪 \`main\`，而 **CHANGELOG 里标 Unreleased 的功能需要更新的版本**——版本化指南才描述已发布的包。跟着 latest 走容易撞上文档与包不一致。
+
+## 排查去哪
+
+README 的 Troubleshooting 一节列了几个专门的文档：Core 设置与信任边界、安装与日常使用、**Windows 上下文与截断恢复**、**Linux/macOS 过载与选择性激活**、插件兼容、以及安全与杀软告警。
+
+技能装多了 Agent 反应变慢或输出被截断，去「overload / truncation recovery」那两篇。
+
+## 顺带说清关系
+
+这是**独立社区项目，与 Google 无隶属或背书关系**。README 里的 Google、Antigravity、Gemini 等名称只是描述兼容性与安装目标。
+
+GitHub 仓库是 canonical；\`aaskills.tech\` 的托管目录和浏览器本地的 Workbench 只是配套的发现与审查界面——Workbench 在浏览器内存里查看 stack 与 plan，**不访问你的文件系统**。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "AAS Core 使用指南",
+          url: "https://github.com/sickn33/agentic-awesome-skills/blob/v19.5.0/docs/users/aas-core.md",
+          note: "MCP 配置、审批、校验与计划的完整契约，以及能力边界和限制。走 Core 路径必读。",
+        },
+        {
+          kind: "html",
+          title: "托管技能目录",
+          url: "https://aaskills.tech/",
+          note: "2,688+ 个技能的在线检索入口，另有 plugins 与 Workbench 子页面。",
+        },
+        {
+          kind: "markdown",
+          title: "安装与日常使用说明",
+          url: "https://github.com/sickn33/agentic-awesome-skills/blob/main/docs/users/usage.md",
+          note: "直接安装器的参数与常见用法，以及出问题时的排查路径。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "bruno",
+    linksCheckedAt: "2026-10-21",
+    name: "bruno",
+    nameZh: "Bruno API 客户端",
+    aliases: ["bruno", "Bruno", "usebruno", "API 客户端", "Postman 替代"],
+    summary: "把 API 集合以纯文本 Bru 格式存在你自己的文件夹里、用 Git 协作的开源 API 客户端，离线优先且明确永不云同步。适合把请求当代码管的人；代价是它故意没有云同步。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["API 工具", "Git 协作", "离线优先", "开源"],
+    body: "Bruno 是一个开源 API 客户端，对标的正是 Postman 那类工具，差异在存储方式：它把你的集合直接存成文件系统上的文件夹，用一种叫 Bru 的纯文本标记语言记录请求信息。这个设计带来一个很实在的结果——你可以直接用 Git（或任何版本控制）来协作管理 API 集合，请求变更能进 code review、能 diff、能回滚。\n另一个态度鲜明的点是离线：README 写着 Bruno is offline-only，「没有给 Bruno 加云同步的计划，永远不会有」，理由是数据隐私、数据就该留在你的设备上。所以别指望跨设备自动同步，想要这个的话它不适合你。\n命令行侧是完整的：Bruno CLI 用 `npm install -g @usebruno/cli` 装，然后 `bru run` 跑整个集合、`bru run request.bru` 跑单个请求、`bru run folder --env Local` 按环境跑一个目录，适合自动化测试和 CI。CLI 还有官方 Docker 镜像（Docker Hub 的 usebruno/cli 与 ghcr.io/usebruno/cli，alpine 与 debian 两种变体，支持 linux/amd64 与 arm64），CI 里不用装 Node 也能跑。\n桌面端支持 Mac、Windows、Linux，包管理器覆盖 Homebrew、Chocolatey、Scoop、Winget、Snap、Flatpak、AUR 与 apt。多数功能免费开源，付费版是额外的团队能力，开源与可持续之间的取舍作者写在 discussions/269 里。",
+    officialUrl: "https://www.usebruno.com",
+    officialLabel: "www.usebruno.com",
+    links: {
+      official: "https://www.usebruno.com",
+      github: "https://github.com/usebruno/bruno",
+    },
+    whoFor: "希望把 API 请求集合纳入 Git 管理、能 diff 能 review 的开发者与团队；以及要求数据只留在本机、不能上云的合规场景。",
+    whoNot: "依赖多设备自动同步的用户——Bruno 明确永不云同步，跨设备只能靠 Git；只想偶尔发一个请求的轻量用户也不需要装桌面端。",
+    installTips: [
+      "桌面端从 usebruno.com/downloads 下 Mac / Windows / Linux 二进制；也可以用包管理器：macOS `brew install bruno`，Windows `choco install bruno` 或 `scoop bucket add extras && scoop install bruno` 或 `winget install Bruno.Bruno`，Linux `snap install bruno` / `flatpak install com.usebruno.Bruno` / Arch `yay -S bruno`。",
+      "Linux 走 apt 需要先导入签名密钥：curl 取 keyserver.ubuntu.com 上 0x9FA6017ECABE0266 的密钥，gpg --dearmor 后写入 /etc/apt/keyrings/bruno.gpg，再添加 debian.usebruno.com 源，然后 apt install bruno。",
+      "命令行跑集合：`npm install -g @usebruno/cli` 装 CLI，然后 `bru run`（整个集合）、`bru run request.bru`（单个请求）、`bru run folder --env Local`（按环境跑目录）。",
+      "CI 里不想装 Node 就用官方镜像：`docker pull usebruno/cli:latest`（或 ghcr.io/usebruno/cli:latest），然后 `docker run -v $(pwd):/bruno usebruno/cli run`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "B",
+      color: "#F07B3F",
+    },
+    guide: {
+      intro: "讲清它和 Postman 最本质的差别（存储方式与云同步态度）、桌面端与 CLI 怎么装、Bru 文件怎么进 Git，以及在 CI 里怎么跑。",
+      markdown: `## 它和 Postman 最本质的差别
+
+不是界面，是**集合存在哪里**。
+
+Bruno 把你的 API 集合直接存成文件系统上的一个文件夹，用一种叫 **Bru** 的纯文本标记语言记录请求信息。
+
+这带来三个连带结果：
+
+1. **可以用 Git 协作** —— 请求变更能进 commit、能 diff、能 review、能回滚。在 Postman 里改一个请求，同事那边是看不见变更历史的
+2. **离线优先** —— 数据就在本地，不依赖账号和云
+3. **能被别的工具处理** —— 纯文本意味着可以脚本化、可以批量改
+
+代价同样明确，README 写得毫不含糊：
+
+> Bruno is offline-only. There are no plans to add cloud-sync to Bruno, **ever**. We value your data privacy and believe it should stay on your device.
+
+**想要多设备自动同步的人，这个工具不适合你。** 跨设备只能靠 Git 推拉。这是设计选择，不是待办事项。
+
+## 装桌面端
+
+从 \`usebruno.com/downloads\` 下 Mac / Windows / Linux 的二进制，或者用包管理器：
+
+\`\`\`bash
+# macOS
+brew install bruno
+
+# Windows
+choco install bruno
+scoop bucket add extras && scoop install bruno
+winget install Bruno.Bruno
+
+# Linux
+snap install bruno
+flatpak install com.usebruno.Bruno
+yay -S bruno          # Arch / AUR
+\`\`\`
+
+Debian / Ubuntu 走 apt 需要先导入签名密钥再添加源：
+
+\`\`\`bash
+sudo mkdir -p /etc/apt/keyrings
+sudo apt update && sudo apt install gpg curl
+curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9FA6017ECABE0266" \\
+  | gpg --dearmor \\
+  | sudo tee /etc/apt/keyrings/bruno.gpg > /dev/null
+sudo chmod 644 /etc/apt/keyrings/bruno.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/bruno.gpg] http://debian.usebruno.com/ bruno stable" \\
+  | sudo tee /etc/apt/sources.list.d/bruno.list
+sudo apt update && sudo apt install bruno
+\`\`\`
+
+（注意这是 README 原文里的源地址，是 http 不是 https）
+
+## 装 CLI
+
+\`\`\`bash
+npm install -g @usebruno/cli
+\`\`\`
+
+然后在集合所在目录里跑：
+
+\`\`\`bash
+bru run                    # 跑集合里的每个请求
+bru run request.bru        # 跑单个请求
+bru run folder --env Local # 按指定环境跑一个目录
+\`\`\`
+
+完整命令参考看 \`docs.usebruno.com\` 的 bru-cli 章节。
+
+## 在 CI 里跑：用 Docker
+
+不想在 runner 上装 Node 和 npm，用官方镜像：
+
+\`\`\`bash
+docker pull usebruno/cli:latest        # Docker Hub
+docker pull ghcr.io/usebruno/cli:latest  # 或 GitHub Container Registry
+
+docker run -v $(pwd):/bruno usebruno/cli run
+\`\`\`
+
+镜像在每次 CLI 发布时同步推送，有 \`alpine\` 与 \`debian\` 两种变体，架构支持 \`linux/amd64\` 与 \`linux/arm64\`。
+
+GitHub Actions、GitLab CI、Jenkins 的例子都在 \`docs.usebruno.com\` 的 bru-cli/docker 页。
+
+## 把集合当代码管
+
+这是用它最正确的姿势：
+
+1. 在仓库里建一个目录放集合（比如 \`api/\`）
+2. 把 \`.bru\` 文件提交进 Git
+3. 改请求走 PR，跟改代码一样的流程
+4. CI 里用 \`bru run\` 或 Docker 镜像跑一遍当作接口冒烟测试
+
+环境相关的变量不要硬编码在 \`.bru\` 里，用 environment 文件配，配合 \`--env\` 切换。
+
+## 关于付费版
+
+README 说得很清楚：**多数功能是免费开源的**，付费版本提供的是额外能力（见 \`usebruno.com/pricing\`）。
+
+开源与可持续之间怎么平衡，作者在 \`discussions/269\` 里写了长文，也是对「为什么永远不做云同步」的完整解释。想判断这个项目会不会哪天变味，读那一篇比读什么都准。
+
+## 其他
+
+- \`Bruno\` 这个名称是 Anoop M D 持有的商标，logo 来自 OpenMoji（CC BY-SA 4.0）
+- 项目主体是 MIT 许可
+- 文档在 \`docs.usebruno.com\`，问题可以在 Stack Overflow 的 \`bruno\` 标签下问
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://www.usebruno.com/downloads",
+          note: "Mac / Windows / Linux 桌面端二进制下载入口。挑版本前先看这里。",
+        },
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.usebruno.com",
+          note: "Bru 语法、CLI 命令参考与 Docker 用法。要接 CI 时以这一份为准。",
+        },
+        {
+          kind: "link",
+          title: "长期愿景讨论（为什么不做云同步）",
+          url: "https://github.com/usebruno/bruno/discussions/269",
+          note: "作者亲述开源与可持续的取舍，也是「永不云同步」这条决定的完整解释。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "cli",
+    linksCheckedAt: "2026-10-21",
+    name: "GitHub CLI",
+    nameZh: "GitHub CLI 命令行工具",
+    aliases: ["github cli", "gh cli", "gh", "GitHub 命令行", "GitHub 官方 CLI"],
+    summary: "GitHub 官方命令行工具，把 PR、issue、release 这些协作动作搬进终端，和 git 放在一起用。适合习惯在命令行里走完整套流程的人；代价是它只服务 GitHub，自建 GitLab / Gitea 用不上。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["命令行", "GitHub", "Git", "开发者工具", "开源"],
+    body: "GitHub CLI（命令名 gh）是 GitHub 官方出的命令行工具，做的事和网页端重叠：管 pull request、issue、release，但入口就在你已经在用 git 的那个终端里，不用切浏览器。\n和老牌的 hub 相比，差别在设计：hub 是给 git 做一层代理，把 GitHub 操作伪装成 git 子命令；gh 是独立程序，命令体系按 GitHub 的概念重新组织。README 里明确说明这是两条不同的路，不是替代关系。\n适用范围要看清楚：它支持 GitHub.com、GitHub Enterprise Cloud，以及受支持版本的 GitHub Enterprise Server；操作系统覆盖 macOS、Windows、Linux。也就是说，如果你的代码托管在自建的 GitLab 或 Gitea 上，这个工具帮不上忙。\n值得一提的是 CI 场景：GitHub 官方托管的 runner 上已经预装了 gh，并且每周更新。这意味着在 Actions 里想用它，通常不需要额外装一遍；只有需要锁特定版本时才按各系统的安装方式处理。",
+    officialUrl: "https://cli.github.com",
+    officialLabel: "cli.github.com",
+    links: {
+      official: "https://cli.github.com",
+      github: "https://github.com/cli/cli",
+    },
+    whoFor: "日常在 GitHub 上协作、又不想在浏览器和终端之间来回切的人：查 PR 状态、开 issue、发 release 都想在命令行完成。",
+    whoNot: "代码托管在 GitLab / Gitea / Bitbucket 上的人——它只对接 GitHub；或者几乎不用 PR / issue、只要 push 代码的独立开发者，装它也用不上。",
+    installTips: [
+      "macOS 用 Homebrew 装，也可以从 releases 页面直接下预编译包；Windows 有 WinGet；Linux 分 Debian/Ubuntu 系与 RPM 系两套包仓库。",
+      "不想配包仓库的话，各平台都有预编译二进制，从 releases 页面下载后放进 PATH 即可。",
+      "在 GitHub Actions 里通常不用装：GitHub 官方托管的 runner 已预装 gh 并每周更新，只有需要特定版本时才手动安装。",
+      "想给 codespace 预置它，在 devcontainer 文件里加一条 feature：`\"features\": { \"ghcr.io/devcontainers/features/github-cli:1\": {} }`。",
+      "装完记得看 `gh skill` 相关说明：官方提供了给编码代理用的 agent skill，可以用 `gh skill install cli/cli gh --scope user` 装上，之后用 `gh skill update gh` 升级。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#24292f",
+      simpleIcon: "github",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：选一条适合你系统的安装路径、登录授权、以及日常最高频的几个命令怎么上手。",
+      markdown: `## 先选一条安装路径
+
+三个系统的推荐入口不同，不要混着来：
+
+- **macOS**：Homebrew，或者 releases 页面的预编译二进制
+- **Linux**：Debian / Ubuntu 用 apt 仓库；CentOS / Fedora / RHEL 等用 RPM 仓库；也可以直接用预编译二进制
+- **Windows**：WinGet，或者 releases 页面的预编译二进制
+
+如果之前改过 Linux 的包签名配置，留意一件事：README 顶部提示了 Linux 仓库的 PGP 签名密钥轮换，装不上或更新失败时去看那条公告。
+
+## 登录之后才有意义
+
+gh 的大部分命令都在操作你的仓库，所以装完第一步是认证。不登录也能跑少数公开查询，但会撞到速率限制，体验很差。认证走浏览器授权，不需要自己生成 token。
+
+## 日常最常用的几条
+
+\`\`\`bash
+gh pr list            # 看当前仓库的 PR
+gh pr checkout 123    # 把某个 PR 拉到本地分支
+gh issue create       # 开一个 issue
+gh repo clone owner/repo
+\`\`\`
+
+要注意 gh 是**独立于 git 的程序**，不是 git 的插件。它不会接管你的 git 操作，只是在旁边提供 GitHub 侧的能力。
+
+## 让编码代理也会用
+
+官方维护了一份 agent skill，装到 user scope 之后，Claude Code 之类的代理就会知道怎么调 gh：
+
+\`\`\`bash
+gh skill install cli/cli gh --scope user
+gh skill update gh
+\`\`\`
+
+## CI 里的注意事项
+
+GitHub 托管 runner 上 gh 已经预装，但版本是「每周更新」的，意味着你没法假定它是某个具体版本。流水线里依赖了特定行为时，显式装一个固定版本更稳。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方使用手册",
+          url: "https://cli.github.com/manual/",
+          note: "所有子命令与参数的权威说明。装完不知道某个动作对应哪条命令时先查这里。",
+        },
+        {
+          kind: "html",
+          title: "各系统安装文档",
+          url: "https://github.com/cli/cli/blob/trunk/docs/install_linux.md",
+          note: "Linux 各发行版的仓库配置步骤，以及遇到签名/更新问题时的处理入口。",
+        },
+        {
+          kind: "html",
+          title: "版本发布记录",
+          url: "https://github.com/cli/cli/releases",
+          note: "查最新版本的预编译包与变更说明，CI 里锁版本时对照这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "codebase-memory-mcp",
+    linksCheckedAt: "2026-10-21",
+    name: "codebase-memory-mcp",
+    nameZh: "codebase-memory-mcp 代码知识图谱",
+    aliases: ["codebase-memory-mcp", "cbm", "代码记忆", "代码知识图谱", "MCP 代码索引"],
+    summary: "把整个代码库用 tree-sitter 解析成持久知识图谱的 MCP 服务器，覆盖 162 种语言，查询亚毫秒级。适合让编码代理少读文件、省 token；代价是它会读写你的代理配置文件，装之前要自己审来源。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["MCP", "代码分析", "知识图谱", "AI 编码代理", "开源"],
+    body: "codebase-memory-mcp（简称 CBM）是一个给 AI 编码代理用的代码智能引擎：它用 tree-sitter 把仓库解析成 AST，构建出包含函数、类、调用链、HTTP 路由、跨服务引用关系的持久知识图谱，再通过 17 个 MCP 工具对外提供服务。\n它的核心价值是省 token。README 给出的数据是：5 个结构化查询大约 3,400 token，而按文件逐个搜索要大约 412,000 token。索引速度是主打卖点——Linux 内核（2,800 万行、7.5 万个文件）三分钟完成，普通仓库毫秒级，查询在 1 毫秒以内。为此它做了 RAM 优先的流水线：LZ4 压缩、内存版 SQLite、融合的 Aho-Corasick 模式匹配，索引完成后释放内存。\n部署形态是原生可执行文件，支持 macOS（arm64/amd64）、Linux（arm64/amd64）、Windows（amd64），不需要 Docker、语言运行时或 API key。install 命令会自动检测已装的编码代理并写入 MCP 配置、指令、skills 和 hooks。\n两个必须知道的坑。第一，它明确说明自己会「读取你的代码库并写入你的代理配置文件」，所以只从官方仓库或官方渠道安装，第三方镜像不受维护。第二，Windows 上 Microsoft Defender 可能把发布二进制误报为 Trojan:Script/Wacatac.B!ml，README 指出这是已知误报（约 62 个引擎中 61 个报干净），并提供了自行核验的方法。",
+    officialUrl: "https://deusdata.github.io/codebase-memory-mcp",
+    officialLabel: "deusdata.github.io",
+    links: {
+      official: "https://deusdata.github.io/codebase-memory-mcp",
+      github: "https://github.com/DeusData/codebase-memory-mcp",
+    },
+    whoFor: "用 Claude Code / Codex / Cursor 这类代理改中大型仓库、受够了它反复 grep 和读文件的人；尤其是跨服务调用关系理不清的项目。",
+    whoNot: "只写小脚本、代理一次就能读完整个项目的人——索引的收益抵不上配置成本；也不适合不能接受第三方二进制写入自己代理配置文件的环境。",
+    installTips: [
+      "macOS / Linux 一行安装：`curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash`。",
+      "Windows 用 PowerShell 拉 install.ps1，先 `Unblock-File .\\install.ps1` 去掉 Mark-of-the-Web，再执行；遇到执行策略报错就加 `Set-ExecutionPolicy -Scope Process Bypass`。",
+      "只想装二进制、不想让 install 改你的代理配置，用 `--skip-config`；想换安装位置用 `--dir=<路径>`。",
+      "装完必须重启编码代理，然后在会话里直接说「Index this project」，索引会自动开始。",
+      "想看图谱可视化，跑 `codebase-memory-mcp --ui=true --port=9749`，浏览器打开 http://localhost:9749；界面由共享守护进程托管，多个代理会话不会起重复服务。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#2f6f4f",
+    },
+    guide: {
+      intro: "按第一次装会卡在哪讲：安装渠道的选择与取舍、索引这一步到底发生了什么、以及 Defender 误报和版本冲突这两类最常见的报错怎么判断。",
+      markdown: `## 只走一条安装渠道
+
+原生安装（install.sh / install.ps1）的好处是完整：它会自动检测你机器上装了哪些编码代理，写 MCP 配置、指令、skills 和 hooks，还会顺手处理 macOS 的隔离属性和临时签名。
+
+包管理器渠道（npm / PyPI / Go）的机制不同：它只校验并发布一套私有的缓存运行时文件，**不替换**已有的原生安装，也不会停掉正在跑的 CBM 会话。同一台机器上混装的后果是版本不一致。
+
+## 索引这一步在做什么
+
+执行「Index this project」之后，引擎做的是 tree-sitter AST 分析，而不是把文件内容塞进向量库。产出的是：
+
+- 函数、类、模块节点
+- 调用链与跨服务 HTTP 引用
+- K8s manifest / compose / Dockerfile 里的 Resource 与 Image 节点
+
+所以查询是结构化的，返回的是「谁调用了谁」而不是「哪段文本相似」。
+
+## 所有 CBM 进程必须同版本
+
+这是最容易踩的一条。README 明确要求：所有活跃的 CBM 进程必须运行**完全一致**的版本、可执行构建、协调 ABI 与缓存根目录。
+
+如果一个进程在跑，你又用另一个不同版本启动，新进程会在做事之前直接失败，并把冲突记录在：
+
+\`\`\`bash
+~/.cache/codebase-memory-icp/logs/daemon-conflicts.ndjson
+\`\`\`
+
+排障时先看这个文件。
+
+## Defender 误报怎么判断
+
+Windows 上 Defender 可能把发布二进制判成 \`Trojan:Script/Wacatac.B!ml\`。README 说明这是已知误报，同一个检测家族也命中 \`gh\`、llama.cpp、Godot 和微软自己的 Go 工具链。
+
+每个发布版本都会把三个行为等价的可执行候选（unstripped / debug-stripped / stripped）提交 VirusTotal 检测，发布说明里链接了每一个的实测结果。想自己核，对发布包的 SHA-256 即可。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目主页",
+          url: "https://deusdata.github.io/codebase-memory-mcp",
+          note: "安装命令、支持的语言与客户端矩阵入口。决定要不要装之前先扫一遍兼容性。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库与发布页",
+          url: "https://github.com/DeusData/codebase-memory-mcp/releases/latest",
+          note: "各平台归档包的下载地址，以及每个候选二进制的 VirusTotal 实测结果链接。",
+        },
+        {
+          kind: "link",
+          title: "设计与基准论文预印本",
+          url: "https://arxiv.org/abs/2603.27277",
+          note: "想判断那些「省 99% token」数字是怎么测的，看这篇：31 个真实仓库上的评测方法。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "streamlit",
+    linksCheckedAt: "2026-10-21",
+    name: "Streamlit",
+    nameZh: "Streamlit 数据应用框架",
+    aliases: ["streamlit", "Streamlit 数据应用", "Python 数据看板", "streamlit app"],
+    summary: "把 Python 脚本直接变成交互式网页应用，几行代码就能出带滑块和图表的页面。适合分析师做内部看板、演示模型；代价是它是「改一次就重跑整个脚本」的模型，复杂交互和状态管理要靠自己想办法。",
+    scenes: ["data", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "Apache-2.0",
+    tags: ["数据可视化", "Python", "看板", "低代码", "开源"],
+    body: "Streamlit 是个 Python 库，卖点是「把脚本变成能给别人点着用的网页」，用分钟而不是周来衡量交付时间。最小例子只需要两行：`x = st.slider(...)` 加 `st.write(...)`，然后 `streamlit run app.py` 就能在浏览器里得到一个可交互页面。\n它的模型很特别：没有传统 MVC，每次用户动一个控件，脚本就从头到尾重新跑一遍，View 由脚本输出决定。这让代码非常好读（就是顺序执行的 Python），但也意味着重活如果不缓存就会反复计算。\n内建组件覆盖面够用：输入控件、dataframe、图表、布局、多页应用。想扩展可以装社区做的 Streamlit Components。\n部署方面，官方的 Community Cloud 可以免费部署、管理和分享应用。需要注意的是项目目前的贡献状态：README 里写明暂时不接受外部维护者之外的 pull request，想贡献力量只能走报 bug、提需求、给 issue 投票、评论 spec、写自定义组件或参与 streamlit-extras 这些路径。",
+    officialUrl: "https://streamlit.io",
+    officialLabel: "streamlit.io",
+    links: {
+      official: "https://streamlit.io",
+      github: "https://github.com/streamlit/streamlit",
+    },
+    whoFor: "用 Python 做数据分析、需要给同事或客户一个能点着看的界面的人：内部看板、模型演示、报表工具。",
+    whoNot: "要做复杂状态流转、精细权限或长事务的生产级 Web 应用的人——重跑脚本的模型会让你很难受；也不适合完全不会 Python、指望纯拖拽的人。",
+    installTips: [
+      "安装就是一条 pip：`pip install streamlit`，装完跑 `streamlit hello` 会在浏览器打开官方的 Hello 示例应用，能打开就说明装好了。",
+      "跑自己的应用用 `streamlit run streamlit_app.py`，保存文件后页面会即时更新，不用手动重启。",
+      "想让别人访问，用官方 Community Cloud 免费部署；注册入口在 share.streamlit.io/signup。",
+      "需要更多控件时看官方 API 文档的分类：widgets / data / charts / layout / multipage，别自己造轮子。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#ff4b4b",
+      simpleIcon: "streamlit",
+    },
+    guide: {
+      intro: "按第一次上手会卡在哪讲：验证安装、写出第一个应用、把输入控件接起来、以及「改一次就重跑」这个模型意味着什么。",
+      markdown: `## 先确认装好了
+
+\`\`\`bash
+pip install streamlit
+streamlit hello
+\`\`\`
+
+\`streamlit hello\` 会打开官方的 Hello 应用。README 说得很直接：如果能看到这个应用，就说明环境没问题；看不到就去文档看各系统的具体安装说明。
+
+## 第一个应用
+
+新建 \`streamlit_app.py\`：
+
+\`\`\`python
+import streamlit as st
+
+x = st.slider("Select a value")
+st.write(x, "squared is", x * x)
+\`\`\`
+
+然后：
+
+\`\`\`bash
+streamlit run streamlit_app.py
+\`\`\`
+
+拖动滑块，输出会跟着变——没有路由、没有前端构建，一个 .py 文件就是一个页面。
+
+## 关键是理解「重跑」
+
+Streamlit 没有回调函数。用户每操作一次，整个脚本从上到下重新执行一次。这带出两个必然后果：
+
+1. **脚本顶层不要放重活**（训练模型、大表查询），否则每次拖滑块都会再跑一遍。
+2. **局部状态会丢**，需要跨交互保留的东西要用官方提供的状态机制。
+
+理解这一点，后面看任何 Streamlit 代码都不会懵。
+
+## 从脚本到能分享的东西
+
+页面够用之后，用 Community Cloud 部署。它是官方的免费托管，负责部署、管理和分享，不需要你自己准备服务器。
+
+需要官方组件之外的能力时，去看 Streamlit Components，社区已经补了不少轮子。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "快速上手文档",
+          url: "https://docs.streamlit.io/get-started",
+          note: "安装与各系统特定配置的详细说明。`streamlit hello` 打不开时的第一站。",
+        },
+        {
+          kind: "html",
+          title: "API 参考",
+          url: "https://docs.streamlit.io/develop/api-reference",
+          note: "widgets / data / charts / layout 等元素的完整清单，写页面时对着查。",
+        },
+        {
+          kind: "html",
+          title: "社区论坛",
+          url: "https://discuss.streamlit.io",
+          note: "提问与找现成解法的地方，踩到奇怪的布局或缓存问题时优先搜这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "zx",
+    linksCheckedAt: "2026-10-21",
+    name: "zx",
+    nameZh: "zx 脚本工具",
+    aliases: ["zx", "google zx", "zx 脚本", "Node shell 脚本"],
+    summary: "给 Node.js 补上写脚本所需的外壳能力，$\\`命令\\` 直接执行并自动转义参数。适合脚本复杂到 bash 难维护、又想用 JS 生态的人；代价是它依赖运行时，在只有 shell 的精简环境里用不了。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "Apache-2.0",
+    tags: ["命令行", "Shell", "Node.js", "自动化", "开源"],
+    body: "README 的开场把问题说得很清楚：bash 很棒，但脚本一复杂，很多人就想换个更顺手的编程语言；JavaScript 是个好选择，可惜 Node.js 标准库在用之前还得先折腾一通。zx 的定位就是「不妥协，两边的好处都拿」——它给 child_process 包了一层跨平台封装，负责转义参数并给出合理的默认值。\n核心是一个模板标签函数，直接 await 就能拿到结果：await $\\`cat package.json | grep name\\`。变量插值会被自动转义，所以带空格的值不用自己加引号。并发也不用学新东西，把几条命令放进 Promise.all 就行。\n兼容性方面：操作系统支持 Linux、macOS、Windows；运行时支持 Node.js >= 12.17.0、Bun >= 1.0.0、Deno 1.x 与 2.x、GraalVM Node.js；shell 支持 Bash 或 PowerShell；模块格式 CJS 与 ESM 都行，语言 JS 或 TS 都行。\n有一点要记住：README 末尾明确声明这不是 Google 官方支持的产品。另外想要更轻的版本可以看 zx@lite。",
+    officialUrl: "https://google.github.io/zx",
+    officialLabel: "google.github.io",
+    links: {
+      official: "https://google.github.io/zx",
+      github: "https://github.com/google/zx",
+    },
+    whoFor: "要写部署、构建、清理这类自动化脚本，又不想在 bash 里手写引号转义的 Node 开发者。",
+    whoNot: "一行命令就能解决的事——为它建一个 Node 项目和 node_modules 不划算；也不能在没装 Node / Bun / Deno 的最小镜像里跑。",
+    installTips: [
+      "装依赖：`npm install zx`，之后脚本首行写 `#!/usr/bin/env zx`，文件加执行权限后就能直接跑。",
+      "运行时不只是 Node：Node.js >= 12.17.0、Bun >= 1.0.0、Deno 1.x 与 2.x、GraalVM Node.js 都支持。",
+      "Windows 上走 PowerShell，所以脚本里的管道、变量语法要按 PowerShell 来写，不能直接照搬 bash。",
+      "项目里用 TypeScript 或 CJS / ESM 都支持，具体配法看文档里的 setup 与 typescript 两节。",
+      "想要更轻的版本可以看 zx@lite，完整安装选项见 zx/setup 文档。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "Z",
+      color: "#4285f4",
+    },
+    guide: {
+      intro: "按第一次写 zx 脚本会卡在哪讲：怎么装、shebang 怎么配、命令结果怎么拿、以及在 Windows 上为什么行为不一样。",
+      markdown: `## 装与跑
+
+\`\`\`bash
+npm install zx
+\`\`\`
+
+脚本第一行写：
+
+\`\`\`js
+#!/usr/bin/env zx
+
+await $\`cat package.json | grep name\`
+\`\`\`
+
+给文件加执行权限后 ./script.mjs 就能跑。所有安装选项在文档的 zx/setup 一节。
+
+## 三个基本动作
+
+\`\`\`js
+const branch = await $\`git branch --show-current\`
+await $\`dep deploy --branch=\${branch}\`
+\`\`\`
+
+并发就是普通的 Promise.all，不用学新的原语：
+
+\`\`\`js
+await Promise.all([
+  $\`sleep 1; echo 1\`,
+  $\`sleep 2; echo 2\`,
+])
+\`\`\`
+
+关键点：插值会被自动转义，所以带空格的变量不用自己加引号。这在 bash 里是最容易出错的地方，zx 帮你兜住了。
+
+## Windows 上要注意
+
+zx 在 Linux / macOS 上用 Bash，在 Windows 上用 PowerShell。这意味着脚本里的管道写法、环境变量语法要按目标 shell 来，跨平台脚本要么只跑一边，要么避开两边差异大的语法。
+
+## 什么时候别用
+
+一两条命令的事，直接在终端敲或者写个 .sh 更快。zx 的价值在于脚本已经开始有分支、循环、错误处理的时候——那时 JS 的表达能力才体现出优势。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://google.github.io/zx/",
+          note: "完整 API 与用法说明。含 setup、shell、typescript、lite 等分节。",
+        },
+        {
+          kind: "html",
+          title: "代码示例",
+          url: "https://github.com/google/zx/tree/main/examples",
+          note: "可直接抄的脚本样例，比从零写更快上手。",
+        },
+        {
+          kind: "html",
+          title: "安装与配置选项",
+          url: "https://google.github.io/zx/setup",
+          note: "所有 setup 选项与 zx@lite 的说明，需要精简体积时看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "jest",
+    linksCheckedAt: "2026-10-21",
+    name: "Jest",
+    nameZh: "Jest JavaScript 测试框架",
+    aliases: ["jest", "Jest 测试", "jestjs", "JS 单元测试框架"],
+    summary: "开箱即用的 JavaScript 测试框架，自带匹配器、mock 和快照测试，watch 模式只跑与改动相关的用例。适合绝大多数 JS / TS 项目；代价是 ESM 与 Vite 集成不是一等公民，配置成本偏高。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["单元测试", "JavaScript", "TypeScript", "快照测试", "开源"],
+    body: "Jest 是 JavaScript 生态里最主流的测试框架，主打「装完就能用」：对大多数 JS 项目不需要额外配置，断言、mock、覆盖率、快照都内置。\n它的三个卖点分别是：对开发者友好（零配置起步）、即时反馈（watch 模式只跑与改动文件相关的测试）、快照测试（把大对象的快照存下来，方便观察它随时间怎么变）。\n最小上手路径：装依赖，写一个 sum.js，再写 sum.test.js，里面 `expect(sum(1,2)).toBe(3)`，然后在 package.json 里把 test 脚本设成 jest，跑 `npm test` 就能看到 PASS 输出。\nTypeScript 有两条路。走 Babel 的话，装 `@babel/preset-typescript` 并加进 presets，但要注意 Babel 只做转译、**不做类型检查**，测试跑过不代表类型正确；需要类型检查就改用 ts-jest，或者单独跑一遍 tsc。\n另一个容易忽略的点：只要项目里有 babel 配置，`babel-jest` 就会自动接管转译。想关掉就在配置里把 `transform` 设成 `{}`。另外新版本可能带来新告警，README 建议手动锁定版本，避免 CI 因升级突然变红。\n集成方面 webpack、Parcel 都有官方指引；Vite 属于「能用但不受完全支持」，需要 vite-jest 并接受它的限制。",
+    officialUrl: "https://jestjs.io",
+    officialLabel: "jestjs.io",
+    links: {
+      official: "https://jestjs.io",
+      github: "https://github.com/jestjs/jest",
+    },
+    whoFor: "写 JS / TS 项目、需要单元测试与快照测试的团队：配置少、生态成熟、CI 集成简单。",
+    whoNot: "Vite + 原生 ESM 的新项目——集成不是一等公民，Vitest 之类更省事；或者需要跑在浏览器真环境里的端到端测试，那是另一类工具。",
+    installTips: [
+      "装到开发依赖：`npm install --save-dev jest`（文档示例用 yarn：`yarn add --dev jest`，两者等价）。",
+      "在 package.json 里把 `\"test\": \"jest\"` 加进 scripts，之后 `npm test` 即可运行。",
+      "测试文件用 `xxx.test.js` 命名，默认会被自动识别；输出里 PASS / ✓ 就是用例通过。",
+      "需要转译就配 Babel：`yarn add --dev babel-jest @babel/core @babel/preset-env`，再写一份 `babel.config.js` 指定 `@babel/preset-env` 并把 targets 设为当前 Node 版本。",
+      "命令行还能直接跑：`jest my-test --notify --config=config.json`；想生成配置文件用 `yarn create jest`，它会问几个问题并写出带注释的配置。",
+      "接 CI 时注意锁版本：新版本可能引入新告警，导致原本通过的构建失败。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "J",
+      color: "#c21325",
+      simpleIcon: "jest",
+    },
+    guide: {
+      intro: "按第一次接 Jest 会卡在哪讲：装依赖、写第一个用例、搞清 Babel 是自动生效的、以及 TypeScript 到底有没有做类型检查。",
+      markdown: `## 三步跑起来
+
+\`\`\`bash
+npm install --save-dev jest
+\`\`\`
+
+\`\`\`json
+{ "scripts": { "test": "jest" } }
+\`\`\`
+
+\`\`\`javascript
+// sum.test.js
+const sum = require('./sum');
+
+test('adds 1 + 2 to equal 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+\`\`\`
+
+跑 \`npm test\`，看到 PASS 就说明通了。
+
+## 一个隐藏行为：Babel 会自动接管
+
+装 Jest 时会顺带装上 \`babel-jest\`。**只要项目里存在 babel 配置，它就会自动转译文件**，不需要你写任何 transform 配置。
+
+想关掉：
+
+\`\`\`javascript
+// jest.config.js
+module.exports = { transform: {} };
+\`\`\`
+
+## TypeScript 的两种走法
+
+走 Babel：装 \`@babel/preset-typescript\`，加进 presets 列表。好处是快，坑是**Babel 只做转译，不检查类型**——测试全绿不代表类型没问题。
+
+要类型检查就用 ts-jest；也可以在构建流程里单独跑一遍 \`tsc\`，两者不冲突。
+
+## 打包工具的兼容性
+
+- **webpack**：有官方指南，但资产、样式处理确实有些坑
+- **Parcel**：零配置，看官方文档即可
+- **Vite**：**不完全支持**，因为 Vite 插件机制的限制。可以用 \`vite-jest\`，但务必先读它的 limitations 一节
+
+新项目如果是 Vite 起的，选型前最好先确认这条。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "快速开始",
+          url: "https://jestjs.io/docs/getting-started",
+          note: "安装与第一个用例的官方步骤，装完照着走一遍最快。",
+        },
+        {
+          kind: "html",
+          title: "配置文档",
+          url: "https://jestjs.io/docs/configuration",
+          note: "所有配置项说明。要调 transform、覆盖率、测试环境时查这里。",
+        },
+        {
+          kind: "html",
+          title: "命令行参数",
+          url: "https://jestjs.io/docs/cli",
+          note: "jest 的全部 CLI 选项，CI 里做过滤、并行、输出格式控制时有用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "mitmproxy",
+    linksCheckedAt: "2026-10-21",
+    name: "mitmproxy",
+    nameZh: "mitmproxy 抓包代理",
+    aliases: ["mitmproxy", "mitmdump", "mitmweb", "抓包代理", "HTTP 拦截代理"],
+    summary: "交互式 TLS 中间人代理，一套三个入口：终端 UI 的 mitmproxy、命令行版 mitmdump、网页版 mitmweb，支持 HTTP/1、HTTP/2 与 WebSocket。适合调试自己的接口与客户端流量；只应在你拥有或获授权的网络与设备上使用。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["抓包", "HTTP", "代理", "调试", "开源"],
+    body: "mitmproxy 是一个能解密 TLS 的拦截代理，官方定位是给渗透测试者和软件开发者用。它其实是三个共享同一内核的入口：\nmitmproxy 是交互式终端界面，支持 HTTP/1、HTTP/2 和 WebSocket；\nmitmdump 是命令行版本，README 把它比作「HTTP 版的 tcpdump」，适合脚本化和批量处理；\nmitmweb 是网页界面，操作更直观。\n用法上的取舍很明确：想边看边改、逐个请求拦截就用 mitmproxy；要把抓包接进流水线或者写脚本处理就用 mitmdump；不习惯终端就用 mitmweb。三者抓到的数据是同一套，只是呈现和交互方式不同。\n要提醒的是能力边界：它靠成为中间人来工作，也就是客户端必须信任它签发的证书。这决定了它适合调试你自己的应用、自己管理的设备，或在明确授权的测试范围内使用；对不属于你的网络与设备做拦截不属于正当用途。\n安装走官方安装文档，官网提供各平台的预编译二进制，也可以从源码构建（见仓库里的 CONTRIBUTING.md）。使用类问题走 GitHub Discussions 而不是 issue。",
+    officialUrl: "https://mitmproxy.org",
+    officialLabel: "mitmproxy.org",
+    links: {
+      official: "https://mitmproxy.org",
+      github: "https://github.com/mitmproxy/mitmproxy",
+    },
+    whoFor: "要排查自己应用到底发出去什么请求的人：接口联调、移动端抓包、复现线上偶发的请求问题。",
+    whoNot: "想在未经授权的网络或他人设备上拦截流量的人——这不是它的正当用途；也不适合只想看状态码的轻量场景，浏览器 DevTools 更省事。",
+    installTips: [
+      "先认清三个入口：mitmproxy 是交互式终端界面，mitmdump 是命令行版（相当于 HTTP 的 tcpdump），mitmweb 是网页界面，按场景选一个即可。",
+      "官方安装说明在 docs.mitmproxy.org/stable/overview-installation，官网提供预编译二进制，不必先配 Python 环境。",
+      "想从源码构建请看仓库里的 CONTRIBUTING.md。",
+      "使用上遇到问题走 GitHub Discussions，不是 issue 列表——README 明确这么要求。",
+      "文档有 stable 与 dev 两套（docs.mitmproxy.org/stable/ 与 /dev/），按你装的版本看对应的那份。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#f1ad3f",
+      simpleIcon: "mitmproxy",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：三个入口怎么选、装上之后为什么抓不到 HTTPS、以及授权边界和求助渠道。",
+      markdown: `## 先决定用哪个入口
+
+同一个项目，三种界面，别装完不知道该开哪个：
+
+- **mitmproxy**：终端里的交互式界面，支持 HTTP/1、HTTP/2、WebSocket，适合逐条请求查看与修改
+- **mitmdump**：命令行版，官方叫它「HTTP 的 tcpdump」，适合脚本与流水线
+- **mitmweb**：网页界面，鼠标操作更顺手
+
+抓到的数据是同一套，区别只在交互方式。
+
+## 抓不到 HTTPS 是必然的
+
+它靠「成为中间人」工作：客户端发出的 TLS 连接先到它这里，它再用自己的证书跟真正的服务端握手。因此客户端必须信任它签发的证书，否则握手直接失败。
+
+这一步怎么配、各系统有什么差别，官方安装文档里有专门说明。跳过这一步就会看到一堆证书错误，这是预期行为不是 bug。
+
+## 授权边界
+
+README 把适用人群写成「penetration testers and software developers」，前提都是你有权限测试。在自己的服务、自己的设备、或书面授权的范围内使用没问题；对别人的网络与设备做拦截不在此列。
+
+## 去哪查、去哪问
+
+文档分两套：
+
+- \`docs.mitmproxy.org/stable/\` 对应稳定版
+- \`docs.mitmproxy.org/dev/\` 对应开发版
+
+用哪个版本就看哪套。使用问题去 GitHub Discussions 提问，比开 issue 更容易得到回复。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://mitmproxy.org/",
+          note: "三个入口的定位说明与预编译二进制下载入口。",
+        },
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://docs.mitmproxy.org/stable/overview-installation",
+          note: "各系统安装步骤与证书配置说明。抓不到 HTTPS 时看这一页。",
+        },
+        {
+          kind: "link",
+          title: "GitHub Discussions",
+          url: "https://github.com/mitmproxy/mitmproxy/discussions",
+          note: "官方指定的提问渠道，使用类问题发这里而不是开 issue。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "bubbletea",
+    linksCheckedAt: "2026-10-21",
+    name: "Bubble Tea",
+    nameZh: "Bubble Tea 终端 UI 框架",
+    aliases: ["bubbletea", "bubble tea", "bubbletea go", "TUI 框架", "Go 终端界面"],
+    summary: "基于 Elm 架构的 Go 终端 UI 框架，一个 model 加 Init / Update / View 三个方法就能跑起来。适合用 Go 写交互式命令行工具的人；代价是要接受 Elm 的心智模型，而且 v2 相对 v1 有破坏性变更。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["TUI", "Go", "终端界面", "框架", "开源"],
+    body: "Bubble Tea 是 Charm 出的 Go 终端 UI 框架，设计来自 Elm 架构。它把应用状态收敛成一个 model，然后只要求你实现三个方法：Init 返回初始命令，Update 处理事件并返回新 model，View 根据 model 渲染界面。\n这个模型的好处是状态集中、可预测：所有变化都经过 Update，你不用自己管重绘逻辑，框架负责。它支持内联、全窗口或两者混合的应用形态，生产环境已有大量项目在用。\n性能方面它做过不少优化：基于单元格的高性能渲染器、内建颜色降采样、声明式视图、高保真键鼠处理、原生剪贴板支持等。\n两个要注意的点。第一，v2 和 v1 不兼容，升级要看仓库里的 UPGRADE_GUIDE_V2.md（README 甚至建议直接把这份文档丢给 LLM 让它帮你改）。第二，调试方式和普通 Go 程序不同：因为应用接管了 stdin/stdout，用 Delve 需要 headless 模式再连上去；也不能往 stdout 打日志，要用 `tea.LogToFile(\"debug.log\", \"debug\")` 写文件，然后 `tail -f debug.log` 看。",
+    officialUrl: "https://github.com/charmbracelet/bubbletea",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/charmbracelet/bubbletea",
+      github: "https://github.com/charmbracelet/bubbletea",
+    },
+    whoFor: "用 Go 写需要交互的命令行工具的人：表单、选择器、看板、向导式的交互界面。",
+    whoNot: "只是输出几行文本就退出的脚本——上框架纯属负担；也不适合排斥 Elm 架构、想直接操作终端绘制的人。",
+    installTips: [
+      "引入依赖：`import tea \"charm.land/bubbletea/v2\"`，然后跑 `go mod tidy` 拉取 bubbletea 及其依赖。",
+      "官方教程以「购物清单」为例，完整未标注的源码在仓库的 tutorials/basics 目录，可以直接跑起来对照看。",
+      "从 v1 升级先看 UPGRADE_GUIDE_V2.md，v2 有破坏性变更，不是改个版本号就能过。",
+      "常用 UI 组件不用自己写：官方的 Bubbles 库提供输入框、视口、spinner 等；样式交给 Lip Gloss。",
+      "调试要用 `dlv debug --headless --api-version=2 --listen=127.0.0.1:43000 .` 再从另一个终端 `dlv connect`，因为程序占用了 stdin/stdout。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "B",
+      color: "#ff5f87",
+    },
+    guide: {
+      intro: "按第一次写 Bubble Tea 会卡在哪讲：三个方法各自负责什么、为什么改了 model 却没重绘、以及调试日志为什么打不出来。",
+      markdown: `## 一个 model，三个方法
+
+\`\`\`go
+type model struct {
+    choices  []string
+    cursor   int
+    selected map[int]struct{}
+}
+
+func (m model) Init() tea.Cmd { return nil }
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { /* 处理事件 */ }
+func (m model) View() tea.View { return tea.NewView(s) }
+\`\`\`
+
+- **Init**：返回初始 I/O 命令，暂时不需要就返回 \`nil\`
+- **Update**：收到事件（按键、定时器、网络响应）后更新 model
+- **View**：根据当前 model 渲染界面
+
+最后用 \`tea.NewProgram(initialModel())\` 加 \`p.Run()\` 启动。
+
+## 怎么知道用户按了什么
+
+事件以 \`tea.Msg\` 形式进来，通常用 type switch 分发。按键会自动转成 \`tea.KeyPressMsg\`，用 \`msg.String()\` 取键名：
+
+\`\`\`go
+case "ctrl+c", "q":
+    return m, tea.Quit
+\`\`\`
+
+返回 \`tea.Quit\` 就是让运行时退出程序。
+
+## 改了 model 却没生效？
+
+Update 的签名是返回值而不是指针。**必须 return 更新后的 model**，原地修改 \`m\` 的字段不会生效。这是从其他语言转过来最常踩的坑。
+
+## 调试的两个限制
+
+TUI 占用了 stdout，所以 \`fmt.Println\` 的日志看不到。改用：
+
+\`\`\`go
+f, _ := tea.LogToFile("debug.log", "debug")
+defer f.Close()
+\`\`\`
+
+然后另一个窗口 \`tail -f debug.log\`。
+
+用 Delve 也要走 headless 模式再连上去，因为它同样接管了 stdin/stdout。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方教程",
+          url: "https://github.com/charmbracelet/bubbletea/tree/main/tutorials/basics",
+          note: "以购物清单为例的完整教程，含未标注的源码，照着敲一遍就能理解三个方法。",
+        },
+        {
+          kind: "html",
+          title: "API 文档",
+          url: "https://pkg.go.dev/charm.land/bubbletea/v2?tab=doc",
+          note: "v2 的完整 API 说明，查 Msg 类型、Cmd 与 View 相关接口时看这里。",
+        },
+        {
+          kind: "html",
+          title: "示例集",
+          url: "https://github.com/charmbracelet/bubbletea/tree/main/examples",
+          note: "从简单列表到复杂应用的样例，写第二个界面时比教程更实用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "fd",
+    linksCheckedAt: "2026-10-21",
+    name: "fd",
+    nameZh: "fd 文件查找工具",
+    aliases: ["fd", "fd-find", "fd 命令", "find 替代品", "文件搜索"],
+    summary: "find 的替代品：默认用正则、智能大小写、并行遍历，自动跳过隐藏文件和 .gitignore 里的路径。适合天天在终端找文件的人；代价是它明确不追求覆盖 find 的全部功能，复杂条件还是得回到 find。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "Apache-2.0",
+    tags: ["命令行", "文件搜索", "Rust", "开发者工具", "开源"],
+    body: "fd 是一个在文件系统里找条目的程序，定位是 find 的简单、快速、好用版。它并不打算支持 find 的全部强大功能，而是为大多数常见场景提供一套合理的默认行为。\n最直观的差别是语法：`fd PATTERN` 就够了，不用再写 `find -iname '*PATTERN*'`。默认按正则匹配，也可以加 `-g` 走 glob。大小写是「智能」的——默认忽略大小写，一旦模式里出现大写字母就自动切换成区分大小写。\n默认还会跳过隐藏文件/目录，并遵守 .gitignore（`.ignore` 文件也认）。要关掉就加 `-H`（含隐藏）和 `-I`（不忽略）；两个一起就是 `-HI`，也可直接用 `-u` / `--unrestricted`。\n速度来自并行目录遍历。README 的基准测试是在约 75 万个子目录、约 400 万个文件的 home 目录里找 `[0-9].jpg` 结尾的文件，`find` 平均耗时约 19.9 秒。\n真正好用之处是把结果接给别的命令：`-x` 对每条结果并行跑一次，`-X` 把所有结果作为参数跑一次。配合 `{}`、`{.}`、`{/}`、`{//}`、`{/.}` 这些占位符，可以写出批量转换、批量格式化的单行命令。想彻底排除某些路径，除了 `-E`，还可以写 `.fdignore` 或放到全局忽略文件（macOS/Linux 是 `~/.config/fd/ignore`，Windows 是 `%APPDATA%\\fd\\ignore`）。",
+    officialUrl: "https://github.com/sharkdp/fd",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/sharkdp/fd",
+      github: "https://github.com/sharkdp/fd",
+    },
+    whoFor: "每天要在终端里找文件、找目录的人，尤其是项目里有大量构建产物、需要自动忽略它们的情况。",
+    whoNot: "需要按时间、权限、大小组合出复杂条件的场景——fd 自己说不追求覆盖 find 全部功能，这类查询老老实实用 find。",
+    installTips: [
+      "基础用法就是 `fd 关键词`：在当前目录递归搜索名字里包含该关键词的条目；加第二个参数可以指定搜索根目录，如 `fd passwd /etc`。",
+      "按类型筛：`-e md` 找所有 Markdown 文件；`-g 'test_*.py'` 用 glob 精确匹配文件名；`-t f`/`-t d` 只找文件或目录。",
+      "默认不搜隐藏、遵守 .gitignore。要突破就 `-H`（含隐藏）、`-I`（不忽略），两者合起来写 `-HI` 或直接用 `-u`。",
+      "对结果执行命令：`-x` 每条结果跑一次（并行，如 `fd -e jpg -x convert {} {.}.png`），`-X` 一次跑完（如 `fd -g 'test_*.py' -X vim`）。",
+      "长期排除某些路径就写 `.fdignore`；全局生效的放在 `~/.config/fd/ignore`（Windows 是 `%APPDATA%\\fd\\ignore`）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#f4a261",
+    },
+    guide: {
+      intro: "按第一次用 fd 会卡在哪讲：为什么有些文件搜不到、正则与 glob 怎么切换、以及 -x 与 -X 的区别。",
+      markdown: `## 搜不到文件？先查默认行为
+
+fd 有两个默认会让你「明明有却搜不到」：
+
+1. **跳过隐藏文件和目录** —— 找 \`.git/hooks/pre-commit.sample\` 必须加 \`-H\`
+2. **遵守 .gitignore** —— \`target/\` 下的东西默认不搜，加 \`-I\` 才能看到
+
+两个都要就用 \`-HI\`，或者简写成 \`-u\` / \`--unrestricted\`。
+
+\`\`\`bash
+fd pre-commit          # 什么都没有
+fd -H pre-commit       # .git/hooks/pre-commit.sample
+\`\`\`
+
+## 正则还是 glob
+
+默认是正则：
+
+\`\`\`bash
+fd '^x.*rc$'           # 以 x 开头、rc 结尾
+fd -e rs mod           # 扩展名 + 模式可以组合
+\`\`\`
+
+要精确匹配文件名用 \`-g\`：
+
+\`\`\`bash
+fd -g libc.so /usr
+\`\`\`
+
+默认只匹配文件名，想匹配完整路径加 \`-p\` / \`--full-path\`。
+
+## -x 与 -X 的区别
+
+这两个是最容易混的：
+
+- \`-x\`：每条结果**各跑一次**命令，并行执行
+- \`-X\`：所有结果**拼成一批**跑一次
+
+\`\`\`bash
+fd -e zip -x unzip        # 每个 zip 各跑一次 unzip
+fd -g 'test_*.py' -X vim  # 一个 vim 打开所有文件
+\`\`\`
+
+占位符：\`{}\` 完整路径、\`{.}\` 去扩展名、\`{/}\` 文件名、\`{//}\` 父目录、\`{/.}\` 去扩展名的文件名。不写占位符时默认在末尾补 \`{}\`。
+
+想看权限、大小等详情，\`fd … -l\` 等价于执行 \`ls -lhd\`。
+
+## 危险操作留个缓冲
+
+\`fd … -X rm\` 会直接删。不确定就先不带 \`-X rm\` 跑一遍看结果，或者加 \`-i\` 让 rm 逐个确认。README 也提醒了 \`-X rm -r\` 在嵌套同名目录时会有竞态，可能报无害的「No such file or directory」。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/sharkdp/fd",
+          note: "完整的命令行选项表（fd -h 输出）、占位符语法与基准测试数据。",
+        },
+        {
+          kind: "html",
+          title: "中文版 README",
+          url: "https://github.com/cha0ran/fd-zh",
+          note: "社区维护的中文翻译，阅读命令行选项说明时更省事。",
+        },
+        {
+          kind: "html",
+          title: "版本发布页",
+          url: "https://github.com/sharkdp/fd/releases",
+          note: "各平台预编译包下载，装完可以用 fd --version 核对。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "yazi",
+    linksCheckedAt: "2026-10-21",
+    name: "Yazi",
+    nameZh: "Yazi 终端文件管理器",
+    aliases: ["yazi", "yazi-rs", "yazi 文件管理器", "终端文件管理器"],
+    summary: "Rust 写的异步终端文件管理器，内置图片预览、代码高亮、Lua 插件和包管理器。适合想留在终端里处理文件的人；代价是项目仍是公开 beta，README 明确说开发中会有破坏性变更。",
+    scenes: ["tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["文件管理器", "终端", "Rust", "图片预览", "开源"],
+    body: "Yazi（意思是「鸭子」）是用 Rust 写的终端文件管理器，基于非阻塞异步 I/O，目标是高效、好用、可定制。技术选型决定了手感：所有 I/O 都是异步的，CPU 任务分摊到多个线程，配合预加载机制加速图片和普通文件的加载；任务调度内建，支持实时进度、取消和优先级。\n功能密度很高：内置多种图片协议支持（也集成了 Überzug++ 与 Chafa），内置代码高亮与图片解码，并发的 Lua 插件系统（既能改 UI 也能加功能），虚拟文件系统（远程文件管理、自定义搜索后端），基于客户端-服务器架构的数据分发服务（不需要额外起服务进程），还有带版本锁定的包管理器。\n交互偏向 Vim 用户：输入、选择、确认、which、通知等组件都是 Vim 风格，cd 路径有自动补全，支持多标签页、跨目录选择、可滚动预览（视频、PDF、压缩包、代码、目录都行），另有批量重命名/新建、压缩包解压、可视化模式、Git 集成、挂载管理器、主题系统、鼠标支持与拖放。\n状态要先说清楚：项目处于公开 beta，可以当主力用，但仍在密集开发中，会有破坏性变更。图片预览是否可用取决于你的终端，官方给了支持矩阵——kitty / iTerm2 / WezTerm / Konsole / foot / Ghostty / Windows Terminal 等内置支持，X11 / Wayland 需额外装 Überzug++，兜底方案需要 Chafa（>= 1.16.0）。",
+    officialUrl: "https://yazi-rs.github.io",
+    officialLabel: "yazi-rs.github.io",
+    links: {
+      official: "https://yazi-rs.github.io",
+      github: "https://github.com/sxyazi/yazi",
+    },
+    whoFor: "习惯在终端里工作、希望文件浏览/预览/批量操作不出终端的人；特别是需要在终端直接看图、看 PDF、看代码高亮的场景。",
+    whoNot: "想要稳定不折腾的工具的人——项目自己都说了会有破坏性变更；终端不在图片预览支持矩阵里的话，这块最大的卖点也用不上。",
+    installTips: [
+      "安装说明在官方文档的 installation 页：https://yazi-rs.github.io/docs/installation ，各平台包管理器的装法都写在那里。",
+      "先确认你的终端在图片预览支持矩阵里，再指望图片预览能用；X11 / Wayland 需要额外装 Überzug++，兜底方案需要 Chafa（>= 1.16.0）。",
+      "想扩展功能先看官方插件仓库（yazi-rs/plugins），Git 集成、挂载管理、Rclone 都有现成插件。",
+      "插件和主题用包管理器一条命令装，也可以锁定到特定版本，避免升级后界面变样。",
+      "已知会和 ripgrep、fd、fzf、zoxide 配合，这几个先在机器上装好体验更完整。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "Y",
+      color: "#e6b800",
+    },
+    guide: {
+      intro: "按第一次用 Yazi 会卡在哪讲：装上之后怎么动、图片预览为什么没反应、以及插件该从哪找。",
+      markdown: `## 先确认项目状态
+
+Yazi 目前是**公开 beta**：README 说可以当主力用，但仍在密集开发中，会有破坏性变更。
+
+如果你打算把它接进团队标准化环境，这一点要先想清楚。
+
+## 装完之后：按键逻辑
+
+Yazi 的交互是 Vim 风格的：移动、选择、确认、which、通知等组件都按 Vim 的习惯设计，cd 路径输入还有自动补全。
+
+常用的几类操作：
+
+- 多标签页切换
+- 跨目录选择
+- 滚动预览（视频、PDF、压缩包、代码、目录都支持）
+- 批量重命名 / 批量新建
+- 压缩包直接解压
+- 可视化模式与文件选择器
+
+不熟 Vim 的话，前半小时会有点别扭，习惯后比反复 ls / cd 快很多。
+
+## 图片预览没反应怎么办
+
+这是最高频的问题，答案在终端而不是 Yazi：
+
+- **kitty >= 0.28.0、iTerm2、WezTerm、Ghostty、VSCode、Tabby、Rio** 等：内置支持
+- **Konsole**：走 Kitty old protocol
+- **foot、Windows Terminal >= v1.22.10352.0**：走 Sixel
+- **X11 / Wayland**：需要额外装 Überzug++
+- **都不行**：装 Chafa（>= 1.16.0）走 ASCII art 兜底
+
+官方文档的 image-preview 页有完整说明。
+
+## 插件去哪找
+
+官方插件仓库 yazi-rs/plugins 里有 git.yazi、mount.yazi、rclone.yazi 等。用包管理器一条命令装，必要时锁定版本。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://yazi-rs.github.io/docs/installation",
+          note: "各平台与包管理器的安装方式，以及上手后的基本操作说明。",
+        },
+        {
+          kind: "html",
+          title: "图片预览说明",
+          url: "https://yazi-rs.github.io/docs/image-preview",
+          note: "完整的终端支持矩阵与依赖安装步骤。预览不出来时看这一页。",
+        },
+        {
+          kind: "html",
+          title: "官方插件仓库",
+          url: "https://github.com/yazi-rs/plugins",
+          note: "Git 集成、挂载管理、Rclone 等现成插件，别自己从零写 Lua。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "agno",
+    linksCheckedAt: "2026-10-21",
+    name: "Agno",
+    nameZh: "Agno 智能体平台框架",
+    aliases: ["agno", "agno-agi", "Agno 框架", "AgentOS", "Python 智能体框架"],
+    summary: "构建、运行、管理智能体平台的 Python 框架：用 SDK 写智能体，用 AgentOS 运行时跑成服务，用自带 Web UI 管理。适合要把智能体做成长期服务的团队；代价是默认会上报每次运行的遥测，介意要手动关。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "Apache-2.0",
+    tags: ["AI 智能体", "Python", "AgentOS", "MCP", "开源"],
+    body: "Agno 是「框架 + 运行时」的组合，目标不是跑一个 demo，而是把智能体做成可管理的平台。结构分三层：用 Agno SDK 写智能体，用 AgentOS 运行时把它们跑成服务，用 AgentOS UI 做管理界面。\n官方强调的一个词是「own your agent stack」：数据、记忆、安全策略（JWT 基础的 RBAC）都留在你自己手里，并可以用模拟运行和使用数据把平台变成持续学习的闭环。\n功能清单偏工程化：生产级 API（50+ 端点，支持 SSE 和 websocket）、存储（会话/记忆/知识/traces 存你自己的数据库）、100+ 集成工具箱、上下文提供者（Slack、Drive、wiki、MCP 等实时数据）、人工审批（暂停运行等确认、按工具设管理员审批）、OpenTelemetry 可观测性与审计日志、多租户隔离，以及 cron 与后台任务（不需要额外基础设施）。\n上手方式很有这个时代的特色：README 建议你直接把一段提示词交给编码代理（Claude Code、Cursor、Codex），让它克隆模板仓库、读 README 并按引导走完。跑起来后你会得到一个 REST API、一个 Postgres 数据库、一个 MCP server 和一个控制平面。换部署目标只要换模板仓库（railway / docker / aws / gcp / azure / fly / render / modal / helm），模板之间只差部署脚本。\n另外别忘了：默认每次运行会发一条遥测事件（不含提示词、消息和输出），设 `AGNO_TELEMETRY=false` 即可关掉。",
+    officialUrl: "https://docs.agno.com",
+    officialLabel: "docs.agno.com",
+    links: {
+      official: "https://docs.agno.com",
+      github: "https://github.com/agno-agi/agno",
+    },
+    whoFor: "要把智能体做成长期服务的工程团队：需要 API、持久化、审批、可观测性和多租户，而不只是写个脚本跑一次。",
+    whoNot: "只想快速验证一个想法的人——这套体系偏重；也适合不了完全不接受任何遥测、又不愿意先改环境变量就部署的场景。",
+    installTips: [
+      "最快的上手路径是把 README 里那段提示词直接交给你的编码代理，让它克隆 agentos-railway 模板、读 README 并按引导执行。",
+      "模板跑起来后是一整套：REST API 服务智能体、Postgres 存数据与 traces、MCP server、以及控制平面。",
+      "换部署平台不用改代码，换模板仓库即可：agentos-docker / aws / gcp / azure / fly / render / modal / helm，它们只差部署脚本。",
+      "想让代理随时查最新文档，把 https://docs.agno.com/mcp 配成 MCP server；或者在 Cursor 里把 https://docs.agno.com/llms-full.txt 加为索引源。",
+      "介意遥测就在环境变量里设 `AGNO_TELEMETRY=false`（官方说明提示词、消息、输出都不会上报）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#4b3f72",
+    },
+    guide: {
+      intro: "按第一次搭会卡在哪讲：模板怎么选、跑起来之后你手里到底有什么、以及让代理能自己查文档的两条路。",
+      markdown: `## 别从零建项目
+
+README 建议的做法很直接：把下面这段提示词交给你的编码代理（Claude Code、Cursor、Codex 都行）：
+
+\`\`\`text
+Help me set up my agent platform.
+
+Clone https://github.com/agno-agi/agentos-railway into a folder called
+agent-platform, cd in, read the README, and follow the get started guide.
+\`\`\`
+
+代理会用 Docker 在本地把整套东西跑起来。
+
+## 跑起来之后你有什么
+
+不是「一个能聊天的脚本」，而是四个部分：
+
+- 一个 **REST API**，用来对外提供智能体能力
+- 一个 **Postgres** 数据库，存会话、记忆、知识与 traces
+- 一个 **MCP server**
+- 一个**控制平面**
+
+理解这一点很重要：Agno 的定位是平台，不是单次调用的库。
+
+## 换部署目标 = 换模板
+
+官方提供多个 starter 模板，它们之间的差别**只有部署脚本**：
+
+\`agentos-railway\` · \`agentos-docker\` · \`agentos-aws\` · \`agentos-gcp\` · \`agentos-azure\` · \`agentos-fly\` · \`agentos-render\` · \`agentos-modal\` · \`agentos-helm\`
+
+所以先在本地跑通，再挑一个云的模板换上去，代码不用动。
+
+## 让编码代理自己查文档
+
+两条路，按你用的工具选：
+
+1. 把 \`https://docs.agno.com/mcp\` 加成 MCP server
+2. 在 Cursor / VSCode / Windsurf 里把 \`https://docs.agno.com/llms-full.txt\` 加为索引源
+
+这样代理写 Agno 代码时不会拿旧 API 瞎猜。
+
+## 顺手关掉遥测（如果需要）
+
+默认每次运行会发一条遥测事件，用来判断优先支持哪些模型供应商。官方说明不会发送提示词、消息与输出。想关就设环境变量 \`AGNO_TELEMETRY=false\`。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.agno.com",
+          note: "SDK、AgentOS 运行时与 UI 的完整文档，也是本条目的 officialUrl。",
+        },
+        {
+          kind: "html",
+          title: "第一个智能体（20 行）",
+          url: "https://docs.agno.com/first-agent",
+          note: "不想用模板、想手写的话从这里开始，最小可运行示例。",
+        },
+        {
+          kind: "html",
+          title: "编码代理接入指南",
+          url: "https://docs.agno.com/coding-agents",
+          note: "把文档接成 MCP server 或索引源的具体步骤。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "cheat-sh",
+    linksCheckedAt: "2026-10-21",
+    name: "cheat.sh",
+    nameZh: "cheat.sh 命令速查表",
+    aliases: ["cheat.sh", "cheat sh", "cht.sh", "cht sh", "命令行速查表"],
+    summary: "用 curl 就能查的速查表服务，覆盖 56 种编程语言和 1000 多个 UNIX/Linux 命令，通常 100 毫秒内返回。适合不想离开终端去翻网页的人；代价是答案来自第三方速查表库和 StackOverflow，准确性不保证。",
+    scenes: ["code", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["速查表", "命令行", "文档", "开发者工具", "开源"],
+    body: "cheat.sh 的理念在 README 开头就讲清楚了：它想做「理想的速查表」——简洁、快、全面、随处可用、不打断你的主线任务、能教你东西。\n实际形态是一个 HTTP 服务，访问方式就是 curl：\n    curl cheat.sh/tar\n    curl cht.sh/curl\n\nHTTPS 和 HTTP 都行，长域名 cheat.sh 和短域名 cht.sh 都行。覆盖范围包括 56 种编程语言、若干 DBMS，以及 1000 多个最常用的 UNIX/Linux 命令。\n编程语言的速查表在各自的命名空间里，如 `curl cht.sh/go/Pointers`。用 `:list` 可以列出该语言有哪些速查表，用 `:learn` 可以看语言基础（对应「Learn X in Y」项目）。不知道命令叫什么时用 `~关键词` 搜索，比如 `curl cht.sh/~snapshot`。\n这里有个必须知道的取舍：如果某个语言查询没有现成的速查表（这几乎是常态），服务会**基于已有速查表和 StackOverflow 的答案即时生成**。README 说得很坦白——不保证 100% 命中，但通常正好是你要的。答案可以按 `/1`、`/2` 换一个。\n输出按查询语言的代码格式排版，注释也用该语言的注释语法，可以直接粘进程序。不想要注释加 `?Q`，不想要语法高亮加 `?T`，两者可叠加为 `?QT`。\n除了 curl，官方还有命令行客户端 `cht.sh`，支持 shell 模式（保持查询上下文、readline、历史、剪贴板集成，以及 bash / fish / zsh 的 Tab 补全）。装它就是把脚本下到 PATH 目录并加执行权限；shell 模式需要额外的 `rlwrap` 依赖。",
+    officialUrl: "https://cheat.sh",
+    officialLabel: "cheat.sh",
+    links: {
+      official: "https://cheat.sh",
+      github: "https://github.com/chubin/cheat.sh",
+    },
+    whoFor: "经常忘记 tar / rsync / find 参数的人，以及想在不离开终端的前提下查某语言惯用法的人。",
+    whoNot: "需要权威、可核对答案的场景——生成式查询不保证准确；也不适合把敏感代码作为查询内容发到公共服务（可以自托管解决）。",
+    installTips: [
+      "不用装任何东西也能用：`curl cheat.sh/tar` 直接拿命令速查表；`curl cht.sh/python/lambda` 查语言惯用法。",
+      "不知道命令叫什么就搜关键词：`curl cht.sh/~snapshot`；某个语言有哪些速查表用 `curl cht.sh/go/:list`，语言基础看 `:learn`。",
+      "嫌 curl 写法别扭就装官方客户端：`curl https://cht.sh/:cht.sh > ~/bin/cht.sh && chmod +x ~/bin/cht.sh`，之后可以写空格而不是加号。",
+      "shell 模式（`cht.sh --shell`）能保持上下文，进某个语言后可以省略语言名；这个模式需要 `rlwrap`（`sudo apt install rlwrap`）。",
+      "想要干净可粘贴的输出，加 `?Q` 去掉注释、`?T` 去掉语法高亮，可叠加为 `?QT`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#2d7ff9",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：查询语法的几条规则、为什么答案有时不靠谱、以及怎么装客户端拿到补全。",
+      markdown: `## 最简单的用法
+
+\`\`\`bash
+curl cheat.sh/tar
+curl cht.sh/curl
+\`\`\`
+
+HTTPS / HTTP 都行，\`cheat.sh\` / \`cht.sh\` 都行。查语言：
+
+\`\`\`bash
+curl cht.sh/go/Pointers
+curl cht.sh/python/lambda
+\`\`\`
+
+## 五条查询规则
+
+README 明确列了，照着写命中率高很多：
+
+1. 越具体越好 —— \`/python/append+file\` 比 \`/python/file\` 好
+2. 尽量问实际问题
+3. 查语言就把语言名作为第一段
+4. 单词之间用 \`+\` 而不是空格
+5. 别用特殊字符，会被忽略
+
+另外想排除含某词的结果，用 \`+-\`，比如 \`python/multiply+matrices+-numpy\`。
+
+## 答案不靠谱是正常的
+
+关键认知：**大多数语言查询没有现成速查表，答案是基于已有速查表和 StackOverflow 即时生成的**。官方原话是不保证 100% 命中。
+
+不满意就换个答案，在查询后加 \`/1\`、\`/2\`：
+
+\`\`\`bash
+curl cht.sh/python/random+string/2
+\`\`\`
+
+## 输出净化
+
+结果默认带注释和语法高亮，方便读但不方便粘。去掉注释用 \`?Q\`，去掉高亮用 \`?T\`：
+
+\`\`\`bash
+curl cht.sh/go/reverse+a+list?Q
+\`\`\`
+
+## 想长期用就装客户端
+
+\`\`\`bash
+PATH_DIR="$HOME/bin"
+mkdir -p "$PATH_DIR"
+curl https://cht.sh/:cht.sh > "$PATH_DIR/cht.sh"
+chmod +x "$PATH_DIR/cht.sh"
+\`\`\`
+
+装完可以用空格代替加号，还能开 shell 模式。bash / zsh 的 Tab 补全脚本分别是 \`:bash_completion\` 和 \`:zsh\`。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方服务首页",
+          url: "https://cheat.sh",
+          note: "直接在浏览器里查也行，页面底部有帮助与特殊页面入口。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/chubin/cheat.sh",
+          note: "完整功能列表、编辑器集成（Vim / Emacs / VSCode / Sublime / IntelliJ）与自托管 Docker 说明。",
+        },
+        {
+          kind: "link",
+          title: "服务帮助页",
+          url: "https://cheat.sh/:help",
+          note: "所有查询选项的权威清单，包含样式主题（:styles-demo）等。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "sniffnet",
+    linksCheckedAt: "2026-10-21",
+    name: "Sniffnet",
+    nameZh: "Sniffnet 网络流量监控",
+    aliases: ["sniffnet", "sniff net", "网络流量监控", "抓包监控"],
+    summary: "跨平台网络流量监控应用，实时图表、按进程看带宽、IP 归属地与 ASN、识别 6000+ 上层服务。适合排查「到底谁在联网」；代价是抓包需要系统依赖与相应权限，Linux 上还要额外装依赖。",
+    scenes: ["tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "Apache-2.0",
+    tags: ["网络监控", "抓包", "Rust", "流量分析", "开源"],
+    body: "Sniffnet 是一个让你「舒服地监控网络流量」的桌面应用，跨平台、直观、可靠，界面用 Rust 的 iced 库写成，并且已经翻译成了十几种语言。\n它的能力覆盖得比较全：选择要监听的网卡、给观察到的流量加过滤器、导入导出 PCAP 捕获报告、看总体流量统计、看实时流量强度图表、识别局域网内的连接、发现远端主机的地理位置、查出域名和 ASN、识别 6000 多种上层服务/协议/木马/蠕虫、看哪些程序在产生带宽、收藏常用主机与服务/程序、应用最小化后仍持续监控、实时搜索和检查每条连接、为特定网络事件设置自定义通知、导入自定义 IP 黑名单来高亮可疑连接、以及换主题。\n排障方面 README 给得很明确：大多数报错都来自系统缺少分析网卡所需的依赖，按官方的「required dependencies」页面按系统处理即可。另外如果是在较老的架构或显卡驱动没更新的机器上，iced 默认的 wgpu 渲染器可能出问题（界面花屏、不支持渐变、图标全黑），这时可以设置环境变量 `ICED_BACKEND=tiny-skia` 切到纯 CPU 的软件渲染器，几乎在所有环境都能正常工作。\n安装是从 GitHub Releases 下载对应平台的包：Windows 有 x64 / arm64 / x86 的 msi，macOS 有 Intel 与 Apple silicon 的 dmg，Linux 提供 DEB（amd64 / arm64 / i386 / armhf）、RPM（x86_64 / aarch64）和 AppImage（四种架构）。其他装法（各发行版仓库等）在官方 Wiki 的「Alternative installation methods」页。",
+    officialUrl: "https://sniffnet.app",
+    officialLabel: "sniffnet.app",
+    links: {
+      official: "https://sniffnet.app",
+      github: "https://github.com/GyulyVGC/sniffnet",
+    },
+    whoFor: "想知道自己机器上哪些程序在联网、连到哪里的开发者和运维；排查异常外联、定位带宽占用来源。",
+    whoNot: "只想看单次 HTTP 请求细节的人——那是抓包代理/代理工具的活；也不适合无法安装系统依赖或拿不到抓包权限的受限环境。",
+    installTips: [
+      "从 GitHub Releases 直接下对应平台的安装包：Windows 是 msi（x64 / arm64 / x86），macOS 是 dmg（Intel / Apple silicon），Linux 有 DEB、RPM 和 AppImage。",
+      "装完别急着用——README 特别提醒要先按系统安装「required dependencies」，抓包需要这些依赖才能分析网卡。",
+      "其他装法（各发行版仓库等）看官方 Wiki 的 Alternative installation methods 页。",
+      "界面出现花屏、渐变不支持或图标全黑，是老架构或显卡驱动太旧导致 wgpu 渲染器出问题，设 `ICED_BACKEND=tiny-skia` 切软件渲染。",
+      "要排查「有没有连可疑地址」，用导入自定义 IP 黑名单的功能高亮可疑连接。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#3aa675",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：装完为什么起不来、怎么定位「谁在联网」、以及渲染异常的快速解法。",
+      markdown: `## 装完起不来，先查依赖
+
+这是最常见的情况。README 说得很直接：**大多数报错源于系统缺少分析网卡所需的依赖**。
+
+处理方式是去官方 Wiki 的 Required dependencies 页，按你的操作系统照着装。Windows、macOS、Linux 的要求不一样，别照抄别人的步骤。
+
+下载入口在 GitHub Releases，页面上的表格链接会直接下载最新版：
+
+- **Windows**：\`Sniffnet_Windows_x64.msi\`（也有 arm64 / x86）
+- **macOS**：\`Sniffnet_macOS_AppleSilicon.dmg\` 或 Intel 版
+- **Linux**：DEB / RPM / AppImage，注意选对架构
+
+## 定位「谁在联网」
+
+按这个顺序查效率最高：
+
+1. 先选网卡 —— 多网卡机器上选错网卡会看到一片空白
+2. 看实时图表 —— 先确认流量高峰出现在什么时候
+3. 切到程序视图 —— 直接看是哪个进程在产生带宽
+4. 看远端主机 —— 查域名、ASN 与地理位置
+
+要长期盯某些地址，用收藏功能把它们固定下来。
+
+## 界面显示异常
+
+在老架构或驱动没更新的机器上，iced 默认的 \`wgpu\` 渲染器可能出问题，表现为界面闪烁、渐变不支持、图标全黑。
+
+切到 CPU 软件渲染：
+
+\`\`\`sh
+ICED_BACKEND=tiny-skia
+\`\`\`
+
+这个渲染器基本在所有环境都能正常工作。
+
+## 抓到的数据可以带走
+
+需要留证或换工具分析时，把捕获导出成 PCAP 文件，需要时再导回来。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://sniffnet.app",
+          note: "功能总览与下载入口，以及项目新闻页。",
+        },
+        {
+          kind: "html",
+          title: "官方 Wiki 使用手册",
+          url: "https://github.com/GyulyVGC/sniffnet/wiki",
+          note: "从基础设置到高级功能的完整手册，含各系统依赖安装步骤。",
+        },
+        {
+          kind: "html",
+          title: "版本发布页",
+          url: "https://github.com/GyulyVGC/sniffnet/releases/latest",
+          note: "下载各平台最新安装包，Windows 安装包由 SignPath 提供免费代码签名。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "codewhale",
+    linksCheckedAt: "2026-10-21",
+    name: "Codewhale",
+    nameZh: "Codewhale 终端编码代理",
+    aliases: ["codewhale", "code whale", "CodeWhale", "鲸鱼代理", "终端 AI 编码"],
+    summary: "Rust 写的开源终端编码代理，内置 40 多条模型路由，也接 Ollama / vLLM / SGLang 本地模型。适合想换模型不换工具的人；代价是它仍是个新项目，且同一台机器混装多个渠道会互相抢 PATH。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["AI 编码代理", "命令行", "Rust", "多模型", "开源"],
+    body: "Codewhale 自我定位是「能用任意模型的开源编码代理」：它读你的项目、改文件、跑命令，并会检查自己改的结果，全部发生在终端里，模型由你选——hosted 或本地都行。\n模型这块是它的主打：内置 40 多条 provider 路由（Anthropic、DeepSeek、Google、Mistral、Moonshot、OpenAI、OpenRouter、xAI 等），外加任意 OpenAI 兼容 endpoint，本地模型则通过 Ollama、vLLM、SGLang 接入。\n控制粒度做得比较细。模式决定代理在干什么：Plan 只探索不改任何东西，Work 会编辑和运行，Operate 按规划好的、经过验证的步骤推进一个目标；用 Tab 或 /mode 切换。审批姿态决定它什么时候先问你：Ask、Auto-Review、Full Access，用 Shift+Tab 切。/undo 和 /restore 用来回滚工作区改动，/receipts 列出一次会话里动过的每个文件、命令和审批。\n长任务方面有 /goal 设持久目标、把有边界的工作派给 sub-agents、跑受监督的 agent teams（带预花费检查）、以及把流程写成可入库的 workflows。扩展上支持 MCP server、skills、plugins、hooks，还能加载现成的 Claude Code 插件。\n安全性上，命令跑在操作系统沙箱里（macOS 用 Seatbelt，Linux 上装了并可用时用 bubblewrap），/preview-request 会在发出前展示脱敏后的完整请求，未知模型的定价保持未知而不是报成免费。遥测默认开着，用 `codewhale config set telemetry false` 关掉。",
+    officialUrl: "https://codewhale.net",
+    officialLabel: "codewhale.net",
+    links: {
+      official: "https://codewhale.net",
+      github: "https://github.com/codewhale-hq/Codewhale",
+    },
+    whoFor: "想在一个终端代理里自由切换模型、并且需要审批与审计留痕的开发者；尤其是既用云端大模型也跑本地模型的混合场景。",
+    whoNot: "只想要一个开箱即用、不用配 provider 的助手的人；或者所在机器已经用多种方式装过同类工具、PATH 已经很乱的情况。",
+    installTips: [
+      "macOS / Linux 一条命令：`curl -fsSL https://codewhale.net/install.sh | sh`，安装器会把校验过哈希的二进制放进 `~/.local/bin`。",
+      "装完提示 command not found 时，执行安装器打印的那行 PATH 命令即可；以后升级用 `codewhale update`。",
+      "Windows 用 `winget install HunterBown.CodeWhale`；也可以走 npm（`npm install -g codewhale`）或 Cargo（`cargo install codewhale-cli --locked`）。",
+      "同一台机器只选一种安装渠道——README 明确提醒多种装法会互相抢 PATH。",
+      "接模型用 `/provider`（或按 F3）添加 hosted key 或选本地 runtime；如果 Ollama 已经在跑聊天模型，它会自动切过去。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#1f6feb",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：装完找不到命令、怎么把模型接上、以及四种运行方式分别适合什么场景。",
+      markdown: `## 装完提示 command not found
+
+安装器下载的是**校验过哈希的**二进制，放在 \`~/.local/bin\`。如果这个目录不在你的 PATH 里，就会出现找不到命令的情况。
+
+处理办法：执行安装器打印的那行 PATH 命令。之后升级随时跑：
+
+\`\`\`bash
+codewhale update
+\`\`\`
+
+Windows 可以走 \`winget install HunterBown.CodeWhale\`，也有 Scoop 和 GitHub Releases 的安装包。npm 和 Cargo 渠道包的是同一份发布二进制。
+
+## 接上模型
+
+\`\`\`bash
+codewhale          # 在项目目录里启动
+/provider          # 或按 F3：添加 hosted key，或选本地 runtime
+/model             # 换模型
+\`\`\`
+
+如果 Ollama 已经在跑着某个聊天模型，Codewhale 会自己切过去。登录账号可以把 provider key 集中存起来，但不登录也完全可以本地用，且登录不会上传已有的本地 key。
+
+## 四种运行方式
+
+| 命令 | 用途 |
+| --- | --- |
+| \`codewhale\` | 交互式终端界面 |
+| \`codewhale exec "…"\` | 无头跑一轮，适合脚本与 CI |
+| \`codewhale web\` | 本地浏览器客户端（127.0.0.1） |
+| \`codewhale review --pr N\` |  advisory 形式的 PR 评审 |
+
+CI 里常用的组合是：
+
+\`\`\`bash
+codewhale exec --auto "fix the failing tests and explain what changed"
+\`\`\`
+
+\`（--auto\` 才允许使用文件与 shell 工具。）
+
+## 权限怎么设
+
+两件事分开：模式决定它在**做什么**，姿态决定它什么时候**先问你**。两者是独立的，用 Tab 与 Shift+Tab 分别切换。
+
+注意 Full Access 仍然受硬性策略边界约束，不等于无限制。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://codewhale.net",
+          note: "安装入口与产品说明，含各渠道安装方式。",
+        },
+        {
+          kind: "html",
+          title: "安装指南",
+          url: "https://github.com/codewhale-hq/Codewhale/blob/main/docs/INSTALL.md",
+          note: "Docker / Nix / Homebrew / Termux / 手动下载与哈希校验等所有渠道，以及 PATH 配置说明。",
+        },
+        {
+          kind: "html",
+          title: "模式与权限指南",
+          url: "https://github.com/codewhale-hq/Codewhale/blob/main/docs/MODES.md",
+          note: "Plan / Work / Operate 三种模式与 Ask / Auto-Review / Full Access 三种姿态的区别。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "appsmith",
+    linksCheckedAt: "2026-10-21",
+    name: "Appsmith",
+    nameZh: "Appsmith 低代码内部工具平台",
+    aliases: ["appsmith", "Appsmith 低代码", "内部工具平台", "admin panel builder"],
+    summary: "开源低代码平台，用来搭管理后台、内部工具和看板，官方称可接 25+ 数据库和任意 API。适合需要给团队快速做内部系统的工程师；代价是自托管要自己维护 Docker 环境与升级。",
+    scenes: ["office", "code", "data"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "Apache-2.0",
+    tags: ["低代码", "内部工具", "管理后台", "看板", "开源"],
+    body: "Appsmith 解决的是一类很常见的需求：团队需要定制的管理后台、内部工具、客户 360 视图、IT 自动化或服务台系统，但没人愿意为此从零搭一个前端项目。它是开源的 low-code 平台，覆盖开发、部署和维护整个链条。\n数据接入是重点：官方称支持 25 种以上的数据库，以及任意 API。这意味着内部系统最常见的工作——把数据库表和内部接口拖成一个能用的界面——是它的主场景。\n两条上手路线。想省事就用 Appsmith Cloud 注册账号直接用；想自己掌控就装到本地，官方给了三种部署方式：Docker（官方推荐）、Kubernetes、AWS AMI。其他部署方式在官方文档里有单独的安装指南页。\n需要注意的是它现在的定位已经不完全是「内部工具平台」了：README 里专门有一节介绍 Appsmith Agents，一个把 AI 模型接入私有数据的 agentic 平台。如果你只是想要一个 CRUD 后台，这部分可以先不管；但也要有心理准备，项目重心在往 AI 方向扩展。\n贡献方面，项目的贡献指南和 Code of Conduct 都在仓库里，想参与可以先看 Good First Issue 标签。",
+    officialUrl: "https://www.appsmith.com",
+    officialLabel: "www.appsmith.com",
+    links: {
+      official: "https://www.appsmith.com",
+      github: "https://github.com/appsmithorg/appsmith",
+    },
+    whoFor: "需要给运营、客服、运维做内部系统的工程团队：数据库 CRUD、数据看板、审批流这类需求，不想从头写前端。",
+    whoNot: "要做面向外部用户、需要精细设计控制和定制交互的产品——低代码的天花板会很快出现；也不适合没人愿意维护自托管环境的小团队（那就只能用 Cloud）。",
+    installTips: [
+      "两条路：注册 Appsmith Cloud 直接用，或者装到自己机器上。没有运维人手的话优先云版。",
+      "自托管官方推荐 Docker，文档在 docs.appsmith.com 的 Docker 安装指南页；另外还有 Kubernetes 和 AWS AMI 两种方式。",
+      "其他部署方式（各云、自建等）看官方文档的 Installation Guides 汇总页，别照着第三方博客的步骤走。",
+      "要二次开发或改源码，先读仓库里的 contributions/CodeContributionsGuidelines.md，里面有本地开发环境搭建步骤。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#f2a100",
+      simpleIcon: "appsmith",
+    },
+    guide: {
+      intro: "按第一次搭会卡在哪讲：云版与自托管怎么选、自托管三条路线的差别、以及什么时候该意识到它不够用了。",
+      markdown: `## 先决定云版还是自托管
+
+这是第一个岔路口，选错了后面全白折腾：
+
+- **Appsmith Cloud**：注册即用，不用管服务器。团队里没人愿意维护部署时选这个。
+- **自托管**：数据在自己机器上，但要自己负责环境、升级和备份。
+
+## 自托管的三条路
+
+官方在 README 里列了三种安装方式：
+
+| 方式 | 说明 |
+| --- | --- |
+| **Docker** | 官方推荐，起步最省事 |
+| **Kubernetes** | 已有 K8s 集群、需要弹性伸缩时 |
+| **AWS AMI** | 直接用 AWS 镜像起机器 |
+
+还有其他部署方式，集中在文档的 Installation Guides 页。自托管之前先确认一件事：谁负责后续的升级。
+
+## 它能接什么
+
+官方给的数字是 25 种以上的数据库，外加任意 API。也就是说这类系统的两个数据源——库表和内部服务接口——都能直接接进来。
+
+## 什么时候该停手
+
+Appsmith 适合的是**内部工具**：界面要求不高、用户是同事、交互以表单和表格为主。
+
+如果你的需求开始出现：面向外部用户、精细的视觉与交互控制、复杂的客户端状态流转——这时候继续在低代码里绕，成本会超过直接写前端。
+
+## 顺便知道一件事
+
+README 里现在有一节介绍 Appsmith Agents，一个把 AI 模型接入私有数据的 agentic 平台。只想要 CRUD 后台的话可以先忽略，但要意识到项目重心在往这个方向扩。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.appsmith.com",
+          note: "安装、数据源接入与组件使用的完整文档。",
+        },
+        {
+          kind: "html",
+          title: "Docker 安装指南",
+          url: "https://docs.appsmith.com/getting-started/setup/installation-guides/docker",
+          note: "官方推荐的自托管方式，一步步照着做即可跑起来。",
+        },
+        {
+          kind: "link",
+          title: "社区论坛",
+          url: "https://community.appsmith.com/",
+          note: "提问与找现成方案的地方，比翻 issue 列表高效。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "it-tools",
+    linksCheckedAt: "2026-10-21",
+    name: "IT Tools",
+    nameZh: "IT Tools 在线工具箱",
+    aliases: ["it-tools", "it tools", "IT Tools 工具箱", "在线开发工具箱"],
+    summary: "给开发者和 IT 人员用的在线小工具集合，自带官网可直接用，也能一条 docker 命令自托管。适合偶尔要做转换、生成、加解密的人；代价是它是 GPLv3 的前端工具箱，敏感数据别交给不信任的实例。",
+    scenes: ["tools", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "GPL-3.0",
+    tags: ["在线工具", "转换", "开发者工具", "自托管", "开源"],
+    body: "IT Tools 是一堆开发者和 IT 人员常用小工具的集合，官方 slogan 就一句话：useful tools for developer and people working in IT，主打的是体验够好。官网上线在 it-tools.tech，直接打开就能用。\n它真正的便利在于可自托管。官方给了两条容器路线，一条从 Docker Hub 拉，一条从 GitHub Packages 拉，都是一条 docker run 就能起来，映射到 8080 端口：\n    docker run -d --name it-tools --restart unless-stopped -p 8080:80 corentinth/it-tools:latest\n\n不想碰容器的话，官方还列了 Cloudron、Tipi、Unraid 这几个现成的应用商店渠道。\n功能范围要看 issue 列表——README 说 roadmap 就在 issues 里，想加工具就提 feature request。这意味着两件事：一是它覆盖面会持续变，二是遇到缺的工具不必自己 fork，提需求就行。\n技术栈是 Vue 3 + TypeScript，前端为主，许可证是 GPLv3。要注意的分寸是：既然是网页工具箱，涉及生产密钥、私钥、真实用户数据时，用自己托管的实例而不是随便一个公共站点。",
+    officialUrl: "https://it-tools.tech",
+    officialLabel: "it-tools.tech",
+    links: {
+      official: "https://it-tools.tech",
+      github: "https://github.com/CorentinTh/it-tools",
+    },
+    whoFor: "偶尔要做格式转换、编码解码、哈希、UUID / 密码生成、时间戳换算的开发者与运维；以及想给团队内网放一套工具箱的人。",
+    whoNot: "需要可审计、可离线、可脚本化调用的场合——网页工具不适合接进自动化流水线；也不该把真实生产密钥粘到任何你不掌控的实例上。",
+    installTips: [
+      "不想装就直接用官方站 https://it-tools.tech ，工具都在上面。",
+      "自托管最省事的方式是 Docker Hub 镜像：`docker run -d --name it-tools --restart unless-stopped -p 8080:80 corentinth/it-tools:latest`。",
+      "也可以从 GitHub Packages 拉：`ghcr.io/corentinth/it-tools:latest`，参数和上面一样。",
+      "不碰命令行的还有 Cloudron、Tipi、Unraid 三个应用市场渠道，直接在里面搜 it-tools 即可。",
+      "想知道会不会加某个工具，去看仓库的 issue 列表——roadmap 就放在那儿，缺什么直接提 feature request。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "I",
+      color: "#4b8bbe",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：官网直接用与自托管怎么选、一条命令起服务、以及哪些数据不该往里放。",
+      markdown: `## 先别急着自托管
+
+绝大多数人的正确用法是打开官方站直接用。自托管是为了两种情况：
+
+1. 想在内网/离线环境用
+2. 不希望查询内容离开自己的机器
+
+如果只是偶尔转个格式，官网就够了。
+
+## 一条命令起本地实例
+
+\`\`\`sh
+docker run -d --name it-tools --restart unless-stopped -p 8080:80 corentinth/it-tools:latest
+\`\`\`
+
+然后浏览器打开 \`http://localhost:8080\`。
+
+\`\`-d\` 后台运行，\`-restart unless-stopped\` 让容器开机自启，端口映射按自己需要改。
+
+想换源就用 GitHub Packages 的镜像：
+
+\`\`\`sh
+docker run -d --name it-tools --restart unless-stopped -p 8080:80 ghcr.io/corentinth/it-tools:latest
+\`\`\`
+
+## 不碰容器的三条路
+
+README 列了三个应用市场渠道，进去搜 it-tools 即可：
+
+- Cloudron
+- Tipi
+- Unraid
+
+## 哪些东西别往里放
+
+它是网页工具箱，本质是在浏览器里处理你输入的内容。涉及生产私钥、真实用户数据、未脱敏的凭证时，要么用自托管实例，要么换本地命令行工具。
+
+这不是 IT Tools 的问题，是所有在线工具箱的共同边界。
+
+## 缺工具怎么办
+
+官方把 roadmap 放在 issue 列表里。想要的工具没有，直接提 feature request，比自己 fork 一份维护划算。
+
+技术栈是 Vue 3 + TypeScript，想自己开发新工具的话，仓库里有 \`pnpm run script:create:tool my-tool-name\` 可以生成样板代码。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方在线站点",
+          url: "https://it-tools.tech",
+          note: "不用安装直接用，先在这里确认有没有你要的工具。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/CorentinTh/it-tools",
+          note: "自托管的完整命令（Docker Hub / GHCR）与第三方渠道清单。",
+        },
+        {
+          kind: "link",
+          title: "功能建议入口",
+          url: "https://github.com/CorentinTh/it-tools/issues/new/choose",
+          note: "官方指定的 feature request 入口，roadmap 就在 issue 列表里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "shellcheck",
+    linksCheckedAt: "2026-10-21",
+    name: "ShellCheck",
+    nameZh: "ShellCheck 脚本静态检查",
+    aliases: ["shellcheck", "shell check", "Shell 静态分析", "bash 检查工具"],
+    summary: "GPLv3 的 shell 脚本静态分析工具，指出引号、条件判断、命令误用等问题。适合任何写 bash / sh 脚本的人；代价是它只做静态检查，跑不出逻辑错误，而且新版本会新增告警。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "GPL-3.0",
+    tags: ["静态分析", "Shell", "Bash", "代码质量", "开源"],
+    body: "ShellCheck 给 bash / sh 脚本提供警告和修复建议。它的三个目标说得很清楚：一是指出并解释初学者的语法问题（这类问题往往只给出晦涩的 shell 报错），二是指出中级水平才会遇到的语义问题（让 shell 表现反直觉），三是指出那些当前能跑、但换个环境就会失败的边界情况。\n用法有四种。网页版最简单：把脚本粘到 shellcheck.net 上即可，而且这个站点始终与最新的 git commit 同步，是试水的最快方式。终端里直接 `shellcheck yourscript`。编辑器里可以装插件，Vim 走 ALE / Neomake / Syntastic，Emacs 走 Flycheck 或 flymake-shellcheck，还有 Sublime、Pulsar Edit、VSCode 的对应插件，其他编辑器则可以用 GCC 兼容的输出格式。构建流程里直接加一条命令即可，因为它规范使用退出码。\n安装主要走包管理器：Debian 系 `apt install shellcheck`、Fedora `dnf install`、Arch `pacman -S`、macOS `brew install`、Windows 有 choco / winget / scoop 三种，此外还有 cabal、stack、conda-forge、snap、nix、flox 和 Docker 镜像。\n一个值得记住的建议：README 明确说最好手动锁定具体版本，否则新版带来的新告警会在某一天突然让构建失败。",
+    officialUrl: "https://www.shellcheck.net",
+    officialLabel: "www.shellcheck.net",
+    links: {
+      official: "https://www.shellcheck.net",
+      github: "https://github.com/koalaman/shellcheck",
+    },
+    whoFor: "任何写 shell 脚本的人：CI 里的部署脚本、机器初始化脚本、定时任务脚本，尤其适合接进 pre-commit 或流水线做常态化检查。",
+    whoNot: "指望它替代测试的人——静态检查抓不到逻辑错误；也不适合在完全不锁版本的情况下接进严格 CI，新告警会随升级冒出来。",
+    installTips: [
+      "最省事的是包管理器：Debian/Ubuntu `sudo apt install shellcheck`，Arch `pacman -S shellcheck`，Fedora `dnf install ShellCheck`，macOS `brew install shellcheck`。",
+      "Windows 三条路任选：`choco install shellcheck`、`winget install --id koalaman.shellcheck`、`scoop install shellcheck`。",
+      "不想装就用网页版：把脚本粘到 https://www.shellcheck.net ，它与最新 git commit 同步。",
+      "接 CI / pre-commit 时把这条加进配置：`repo: https://github.com/koalaman/shellcheck-precommit`，`rev: v0.11.0`，`id: shellcheck`；可加 `args: [\"--severity=warning\"]` 只看错误与警告。",
+      "输出格式除了人类可读文本，还支持 JSON、CheckStyle 兼容 XML 与 GCC 兼容告警，方便接进别的系统。",
+      "务必锁定版本：新版可能引入新告警，不锁版本的话构建可能某天突然变红。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#2e7d32",
+      simpleIcon: "shellcheck",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：四种用法怎么选、接进 CI 后为什么突然变红、以及怎么按严重程度收敛输出。",
+      markdown: `## 四种用法，从轻到重
+
+1. **网页版** —— 把脚本粘到 \`https://www.shellcheck.net\`。它始终同步最新的 git commit，是试水的最快方式。
+2. **终端** —— \`shellcheck yourscript\`，立刻看到输出。
+3. **编辑器** —— Vim 用 ALE / Neomake / Syntastic；Emacs 用 Flycheck 或 flymake-shellcheck；还有 Sublime、Pulsar Edit、VSCode 的插件。其他编辑器可以走 GCC 兼容输出格式。
+4. **构建 / 测试** —— 它规范使用退出码，直接把命令加进流程即可。
+
+## 接进 Makefile 与 CI
+
+\`\`\`Makefile
+check-scripts:
+    # Fail if any of these files have warnings
+    shellcheck myscripts/*.sh
+\`\`\`
+
+很多平台已预装：Travis CI、Codacy、Code Climate、Code Factor、Codety、CircleCI（通过 ShellCheck Orb）、GitHub Actions（仅 Linux）、Trunk Code Quality、CodeRabbit。GitLab 需要自己装。
+
+## CI 突然变红的原因
+
+新版本会带来新告警。原本通过的脚本，升级后可能冒出一批 warning，构建就红了。
+
+README 的建议很直接：**手动安装固定的 ShellCheck 版本**。别让 CI 自动跟最新版。
+
+## 收敛输出
+
+只想看错误和警告：
+
+\`\`\`yaml
+args: ["--severity=warning"]
+\`\`\`
+
+需要机器处理时，输出可以切成 JSON、CheckStyle 兼容 XML 或 GCC 兼容告警，具体见官方 Integration wiki 页。
+
+## 源码构建提醒
+
+ShellCheck 用 Haskell 写成，从源码编译需要约 2GB 内存。大多数情况下直接用包管理器更划算。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与在线检查",
+          url: "https://www.shellcheck.net",
+          note: "粘贴脚本即时检查，始终与最新 git commit 同步。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/koalaman/shellcheck",
+          note: "各系统完整安装命令、编辑器集成清单与「坏代码案例集」。",
+        },
+        {
+          kind: "link",
+          title: "集成 wiki",
+          url: "https://github.com/koalaman/shellcheck/wiki/Integration",
+          note: "输出格式（JSON / CheckStyle XML / GCC）与各类集成方式的说明。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ink",
+    linksCheckedAt: "2026-10-21",
+    name: "Ink",
+    nameZh: "Ink 命令行 React 渲染器",
+    aliases: ["ink", "ink cli", "React CLI", "命令行 React"],
+    summary: "用 React 写命令行界面，底层用 Yoga 做 Flexbox 布局，熟悉的 CSS 属性基本都能用。适合已经会 React、要做交互式 CLI 的人；代价是它本质是 React 渲染器，不熟 React 的人学习成本不低。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["命令行", "React", "TUI", "Node.js", "开源"],
+    body: "Ink 的口号是「React for CLIs」：把浏览器里 React 那套组件化的界面构建体验搬到命令行。它用 Yoga（Facebook 的 Flexbox 布局引擎）来排版，所以你在浏览器里熟悉的那些类 CSS 属性，在 Ink 里基本都有对应。官方的说法很直白——如果你已经熟悉 React，那你就会用 Ink。\n因为 Ink 本身是一个 React renderer，React 的全部特性都可用，README 明确表示不再重复文档，只写 Ink 自己的方法；React 的用法去 reactjs.org 看。\n最小例子只要几行：从 ink 引入 render 和 Text，写个函数组件，最后 render(<Counter />)。状态用 useState，副作用用 useEffect，和在浏览器里写法一致。\n装的时候注意一个点：README 顶部声明当前文档描述的是**即将发布的版本**，稳定版要看 npm 上的页面。所以照着 README 抄代码之前，先确认你装的版本的文档入口，避免 API 对不上。\n另外项目对贡献有明确要求：不接受完全由 AI 生成的 PR，可以用 AI 但必须有人核实与整理。",
+    officialUrl: "https://term.ink",
+    officialLabel: "term.ink",
+    links: {
+      official: "https://term.ink",
+      github: "https://github.com/vadimdemedes/ink",
+    },
+    whoFor: "已经写 React、想把交互界面搬到终端的人：脚手架向导、状态面板、带表单的 CLI 工具。",
+    whoNot: "完全没接触过 React 的人——为它现学一套心智模型并不划算；也不适合只是输出几行静态文本的脚本。",
+    installTips: [
+      "装两个包：`npm install ink react` —— Ink 是 React renderer，react 是必须的同伴依赖。",
+      "最小骨架：从 `ink` 引入 `render` 和 `Text`，写函数组件后用 `render(<App />)` 挂载。",
+      "所有文字必须包在 `<Text>` 组件里；`<Text>` 内部只能放文本节点或嵌套的 `<Text>`，不能放 `<Box>`。",
+      "布局靠 `<Box>`，且**每个元素都是 Flexbox 容器**——可以想象成浏览器里每个 div 都自带 `display: flex`。",
+      "想快速起项目用 `npx create-ink-app my-ink-cli`，加 `--typescript` 生成 TS 版。",
+      "注意 README 文档的是即将发布的版本，稳定版用法看 npm 页面，别混着抄。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "I",
+      color: "#1a1a1a",
+    },
+    guide: {
+      intro: "按第一次写 Ink 会卡在哪讲：装哪些包、为什么文字必须包在 Text 里、以及布局为什么和浏览器默认不一样。",
+      markdown: `## 装两个包
+
+\`\`\`sh
+npm install ink react
+\`\`\`
+
+Ink 是 React 的 renderer，\`react\` 必须一起装。
+
+## 最小骨架
+
+\`\`\`jsx
+import React, {useState, useEffect} from 'react';
+import {render, Text} from 'ink';
+
+const Counter = () => {
+	const [counter, setCounter] = useState(0);
+
+	useEffect(() => {
+		const timer = setInterval(() => {
+			setCounter(previousCounter => previousCounter + 1);
+		}, 100);
+
+		return () => {
+			clearInterval(timer);
+		};
+	}, []);
+
+	return <Text color="green">{counter} tests passed</Text>;
+};
+
+render(<Counter />);
+\`\`\`
+
+和在浏览器里写 React 完全一样：useState 管状态，useEffect 管副作用。
+
+## 两个硬规则
+
+**所有文本必须包在 \`<Text>\` 里。** 裸露的字符串不会被渲染。
+
+**\`<Text>\` 里只能放文本节点或嵌套 \`<Text>\`。** 想在一段文字里塞布局容器（\`\`<Box>\`\`）是不行的。
+
+## 布局：每个元素都是 Flexbox 容器
+
+Ink 用 Yoga 排版，这点最容易踩坑：**每个元素都自带 flex 布局**。
+
+想象浏览器里每个 div 都默认 \`display: flex\`——你写的每个 \`\`<Box>\`\` 都已经是个 flex 容器了，不用额外声明。熟悉的类 CSS 属性基本都支持。
+
+## 版本陷阱
+
+README 开头就说明了：当前文档描述的是**即将发布的版本**，不是稳定版。抄示例代码前先去 npm 页面确认你装的版本对应的文档，否则会遇到 API 对不上的情况。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://term.ink",
+          note: "Ink 的主页与文档入口。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/vadimdemedes/ink",
+          note: "内置组件（Text / Box / Newline / Spacer / Static / Transform）与 Hooks 的完整说明。",
+        },
+        {
+          kind: "html",
+          title: "npm 包页面",
+          url: "https://www.npmjs.com/package/ink",
+          note: "最新稳定版的文档与版本号。README 描述的是即将发布的版本，以这里为准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "zoxide",
+    linksCheckedAt: "2026-10-21",
+    name: "zoxide",
+    nameZh: "zoxide 智能跳转目录",
+    aliases: ["zoxide", "z", "zi", "智能 cd", "目录跳转"],
+    summary: "更聪明的 cd：记住你最常去的目录，用 z foo 就能跳到匹配的最高分目录，支持所有主流 shell。适合目录层级深、每天要跳很多次的人；代价是它靠 shell hook 记录数据，换个 shell 忘了 init 就没历史。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MIT",
+    tags: ["命令行", "目录跳转", "Shell", "Rust", "开源"],
+    body: "zoxide 的灵感来自 z 和 autojump，定位是「更聪明的 cd」。它记住你最常访问的目录，之后只要敲几个键就能跳过去，而且支持所有主流 shell。\n基本用法：\n    z foo          跳到匹配 foo 的最高分目录\n    z foo bar      匹配同时含 foo 和 bar 的目录\n    z foo /        跳到以 foo 开头的子目录\n\n它同时还是一个正常的 cd：`z ~/foo` 走绝对路径，`z foo/` 走相对路径，`z ..` 上一层，`z -` 回上一个目录。交互选择用 `zi foo`（依赖 fzf）。bash 4.4+ / fish / zsh 还支持按空格+Tab 触发补全。\n安装分四步，其中第二步最容易漏：装完二进制后**必须把它挂进 shell**，否则它记录不到你去了哪些目录。各 shell 的写法不同，bash / zsh 是 `eval \"$(zoxide init bash)\"`，fish 是 `zoxide init fish | source`，PowerShell 用 `Invoke-Expression (& { (zoxide init powershell | Out-String) })`，此外还支持 elvish、nushell、tcsh、xonsh 和任意 POSIX shell。注意 init 那行要放在配置文件的**末尾**。\n可选但推荐装 fzf，它用于补全和交互选择，最低要求 v0.51.0。如果你之前用过 z、autojump、fasd、z.lua、zsh-z、atuin，可以直接 `zoxide import <插件名>` 把老数据导进来。\n还有一个小坑：Warp 自带补全，不支持 Space+Tab 补全。",
+    officialUrl: "https://crates.io/crates/zoxide",
+    officialLabel: "crates.io",
+    links: {
+      official: "https://crates.io/crates/zoxide",
+      github: "https://github.com/ajeetdsouza/zoxide",
+    },
+    whoFor: "项目目录层级深、每天要在十几个目录之间反复跳的人；愿意为了省下 cd 的击键数花十分钟配 shell 的人。",
+    whoNot: "只在两三个固定目录里干活的人——收益有限；也不适合经常换机器、换 shell 又不愿每次都配 init 的人，没有历史数据它就跟普通 cd 一样。",
+    installTips: [
+      "第一步装二进制，Linux / WSL 与 macOS 推荐用安装脚本：`curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh`。",
+      "第二步挂进 shell，这一步最容易漏：bash 用 `eval \"$(zoxide init bash)\"`，zsh 同理，fish 用 `zoxide init fish | source`，PowerShell 用 `Invoke-Expression (& { (zoxide init powershell | Out-String) })`。",
+      "注意 init 那行要放在配置文件的**末尾**；zsh 还要放在 compinit 之后，必要时跑 `rm ~/.zcompdump*; compinit` 重建补全缓存。",
+      "包管理器也能装：Arch `pacman -S zoxide`、Homebrew `brew install zoxide`、Windows `winget install ajeetdsouza.zoxide`（或 choco / scoop）、Termux `pkg install zoxide`、通用 `cargo install zoxide --locked`。",
+      "顺手装 fzf（>= v0.51.0），`zi` 交互选择和补全靠它。",
+      "从 z / autojump / fasd / z.lua / zsh-z / atuin 迁移：跑 `zoxide import <插件名>`，数据文件会自动识别。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "Z",
+      color: "#6f42c1",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：装完为什么没反应（忘了 init）、z 与 zi 的区别、以及老数据怎么导进来。",
+      markdown: `## 装完没反应？缺了 init
+
+这是几乎所有人第一次都会踩的坑：装完二进制直接敲 \`z\`，然后发现没什么用——因为它**还没开始记录你去过哪些目录**。
+
+必须把这一行加进 shell 配置，且放在**末尾**：
+
+\`\`\`sh
+eval "$(zoxide init bash)"
+\`\`\`
+
+fish 用 \`zoxide init fish | source\`；PowerShell 用：
+
+\`\`\`powershell
+Invoke-Expression (& { (zoxide init powershell | Out-String) })
+\`\`\`
+
+## z 与 zi
+
+- \`z foo\` —— 直接跳到匹配 foo 的**最高分**目录
+- \`z foo bar\` —— 需要同时匹配 foo 和 bar
+- \`zi foo\` —— 用 fzf 交互选择后再跳
+
+\`\`z\` 同时也兼容普通 cd 的用法：\`z ..\`、\`z -\`、\`z ~/foo\` 都能走。
+
+## 把老数据导进来
+
+以前用过别的跳转工具的话不用从零攒：
+
+\`\`\`sh
+zoxide import z          # 或 autojump / fasd / z.lua / zsh-z / atuin
+\`\`\`
+
+数据文件位置会自动按各插件的约定去识别。
+
+## 一个已知限制
+
+Warp 提供自己的补全机制，因此在 Warp 里 **Space+Tab 补全不可用**。其他 shell 中这项功能需要 bash 4.4+ / fish / zsh。
+
+## 想改默认行为
+
+\`zoxide init\` 支持几个常用参数：
+
+- \`--cmd j\` —— 把 \`z\` / \`zi\` 改成 \`j\` / \`ji\`；\`--cmd cd\` 则是直接接管 cd
+- \`--hook <none|prompt|pwd>\` —— 决定打分时机，默认 \`pwd\`（每次换目录）
+- \`--no-cmd\` —— 不定义 z / zi 命令
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "crates.io 包页面",
+          url: "https://crates.io/crates/zoxide",
+          note: "官方 homepage，版本号与发布信息入口。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/ajeetdsouza/zoxide",
+          note: "四步安装说明、各发行版包管理器命令表、shell 配置写法与配置项。",
+        },
+        {
+          kind: "link",
+          title: "fzf 安装说明",
+          url: "https://github.com/junegunn/fzf#installation",
+          note: "zoxide 的交互选择与补全依赖 fzf，最低版本 v0.51.0。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "devdocs",
+    linksCheckedAt: "2026-10-21",
+    name: "DevDocs",
+    nameZh: "DevDocs API 文档浏览器",
+    aliases: ["devdocs", "dev docs", "DevDocs 文档", "API 文档浏览器"],
+    summary: "把多份开发者文档聚合到一个界面，即时搜索、离线可用、支持键盘操作。适合开发时高频查文档的人；代价是它只收 API / 参考类内容，教程和指南不在范围内，而且项目正在招募维护者。",
+    scenes: ["docs", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "MPL-2.0",
+    tags: ["文档", "离线文档", "API 参考", "开发者工具", "开源"],
+    body: "DevDocs 把多份开发者文档合并到一个干净、有组织的网页界面里，配即时搜索、离线支持、移动端版本、深色主题和键盘快捷键。它由 Thibaut Courouble 创建，目前由 freeCodeCamp 运营。\n它的自我定位很克制，值得记住：**DevDocs 既不是编程教程，也不是搜索引擎**。所有内容都来自第三方，项目不打算和全文搜索引擎竞争。它的骨架是元数据——每段内容靠一个唯一、明显且短的字符串来标识。教程、指南这类不满足这个条件的内容，不在项目范围内。\n架构上是两块：一个 Ruby 写的 scraper 负责抓取并生成文档与索引文件，一个 JavaScript 前端加一个小的 Sinatra 应用负责展示。抓取分两种，`UrlScraper` 走 HTTP 下载，`FileScraper` 读本地文件；文档用 Nokogiri 解析，改写动作通过 HTML::Pipeline 的一组 filter 完成，包括剥离原始 HTML 结构、修链接、补标题、统一语法高亮等。\n用法上，除非你要贡献代码，官方推荐直接用托管版 devdocs.io，它保持更新且开箱即离线可用。想自己跑，Docker 是最省事的：`docker run --name devdocs -d -p 9292:9292 ghcr.io/freecodecamp/devdocs:latest`，然后开 localhost:9292。\n手动装则要求 Ruby 4.0.7、libcurl、bsdtar 和一个 ExecJS 支持的 JS 运行时，之后 git clone、bundle install、`thor docs:download --default`、`rackup` 四步。注意没有别的更新机制，只能 `git pull` 加 `thor docs:download --installed`。",
+    officialUrl: "https://devdocs.io",
+    officialLabel: "devdocs.io",
+    links: {
+      official: "https://devdocs.io",
+      github: "https://github.com/freeCodeCamp/devdocs",
+    },
+    whoFor: "开发时高频查 API 文档、希望能离线查、并且愿意用键盘操作的人：把常用文档固定到侧边栏后效率很高。",
+    whoNot: "想找教程、最佳实践或「怎么写」的人——官方明确说不收录这类内容；浏览器版本太老的也用不了（要求 Safari 16.4+、Edge 89+、iOS 16.4+）。",
+    installTips: [
+      "除非要贡献代码，官方推荐直接用托管版 https://devdocs.io ，保持更新且开箱离线可用。",
+      "自己跑最省事的是 Docker：`docker run --name devdocs -d -p 9292:9292 ghcr.io/freecodecamp/devdocs:latest`，然后打开 localhost:9292。镜像每月自动重建更新。",
+      "想更小的镜像用 `latest-alpine` 标签；也可以自己 `docker build -t devdocs .`。",
+      "手动装需要 Ruby 4.0.7、libcurl、bsdtar（Debian 上是 libarchive-tools 包）和一个 ExecJS 支持的 JS 运行时（Linux 上装 Node.js）。",
+      "手动装的四步：git clone → `gem install bundler` + `bundle install` → `bundle exec thor docs:download --default` → `bundle exec rackup`。首次请求会编译资源，稍等几秒。",
+      "文档管理命令：`thor docs:list` 看可下载列表，`thor docs:download html css` 下载指定文档，`thor docs:download --installed` 更新已装的，`--all` 全下。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#2f6f4f",
+    },
+    guide: {
+      intro: "按第一次自建会卡在哪讲：Docker 与手动安装怎么选、下载文档的命令、以及为什么它没有自动更新。",
+      markdown: `## 先问自己：真的要自建吗
+
+官方的态度很明确：**除非你想贡献代码，否则用托管版** \`devdocs.io\`。它保持最新，而且开箱就能离线用。
+
+自建的理由通常是内网隔离，或者想打包自己要的文档子集。
+
+## Docker 起服务
+
+\`\`\`sh
+docker run --name devdocs -d -p 9292:9292 ghcr.io/freecodecamp/devdocs:latest
+\`\`\`
+
+然后浏览器打开 \`http://localhost:9292\`。
+
+两个镜像可选：
+
+- \`ghcr.io/freecodecamp/devdocs:latest\` —— 标准镜像
+- \`ghcr.io/freecodecamp/devdocs:latest-alpine\` —— 基于 Alpine，体积更小
+
+镜像每月自动构建并更新文档。
+
+## 手动安装的前置
+
+需要四样东西：
+
+- **Ruby 4.0.7**（定义在 Gemfile 里）
+- **libcurl**
+- **bsdtar**（macOS 自带；Debian / Alpine 上是 \`libarchive-tools\` 包）
+- **ExecJS 支持的 JS 运行时**（macOS 和 Windows 自带，Linux 装 Node.js）
+
+## 手动安装四步
+
+\`\`\`sh
+git clone https://github.com/freeCodeCamp/devdocs.git && cd devdocs
+gem install bundler
+bundle install
+bundle exec thor docs:download --default
+bundle exec rackup
+\`\`\`
+
+打开 \`localhost:9292\`，第一次请求会花几秒编译资源。
+
+## 没有自动更新
+
+这点要记住：**没有更新机制**。
+
+- 更新代码：\`git pull origin main\`
+- 更新文档：\`thor docs:download --installed\`
+
+想知道新版本，去仓库点 watch。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "DevDocs 官方站点",
+          url: "https://devdocs.io",
+          note: "官方推荐的使用方式，保持更新且离线可用。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/freeCodeCamp/devdocs",
+          note: "Docker 与手动安装步骤、所有 thor 命令清单、以及维护者招募说明。",
+        },
+        {
+          kind: "link",
+          title: "Scraper 参考文档",
+          url: "https://github.com/freeCodeCamp/devdocs/blob/main/docs/scraper-reference.md",
+          note: "想新增文档源时看这份，说明 scraper 与 filter 的写法。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "lapce",
+    linksCheckedAt: "2026-10-21",
+    name: "Lapce",
+    nameZh: "Lapce 代码编辑器",
+    aliases: ["lapce", "Lapce 编辑器", "Rust 代码编辑器", "lap.dev"],
+    summary: "纯 Rust 写的代码编辑器，内置 LSP、模态编辑、远程开发和终端，UI 用自研的 Floem。适合想要 VS Code 的能力但不想背 Electron 的人；代价是插件要编译成 WASI，和现成的 VS Code 插件不通用。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "Apache-2.0",
+    tags: ["代码编辑器", "Rust", "LSP", "模态编辑", "开源"],
+    body: "Lapce（读作 /læps/）是用纯 Rust 写的代码编辑器，UI 层用 Lapce 团队自研的 Floem。底层数据结构借鉴 Xi-Editor 的 Rope Science，渲染走 wgpu——这两点加起来就是它敢叫「lightning-fast」的底气。\n功能清单不长但都在点上：内置 LSP 支持（补全、诊断、code action 这些智能特性）；模态编辑作为一等公民（Vim 风格，而且可以关掉）；内置远程开发（对标 VSCode Remote Development，本地体验 + 远程算力，另外还有 Lapdev 用来管理远程环境）；内置终端，不用离开编辑器跑命令。\n插件机制是它最需要提前知道的一点：插件用能编译成 WASI 格式的语言写（C、Rust、AssemblyScript 等）。好处是跨语言和沙箱化，坏处很明确——**不能直接用 VS Code 现成的插件生态**。如果你高度依赖某个只在 VS Code 上有的插件，迁移前先确认有没有替代。\n安装有预编译包，Windows、Linux、macOS 都有，在 GitHub Releases 页面；也可以用包管理器（仓库里有专门的文档页）；想从源码编译也有对应的构建指南。",
+    officialUrl: "https://lap.dev/lapce",
+    officialLabel: "lap.dev",
+    links: {
+      official: "https://lap.dev/lapce",
+      github: "https://github.com/lapce/lapce",
+    },
+    whoFor: "想要现代编辑器的智能能力、又嫌 Electron 应用太重的人；以及常用 Vim 键位、希望模态编辑是原生支持的 Rust 开发者。",
+    whoNot: "重度依赖某个 VS Code 专属插件的人——Lapce 的 WASI 插件生态接不住；也不适合需要成熟调试器、Git 图形界面等配套能力的场景。",
+    installTips: [
+      "Windows、Linux、macOS 都有预编译发布包，在仓库的 releases 页面下载即可。",
+      "想用包管理器装，看仓库里的 docs/installing-with-package-manager.md，里面列了各系统的命令。",
+      "想从源码编译，看 docs/building-from-source.md。",
+      "Vim 键位是内置且可关闭的，不需要额外装插件——不喜欢就关掉，不会强制模态。",
+      "远程开发是内置能力，不用装扩展；要管理远程环境可以配合 Lapdev。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#e05a4f",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：装完怎么接语言服务、Vim 键位怎么关、以及插件生态这条最现实的限制。",
+      markdown: `## 装法三条
+
+- **预编译包** —— 仓库 releases 页，Windows / Linux / macOS 都有
+- **包管理器** —— 见仓库里的 \`docs/installing-with-package-manager.md\`
+- **源码编译** —— 见 \`docs/building-from-source.md\`
+
+## 语言智能是内置的
+
+Lapce **自带 LSP 客户端**，不需要装插件就能获得：
+
+- 补全
+- 诊断
+- code action
+
+前提是你的机器上装了对应语言的 language server。Lapce 负责对接，不负责提供 server。
+
+## Vim 键位：默认就有，也能关
+
+模态编辑在 Lapce 里是一等公民，Vim 风格，而且**可以切换关闭**。不用装任何插件，也不必被迫适应。
+
+## 插件生态这条要想清楚
+
+插件用能编译成 **WASI** 的语言写：C、Rust、AssemblyScript 等。
+
+好处是跨语言与沙箱化，坏处很现实：**不能直接用 VS Code 现成的插件**。
+
+迁移前先做一件事——列出你离不开的插件，确认 Lapce 侧有没有替代。这一步跳过了，后面一定会卡住。
+
+## 远程开发
+
+内置支持，思路对标 VSCode Remote Development：本地操作手感，算力在远端。
+
+如果有多套远程环境要管理，官方还有配套的 Lapdev。
+
+## 终端
+
+内置终端，命令直接在当前工作区里跑，不用切窗口。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://lap.dev/lapce",
+          note: "项目主页与特性总览入口。",
+        },
+        {
+          kind: "html",
+          title: "版本发布页",
+          url: "https://github.com/lapce/lapce/releases",
+          note: "各平台预编译安装包下载，装完可对照最新版本。",
+        },
+        {
+          kind: "html",
+          title: "用户文档",
+          url: "https://docs.lapce.dev",
+          note: "GitBook 上的使用文档，含配置、键位与远程开发说明。",
+        },
+      ],
+    },
+  },
 ];
