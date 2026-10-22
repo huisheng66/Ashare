@@ -87,6 +87,10 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
     tier: "strong-copyleft",
     allowsClosedSource: false,
   },
+  // Vim：慈善软件许可（charityware），可自由使用与分发，但修改版须沿用同一许可。
+  Vim: { summary: "可自由使用与分发，修改版需沿用同一许可", tier: "strong-copyleft", allowsClosedSource: false },
+  // WTFPL：除署名外不设任何限制，实质等同公有领域。
+  WTFPL: { summary: "几乎无限制，可自由商用与闭源", tier: "permissive", allowsClosedSource: true },
 };
 
 /**

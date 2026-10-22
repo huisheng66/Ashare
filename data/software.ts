@@ -7645,7 +7645,7 @@ README 里所有示例都钉在具体版本（\`2.2.3\`）。这不是保守：\
       "Windows 杀软可能隔离 `uv.exe`——那是 Hermes 自带的 Astral uv，是误报。要给 `%LOCALAPPDATA%\\hermes\\bin` 整个目录加白名单，别按文件哈希加，因为升级后哈希会变。",
       "Android / Termux 不要用桌面安装脚本，走仓库提供的签名 APT 源（aarch64，stable 与 canary 两个通道）。",
     ],
-    alternatives: [],
+    alternatives: ["nanobot"],
     icon: {
       letter: "H",
       color: "#5B4E7A",
@@ -7754,7 +7754,7 @@ Add-MpPreference -ExclusionPath "$env:LOCALAPPDATA\\hermes\\bin"
       "想在终端长期用就 `npm install --global rea-agents`，之后 `rea --help`；升级用 `rea update`，并重新跑 setup 刷新 agent 注册。",
       "逆原生二进制要另配 Hopper / Ghidra / IDA 之一（setup 可在你同意后装 Hopper）；只做 JavaScript / Electron / .NET 静态分析不需要任何原生引擎。",
     ],
-    alternatives: [],
+    alternatives: ["x64dbg"],
     icon: {
       letter: "R",
       color: "#1F3A5F",
@@ -7879,7 +7879,7 @@ REA 返回的每条边都标 \`EXTRACTED\`（源码里明写）或 \`INFERRED\`�
       "Windows 用户不要用单容器安装器那条路，继续走手动自托管指南。",
       "只想跑经典的单机 AutoGPT，看仓库里的 `classic/` 目录——它是 MIT 协议，和平台部分不是同一份许可。",
     ],
-    alternatives: [],
+    alternatives: ["sim", "fastgpt"],
     icon: {
       letter: "A",
       color: "#2F5D62",
@@ -7955,6 +7955,7 @@ README 写得很直白：面向 Linux 与 macOS 的单容器发布安装器**要
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "ollama",
@@ -8346,7 +8347,7 @@ transformers chat Qwen/Qwen2.5-0.5B-Instruct
       "要 SSO、RBAC 和企业支持属于 Dify Enterprise 的范围，社区版自托管没有这些能力。",
       "想改代码或做二次开发，走官方的「从源码部署」指南，不要直接在 compose 起来的容器里改。",
     ],
-    alternatives: [],
+    alternatives: ["fastgpt", "sim"],
     icon: {
       letter: "D",
       color: "#155EEF",
@@ -8429,6 +8430,7 @@ Dify 不是「一个库」，是一整套服务：web、api、worker、数据库
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "open-webui",
@@ -8456,7 +8458,7 @@ Dify 不是「一个库」，是一整套服务：web、api、worker、数据库
       "只用 OpenAI API 的话加 `-e OPENAI_API_KEY=...`；要 GPU 用 `:cuda` 镜像，且宿主机先装好 NVIDIA CUDA container toolkit。",
       "不想用 Docker 可以 `pip install open-webui` 后 `open-webui serve`，但要用 Python 3.11，否则有兼容性问题；容器内端口是 8080。",
     ],
-    alternatives: [],
+    alternatives: ["vane"],
     icon: {
       letter: "O",
       color: "#4A4A4A",
@@ -8561,6 +8563,7 @@ docker run -d -p 3000:8080 \\
         },
       ],
     },
+    license: "BSD-3-Clause",
   },
   {
     slug: "langchain",
@@ -8588,7 +8591,7 @@ docker run -d -p 3000:8080 \\
       "评估、tracing 与调试接 LangSmith，部署长时有状态工作流用 LangSmith Deployment。",
       "JS / TS 项目用 LangChain.js，不要指望 Python 版接口直接照搬。",
     ],
-    alternatives: [],
+    alternatives: ["llama-index"],
     icon: {
       letter: "L",
       color: "#1C3C3C",
@@ -8696,7 +8699,7 @@ LangChain 演进很快，\`Chain\` 时代那批教程（\`LLMChain\`、\`Convers
       "脚本环节要自备大模型 Key，支持 Kimi、OpenAI、Claude、Gemini、DeepSeek、通义千问、Azure OpenAI、火山方舟、Grok、MiniMax、小米 MiMo 等，也兼容 Ollama、OneAPI、LiteLLM 等聚合网关。",
       "画幅要在生成前定好：竖屏 9:16 是 1080×1920，横屏 16:9 是 1920×1080，方形 1:1 是 1080×1080，成片后再改很麻烦。",
     ],
-    alternatives: [],
+    alternatives: ["hypit"],
     icon: {
       letter: "M",
       color: "#16A34A",
@@ -8809,7 +8812,7 @@ LangChain 演进很快，\`Chain\` 时代那批教程（\`LLMChain\`、\`Convers
       "要装到项目而不是用户级：`graphify install --project`，文件落在 `.claude/skills/` 或 `.agents/skills/` 下，可以提交进仓库给团队共用。",
       "需要 Python 3.10+；Windows 用 `winget install astral-sh.uv`，macOS 用 `brew install python@3.12 uv`，Ubuntu/Debian 可以 `sudo apt install python3.12 python3-pip pipx`。",
     ],
-    alternatives: [],
+    alternatives: ["code-review-graph", "codebase-memory-mcp"],
     icon: {
       letter: "G",
       color: "#0F766E",
@@ -8953,7 +8956,7 @@ graphify install --project --platform codex
       "CLI 路线把 README 里那段提示直接粘给你的编码代理，它会装最新版、跑 `browser-use skill install` 注册技能并接上你的浏览器。",
       "Windows 上 Bash 工具要 WSL——它需要 Linux 或 macOS 主机上的 `/bin/bash`；Python 库本身没有这个限制。",
     ],
-    alternatives: [],
+    alternatives: ["opencli"],
     icon: {
       letter: "B",
       color: "#E85C0D",
@@ -9099,7 +9102,7 @@ Python 库是 MIT、免费。但**模型推理和托管浏览器都要钱**—�
       "npm 12 及以上会拦住 git 安装，旧的一键脚本会失败；用 README 里的新版一行命令，或 `npx --allow-git=root -y github:JuliusBrussee/caveman#v4.0.0`。",
       "卸载：`npx -y github:JuliusBrussee/caveman -- --uninstall`（npm 12+ 要额外加 `--allow-git=root`）；只装了技能就 `npx skills remove JuliusBrussee/caveman -g`。",
     ],
-    alternatives: [],
+    alternatives: ["rtk"],
     icon: {
       letter: "C",
       color: "#6B4423",
@@ -9231,7 +9234,7 @@ README 里有专门的 HONEST-NUMBERS 一节，值得先看。几个关键点：
       "结果、报告、记忆日志和缓存默认落在 `tradingagents_data` 卷里；想放宿主机目录就设 `TRADINGAGENTS_DATA_DIR`（例如 `mkdir -p data && TRADINGAGENTS_DATA_DIR=./data ...`）。",
       "至少要配一个模型 Key（OpenAI / Google / Anthropic / DeepSeek / Qwen / GLM 等）；`FRED_API_KEY` 是免费的宏观数据，可选；本地模型用 `llm_provider: ollama`。",
     ],
-    alternatives: [],
+    alternatives: ["vibe-trading"],
     icon: {
       letter: "T",
       color: "#0B4F6C",
@@ -9386,7 +9389,7 @@ README 顶部有一句加粗：本框架为研究用途设计，交易表现取�
       "没用过 PyTorch 就从附录 A 开始，它是一份精简入门；主章节代码会自动使用 GPU，没有 GPU 也能在笔记本 CPU 上跑完。",
       "每个主章节都有 `exercise-solutions.ipynb`，答案汇总在附录 C；Manning 网站可免费下载含每章约 30 题的测验 PDF 自查。",
     ],
-    alternatives: [],
+    alternatives: ["happy-llm", "ai-engineering-from-scratch"],
     icon: {
       letter: "L",
       color: "#7C3AED",
@@ -9787,7 +9790,7 @@ README 把 CLI 参数一节标了 Unmaintained，但常用的还在：\`--mouth-
       "v2 的检查器要求本机有 Chrome / Edge / Chromium 且 Node 22+，它自身不安装任何东西；没有浏览器就只能拿到方向建议。",
       "出图不出代码用 `imagegen-frontend-web` / `imagegen-frontend-mobile` / `brandkit`；要先审计再改老项目用 `redesign-existing-projects`；代理老输出半成品就加 `full-output-enforcement`。",
     ],
-    alternatives: [],
+    alternatives: ["appllama-skills", "typeui"],
     icon: {
       letter: "T",
       color: "#DB2777",
@@ -9922,7 +9925,7 @@ README 里有一条 Disclaimer：Taste Skill 没有官方代币、代币或加�
       "服务起来就是 OpenAI 兼容接口（另有 Anthropic Messages API 与 gRPC），现有按 OpenAI 写的代码改 base_url 即可接入。",
       "要开发或改内核就走 build-wheel-from-source 从源码构建，别在 pip 安装的包上改。",
     ],
-    alternatives: [],
+    alternatives: ["sglang"],
     icon: {
       letter: "V",
       color: "#0891B2",
@@ -10046,7 +10049,7 @@ vLLM 是生产组件，不是本地玩具。以下情况都不划算：
       "启动后先 `curl -f http://localhost/api/v1/system/healthz`，返回 200 再开网页；默认 HTTP 端口是 80，浏览器直接输机器 IP，不必带端口号。",
       "登录后第一件事是在模型供应商页添加 LLM、embedding 和 rerank（模型名、服务地址、API key）；从源码启动则要 Go 1.27、Clang 20、LLD 20、CMake ≥ 4.0 与 PCRE2 开发文件。",
     ],
-    alternatives: [],
+    alternatives: ["onyx", "weknora", "fastgpt"],
     icon: {
       letter: "R",
       color: "#2B6CB0",
@@ -10153,7 +10156,7 @@ README 的 Docker 配置页明确标注 **macOS 目前不在支持列表**。别
       "高吞吐解析走 HPD-Parsing：支持 OpenAI 兼容 serving，也可以通过定制 vLLM runtime 本地推理，环境与服务化步骤看官方 HPD-Parsing 教程。",
       "选模型先定档位：PP-OCRv6 有 tiny(1.5M) / small(7.7M) / medium(34.5M) 三档，端侧、移动端、服务器各取所需，别一上来就上最大的。",
     ],
-    alternatives: [],
+    alternatives: ["opendataloader-pdf"],
     icon: {
       letter: "P",
       color: "#1E6FD9",
@@ -10350,7 +10353,7 @@ Canvas 连的是 Agent Server（一个 REST API，一台机器一个 host/port�
       "临时抓用命令行 `crwl`：`crwl https://example.com -o markdown`；深爬 `crwl URL --deep-crawl bfs --max-pages 10`；带 LLM 提问先 `crwl config` 配 key。",
       "接编码代理：`claude mcp add --transport http crawl4ai https://api.crawl4ai.com/mcp --header \"Authorization: Bearer $CRAWL4AI_KEY\"`；自托管 Docker 同样提供 MCP 端点。",
     ],
-    alternatives: [],
+    alternatives: ["firecrawl"],
     icon: {
       letter: "C",
       color: "#3E7B4F",
@@ -10608,7 +10611,7 @@ InfoQuest 的 reader、网页搜索、图片搜索用的是 **30 秒 HTTP 连接
       "一键部署到 Vercel / Zeabur / Sealos / 阿里云时记得填 OPENAI_API_KEY；Vercel 分配的域名在部分地区 DNS 被污染，建议绑自定义域名。",
       "fork 之后只保留 upstream sync 这个 GitHub Action，其余全部禁用；用一键部署建的项目会一直提示更新，要按官方的 Auto Sync With Latest 重来一遍。",
     ],
-    alternatives: [],
+    alternatives: ["autogpt"],
     icon: {
       letter: "L",
       color: "#4C6EF5",
@@ -10688,6 +10691,7 @@ Agent Groups、Pages、Schedule、Workspace 是按团队协作设计的。个人
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "rtk",
@@ -10715,7 +10719,7 @@ Agent Groups、Pages、Schedule、Workspace 是按团队协作设计的。个人
       "接入代理：`rtk init -g`（Claude Code / Copilot 默认），Gemini CLI 加 `--gemini`，Codex 加 `--codex`，Cursor / Windsurf / Cline / Kilo Code / Trae 等各有 `--agent <name>`；改完必须重启代理才生效。",
       "Windows 用预编译包时把 rtk.exe 放进 PATH（如 C:\\Users\\<你>\\.local\\bin），从命令提示符 / PowerShell / Windows Terminal 运行，不要双击 exe。",
     ],
-    alternatives: [],
+    alternatives: ["caveman"],
     icon: {
       letter: "R",
       color: "#8B5E3C",
@@ -10838,7 +10842,7 @@ rtk run <cmd>                   # 原样执行，不过滤
       "不要求必须有仓库：直接描述一句需求就能出图；想画真实系统就让代理先读仓库，README 的案例是针对某个具体 commit 做的追踪。",
       "介意联网可设 `ARCHIFY_UPDATE_CHECK_DISABLED=1`：默认只会 GET 一个固定的稳定 manifest 用于提醒，不会自动下载或安装更新。",
     ],
-    alternatives: [],
+    alternatives: ["next-ai-draw-io"],
     icon: {
       letter: "A",
       color: "#6B4E9B",
@@ -11044,7 +11048,7 @@ README 写得很明确：**会 Python，知道怎么通过 API 调一次 LLM**�
       "Windows 装 Core 的顺序不能反：先 `uv pip install torchao`，再 `uv pip install unsloth --torch-backend=auto`；官方示例是 Python 3.13 + venv。",
       "Docker：`docker run -d --name unsloth --gpus all --ipc=host -p 8000:8000 -p 8888:8888 -v \"$PWD\":/workspace/host -v \"$HOME/.cache/huggingface\":/workspace/.cache/huggingface -v unsloth-studio:/opt/unsloth-studio unsloth/unsloth`；AMD 用 unsloth/unsloth-rocm，只要 notebook 用 :core 标签。",
     ],
-    alternatives: [],
+    alternatives: ["llamafactory", "ludwig"],
     icon: {
       letter: "U",
       color: "#2C7A7B",
@@ -11157,7 +11161,7 @@ Linux / Mac 上先配一次 NVIDIA toolkit（官方脚本 \`install_nvidia_toolk
       "本地部署用 Docker Hub 上的 `hiyouga/llamafactory` 镜像；依赖版本与详细安装步骤以官方文档站 llamafactory.readthedocs.io 为准，README 没钉版本号。",
       "ASCEND NPU 与 AMD GPU 各有单独文档（readthedocs 的 multibackend/npu 与 ROCm 文档），别照通用 CUDA 教程装。",
     ],
-    alternatives: [],
+    alternatives: ["unsloth", "ludwig"],
     icon: {
       letter: "L",
       color: "#975A16",
@@ -11255,7 +11259,7 @@ README 用 NOTE 明确写：**除了它列出的那几个链接，其他网站�
       "装完 `headroom doctor` 确认路由生效，`headroom perf` 看节省，`headroom dashboard` 看实时数据（代理必须在跑）。",
       "用 DeepSeek / OpenRouter / 自建网关这类第三方 OpenAI 兼容服务时，wrap 必须加 `--openai-api-url https://...`（或先 export `OPENAI_TARGET_API_URL`），否则 key 会被发到 OpenAI 并返回 401。",
     ],
-    alternatives: [],
+    alternatives: ["caveman"],
     icon: {
       letter: "H",
       color: "#4A5568",
@@ -11686,7 +11690,7 @@ python3 scripts/project_test.py retrieval-evaluation-lab \\
       "看结果用 `strix view`（最近一次）或 `strix view my-run-name`；要固定端口对外用 `strix view --host 0.0.0.0 --port 8080 --no-open`，默认只绑 127.0.0.1 并打印带 token 的链接。",
       "升级看装法：standalone 用 `strix --update`；pipx / uv / pip 装的它会直接打印对应命令（`pipx upgrade strix-agent` / `uv tool upgrade strix-agent` / `pip install --upgrade strix-agent`）。",
     ],
-    alternatives: [],
+    alternatives: ["pentagi"],
     icon: {
       letter: "S",
       color: "#9B2C2C",
@@ -11808,7 +11812,7 @@ strix view --host 0.0.0.0 --port 8080 --no-open   # 需要固定端口对外时
       "Windows 上 `npm install` 报 `ERR_INVALID_ARG_TYPE` 就改用 `npx --yes npm install`；PowerShell 的等价命令 README 里也给了。",
       "API key 全部可选、按需往 .env 加：`FAL_KEY`（FLUX 图 + Veo / Kling / MiniMax 视频）、`ATLASCLOUD_API_KEY`、`KLING_API_KEY`、`PEXELS_API_KEY`、`PIXABAY_API_KEY`（后两个是免费素材）。",
     ],
-    alternatives: [],
+    alternatives: ["hypit"],
     icon: {
       letter: "O",
       color: "#B7791F",
@@ -11914,7 +11918,7 @@ AGPL-3.0，改了要一并开源。它不是一个独立软件——**必须挂�
       "从无鉴权的旧版升级要先处理鉴权：设 `ADMIN_API_KEY` 或走注册向导；`AUTH_DISABLED=true` 仅限本地开发。",
       "终端管记忆用 CLI：`npm install -g @mem0/cli`（或 `pip install mem0-cli`），`mem0 add \"Prefers dark mode and vim keybindings\" --user-id alice`、`mem0 search \"...\" --user-id alice`。",
     ],
-    alternatives: [],
+    alternatives: ["mempalace"],
     icon: {
       letter: "M",
       color: "#2C5282",
@@ -12036,7 +12040,7 @@ cd server && docker compose up -d   # 手动：起栈后走浏览器向导
       "在意隐私就先关遥测：服务端或 Docker 的 .env 里设 `DISABLE_TELEMETRY=true`，也可以在应用内 侧栏 > Privacy 里关。",
       "改代码：`yarn setup` 生成各部分的 .env（务必填 server/.env.development），再 `yarn dev:server`、`yarn dev:frontend`、`yarn dev:collector` 分别起。",
     ],
-    alternatives: [],
+    alternatives: ["onyx", "fastgpt"],
     icon: {
       letter: "A",
       color: "#1A365D",
@@ -14107,6 +14111,7 @@ npm run dev:energy       # energy.worldmonitor.app
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "daily-stock-analysis",
@@ -14135,7 +14140,7 @@ npm run dev:energy       # energy.worldmonitor.app
       "免费行情源（AkShare / Baostock / YFinance）够用但会被上游限流，长期定时或批量分析建议在 TUSHARE_TOKEN、Longbridge 等 token 型数据源里按市场补一个。",
       "要 Web 工作台与策略问股用 python main.py --webui，访问 127.0.0.1:8000；Agent 问股需要已配置任意可用模型 key。",
     ],
-    alternatives: [],
+    alternatives: ["tradingagents"],
     icon: {
       letter: "D",
       color: "#A8322D",
@@ -14200,6 +14205,7 @@ README 末尾写着：本项目仅供学习和研究使用，不构成任何投�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "minimind",
@@ -14228,7 +14234,7 @@ README 末尾写着：本项目仅供学习和研究使用，不构成任何投�
       "多卡用 torchrun --nproc_per_node N train_xxx.py；中断了加 --from_resume 1 可从 ./checkpoints 恢复，支持跨 GPU 数量恢复。",
       "想用 WebUI 必须先把模型文件夹复制到 ./scripts/ 下（如 cp -r minimind-3 ./scripts/minimind-3），再 cd scripts && streamlit run web_demo.py，否则扫描不到权重直接报错。",
     ],
-    alternatives: [],
+    alternatives: ["happy-llm", "llms-from-scratch"],
     icon: {
       letter: "M",
       color: "#2E6F5E",
@@ -14298,6 +14304,7 @@ README 明确不建议重新训练 tokenizer：词表和切分规则一变，模
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "context7",
@@ -14402,6 +14409,7 @@ How do I set up a Next.js 16 proxy? use context7
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "trendradar",
@@ -14430,7 +14438,7 @@ How do I set up a Next.js 16 proxy? use context7
       "推送时段统一由 timeline.yaml 控制，先选预设模板（如 morning_evening 早晚汇总）再微调；两个时段若时间重叠系统会直接报错提醒。",
       "从 v6.0.0 以前升级要重做配置：config.yaml 已是 2.0.0，旧的 push_window / analysis_window 不兼容，必须照新版迁移。",
     ],
-    alternatives: [],
+    alternatives: ["huginn"],
     icon: {
       letter: "T",
       color: "#C2410C",
@@ -14499,6 +14507,7 @@ v6.0.0 起，采集、推送、AI 分析的时间统一写在 \`timeline.yaml\` 
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "litellm",
@@ -14618,6 +14627,7 @@ curl -X POST 'http://0.0.0.0:4000/v1/chat/completions' \\
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "mempalace",
@@ -14731,6 +14741,7 @@ README 顶部挂着醒目警告：MemPalace 没有其它官网，唯一官方来
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "humanizer",
@@ -14862,6 +14873,7 @@ Now humanize this text:
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "ai-agent-book",
@@ -14890,7 +14902,7 @@ Now humanize this text:
       "没装 uv 也能跑：python -m pip install -e \".[ch1]\"，但不会使用锁文件，依赖版本不如 uv 可复现。",
       "调用模型的实验要先配凭据：多数可在仓库根目录把 .env.example 复制成 .env 填一个厂商 key；只有实验明确列出 ollama 时才启用本地模型并加 --provider ollama。",
     ],
-    alternatives: [],
+    alternatives: ["hello-agents"],
     icon: {
       letter: "A",
       color: "#3B5B8C",
@@ -14960,6 +14972,7 @@ FAQ 里给了一个很具体的收尾项目：从头做一个像 Claude Code 那
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "llama-index",
@@ -14988,7 +15001,7 @@ FAQ 里给了一个很具体的收尾项目：从头做一个像 Claude Code 那
       "要 agentic OCR / 复杂文档抽取，走 LlamaParse 平台（130+ 格式，含 Parse / Extract / Index / Split / Agents 五个能力），可以脱离框架单独用。",
       "最新教程以文档站为准——README 明确说它自己更新不频繁，示例在仓库的 docs/examples 目录。",
     ],
-    alternatives: [],
+    alternatives: ["langchain"],
     icon: {
       letter: "L",
       color: "#D97706",
@@ -15069,6 +15082,7 @@ README 自己声明：它更新得没有文档站勤，最新教程请以 develo
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "huginn",
@@ -15097,7 +15111,7 @@ README 自己声明：它更新得没有文档站勤，最新教程请以 develo
       "用 PostgreSQL 时所有命令要前缀 DATABASE_ADAPTER=postgresql；db:seed 会在日志里打印 admin 密码，也可以提前用 SEED_PASSWORD 指定。",
       "第三方代理可以做成 gem，用环境变量 ADDITIONAL_GEMS 加载，不用改核心仓库。",
     ],
-    alternatives: [],
+    alternatives: ["n8n"],
     icon: {
       letter: "H",
       color: "#B45309",
@@ -15168,6 +15182,7 @@ bundle exec foreman start
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "localai",
@@ -15283,6 +15298,7 @@ sudo xattr -d com.apple.quarantine /Applications/LocalAI.app
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "nanobot",
@@ -15311,7 +15327,7 @@ sudo xattr -d com.apple.quarantine /Applications/LocalAI.app
       "在服务器上跑：nanobot webui --no-open，再在本地 ssh -N -L 127.0.0.1:8765:127.0.0.1:8765 user@SERVER 转发，浏览器打开服务端打印的完整登录链接（# 后面别丢）。",
       "要求 Python 3.11 或更高，并且必须自备模型 provider 或本地模型服务——nanobot 本身不提供模型账号。",
     ],
-    alternatives: [],
+    alternatives: ["hermes-agent"],
     icon: {
       letter: "N",
       color: "#2563EB",
@@ -15393,6 +15409,7 @@ ssh -N -L 127.0.0.1:8765:127.0.0.1:8765 user@SERVER
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "jeecgboot",
@@ -15489,6 +15506,7 @@ JeecgBoot 不是一个能一键跑起来的 demo，而是一整套企业级脚�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "cowagent",
@@ -15517,7 +15535,7 @@ JeecgBoot 不是一个能一键跑起来的 demo，而是一整套企业级脚�
       "部署到服务器必须改 config.json：web_host 设为 0.0.0.0 才能外网访问，同时设 web_password 保护控制台，并在防火墙/安全组放行 9899。",
       "模型可以在控制台里一键切换；聊天、视觉、图像生成、ASR/TTS、嵌入可以分别路由到不同厂商。",
     ],
-    alternatives: [],
+    alternatives: ["openclaw", "hermes-agent", "nanobot"],
     icon: {
       letter: "C",
       color: "#4338CA",
@@ -15598,6 +15616,7 @@ Skill Hub 一键安装，也支持从 GitHub、ClawHub 装，或者直接用自�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "open-code-review",
@@ -15721,6 +15740,7 @@ README 说得很直白：这是刻意用召回换精度、减少噪音的取舍�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "milvus",
@@ -15834,6 +15854,7 @@ Milvus 是为规模设计的：存算分离、可水平扩展、K8s 原生、副
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "jan",
@@ -15941,6 +15962,7 @@ make dev JAN_ENGINE_VARIANT=cuda13
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "kong",
@@ -16046,6 +16068,7 @@ K8s 环境直接用官方 **Kubernetes Ingress Controller**，别自己把网关
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "ray",
@@ -16142,6 +16165,7 @@ print(ray.get(futures))
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "herdr",
@@ -16229,6 +16253,7 @@ herdr 同时给 tmux 风格的 prefix 键和鼠标操作（点击、拖拽、分
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "langgraph",
@@ -16317,6 +16342,7 @@ LangGraph 里，流程是**图**，节点是步骤，边决定下一步去哪；
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "chatbox",
@@ -16414,6 +16440,7 @@ Windows 构建失败多半是脚本 shell 问题，README 给的解决办法是�
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "openhuman",
@@ -16507,6 +16534,7 @@ README 顶部写着「Early beta，expect rough edges」。能力清单（MCP、
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "astrbot",
@@ -16535,7 +16563,7 @@ README 顶部写着「Early beta，expect rough edges」。能力清单（MCP、
       "完全不想管服务器就选 RainYun 的一键云部署（24 小时在线）；桌面用户另有 AstrBot-desktop 与 Launcher，官方明确说桌面版不适合服务器场景。",
       "环境装好后插件从插件市场一键安装，第三方接入（Dify、百炼、Coze）走 LLMOps 类型的模型服务配置。",
     ],
-    alternatives: [],
+    alternatives: ["openclaw"],
     icon: {
       letter: "A",
       color: "#6B4E9B",
@@ -16610,6 +16638,7 @@ uv tool upgrade astrbot --python 3.12
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "deeptutor",
@@ -16705,6 +16734,7 @@ v1.5.17 起提供 \`deeptutor doctor\`，环境、连接、凭证这类问题先
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "tidb",
@@ -16798,6 +16828,7 @@ README 提供了完整的 troubleshooting 文档。日常排查的顺序建议�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "lightrag",
@@ -16826,7 +16857,7 @@ README 提供了完整的 troubleshooting 文档。日常排查的顺序建议�
       "要用 docx 的 smart_heading 特性，装完还得跑 `lightrag-download-cache --spacy-install` 拉两个语言模型；处理带内嵌 SVG 的 markdown/textpack，系统还要装 libcairo（Debian/Ubuntu 是 libcairo2）。",
       "离线或隔离网络环境先看仓库里的 Offline Deployment Guide，提前把依赖和缓存装齐。",
     ],
-    alternatives: [],
+    alternatives: ["graphrag"],
     icon: {
       letter: "L",
       color: "#4C6EF5",
@@ -16901,6 +16932,7 @@ v2025.11 起集成了 RAGAS 做评估和 Langfuse 做 tracing，并且 API 会�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "quivr",
@@ -16994,6 +17026,7 @@ v0 的告警已经支持三种：关键字（\`"Acme" AND (grève OR strike) NOT
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "ui-tars-desktop",
@@ -17022,7 +17055,7 @@ v0 的告警已经支持三种：关键字（\`"Acme" AND (grève OR strike) NOT
       "UI-TARS Desktop 走另一条路：下桌面应用，用本地或远程 computer / browser operator，需要 UI-TARS 或 Seed-1.5-VL/1.6 系列视觉模型。",
       "要扩展能力就挂 MCP Server，Agent TARS 的内核本身就建在 MCP 上。",
     ],
-    alternatives: [],
+    alternatives: ["browser-use"],
     icon: {
       letter: "U",
       color: "#3B5BDB",
@@ -17098,6 +17131,7 @@ Agent TARS 的内核建在 MCP 上，额外能力通过挂载 MCP Server 接入�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "pageindex",
@@ -17206,6 +17240,7 @@ OSS-Benchmark 用的是上面那段 quickstart 的配置（本地模式 + flash 
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "langextract",
@@ -17347,6 +17382,7 @@ html_content = lx.visualize("extraction_results.jsonl")
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "ai-engineering-hub",
@@ -17374,7 +17410,7 @@ html_content = lx.visualize("extraction_results.jsonl")
       "跑项目前先读该项目目录下的说明，确认需要哪些第三方 API key（Firecrawl、AssemblyAI、Groq 等），先把 key 备齐再动手。",
       "很多项目以 Jupyter / Colab notebook 形式提供，本地没有 GPU 时优先用 Colab 链接直接跑。",
     ],
-    alternatives: [],
+    alternatives: ["rag-techniques"],
     icon: {
       letter: "A",
       color: "#F08C00",
@@ -17444,6 +17480,7 @@ MIT 协议，流程是 fork → 建分支 → 提 PR，细节看 CONTRIBUTING.md
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "airllm",
@@ -17562,6 +17599,7 @@ python air_llm/examples/train_qwen38_flash_next_lora.py --data my_data.jsonl
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "copilotkit",
@@ -17680,6 +17718,7 @@ Intelligence 可以用托管平台，也可以自托管在你自己的 K8s / VPC
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "llmfit",
@@ -17798,6 +17837,7 @@ llmfit doctor     # 输出硬件探测报告，提 bug 时附上它
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "prompt-optimizer",
@@ -17897,6 +17937,7 @@ README 用明确的语气警告过，**别跳过**：
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "khoj",
@@ -17994,6 +18035,7 @@ README 用明确的语气警告过，**别跳过**：
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "arthas",
@@ -18110,6 +18152,7 @@ Arthas 回答的是「**这一刻**这个 JVM 里发生了什么」，非常适�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "vane",
@@ -18207,6 +18250,7 @@ Upcoming Features 里「Adding authentication」还画着未完成的勾。也�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "1panel",
@@ -18298,6 +18342,7 @@ bash -c "$(curl -sSL https://resource.1panel.pro/v2/quick_start.sh)"
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "sglang",
@@ -18325,7 +18370,7 @@ bash -c "$(curl -sSL https://resource.1panel.pro/v2/quick_start.sh)"
       "改源码要从 `lmsysorg/sglang:dev` 镜像起，把仓库挂进去后在根目录 `pip install -e \"python\"`，这样测试跑的是你本地改动；生产别用 dev 镜像。",
       "起步别自己拼启动参数，去 Cookbook 按「模型 + 硬件」查出一条现成的 launch 命令。",
     ],
-    alternatives: [],
+    alternatives: ["vllm"],
     icon: {
       letter: "S",
       color: "#7A3E9D",
@@ -18393,6 +18438,7 @@ SGLang Diffusion 是内置的图片 / 视频生成引擎，就在 \`sglang\` 这
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "graphrag",
@@ -18420,7 +18466,7 @@ SGLang Diffusion 是内置的图片 / 视频生成引擎，就在 \`sglang\` 这
       "每次小版本升级都跑 `graphrag init --root [path] --force` 拿最新配置格式，注意它会覆盖配置与 prompt，先备份。",
       "跨大版本升级先跑官方提供的迁移 notebook，否则已有数据集要重新索引。",
     ],
-    alternatives: [],
+    alternatives: ["lightrag"],
     icon: {
       letter: "G",
       color: "#0F6CBD",
@@ -18482,6 +18528,7 @@ README 明确说：这份代码是方法论的演示，不是受支持的 Micros
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "continue",
@@ -18565,6 +18612,7 @@ README 第一句就写着：\`continuedev/continue\` 仓库已不再活跃维护
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "deepseek-reasonix",
@@ -18592,7 +18640,7 @@ README 第一句就写着：\`continuedev/continue\` 仓库已不再活跃维护
       "CLI 起手三条：`reasonix setup` 配 provider 与模型，`reasonix` 进交互会话，`reasonix run \"任务描述\"` 直接跑一条；交互会话里用 /init 让它生成项目说明。",
       "VS Code 扩展不打包 CLI，它只是拉起你本地的 reasonix acp 后端，所以要先装 1.x CLI；扩展 ID 是 SivanLiu.reasonix-agent。",
     ],
-    alternatives: [],
+    alternatives: ["oh-my-pi", "gemini-cli"],
     icon: {
       letter: "D",
       color: "#4D6BFE",
@@ -18655,6 +18703,7 @@ reasonix web                        # 在本机开一个 Web 界面
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "langfuse",
@@ -18746,6 +18795,7 @@ tracing 只是入口。看到一条坏结果，可以直接跳到 Playground 改
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "qwenpaw",
@@ -18850,6 +18900,7 @@ Windows LTSC 或受严格策略管理的机器上，PowerShell 可能处于 Cons
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "vibe-trading",
@@ -18877,7 +18928,7 @@ Windows LTSC 或受严格策略管理的机器上，PowerShell 可能处于 Cons
       "只认官方渠道：README 点名的 X 账号 VibeTrading_HKU、Virtuals 项目 101845、合约 0x640BDBF77b6447E8b7DB7894cED84BD1c40571f4 都不是官方资产，别买、别连钱包、别签名。",
       "用之前先读 CHANGELOG 的 scope 与 limits，数据口径与券商能力限制都写在那里（例如 mStock 不参与组合聚合、Robinhood 期权下单不可用）。",
     ],
-    alternatives: [],
+    alternatives: ["tradingagents"],
     icon: {
       letter: "V",
       color: "#0E7C66",
@@ -18937,6 +18988,7 @@ README 明确列出限制：mStock 不参与组合聚合，Robinhood 期权下�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "oh-my-pi",
@@ -18964,7 +19016,7 @@ README 明确列出限制：mStock 不参与组合聚合，Robinhood 期权下�
       "钉版本：`curl -fsSL https://omp.sh/install | sh -s -- --binary --ref v<version>`；没有可用 bun 或加 --binary 时，脚本会拉预编译二进制并校验 SHA-256 再安装。",
       "Alpine / musl 要先 `apk add libstdc++ libgcc`，否则预编译的 musl 二进制起不来。",
     ],
-    alternatives: [],
+    alternatives: ["deepseek-reasonix"],
     icon: {
       letter: "O",
       color: "#C2410C",
@@ -19044,6 +19096,7 @@ eval "$(omp completions zsh)"    # bash / fish 同理
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "book-to-skill",
@@ -19148,6 +19201,7 @@ python3 scripts/extract.py --check
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "anthropic-cybersecurity-skills",
@@ -19237,6 +19291,7 @@ README 顶部写明：这是独立社区项目，与 Anthropic PBC 无关；库�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "happy-llm",
@@ -19264,7 +19319,7 @@ README 顶部写明：这是独立社区项目，与 Anthropic PBC 无关；库�
       "PDF 版在 GitHub Releases 里（v1.0.2），官方预加了 Datawhale 水印防倒卖，不影响阅读；配套教学 PPT 在另一个仓库 happy-llm-ppt。",
       "没有 GPU 也能对照第 5 章：作者把 215M 的 base 与 SFT 权重放到了 ModelScope，可以直接下载比对，不必从头预训练。",
     ],
-    alternatives: [],
+    alternatives: ["llms-from-scratch", "minimind"],
     icon: {
       letter: "H",
       color: "#D97706",
@@ -19352,7 +19407,7 @@ Extra Chapter 里还有一批社区投稿的专题笔记（小模型微调的意
       "要 GPU 加速先看 spacy.io/usage#gpu 的 CUDA 说明；默认是 CPU 路径，先确认真的需要 GPU 再折腾。",
       "想端到端地跑，去 explosion/projects 克隆官方项目模板改；系统学习可以用免费的在线课程 course.spacy.io。",
     ],
-    alternatives: [],
+    alternatives: ["langextract"],
     icon: {
       letter: "S",
       color: "#09A3D5",
@@ -19410,6 +19465,7 @@ spaCy 是「commercial open-source」，代码 MIT —— 商用没问题。但�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "weknora",
@@ -19437,7 +19493,7 @@ spaCy 是「commercial open-source」，代码 MIT —— 商用没问题。但�
       "想用本地 Ollama，先 `ollama serve > /dev/null 2>&1 &`，再在配置里设 OLLAMA_BASE_URL 与 embedding 模型名，具体见官方 Configuration 页。",
       "升级先在 .env 里把 WEKNORA_VERSION 设成目标版本再 pull + up -d，只跑 up -d 会复用缓存镜像导致 UI 版本与发布版不同步。",
     ],
-    alternatives: [],
+    alternatives: ["ragflow", "onyx"],
     icon: {
       letter: "W",
       color: "#1A6FC4",
@@ -19511,6 +19567,7 @@ README 用了 WARNING：WeKnora 自带登录鉴权，但生产部署强烈建议
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "aionui",
@@ -19594,6 +19651,7 @@ README 用了 WARNING：WeKnora 自带登录鉴权，但生产部署强烈建议
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "nacos",
@@ -19688,6 +19746,7 @@ Spring 用 nacos-spring-project；Spring Cloud Alibaba 是一站式方案，把 
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "agentscope",
@@ -19805,6 +19864,7 @@ cd examples/web_ui && pnpm install && pnpm dev  # 前端
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "zeroclaw",
@@ -19831,7 +19891,7 @@ cd examples/web_ui && pnpm install && pnpm dev  # 前端
       "Windows 走官方文档的预编译 PowerShell 路径，不需要 Rust；源码与文档构建是另一条安装路线。",
       "常驻运行用 `zeroclaw service install` 再 `zeroclaw service start`；先在 supervised 模式确认工具审批和工作区范围。",
     ],
-    alternatives: [],
+    alternatives: ["openclaw", "nanobot"],
     icon: {
       letter: "Z",
       color: "#B7410E",
@@ -19894,6 +19954,7 @@ zeroclaw auth status
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "onyx",
@@ -19920,7 +19981,7 @@ zeroclaw auth status
       "只想试 UI 与 Agent 可选 Onyx Lite，内存需求低于 1GB；它不包含文档索引能力，别拿它验证企业搜索。",
       "完整 Standard 会增加向量/关键词索引、同步 worker、推理服务、Redis 与 MinIO，部署前先规划持久卷和备份。",
     ],
-    alternatives: [],
+    alternatives: ["ragflow", "fastgpt"],
     icon: {
       letter: "O",
       color: "#2563EB",
@@ -19973,6 +20034,7 @@ Onyx 还支持 Docker、Kubernetes、Helm/Terraform 与主要云厂商。测试�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "code-review-graph",
@@ -19999,7 +20061,7 @@ Onyx 还支持 Docker、Kubernetes、Helm/Terraform 与主要云厂商。测试�
       "在仓库中执行 `code-review-graph build` 建图，安装后要重启编辑器或 CLI 才能加载新的 MCP 与规则。",
       "若输出为 `partial`，按摘要列出的解析失败文件处理；不要忽略 stderr 的 Warning，也不要把旧图行当成最新结果。",
     ],
-    alternatives: [],
+    alternatives: ["graphify", "codebase-memory-mcp"],
     icon: {
       letter: "C",
       color: "#0F766E",
@@ -20052,6 +20114,7 @@ GitHub Action 在 runner 本地建图并更新一条 PR 评论，内容包含风
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "scrapegraph-ai",
@@ -20078,7 +20141,7 @@ GitHub Action 在 runner 本地建图并更新一条 PR 评论，内容包含风
       "本地模型示例使用 `ollama/llama3.2`，要先安装 Ollama 并用 `ollama pull` 下载对应模型。",
       "不需要匿名遥测时设置 `SCRAPEGRAPHAI_TELEMETRY_ENABLED=false`；批量抓取前先评估模型 token、代理和浏览器资源。",
     ],
-    alternatives: [],
+    alternatives: ["firecrawl"],
     icon: {
       letter: "S",
       color: "#7C3AED",
@@ -20148,6 +20211,7 @@ print(graph.run())
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "graphiti",
@@ -20235,6 +20299,7 @@ Docker Compose 可用 \`docker compose up\` 起 Neo4j 配套服务，FalkorDB pr
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "pytorch-lightning",
@@ -20315,6 +20380,7 @@ trainer.fit(model, train_loader, val_loader)
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "xiaozhi-esp32",
@@ -20390,6 +20456,7 @@ README 建议 Linux 编译，原因是更快且驱动问题更少。Windows 也�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "9router",
@@ -20474,6 +20541,7 @@ OAuth 与 API Key 会集中到本地路由器。只绑定本机或可信内网�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "mcp-for-blender",
@@ -20555,6 +20623,7 @@ uvx mcp-for-blender install-addon
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "serena",
@@ -20659,7 +20728,7 @@ Serena 支持全局、启动命令、项目本地覆盖、客户端 context 和 
       "服务用 `python -m uvicorn main:app --reload` 启动，默认访问 localhost:8000；完整 Docker Compose 还会起 React 前端在 3000。",
       "只嵌入 Python 项目可 `pip install gpt-researcher`；本地文件研究设置 `DOC_PATH` 并选择 local report source。",
     ],
-    alternatives: [],
+    alternatives: ["deer-flow"],
     icon: {
       letter: "G",
       color: "#14B8A6",
@@ -20715,6 +20784,7 @@ python -m uvicorn main:app --reload
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "openai-agents-python",
@@ -20801,6 +20871,7 @@ RealtimeAgent 通过 WebSocket 维护低延迟会话；VoicePipeline 串联转�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "nautilus-trader",
@@ -20874,6 +20945,7 @@ RealtimeAgent 通过 WebSocket 维护低延迟会话；VoicePipeline 串联转�
         },
       ],
     },
+    license: "LGPL-3.0",
   },
   {
     slug: "rag-techniques",
@@ -20900,7 +20972,7 @@ RealtimeAgent 通过 WebSocket 维护低延迟会话；VoicePipeline 串联转�
       "一次只换一个检索变量，保留同一问题集和评价口径；否则无法判断提升来自哪个技巧。",
       "Notebook 依赖模型与数据源可能不同，复制到本地前逐个检查单元格里的 Key、包与外部下载，不要整库盲目执行。",
     ],
-    alternatives: [],
+    alternatives: ["ai-engineering-hub"],
     icon: {
       letter: "R",
       color: "#8B5CF6",
@@ -20981,7 +21053,7 @@ Notebook 证明的是“技术在示例上可运行”。生产仍需权限、�
       "完成后访问 `http://localhost:3000`；用 `npx sim-setup status` 看健康状态，配置问题先跑 `npx sim-setup doctor`。",
       "macOS 桌面端要求 macOS 12+；本地模型可接 Ollama 或 vLLM，但仍要按自托管文档配置。",
     ],
-    alternatives: [],
+    alternatives: ["fastgpt", "autogpt", "n8n"],
     icon: {
       letter: "S",
       color: "#6C5CE7",
@@ -21042,6 +21114,7 @@ Chat 是 Sim 管理服务。向导会打开浏览器登录并保存 Chat API Key
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "fastgpt",
@@ -21068,7 +21141,7 @@ Chat 是 Sim 管理服务。向导会打开浏览器登录并保存 Chat API Key
       "完整启动后访问 `http://localhost:3000`，README 默认账号 root、密码 1234；首次登录立即改密码并限制网络访问。",
       "商用前阅读 FastGPT Open Source License：允许后台服务商用，但未经授权不允许提供 SaaS，且需保留版权信息。",
     ],
-    alternatives: [],
+    alternatives: ["sim", "dify"],
     icon: {
       letter: "F",
       color: "#3370FF",
@@ -21118,6 +21191,7 @@ docker compose up -d
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "opendataloader-pdf",
@@ -21144,7 +21218,7 @@ docker compose up -d
       "把多个文件一次传给 `convert()`；每次调用都会新建 JVM，循环单文件会显著拖慢。",
       "复杂 PDF 安装 `[hybrid]`，先起 `opendataloader-pdf-hybrid --port 5002`，再用客户端 `--hybrid docling-fast` 处理。",
     ],
-    alternatives: [],
+    alternatives: ["paddleocr"],
     icon: {
       letter: "O",
       color: "#D97706",
@@ -21213,6 +21287,7 @@ Tagged PDF 使用 \`--format tagged-pdf\`，是开源自动标记能力；PDF/UA
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "cua",
@@ -21305,6 +21380,7 @@ Spaces 是 FSL-1.1-MIT；CUA-S1 代码为 MIT，模型和数据另看 card。Lum
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "python-telegram-bot",
@@ -21390,6 +21466,7 @@ Python 3.14 free threading 通过测试也不等于线程安全。遇到竞态�
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "page-agent",
@@ -21478,6 +21555,7 @@ Agent 能操作 DOM 不代表它应该拥有所有业务权限。登录、删除
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "cs249r-book",
@@ -21505,7 +21583,7 @@ Agent 能操作 DOM 不代表它应该拥有所有业务权限。登录、删除
       "硬件套件要把 ML 部署到 Arduino、Seeed、Grove 与树莓派，需要自备开发板，不是纯软件路径。",
       "卷三卷四只应从仓库 books/vol3、books/vol4 看开发进度，反馈走仓库的 Book feedback issue 表单。",
     ],
-    alternatives: [],
+    alternatives: ["ai-engineering-from-scratch"],
     icon: {
       letter: "M",
       color: "#A41034",
@@ -21664,6 +21742,7 @@ human-in-the-loop 靠 storage 记住执行状态，可以无限期暂停再恢�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "officecli",
@@ -21776,6 +21855,7 @@ officecli close deck.pptx
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "composio",
@@ -21875,6 +21955,7 @@ composio execute     # 直接跑
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "gitleaks",
@@ -21997,6 +22078,7 @@ README 顶部明确写了：Gitleaks 已 feature complete，不再合并新功�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "repomix",
@@ -22117,6 +22199,7 @@ repomix --include-logs --include-diffs
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "uptime-kuma",
@@ -22229,6 +22312,7 @@ README 明确列出不支持：FreeBSD / OpenBSD / NetBSD，以及 Replit / Hero
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "coolify",
@@ -22257,7 +22341,7 @@ README 明确列出不支持：FreeBSD / OpenBSD / NetBSD，以及 Replit / Hero
       "不想维护服务器就用 Coolify Cloud（app.coolify.io），定价见 coolify.io。",
       "升级与运维走官方文档；有任何异常先看部署与运行时日志，面板里可直接开容器终端排查。",
     ],
-    alternatives: [],
+    alternatives: ["dokploy", "dokku"],
     icon: {
       letter: "C",
       color: "#4F46E5",
@@ -22329,6 +22413,7 @@ Coolify 不需要在被管机器上安装 agent，只要能 SSH 上去：VPS、�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "appwrite",
@@ -22445,6 +22530,7 @@ Web、Flutter、Apple、Android、React Native 有客户端 SDK；Node、Python�
         },
       ],
     },
+    license: "BSD-3-Clause",
   },
   {
     slug: "clickhouse",
@@ -22541,6 +22627,7 @@ Slack 与 Telegram 可以实时和其他用户聊；文档站提供深入内容�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "gogs",
@@ -22636,6 +22723,7 @@ Slack 与 Telegram 可以实时和其他用户聊；文档站提供深入内容�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "reactive-resume",
@@ -22746,6 +22834,7 @@ v6 的 PDF 用 Forme 渲染，不需要 Browserless / Chromium / 外部打印服
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "tooljet",
@@ -22774,7 +22863,7 @@ v6 的 PDF 用 Forme 渲染，不需要 Browserless / Chromium / 外部打印服
       "让 agent 来建应用：装 MCP（docs.tooljet.com/docs/build-with-ai/mcp/overview），Claude Code / Codex / Grok Build 有打包了 app-builder skill 的插件，Cursor 等可直接配 MCP server。",
       "要扩展数据源或连接器用 `@tooljet/cli`（npm 包）写插件。",
     ],
-    alternatives: [],
+    alternatives: ["appsmith"],
     icon: {
       letter: "T",
       color: "#3B82F6",
@@ -22845,6 +22934,7 @@ CE 许可是 AGPL-3.0，有分发约束；采购前先确认你的用法是否�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "sharex",
@@ -22873,7 +22963,7 @@ CE 许可是 AGPL-3.0，有分发约束；采购前先确认你的用法是否�
       "给常用操作绑热键（官方有 keybinds 文档），滚动截图、区域捕获与 GIF 录制各配一个会明显提速。",
       "分享前用模糊、像素化或智能橡皮擦遮掉敏感信息，别指望事后撤回。",
     ],
-    alternatives: [],
+    alternatives: ["esearch"],
     icon: {
       letter: "S",
       color: "#E85324",
@@ -22947,6 +23037,7 @@ ShareX 能把图片、文本、文件、文件夹、剪贴板内容与 URL 上�
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "trilium",
@@ -22975,7 +23066,7 @@ ShareX 能把图片、文本、文件、文件夹、剪贴板内容与 URL 上�
       "从 zadam/Trilium 迁过来不用特殊步骤，装好直接用现有数据库；但要核对版本对应关系（v0.90.4 之前 ↔ zadam v0.63.7）。",
       "用 TriliumDroid 时要在服务端关掉自动更新，因为同步版本必须与客户端一致。",
     ],
-    alternatives: [],
+    alternatives: ["obsidian"],
     icon: {
       letter: "T",
       color: "#1F6FEB",
@@ -23038,6 +23129,7 @@ ETAPI（REST API）可用来做批量导入导出与自动化；支持 Evernote 
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "dokploy",
@@ -23066,7 +23158,7 @@ ETAPI（REST API）可用来做批量导入导出与自动化；支持 Evernote 
       "数据库建好就把自动备份配到外部存储，别等到出事才补。",
       "自动化与脚本化走它自带的 CLI 或 API；部署结果接 Slack / Discord / Telegram / 邮件通知。",
     ],
-    alternatives: [],
+    alternatives: ["coolify", "dokku"],
     icon: {
       letter: "D",
       color: "#0EA5E9",
@@ -23249,6 +23341,7 @@ pages:
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "casaos",
@@ -23277,7 +23370,7 @@ pages:
       "更新可从界面 Settings → Update 做；终端方式要经 SSH 或直接接显示器键盘，命令 `wget -qO- https://get.casaos.io/update | sudo bash`；查版本 `casaos -v`。",
       "卸载用 `casaos-uninstall`（v0.3.3 及以上）；更早版本用 `curl -fsSL https://get.icewhale.io/casaos-uninstall.sh | sudo bash`。",
     ],
-    alternatives: [],
+    alternatives: ["1panel"],
     icon: {
       letter: "C",
       color: "#2563EB",
@@ -23351,6 +23444,7 @@ casaos -v          # 查版本
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "wails",
@@ -23451,6 +23545,7 @@ Wails 自带强大的 CLI，负责项目生成、编译与打包。模板里已�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "next-ai-draw-io",
@@ -23479,7 +23574,7 @@ Wails 自带强大的 CLI，负责项目生成、编译与打包。模板里已�
       "自托管：`git clone` 后 `npm install`，`cp env.example .env.local` 填供应商与 Key，再 `npm run dev`，打开 http://localhost:6002。",
       "多人共用可设 `ADMIN_PASSWORD` 后从 /admin 管理模型、访问码、功能开关与配额；多模型用 `AI_MODEL` 逗号分隔或 `ai-models.json`。",
     ],
-    alternatives: [],
+    alternatives: ["archify"],
     icon: {
       letter: "N",
       color: "#F08705",
@@ -23568,6 +23663,7 @@ npm run dev                 # 打开 http://localhost:6002
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "changedetection-io",
@@ -23763,6 +23859,7 @@ README 的安全提示写得很重：widget 会访问你的家庭自动化等个
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "signoz",
@@ -23855,6 +23952,7 @@ README 专门写了一节能力边界，值得照抄进你的预期管理：
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "dokku",
@@ -23882,7 +23980,7 @@ README 专门写了一节能力边界，值得照抄进你的预期管理：
       "装完还要补两步才算完成：用 `dokku domains:set-global` 设置全局域名，用 `dokku ssh-keys:add` 添加允许部署的 SSH key。",
       "升级有独立文档（dokku.com/docs/getting-started/upgrading/），不要直接重跑 bootstrap.sh 覆盖；需要无人值守安装也另有文档入口。",
     ],
-    alternatives: [],
+    alternatives: ["coolify", "dokploy"],
     icon: {
       letter: "D",
       color: "#4B8BBE",
@@ -23965,6 +24063,7 @@ dokku ssh-keys:add <name> ~/.ssh/id_rsa.pub
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "meetily",
@@ -24060,6 +24159,7 @@ Meetily 支持麦克风与系统音频同时采集，并带智能闪避与防削
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "proxmoxve",
@@ -24165,6 +24265,7 @@ Proxmox® 是 Proxmox Server Solutions GmbH 的注册商标，这个项目与官
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "karakeep",
@@ -24269,6 +24370,7 @@ Karakeep 自称 self-hosting first，但完整体验依赖的可不止一个进�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "analytics",
@@ -24369,6 +24471,7 @@ Plausible 的产品哲学是「少即是多」，所以第一件事不是装，�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "archivebox",
@@ -24478,6 +24581,7 @@ README 明确写了：默认会**同时把页面存到 archive.org** 做冗余�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "setup-ipsec-vpn",
@@ -24505,7 +24609,7 @@ README 明确写了：默认会**同时把页面存到 archive.org** 做冗余�
       "云主机有外部防火墙时（EC2 / GCE 等）必须放行 UDP 500 与 UDP 4500，这是「连不上」最常见的原因。",
       "装之前先更新系统：Ubuntu/Debian 用 `sudo apt-get update && sudo apt-get dist-upgrade`，CentOS/RHEL 系用 `sudo yum update`，然后重启；想换 DNS 就加 `sudo VPN_DNS_SRV1=1.1.1.1 VPN_DNS_SRV2=1.0.0.1 sh vpn.sh`。",
     ],
-    alternatives: [],
+    alternatives: ["algo"],
     icon: {
       letter: "s",
       color: "#2E5A88",
@@ -24615,7 +24719,7 @@ IKEv2 有几个专属变量：\`VPN_DNS_NAME\`（服务器域名，必须是完�
       "REST 与 GraphQL 用 Bearer token 鉴权，不要把管理界面或 API 网关直接暴露在公网。",
       "只对自有或已取得书面授权的目标运行；先把测试范围、时间窗和应急联系人写清楚再启动。",
     ],
-    alternatives: [],
+    alternatives: ["strix"],
     icon: {
       letter: "P",
       color: "#7B2D26",
@@ -24690,6 +24794,7 @@ README 有一节 Current Capability Boundaries，值得逐条读完再设定预�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "wox",
@@ -24787,6 +24892,7 @@ README 说明插件可以用 **Node.js、Python 或脚本**来写，也就是说
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "beszel",
@@ -24884,6 +24990,7 @@ Beszel 是**指标**监控与告警，不做日志检索，也不做链路追踪
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "nocobase",
@@ -24911,7 +25018,7 @@ Beszel 是**指标**监控与告警，不做日志检索，也不做链路追踪
       "想让编码代理一起搭，README 的示例是在项目目录里直接跑 `codex`（也支持 `claude`、`opencode`）；AI 集成指引见 docs 的 quick-start。",
       "先不装也行：官方有在线演示 demo.nocobase.com/new，可以先验证是不是你要的东西。",
     ],
-    alternatives: [],
+    alternatives: ["jeecgboot"],
     icon: {
       letter: "N",
       color: "#2E6F9E",
@@ -25017,7 +25124,7 @@ NocoBase 提供了「AI 员工」：前端能做分析、问答、辅助填表�
       "要给别人访问就得自己解决部署：开源版跑在本地工作站，README 明确说它不容易被组织内其他人访问；评估 Dash Enterprise 时重点看 App Manager、K8s 伸缩与无代码鉴权。",
       "重计算别塞进同步回调：Enterprise 有 Job Queue 做异步后台处理，开源场景下也要自己把耗时任务挪出回调。",
     ],
-    alternatives: [],
+    alternatives: ["streamlit"],
     icon: {
       letter: "D",
       color: "#1F3B63",
@@ -25106,6 +25213,7 @@ if __name__ == "__main__":
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "ohmyzsh",
@@ -25226,6 +25334,7 @@ README 的解释是：很多主题需要 **Powerline 字体**或 **Nerd 字体**
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "gemini-cli",
@@ -25254,7 +25363,7 @@ README 的解释是：很多主题需要 **Powerline 字体**或 **Nerd 字体**
       "认证三选一：直接 `gemini` 走 Google 账号登录（60 次/分钟、1000 次/天）；或 `export GEMINI_API_KEY=\"...\"` 用 API key；或 `export GOOGLE_API_KEY=\"...\"` 加 `export GOOGLE_GENAI_USE_VERTEXAI=true` 走 Vertex AI。",
       "非交互用法：`gemini -p \"解释这个代码库的架构\"`，加 `--output-format json` 拿结构化输出，`--output-format stream-json` 拿实时事件流。",
     ],
-    alternatives: [],
+    alternatives: ["deepseek-reasonix", "hermes-agent"],
     icon: {
       letter: "G",
       color: "#4285F4",
@@ -25357,6 +25466,7 @@ gemini -p "Run tests and deploy" --output-format stream-json
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "playwright",
@@ -25385,7 +25495,7 @@ gemini -p "Run tests and deploy" --output-format stream-json
       "只写脚本就 `npm i playwright`；用 VS Code 的话装官方扩展，能录操作生成代码、拾取定位器并直接看 trace。",
       "CI 里记得缓存浏览器二进制，首次 `npx playwright install` 下载量不小。",
     ],
-    alternatives: [],
+    alternatives: ["puppeteer"],
     icon: {
       letter: "P",
       color: "#2EAD33",
@@ -25446,6 +25556,7 @@ test.use({ storageState: 'auth.json' });
 export default defineConfig({
   use: {
     trace: 'on-first-retry',
+    license: "Apache-2.0",
   },
 });
 \`\`\`
@@ -25608,6 +25719,7 @@ pip uninstall agent-reach            # 卸 Python 包本身
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "puppeteer",
@@ -25739,6 +25851,7 @@ Puppeteer 不止支持 Chrome，Firefox 走的是 WebDriver BiDi。另外官方�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "sherlock",
@@ -25859,6 +25972,7 @@ Sherlock 查的是公开可见的账号存在性，不登录任何平台，也�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "orca",
@@ -25973,6 +26087,7 @@ README 结尾写着：we ship daily, so this list is perpetually behind，**chan
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "storybook",
@@ -26088,6 +26203,7 @@ README 自己列了迁移建议，说明生态一直在动，别照着旧教程�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "fzf",
@@ -26254,6 +26370,7 @@ fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "lazygit",
@@ -26374,6 +26491,7 @@ lazygit 是**另一套键位记忆**。头一两周你一定会比敲命令慢�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "payloads-all-the-things",
@@ -26480,6 +26598,7 @@ rg -i "your keyword" --glob '*.md'
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "hoppscotch",
@@ -26507,7 +26626,7 @@ rg -i "your keyword" --glob '*.md'
       "在网页版上打没有 CORS 头的接口会失败：去 Settings 开 Proxy Mode，或者装官方浏览器扩展（Firefox 与 Chrome 都有），README 明确写着扩展是用来修 CORS 问题的。",
       "要自托管看官方 docs.hoppscotch.io 的 self-host getting started，按 GitHub Flow 提 PR 参与贡献。",
     ],
-    alternatives: [],
+    alternatives: ["bruno"],
     icon: {
       letter: "H",
       color: "#4CBB7B",
@@ -26595,6 +26714,7 @@ HTTP 方法除了 GET / POST / PUT / PATCH / DELETE / HEAD / CONNECT / OPTIONS /
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "career-ops",
@@ -26731,6 +26851,7 @@ README 直接说了：the first runs are rough, it does not know you yet. 把它
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "ripgrep",
@@ -26877,6 +26998,7 @@ Andy Lester（ack 作者）维护了一份 ack / ag / git-grep / GNU grep / rg �
         },
       ],
     },
+    license: "Unlicense",
   },
   {
     slug: "tldr",
@@ -26903,7 +27025,7 @@ Andy Lester（ack 作者）维护了一份 ack / ag / git-grep / GNU grep / rg �
       "Rust 客户端 tlrc：macOS/Linux `brew install tlrc` 或 `cargo install tlrc --locked`，Windows `winget install tldr-pages.tlrc`。",
       "不想装任何东西：用网页版 https://tldr.inbrowser.app（支持 PWA 离线），或下载 PDF 版 https://github.com/tldr-pages/tldr/releases/latest/download/tldr-book.pdf。",
     ],
-    alternatives: [],
+    alternatives: ["cheat-sh"],
     icon: {
       letter: "T",
       color: "#2C9678",
@@ -27000,6 +27122,7 @@ README 自己列了一串同类：cheat.sh（聚合多来源，含 tldr）、dev
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "bat",
@@ -27189,6 +27312,7 @@ help() { "$@" --help 2>&1 | bathelp; }
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "win11debloat",
@@ -27315,6 +27439,7 @@ cd c:\\Win11Debloat
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "i-have-adhd",
@@ -27449,6 +27574,7 @@ README 的 Credits 说得很清楚：它 loosely based on《The Adult ADHD Tool 
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "x64dbg",
@@ -27560,6 +27686,7 @@ README 顶部列了一串社区入口：Discord、Slack、Gitter、Matrix、以�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "obsidian-skills",
@@ -27690,6 +27817,7 @@ README 用加粗强调过：**不要只拷内层的 \`skills/\` 目录**，要 c
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "shannon",
@@ -27855,6 +27983,7 @@ Shannon 解决的是另一个问题——**要测的软件远多于安全团队�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "agentic-awesome-skills",
@@ -27882,7 +28011,7 @@ Shannon 解决的是另一个问题——**要测的软件远多于安全团队�
       "按宿主简化：Cursor `npx agentic-awesome-skills --cursor`、Gemini CLI `--gemini`、Codex `--codex`、Kiro CLI `--kiro`、Antigravity CLI `--agy`、AdaL `--path .adal/skills`、自定义目录 `--path ./my-skills`。",
       "清单与计划：`aas stack validate` 校验 manifest，`aas stack plan` 写一份不可变预览；把审阅过的 ID 交给直接安装器用 `aas stack install-preview`（它只生成 --dry-run 预览，不会应用 Core 计划）。",
     ],
-    alternatives: [],
+    alternatives: ["anthropic-cybersecurity-skills"],
     icon: {
       letter: "A",
       color: "#6D4A9C",
@@ -28001,6 +28130,7 @@ GitHub 仓库是 canonical；\`aaskills.tech\` 的托管目录和浏览器本地
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "bruno",
@@ -28028,7 +28158,7 @@ GitHub 仓库是 canonical；\`aaskills.tech\` 的托管目录和浏览器本地
       "命令行跑集合：`npm install -g @usebruno/cli` 装 CLI，然后 `bru run`（整个集合）、`bru run request.bru`（单个请求）、`bru run folder --env Local`（按环境跑目录）。",
       "CI 里不想装 Node 就用官方镜像：`docker pull usebruno/cli:latest`（或 ghcr.io/usebruno/cli:latest），然后 `docker run -v $(pwd):/bruno usebruno/cli run`。",
     ],
-    alternatives: [],
+    alternatives: ["hoppscotch"],
     icon: {
       letter: "B",
       color: "#F07B3F",
@@ -28163,6 +28293,7 @@ README 说得很清楚：**多数功能是免费开源的**，付费版本提供
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "cli",
@@ -28288,7 +28419,7 @@ GitHub 托管 runner 上 gh 已经预装，但版本是「每周更新」的，�
       "装完必须重启编码代理，然后在会话里直接说「Index this project」，索引会自动开始。",
       "想看图谱可视化，跑 `codebase-memory-mcp --ui=true --port=9749`，浏览器打开 http://localhost:9749；界面由共享守护进程托管，多个代理会话不会起重复服务。",
     ],
-    alternatives: [],
+    alternatives: ["graphify", "code-review-graph"],
     icon: {
       letter: "C",
       color: "#2f6f4f",
@@ -28378,7 +28509,7 @@ Windows 上 Defender 可能把发布二进制判成 \`Trojan:Script/Wacatac.B!ml
       "想让别人访问，用官方 Community Cloud 免费部署；注册入口在 share.streamlit.io/signup。",
       "需要更多控件时看官方 API 文档的分类：widgets / data / charts / layout / multipage，别自己造轮子。",
     ],
-    alternatives: [],
+    alternatives: ["dash"],
     icon: {
       letter: "S",
       color: "#ff4b4b",
@@ -29179,7 +29310,7 @@ agent-platform, cd in, read the README, and follow the get started guide.
       "shell 模式（`cht.sh --shell`）能保持上下文，进某个语言后可以省略语言名；这个模式需要 `rlwrap`（`sudo apt install rlwrap`）。",
       "想要干净可粘贴的输出，加 `?Q` 去掉注释、`?T` 去掉语法高亮，可叠加为 `?QT`。",
     ],
-    alternatives: [],
+    alternatives: ["tldr"],
     icon: {
       letter: "C",
       color: "#2d7ff9",
@@ -29488,7 +29619,7 @@ codewhale exec --auto "fix the failing tests and explain what changed"
       "其他部署方式（各云、自建等）看官方文档的 Installation Guides 汇总页，别照着第三方博客的步骤走。",
       "要二次开发或改源码，先读仓库里的 contributions/CodeContributionsGuidelines.md，里面有本地开发环境搭建步骤。",
     ],
-    alternatives: [],
+    alternatives: ["tooljet"],
     icon: {
       letter: "A",
       color: "#f2a100",
@@ -29579,7 +29710,7 @@ README 里现在有一节介绍 Appsmith Agents，一个把 AI 模型接入私�
       "不碰命令行的还有 Cloudron、Tipi、Unraid 三个应用市场渠道，直接在里面搜 it-tools 即可。",
       "想知道会不会加某个工具，去看仓库的 issue 列表——roadmap 就放在那儿，缺什么直接提 feature request。",
     ],
-    alternatives: [],
+    alternatives: ["devtoys"],
     icon: {
       letter: "I",
       color: "#4b8bbe",
@@ -30257,6 +30388,7 @@ maigret --web 5000
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "trivy",
@@ -30350,6 +30482,7 @@ Trivy 是扫描器，不负责修复，也不替你判断豁免。误报要写�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "textual",
@@ -30377,7 +30510,7 @@ Trivy 是扫描器，不负责修复，也不替你判断豁免。误报要写�
       "不想污染本机环境：`uvx --python 3.12 textual-demo`，需要安装了 uv。",
       "要给别人看时 `textual serve \"python -m textual\"`，同一条命令既能在本地起服务也能指向自己的应用。",
     ],
-    alternatives: [],
+    alternatives: ["bubbletea", "ink"],
     icon: {
       letter: "T",
       color: "#5A56E0",
@@ -30451,6 +30584,7 @@ textual serve "python -m textual"
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "ai-website-cloner-template",
@@ -30543,6 +30677,7 @@ Node 需要 24 以上。版本低了会在构建阶段报语法错，而不是�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "openclaude",
@@ -30640,6 +30775,7 @@ openclaude kill auth-refactor
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "surrealdb",
@@ -30761,7 +30897,7 @@ RELATE user:tobie->write->article:surreal
       "默认 30 个工具不够时去扩展页装；也可以按 devtoys.app/doc 的文档自己写一个。",
       "所有处理都在本地完成，工具本身不需要联网——这也是它相对在线工具站的主要理由。",
     ],
-    alternatives: [],
+    alternatives: ["it-tools"],
     icon: {
       letter: "D",
       color: "#5B4CDB",
@@ -30820,6 +30956,7 @@ RELATE user:tobie->write->article:surreal
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "nuclei",
@@ -30909,6 +31046,7 @@ README 明确警告：本项目主要作为独立 CLI，当服务运行可能有
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "nginx",
@@ -30936,7 +31074,7 @@ README 明确警告：本项目主要作为独立 CLI，当服务运行可能有
       "源码编译最小依赖：`sudo apt install gcc make libpcre3-dev zlib1g-dev`；要 HTTPS 再加 libssl-dev。",
       "源码安装默认落到 /usr/local/nginx/，启动是 `sudo /usr/local/nginx/sbin/nginx`，配置文件在同目录 conf/ 下。",
     ],
-    alternatives: [],
+    alternatives: ["caddy"],
     icon: {
       letter: "N",
       color: "#009639",
@@ -31008,6 +31146,7 @@ worker 是多个进程，要统计「同一个 IP 打了几次」只能靠共享
         },
       ],
     },
+    license: "BSD-2-Clause",
   },
   {
     slug: "google-workspace-cli",
@@ -31108,6 +31247,7 @@ gws sheets spreadsheets values get \\
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "tqdm",
@@ -31307,6 +31447,7 @@ Lighthouse 告诉你「在这台机器、这个限速下页面表现如何」。
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "algo",
@@ -31334,7 +31475,7 @@ Lighthouse 告诉你「在这台机器、这个限速下页面表现如何」。
       "macOS/Linux 跑 `./algo`，Windows 跑 `.\\algo.ps1`（会自动用 WSL）；首次运行自动装 Python 3.11+ 环境。",
       "要用 IPsec 且以后要加删用户，部署时对「Do you want to retain the keys (PKI)?」必须选 yes。",
     ],
-    alternatives: [],
+    alternatives: ["setup-ipsec-vpn"],
     icon: {
       letter: "A",
       color: "#1F3A5F",
@@ -31414,6 +31555,7 @@ README 写得很直接：不承诺匿名，也不承诺对抗国家级对手。�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "opencli",
@@ -31441,7 +31583,7 @@ README 写得很直接：不承诺匿名，也不承诺对抗国家级对手。�
       "装完先 `opencli doctor` 自检，再 `opencli list` 看有哪些命令可用。",
       "多个 Chrome 配置档要显式指定：`opencli profile list` 查看，`opencli profile rename <id> work` 起别名，`opencli --profile work ...` 指定。",
     ],
-    alternatives: [],
+    alternatives: ["browser-use"],
     icon: {
       letter: "O",
       color: "#0F766E",
@@ -31521,6 +31663,7 @@ bilibili 的视频下载需要本机有 yt-dlp，没装会失败。其他平台�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "infisical",
@@ -31710,6 +31853,7 @@ npx nx run <target>    # 第二次应命中缓存
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "authelia",
@@ -31808,6 +31952,7 @@ session 存在 Redis，多副本部署时它是共享登录态的唯一途径。
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "superset",
@@ -31835,7 +31980,7 @@ session 存在 Redis，多副本部署时它是共享登录态的唯一途径。
       "每个数据源要单独装对应的 Python 驱动，装完重启服务才生效，缺驱动的表现是连不上而不是报错提示。",
       "给大表建 physical dataset 再建 chart，别用原始 SQL 每次全表扫；同时把缓存和查询超时配上。",
     ],
-    alternatives: [],
+    alternatives: ["dataease"],
     icon: {
       letter: "S",
       color: "#20A7C9",
@@ -31995,6 +32140,7 @@ ffmpeg -i in.mp4 -vf fps=1 out_%04d.jpg   # 每秒一帧
         },
       ],
     },
+    license: "LGPL-3.0",
   },
   {
     slug: "remotion",
@@ -32119,7 +32265,7 @@ README 直说：Remotion 有专门的许可证，某些情况下需要购买公�
       "给 Claude Code 用要先装插件：claude plugin marketplace add heygen-com/hyperframes，再 claude plugin install hyperframes@hyperframes，然后从 /hyperframes 路由进具体工作流。",
       "只装技能用 npx skills add heygen-com/hyperframes，但别选 --all，那会装全部 21 个；非交互环境直接用 npx hyperframes skills update 只装核心集。",
     ],
-    alternatives: [],
+    alternatives: ["remotion"],
     icon: {
       letter: "H",
       color: "#1F6FEB",
@@ -32384,7 +32530,7 @@ print(a + b)   # x 是 NaN，不是报错
       "系统要求 macOS 11.0 及以上，低于这个版本装上也跑不起来。",
       "自己编译先执行 ./other/download_libs.sh 拉预编译依赖，可用 --arch arm64 或 --arch x86_64 只下单一架构，然后用最新版 Xcode 打开 iina.xcodeproj。",
     ],
-    alternatives: [],
+    alternatives: ["mpv"],
     icon: {
       letter: "I",
       color: "#1E6F9F",
@@ -32564,7 +32710,7 @@ demo.launch()
       "镜像拉取慢是常态，docker-compose.yml 里已经用注释留了备用镜像地址，直接替换注释掉的那一行即可。",
       "源码跑需要 Python 3.9+ 与 PostgreSQL（也支持 MySQL），先建库再改 config.py，缺库会在启动阶段直接失败。",
     ],
-    alternatives: [],
+    alternatives: ["gpt-researcher"],
     icon: {
       letter: "B",
       color: "#C2410C",
@@ -32708,6 +32854,7 @@ npx @videojs/cli agents init
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "data-science-for-beginners",
@@ -32735,7 +32882,7 @@ npx @videojs/cli agents init
       "每课先做 warmup quiz 再看讲义，最后对照 /solutions 里的答案，顺序反了就失去练习意义。",
       "要本地跑 notebook 按 INSTALLATION.md 配 Python 环境；只是阅读的话 GitHub 网页和 Codespaces 就够，不必装任何东西。",
     ],
-    alternatives: [],
+    alternatives: ["ai-for-beginners"],
     icon: {
       letter: "D",
       color: "#0F6CBD",
@@ -33305,7 +33452,7 @@ app.add_page(index)
       "微软商店、Chocolatey（choco install screentogif）、FOSSHub 和 GitHub Releases 都能拿到，便携版解压即用。",
       "录完先在编辑器里删掉多余帧再导出：GIF 体积几乎完全由帧数和画布尺寸决定，前期剪掉比后期压缩有效。",
     ],
-    alternatives: [],
+    alternatives: ["sharex"],
     icon: {
       letter: "S",
       color: "#7C3AED",
@@ -33398,7 +33545,7 @@ app.add_page(index)
       "自建按 docs.invidious.io/installation 的步骤走，官方文档列了完整依赖与两种部署路径，先核对环境再动手。",
       "配合 Privacy Redirect 或 LibRedirect 扩展，可以把 YouTube 链接和网页里的嵌入视频自动转到你的实例，省掉手动改域名。",
     ],
-    alternatives: [],
+    alternatives: ["freetube"],
     icon: {
       letter: "I",
       color: "#CC0000",
@@ -33489,7 +33636,7 @@ README 里写了免责声明：不对第三方实例负责，也不为不当使�
       "机器至少 2 核 4G，低于这个规格装得上也跑不动仪表板。",
       "已经在用 1Panel 的话直接从应用商店装，比手动跑安装脚本省事，升级路径也更清楚。",
     ],
-    alternatives: [],
+    alternatives: ["superset"],
     icon: {
       letter: "D",
       color: "#1C64F2",
@@ -33864,7 +34011,7 @@ README 自己写了两条：数据仅供学术研究、部分接口可能因不�
       "支持 Windows 10 及以上、macOS 12 及以上，旧系统装上去问题会很多。",
       "换机前先在设置里导出订阅：订阅与历史存在本地，不跟着账号走，删了应用就没了。",
     ],
-    alternatives: [],
+    alternatives: ["invidious"],
     icon: {
       letter: "F",
       color: "#E11D48",
@@ -33956,7 +34103,7 @@ README 自己写了两条：数据仅供学术研究、部分接口可能因不�
       "下指令用 `/hypit Clone this video: /path/to/video.mp4, and replace the ranking content with ...`；没有参考片就直接描述要什么。",
       "模型服务可选：HypiHub 是官方推荐的托管服务，也可以自带 API 或本地模型，把服务名和接口文档告诉 agent 让它接。",
     ],
-    alternatives: [],
+    alternatives: ["openmontage"],
     icon: {
       letter: "H",
       color: "#E4572E",
@@ -34027,6 +34174,7 @@ Hypit 免费，但没有白送的生成能力。HypiHub 是官方推荐的托管
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "gsyvideoplayer",
@@ -34131,6 +34279,7 @@ README 明说 JitPack 会随机丢包，已迁到 MavenCentral；GitHub Packages
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "livekit",
@@ -34159,7 +34308,7 @@ README 明说 JitPack 会随机丢包，已迁到 MavenCentral；GitHub Packages
       "想造点流量：`lk room join --url ws://localhost:7880 --publish-demo my-first-room`，会推一路循环演示视频。",
       "建议同时装 LiveKit CLI，签 token、脚手架、部署 agent 都靠它。",
     ],
-    alternatives: [],
+    alternatives: ["jitsi-meet"],
     icon: {
       letter: "L",
       color: "#1FD5A4",
@@ -34246,6 +34395,7 @@ Agent 和浏览器一样，是房间里的普通参与者。语音 agent 的路�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "vhs",
@@ -34371,6 +34521,7 @@ vhs record > cassette.tape
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "goaccess",
@@ -34494,6 +34645,7 @@ cat access.log | docker run --rm -i -v ./report.html:/report.html \\
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "animeko",
@@ -34584,6 +34736,7 @@ Android 底层播放器是 ExoPlayer，桌面端是 VLC，所以同一集在手�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "screenity",
@@ -34612,7 +34765,7 @@ Android 底层播放器是 ExoPlayer，桌面端是 VLC，所以同一集在手�
       "想启用「保存到 Google Drive」，得在 Google Cloud Console 建 OAuth Client ID（类型选 Chrome App），把 client_id 换进 manifest.json。",
       "自己改代码：Node.js ≥ 14，`npm install` 后 `npm start` 开发，`npm run build` 产出 build 目录再加载。",
     ],
-    alternatives: [],
+    alternatives: ["sharex", "obs-studio"],
     icon: {
       letter: "S",
       color: "#E5484D",
@@ -34685,6 +34838,7 @@ Node.js ≥ 14，改完 \`npm run build\` 重新加载。授权是 GPLv3（3.0.0
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "flutter",
@@ -34713,7 +34867,7 @@ Node.js ≥ 14，改完 \`npm run build\` 重新加载。授权是 GPLv3（3.0.0
       "VS Code 装 Dart-Code 的 Flutter 插件，或 IntelliJ / Android Studio 的 Flutter 插件，热重载体验才完整。",
       "要调原生代码优先看 FFI 与 platform channels 两套方案，再决定用社区包还是自己写。",
     ],
-    alternatives: [],
+    alternatives: ["react-native", "expo"],
     icon: {
       letter: "F",
       color: "#02569B",
@@ -34781,6 +34935,7 @@ Dart 可以编到 JavaScript 与 WebAssembly，也能编 x64/ARM 桌面程序。
         },
       ],
     },
+    license: "BSD-3-Clause",
   },
   {
     slug: "scrcpy",
@@ -34903,6 +35058,7 @@ scrcpy --new-display=1920x1080 --start-app=org.videolan.vlc
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "react-native",
@@ -34995,6 +35151,7 @@ Expo Go 是一个装好的壳，扫码就能跑你的 JS，适合验证界面与
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "nextchat",
@@ -35094,6 +35251,7 @@ README 明说：直接用 Vercel 的「新建项目」克隆，Vercel 会给你�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "termux-app",
@@ -35220,7 +35378,7 @@ GitHub 构建用的是公开测试密钥（仓库里就有 keystore）。任何�
       "要在 CSS 里连续调轴，用 `font-variation-settings`，例如 `'FILL' 1, 'wght' 500, 'opsz' 24`。",
       "别指望提 PR 加图标：官方明确不接受图标文件投稿，只能提 concept。",
     ],
-    alternatives: [],
+    alternatives: ["lucide"],
     icon: {
       letter: "M",
       color: "#4285F4",
@@ -35301,6 +35459,7 @@ Google 从 2016 年的 v3 之后就不维护 npm 包了。现在常见的 materi
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "expo",
@@ -35329,7 +35488,7 @@ Google 从 2016 年的 v3 之后就不维护 npm 包了。现在常见的 materi
       "想先看效果直接开 snack.expo.dev，浏览器里就能跑示例工程。",
       "API 与配置项以 docs.expo.dev/versions/latest 为准，SDK 版本之间差异不小。",
     ],
-    alternatives: [],
+    alternatives: ["flutter", "react-native"],
     icon: {
       letter: "E",
       color: "#4630EB",
@@ -35399,6 +35558,7 @@ API 参考以 \`docs.expo.dev/versions/latest\` 为准，同一个能力在不�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "jadx",
@@ -35506,6 +35666,7 @@ README 的 WARNING 写得很清楚：多数情况下 jadx 无法反编译 100% �
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "spotube",
@@ -35534,7 +35695,7 @@ README 的 WARNING 写得很清楚：多数情况下 jadx 无法反编译 100% �
       "Android 从 F-Droid 或 GitHub Releases 的 all-arch APK 装；**iOS 只有 ipa，需要 AltStore 之类侧载**。",
       "AppImage 已因稳定性问题暂时移除，别在旧教程里找 AppImage 链接。",
     ],
-    alternatives: [],
+    alternatives: ["musicfreedesktop"],
     icon: {
       letter: "S",
       color: "#1DB954",
@@ -35608,6 +35769,7 @@ README 明确写了无遥测、无诊断、无用户数据收集，播放控制�
         },
       ],
     },
+    license: "BSD-3-Clause",
   },
   {
     slug: "okhttp",
@@ -35636,7 +35798,7 @@ README 明确写了无遥测、无诊断、无用户数据收集，播放控制�
       "需要 BoringSSL 的 TLS 行为时装 Conscrypt，并在最前面插入 provider：`Security.insertProviderAt(Conscrypt.newProvider(), 1)`。",
       "尽量跟着升版本——HTTPS 客户端和浏览器一样，旧版本会逐渐连不上新站点。",
     ],
-    alternatives: [],
+    alternatives: ["retrofit"],
     icon: {
       letter: "O",
       color: "#0B6E4F",
@@ -35723,6 +35885,7 @@ OkHttp 会跟着 TLS 生态调整行为以保持连通性。长期不升级的�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "architecture-samples",
@@ -35829,6 +35992,7 @@ README 提到单元、集成、e2e 三层，外加一批「shared」测试——
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "retrofit",
@@ -35857,7 +36021,7 @@ README 提到单元、集成、e2e 三层，外加一批「shared」测试——
       "因为底层依赖 OkHttp，OkHttp 的混淆规则通常也要一起加，否则报错会很难定位。",
       "需要最新 JAR 可从 Maven 中央仓库按坐标直接拿，不必自己编译。",
     ],
-    alternatives: [],
+    alternatives: ["okhttp"],
     icon: {
       letter: "R",
       color: "#48B983",
@@ -35930,6 +36094,7 @@ README 说得很明确：
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "fastlane",
@@ -36012,6 +36177,7 @@ README 承诺所有工具都跑在你自己的电脑或服务器上，凭证不�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "uni-app",
@@ -36039,7 +36205,7 @@ README 承诺所有工具都跑在你自己的电脑或服务器上，凭证不�
       "快应用只支持 vivo、OPPO、华为三家，别按「全平台」预期排期。",
       "README 里的性能倍数来自 benchmark 目录的三份平台报告（Android / iOS / 鸿蒙），属于官方自测，换项目要自己复测。",
     ],
-    alternatives: [],
+    alternatives: ["flutter", "react-native"],
     icon: {
       letter: "U",
       color: "#2B9939",
@@ -36097,6 +36263,7 @@ README 给的是 view/text 渲染是原生 2~3 倍、长列表帧率 2~4 倍。�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "vim",
@@ -36186,6 +36353,7 @@ README 的建议是用包管理器装完整版；Windows 用 vim-win32-installer
         },
       ],
     },
+    license: "Vim",
   },
   {
     slug: "dioxus",
@@ -36284,6 +36452,7 @@ Web 端可以只编 wasm，但记得先关默认的桌面特性，否则会把�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "spacedrive",
@@ -36374,6 +36543,7 @@ Rust 1.95+（仓库 pin 了 1.97.1）、Bun 1.3.4、Node 20，外加 \`just\`。
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "mpandroidchart",
@@ -36477,6 +36647,7 @@ chart.animateX(500)
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "mediapipe",
@@ -36556,6 +36727,7 @@ legacy solutions 2023 年 3 月已停支，仓库里那些老示例的 API 可�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "kazumi",
@@ -36643,6 +36815,7 @@ README 写了两条：遵守所在地法律、不得侵犯第三方知识产权�
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "raylib",
@@ -36670,7 +36843,7 @@ README 写了两条：遵守所在地法律、不得侵犯第三方知识产权�
       "先读 README 的 limitations 一节：单窗口单上下文、窗口缩放会中断渲染循环、RenderTexture 上下翻转。",
       "各平台编译步骤在 GitHub Wiki 的对应页面（Windows / macOS / GNU Linux / Android / Web），另有 projects 目录的 IDE 模板。",
     ],
-    alternatives: [],
+    alternatives: ["pixijs", "libgdx"],
     icon: {
       letter: "R",
       color: "#C8102E",
@@ -36745,6 +36918,7 @@ int main(void)
         },
       ],
     },
+    license: "Zlib",
   },
   {
     slug: "etcher",
@@ -36832,6 +37006,7 @@ Linux 上一定要用 \`apt install ./xxx.deb\` 而不是 \`dpkg -i\`——后�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "zxing",
@@ -36924,6 +37099,7 @@ README 开头就是它。含义：改动来自社区补丁，只做 bug 修复�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "handy",
@@ -37021,6 +37197,7 @@ sudo usermod -aG input $USER
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "comprehensive-rust",
@@ -37124,6 +37301,7 @@ README 单独提了这一条：必须 \`git config --global core.symlinks true\`
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "qtscrcpy",
@@ -37151,7 +37329,7 @@ README 单独提了这一条：必须 \`git config --global core.symlinks true\`
       "无线连接按这个顺序：USB 连上 → 更新设备 → 获取设备 IP → 启动 adbd → 无线连接 → 再更新设备并选带 IP 的那台 → 启动服务。",
       "自定义键位脚本放进 `keymap` 目录，点「刷新脚本」后选中，连上手机启动服务再点应用，按 `~` 切换映射模式。",
     ],
-    alternatives: [],
+    alternatives: ["scrcpy"],
     icon: {
       letter: "Q",
       color: "#2E8B57",
@@ -37226,6 +37404,7 @@ README 单独提了这一条：必须 \`git config --global core.symlinks true\`
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "avalonia",
@@ -37317,6 +37496,7 @@ WPF 的第三方控件库、StackOverflow 上的答案存量，Avalonia 都还�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "flameshot",
@@ -37344,7 +37524,7 @@ WPF 的第三方控件库、StackOverflow 上的答案存量，Avalonia 都还�
       "i3 / dwm / xmonad 这类极简 X11 窗口管理器可能报 \"Screenshot portal timed out\"，要按 docs 打开 legacy X11 捕获。",
       "Flatpak 安装后命令不在 PATH，README 给了软链到 `~/.local/bin/flameshot` 的做法。",
     ],
-    alternatives: [],
+    alternatives: ["sharex"],
     icon: {
       letter: "F",
       color: "#E2574C",
@@ -37418,6 +37598,7 @@ flameshot full -c -p ~/Pictures/shots  # 全屏 + 复制到剪贴板
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "leakcanary",
@@ -37510,6 +37691,7 @@ LeakCanary 不会主动扫描全应用，它在生命周期回调里等待对象
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "micro",
@@ -37613,6 +37795,7 @@ ip a | micro
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "ente",
@@ -37639,7 +37822,7 @@ ip a | micro
       "先确认免费额度再决定放多少东西：Photos 免费 10GB，Locker 免费 100 条（订阅 Photos 后 1000 条），Auth 免费。",
       "要自托管就 clone 本仓库部署 server，再把客户端指向自建实例；README 只给到「可以自托管」这一步，具体部署步骤以仓库文档为准，别按云服务的体验预估工作量。",
     ],
-    alternatives: [],
+    alternatives: ["lychee"],
     icon: {
       letter: "E",
       color: "#12A150",
@@ -37699,6 +37882,7 @@ README 的路线是 clone 仓库自己部署 server，客户端填自建地址�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "mindustry",
@@ -37793,6 +37977,7 @@ Windows 上去掉 \`./\`，写成 \`gradlew desktop:run\`。Mac / Linux 第一�
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "wiki",
@@ -37819,7 +38004,7 @@ Windows 上去掉 \`./\`，写成 \`gradlew desktop:run\`。Mac / Linux 第一�
       "数据库用环境变量声明：`DB_TYPE` 取 `postgres` / `mysql` / `mariadb` / `mssql` / `sqlite`；除 SQLite 外还要 `DB_HOST`、`DB_PORT`、`DB_USER`、`DB_PASS`、`DB_NAME`，缺一个都起不来。",
       "3.0 beta 的安装与要求只写在 docs.js.wiki/setup 下面，2.x 在 docs.requarks.io，两套文档别混着照抄。",
     ],
-    alternatives: [],
+    alternatives: ["trilium", "obsidian"],
     icon: {
       letter: "W",
       color: "#1976D2",
@@ -37897,6 +38082,7 @@ services:
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "lx-music-desktop",
@@ -37924,7 +38110,7 @@ services:
       "第一次启动先花十分钟把设置过一遍。作者自己说默认设置与 UI 不以新手友好为目标，不调会处处别扭。",
       "要多端同步列表得另外部署 lx-music-sync-server，那是独立发布的项目，客户端本身不带云端。",
     ],
-    alternatives: [],
+    alternatives: ["pear-desktop", "yesplaymusic", "musicfreedesktop"],
     icon: {
       letter: "L",
       color: "#0F766E",
@@ -37984,6 +38170,7 @@ Windows 想便携，就在程序目录建 \`portable\` 文件夹，v1.17.0 起�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "pear-desktop",
@@ -38011,7 +38198,7 @@ Windows 想便携，就在程序目录建 \`portable\` 文件夹，v1.17.0 起�
       "Windows 无网络环境安装要下两样东西：对应架构的 *.nsis.7z 与 *-Setup.exe，放在同一个目录里再运行安装程序。",
       "换外观不用装插件：把 CSS 文件放进主题目录，在 Options > Visual Tweaks > Themes 里加载。",
     ],
-    alternatives: [],
+    alternatives: ["lx-music-desktop", "yesplaymusic", "simpmusic"],
     icon: {
       letter: "P",
       color: "#7C9A3B",
@@ -38076,6 +38263,7 @@ cd pear-desktop && pnpm install --frozen-lockfile && pnpm dev
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "yesplaymusic",
@@ -38103,7 +38291,7 @@ cd pear-desktop && pnpm install --frozen-lockfile && pnpm dev
       "API 与页面不同域时用 Nginx 反代到 /api，并把 .env 里的 VUE_APP_NETEASE_API_URL 填成 /api，否则会碰到跨域导致的诡异 bug。",
       "想用变灰歌曲替换只能用 Electron 客户端；网页版没有这个功能，YouTube 音源还要另外装 yt-dlp。",
     ],
-    alternatives: [],
+    alternatives: ["lx-music-desktop", "pear-desktop", "algermusicplayer"],
     icon: {
       letter: "Y",
       color: "#1E88E5",
@@ -38162,6 +38350,7 @@ scoop install extras/yesplaymusic
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "ultimatevocalremovergui",
@@ -38252,6 +38441,7 @@ python UVR.py
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "spotify-downloader",
@@ -38365,6 +38555,7 @@ docker run --rm -v $(pwd):/music spotdl download <trackUrl>
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "algermusicplayer",
@@ -38392,7 +38583,7 @@ docker run --rm -v $(pwd):/music spotdl download <trackUrl>
       "沉浸式歌词是从左下角封面点进去的，不是一个独立菜单项，第一次找会找不到。",
       "想要手机遥控电脑播放，用内置的远程控制功能，两端需要处在同一个局域网内。",
     ],
-    alternatives: [],
+    alternatives: ["yesplaymusic", "lx-music-desktop", "pear-desktop"],
     icon: {
       letter: "A",
       color: "#C2410C",
@@ -38448,6 +38639,7 @@ npm run dev
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "tone-js",
@@ -38475,7 +38667,7 @@ npm run dev
       "在 Loop 与 Transport 回调里用回调收到的 time 参数触发音符，不要用 Tone.now()，JS 回调的时间不精确。",
       "同时响多个音要用 new Tone.PolySynth(Tone.Synth)，直接 new Tone.Synth() 一次只能发一个音。",
     ],
-    alternatives: [],
+    alternatives: ["audiokit"],
     icon: {
       letter: "T",
       color: "#5B21B6",
@@ -38541,6 +38733,7 @@ Sampler 按音名放采样，缺的音自动移调补上，不必每个半音都
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "simpmusic",
@@ -38568,7 +38761,7 @@ Sampler 按音名放采样，缺的音自动移调补上，不必每个半音都
       "桌面版：Windows 下 SimpMusic-Windows-installer.zip 解压后跑 install.bat；macOS 需要 15 以上并用 .dmg；Linux 用 .AppImage。",
       "介意崩溃上报就装 FOSS 版，Full 版会用 Sentry 收集崩溃数据。",
     ],
-    alternatives: [],
+    alternatives: ["pear-desktop", "lx-music-desktop", "yesplaymusic"],
     icon: {
       letter: "S",
       color: "#DC2626",
@@ -38624,6 +38817,7 @@ AI 歌词翻译、歌曲推荐这些需要用你自己的 OpenAI 或 Gemini API 
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "audiokit",
@@ -38651,7 +38845,7 @@ AI 歌词翻译、歌曲推荐这些需要用你自己的 OpenAI 或 Gemini API 
       "离线文档用 Product → Build Documentation 生成，不必全程翻网站。",
       "先照着 AudioKit/Cookbook 里对应组件的配方改，比从零读 API 快得多。",
     ],
-    alternatives: [],
+    alternatives: ["tone-js"],
     icon: {
       letter: "A",
       color: "#0E7490",
@@ -38715,6 +38909,7 @@ README 没有教程性质的内容，这是它和很多框架不同的地方。�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "wavesurfer-js",
@@ -38845,7 +39040,7 @@ v7 起波形渲染在 Shadow DOM 里，页面选择器穿不进去，只能用 \
       "登录只支持扫码：终端窗口至少 25 行、必须等宽字体，否则二维码扫不出来。Cookie 存在 ~/.local/share/netease-musicbox/cookie.txt。",
       "要放无损得装 mpv 并把配置里的 music_quality 设为 lossless 或 hires；只装 mpg123 时最高只有 MP3 档。",
     ],
-    alternatives: [],
+    alternatives: ["yesplaymusic", "algermusicplayer"],
     icon: {
       letter: "M",
       color: "#C026D3",
@@ -38904,6 +39099,7 @@ musicbox download --playlist 3778678 --path ./music --json
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "musicfreedesktop",
@@ -38931,7 +39127,7 @@ musicbox download --playlist 3778678 --path ./music --json
       "写主题包时文件夹内必须同时有 index.css 与 config.json，缺一个主题就不生效。",
       "主题里引用包内文件用 @/ 前缀，例如 iframes 填 @/bg.html，它会被替换成主题包路径。",
     ],
-    alternatives: [],
+    alternatives: ["lx-music-desktop", "pear-desktop", "yesplaymusic"],
     icon: {
       letter: "M",
       color: "#0D9488",
@@ -39018,6 +39214,7 @@ npm start
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "spotifast",
@@ -39045,7 +39242,7 @@ npm start
       "不想登录只想看界面，用演示模式：cargo run --features demo -- --demo。",
       "本地音乐在设置里指定文件夹即可，按你在歌单里列出的本地文件播放，支持任意采样率。",
     ],
-    alternatives: [],
+    alternatives: ["lx-music-desktop", "pear-desktop", "yesplaymusic"],
     icon: {
       letter: "S",
       color: "#15803D",
@@ -39112,6 +39309,7 @@ Windows 与其他 Linux 发行版去官网下载页，按平台取构建。
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "folia-major",
@@ -39139,7 +39337,7 @@ Windows 与其他 Linux 发行版去官网下载页，按平台取构建。
       "本地音乐目录访问依赖可信 HTTPS 安全上下文，自托管在 NAS 上用反代时必须配好证书，http 访问读不到本地库。",
       "模组系统默认关闭，要先在 设置 → 模组 → 模组系统 打开；每个模组首次启用都要在原生窗口确认，文件改动后需再确认一次。",
     ],
-    alternatives: [],
+    alternatives: ["lx-music-desktop", "pear-desktop", "yesplaymusic"],
     icon: {
       letter: "F",
       color: "#7E22CE",
@@ -39201,6 +39399,7 @@ Folium 模组能加歌词动画、背景、播放页图层与命令，也能通�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "librosa",
@@ -39306,6 +39505,7 @@ README 还建议把函数文档里标注的原始方法论文一并引上。
         },
       ],
     },
+    license: "ISC",
   },
   {
     slug: "mopidy",
@@ -39394,6 +39594,7 @@ README 直接把人指向安装文档，因为不同系统的依赖差异不小�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "snapcast",
@@ -39491,6 +39692,7 @@ cat /dev/urandom > /tmp/snapfifo
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "pixijs",
@@ -39518,7 +39720,7 @@ cat /dev/urandom > /tmp/snapfifo
       "资源统一走 Assets.load()，它自带缓存与进度；不要再用旧的 loader。",
       "TypeScript 6/7 项目要把 types 换成 @types/web，并移除 @webgpu/types，两者会冲突。",
     ],
-    alternatives: [],
+    alternatives: ["raylib", "libgdx"],
     icon: {
       letter: "P",
       color: "#E72264",
@@ -39583,6 +39785,7 @@ TS 5 由 pixi.js 自带 @webgpu/types，无需配置。TS 6/7 把 WebGPU 类型�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "gdevelop",
@@ -39670,6 +39873,7 @@ TS 5 由 pixi.js 自带 @webgpu/types，无需配置。TS 6/7 把 WebGPU 类型�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "libgdx",
@@ -39697,7 +39901,7 @@ TS 5 由 pixi.js 自带 @webgpu/types，无需配置。TS 6/7 把 WebGPU 类型�
       "跑桌面版是运行 desktop 模块的 main 类，不是运行 core；core 里只放与平台无关的逻辑。",
       "API 查询用 javadoc.io 上的 gdx 文档，版本与依赖里的一致。",
     ],
-    alternatives: [],
+    alternatives: ["raylib", "pixijs"],
     icon: {
       letter: "L",
       color: "#C8452F",
@@ -39775,6 +39979,7 @@ public class MyGame extends ApplicationAdapter {
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "osu",
@@ -39859,6 +40064,7 @@ dotnet run --project osu.Desktop
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "lila",
@@ -39942,6 +40148,7 @@ curl https://lichess.org/api/user/thibault
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "pyxel",
@@ -39969,7 +40176,7 @@ curl https://lichess.org/api/user/thibault
       "素材用内置的图像/声音编辑器做好后存成资源文件，游戏里用 pyxel.load() 读入，别在代码里硬编码图形。",
       "官网 showcase 里的示例可以直接在浏览器试玩，先挑一个接近你想做的类型改。",
     ],
-    alternatives: [],
+    alternatives: ["raylib"],
     icon: {
       letter: "P",
       color: "#D94F70",
@@ -40040,6 +40247,7 @@ pyxel.blt(x, y, 0, 0, 0, 16, 16)
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "openra",
@@ -40067,7 +40275,7 @@ pyxel.blt(x, y, 0, 0, 0, 16, 16)
       "想联机自建房间，按 wiki 的 Dedicated Server 说明跑服务端，别直接暴露自家机器。",
       "做 mod 用 OpenRA Mod SDK 起项目，规则改 YAML，剧情脚本用 Lua API。",
     ],
-    alternatives: [],
+    alternatives: ["openage"],
     icon: {
       letter: "O",
       color: "#8A5A2B",
@@ -40120,6 +40328,7 @@ pyxel.blt(x, y, 0, 0, 0, 16, 16)
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "openrct2",
@@ -40147,7 +40356,7 @@ pyxel.blt(x, y, 0, 0, 0, 16, 16)
       "首次启动会让你指定 RCT2 安装目录，指向原版文件夹即可；有 RCT1 数据也可以一并指过去。",
       "想要新功能用 develop 通道，想稳定玩用 release 通道，两者可以共存但别混用存档。",
     ],
-    alternatives: [],
+    alternatives: ["openttd"],
     icon: {
       letter: "O",
       color: "#C4632B",
@@ -40204,6 +40413,7 @@ launcher 里通常有 release 与 develop 两条。想稳定造园选 release；
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "openage",
@@ -40320,7 +40530,7 @@ cd bin && ./run main
       "第一次跑如果窗口立刻退出，检查 Update 是否返回了 ebiten.Termination，这是正常退出的返回约定。",
       "要出 Android / iOS 必须开 CGO 并配好对应工具链；WebAssembly 走 GOOS=js GOARCH=wasm 构建。",
     ],
-    alternatives: [],
+    alternatives: ["flame"],
     icon: {
       letter: "E",
       color: "#2E8B8B",
@@ -40393,6 +40603,7 @@ Android 与 iOS 都要 Cgo，意味着不能纯靠交叉编译，得准备 NDK /
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "nakama",
@@ -40482,6 +40693,7 @@ curl "127.0.0.1:7350/v2/account/authenticate/device?create=true" \\
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "cataclysm-dda",
@@ -40735,6 +40947,7 @@ iOS 版不会做（作者没有设备测试，也不想付苹果的费用），S
         },
       ],
     },
+    license: "MPL-2.0",
   },
   {
     slug: "flame",
@@ -40762,7 +40975,7 @@ iOS 版不会做（作者没有设备测试，也不想付苹果的费用），S
       "物理、瓦片地图、音频这些是独立包（flame_forge2d / flame_tiled / flame_audio），按需逐个添加。",
       "官方示例站能在浏览器里直接试玩，点右上角按钮可以看每个示例的源码。",
     ],
-    alternatives: [],
+    alternatives: ["ebiten"],
     icon: {
       letter: "F",
       color: "#E05A33",
@@ -40827,6 +41040,7 @@ update(dt) 的 dt 是秒，移动要写成 position += velocity * dt，不乘 dt
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "et",
@@ -41071,6 +41285,7 @@ CompactGUI 不打包、不移动文件，只是给文件夹打上 NTFS 的透明
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "openttd",
@@ -41098,7 +41313,7 @@ CompactGUI 不打包、不移动文件，只是给文件夹打上 NTFS 的透明
       "想用原版素材：把 TTD 的 trg1r.grf、trgcr.grf、trghr.grf、trgir.grf、trgtr.grf 和 sample.cat 复制到 baseset/ 目录。",
       "装 mod 用主菜单的 Check Online Content，别手动往游戏目录里丢文件，手动装更复杂且容易版本错位。",
     ],
-    alternatives: [],
+    alternatives: ["openrct2"],
     icon: {
       letter: "O",
       color: "#1E6B52",
@@ -41178,7 +41393,7 @@ CompactGUI 不打包、不移动文件，只是给文件夹打上 NTFS 的透明
       "重存 PSD 会重写图像资源与图层记录，渲染一致但不是字节一致；原始文件务必留备份。",
       "用前先核对格式支持：JPEG XL 不支持、AVIF 只能写、HEIC 与 Affinity 文档只读。",
     ],
-    alternatives: [],
+    alternatives: ["pinta", "photodemon"],
     icon: {
       letter: "P",
       color: "#7C3AED",
@@ -41235,6 +41450,7 @@ CompactGUI 不打包、不移动文件，只是给文件夹打上 NTFS 的透明
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "vue-fabric-editor",
@@ -41319,6 +41535,7 @@ README 写得很清楚：开源版本只含前端代码。完整前后端、管�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "jspaint",
@@ -41408,6 +41625,7 @@ README 写得很清楚：开源版本只含前端代码。完整前后端、管�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "esearch",
@@ -41435,7 +41653,7 @@ README 写得很清楚：开源版本只含前端代码。完整前后端、管�
       "离线 OCR 开箱可用，但生僻字、竖排与更多语种要在设置里另外下载 v5 模型。",
       "Windows 安装后可能提示补截屏依赖库，按提示去微软官网装完再重启；Gnome 要先装 appindicator 扩展。",
     ],
-    alternatives: [],
+    alternatives: ["sharex"],
     icon: {
       letter: "E",
       color: "#0EA5E9",
@@ -41491,6 +41709,7 @@ README 写得很清楚：开源版本只含前端代码。完整前后端、管�
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "lychee",
@@ -41518,7 +41737,7 @@ README 写得很清楚：开源版本只含前端代码。完整前后端、管�
       "上传目录、日志、临时目录要挂卷，否则重建容器照片就没了。",
       "从旧版本升级到 7.0 前先读官方 upgrade 指南，Docker 镜像有结构性变化。",
     ],
-    alternatives: [],
+    alternatives: ["immich", "ente"],
     icon: {
       letter: "L",
       color: "#E11D48",
@@ -41580,6 +41799,7 @@ README 用了一个单独的警告块：7.0 对 Docker 镜像做了较大改动�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "pinta",
@@ -41607,7 +41827,7 @@ README 用了一个单独的警告块：7.0 对 Docker 镜像做了较大改动�
       "macOS 上 Apple Silicon 需要 `export DYLD_LIBRARY_PATH=/opt/homebrew/lib`，Intel 用 `/usr/local/lib`，否则启动找不到 GTK。",
       "跑起来调试用 `dotnet run --project Pinta`，正式安装走 `./autogen.sh && make install`（tarball 里用 ./configure）。",
     ],
-    alternatives: [],
+    alternatives: ["photocraft", "photodemon"],
     icon: {
       letter: "P",
       color: "#64748B",
@@ -41665,6 +41885,7 @@ Apple Silicon 上不设 \`DYLD_LIBRARY_PATH=/opt/homebrew/lib\`，程序启动�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "lap",
@@ -41692,7 +41913,7 @@ Apple Silicon 上不设 \`DYLD_LIBRARY_PATH=/opt/homebrew/lib\`，程序启动�
       "Windows 包未签名，SmartScreen 拦截时点 Keep anyway；Linux 播不了视频先装 `gstreamer1.0-libav` 与 `gstreamer1.0-plugins-good`。",
       "数据库默认在用户目录，要用就把它和照片一起备份；设置 → Storage 里能改位置并做备份。",
     ],
-    alternatives: [],
+    alternatives: ["immich"],
     icon: {
       letter: "L",
       color: "#0F766E",
@@ -41751,6 +41972,7 @@ Apple Silicon 上不设 \`DYLD_LIBRARY_PATH=/opt/homebrew/lib\`，程序启动�
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "libjxl",
@@ -41856,6 +42078,7 @@ for f in *.jpg; do cjxl "$f" "\${f%.jpg}.jxl"; done
         },
       ],
     },
+    license: "BSD-3-Clause",
   },
   {
     slug: "metadata-extractor",
@@ -41883,7 +42106,7 @@ for f in *.jpg; do cjxl "$f" "\${f%.jpg}.jxl"; done
       "Android API < 24 要开启 Java 8 interface method desugaring，否则 TiffHandler 的默认方法不可用。",
       "遇到解析异常先准备样例图：没有样本文件，维护者基本无法复现元数据问题。",
     ],
-    alternatives: [],
+    alternatives: ["exiftool"],
     icon: {
       letter: "M",
       color: "#B45309",
@@ -41954,6 +42177,7 @@ compileOptions {
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "snapotter",
@@ -42040,6 +42264,7 @@ Pipelines 是把多个工具串成一个可复用流程：比如「批量去背�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "afilmory",
@@ -42132,6 +42357,7 @@ pnpm dev
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "photodemon",
@@ -42159,7 +42385,7 @@ pnpm dev
       "要批量处理：先录一个宏，再用内置批处理器把它套到整个文件夹。",
       "记住 32 位上限：单张图超过约 2GB 就打不开也存不了。",
     ],
-    alternatives: [],
+    alternatives: ["photocraft", "pinta"],
     icon: {
       letter: "P",
       color: "#0891B2",
@@ -42248,7 +42474,7 @@ pnpm dev
       "先确认许可：社区版是 AGPLv3，网络提供服务即视为分发；要闭源商用得买商业授权。",
       "从 V3 或 V2 升级要按对应版本的升级指南走，跨大版本不能直接覆盖。",
     ],
-    alternatives: [],
+    alternatives: ["lychee"],
     icon: {
       letter: "C",
       color: "#DC2626",
@@ -42309,6 +42535,7 @@ pnpm dev
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "ui-ux-pro-max-skill",
@@ -42399,6 +42626,7 @@ README 里的示例只有一句：\`Build a landing page for my beauty spa\`。�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "daisyui",
@@ -42426,7 +42654,7 @@ README 里的示例只有一句：\`Build a landing page for my beauty spa\`。�
       "README 与官网都是 v5 的说法；照抄旧教程前先核对版本，避免类名对不上。",
       "它只提供样式，下拉、弹窗这类交互要自己用原生元素或补 JS。",
     ],
-    alternatives: [],
+    alternatives: ["oat"],
     icon: {
       letter: "D",
       color: "#1AD1A5",
@@ -42492,6 +42720,7 @@ daisyUI 不是独立框架，它是 Tailwind 的插件式组件层。正确的�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "lucide",
@@ -42519,7 +42748,7 @@ daisyUI 不是独立框架，它是 Tailwind 的插件式组件层。正确的�
       "设计侧在 Figma 社区装 Lucide 插件，保证设计稿与代码同一套图标。",
       "别指望它提供品牌 logo：官方明确不收，且不计划加。",
     ],
-    alternatives: [],
+    alternatives: ["material-design-icons"],
     icon: {
       letter: "L",
       color: "#F56565",
@@ -42589,6 +42818,7 @@ ISC，商用免费，不需要署名。想确认细节看仓库里的 LICENSE。
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "tachyons",
@@ -42616,7 +42846,7 @@ ISC，商用免费，不需要署名。想确认细节看仓库里的 LICENSE。
       "只需构建一次用 `npm run build`；和自有 CSS 或别的库混用时跑 `npm run mutations`，检查有没有类名被重复定义。",
       "类名与刻度查 https://tachyons.io/docs，模块文件本身很短，直接读 src 比翻文档更快。",
     ],
-    alternatives: [],
+    alternatives: ["daisyui", "oat"],
     icon: {
       letter: "T",
       color: "#2D3748",
@@ -42692,6 +42922,7 @@ npm run mutations
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "nuclear",
@@ -42719,7 +42950,7 @@ npm run mutations
       "要用 AI 控制播放器：设置 → Integrations 打开 MCP server，地址是 http://127.0.0.1:8800/mcp；Claude Code 用 claude mcp add nuclear --transport http http://127.0.0.1:8800/mcp。",
       "从源码开发需要 Node.js 22+、pnpm 9+、Rust stable 和对应平台的 Tauri 依赖，然后 pnpm install 再 pnpm dev；pnpm dev:remote 会把 Vite 绑到 0.0.0.0，方便局域网内用手机远程控制。",
     ],
-    alternatives: [],
+    alternatives: ["lx-music-desktop", "yesplaymusic"],
     icon: {
       letter: "N",
       color: "#2F3E9E",
@@ -42771,6 +43002,7 @@ Cursor、Windsurf、Claude Desktop 走 JSON 配置，键名是 mcpServers，只�
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "graphite",
@@ -42848,6 +43080,7 @@ Cursor、Windsurf、Claude Desktop 走 JSON 配置，键名是 mcpServers，只�
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "ant-design-vue",
@@ -42927,6 +43160,7 @@ README 推荐用 npm / yarn 而不是 CDN，原因是这个库依赖生态里的
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "pencil",
@@ -43023,6 +43257,7 @@ yarn install && yarn start
         },
       ],
     },
+    license: "GPL-2.0",
   },
   {
     slug: "plasmic",
@@ -43073,6 +43308,7 @@ export default function HeroSection({ children }) {
 PLASMIC.registerComponent(HeroSection, {
   props: {
     children: "slot",
+    license: "MIT",
   },
 });
 \`\`\`
@@ -43147,7 +43383,7 @@ import { PlasmicComponent, PlasmicRootProvider } from "@plasmicapp/loader-nextjs
       "默认每次新会话都会问 during / after；想固定下来跑 npx antislop-ai --mode during，设置写到 ~/.config/antislop/settings.json（Windows 在 %APPDATA%）。",
       "它不会自动更新，升级要手动 npx antislop-ai --update，之后重开会话才生效。",
     ],
-    alternatives: [],
+    alternatives: ["lint"],
     icon: {
       letter: "A",
       color: "#111827",
@@ -43211,6 +43447,7 @@ npx antislop-ai --mode during   # 或 after / ask
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "oat",
@@ -43238,7 +43475,7 @@ npx antislop-ai --mode during   # 或 after / ask
       "动态组件由 WebComponent 实现、依赖那一个 JS 文件，禁用 JS 时这部分会退化，别指望纯 CSS 兜住。",
       "README 只有一页，组件清单、可定制变量与浏览器支持以 oat.ink 的在线文档与 demo 为准。",
     ],
-    alternatives: [],
+    alternatives: ["daisyui", "tachyons"],
     icon: {
       letter: "O",
       color: "#B45309",
@@ -43289,6 +43526,7 @@ README 很短，这本身就是信息：它是个人项目，为了自己的需�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "transitions-dev",
@@ -43410,7 +43648,7 @@ npx transitions-refine stop        # 移除注入的 script
       "先克隆 starter kit 或看 pts-react-example，比从空白页开始快；React 项目也可直接用 react-pts-canvas。",
       "它只有画布与几何，没有图表组件——别按 ECharts 的预期找配置项。",
     ],
-    alternatives: [],
+    alternatives: ["p5js"],
     icon: {
       letter: "P",
       color: "#0F766E",
@@ -43474,6 +43712,7 @@ Apache-2.0。开发要求 Node 24.18 以上（发布产物也在 Node 20 / 22 �
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "animal-island-ui",
@@ -43501,7 +43740,7 @@ Apache-2.0。开发要求 Node 24.18 以上（发布产物也在 Node 20 / 22 �
       "想让 AI 按这套规范生成页面：skills add guokaigdg/animal-island-ui；不写代码的人用 docs/one-click-prompt.md 里的一键提示词。",
       "配套图标库是 naive-icons，Vue 版是 animal-island-vue，跨框架时别把两套组件混着用。",
     ],
-    alternatives: [],
+    alternatives: ["taiga-ui"],
     icon: {
       letter: "A",
       color: "#F59E0B",
@@ -43555,6 +43794,7 @@ import 'animal-island-ui/style';
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "style-dictionary",
@@ -43656,6 +43896,7 @@ README 第一行就挂了迁移指南链接。顺序建议：先读迁移文档 
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "taro-ui",
@@ -43746,6 +43987,7 @@ npx skills add https://raw.githubusercontent.com/jd-opensource/taro-ui/master/pa
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "baoyu-design",
@@ -43830,6 +44072,7 @@ README 明说这是一份长而苛刻的设计指令，模型越强越好，推�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "taiga-ui",
@@ -43857,7 +44100,7 @@ README 明说这是一份长而苛刻的设计指令，模型越强越好，推�
       "样式走 CSS 自定义属性，改主题改变量而不是覆盖组件内部类名，否则升级时会大面积失效。",
       "Figma 库只到 2.x / 3.x，新版没有对应设计资源，设计交付前要提前说明。",
     ],
-    alternatives: [],
+    alternatives: ["animal-island-ui"],
     icon: {
       letter: "T",
       color: "#DD0031",
@@ -43913,6 +44156,7 @@ Taiga UI 的兼容表是硬性的，不是建议：
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "lint",
@@ -44004,6 +44248,7 @@ npm install -D @shadcn/lint eslint @typescript-eslint/parser
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "pattern-craft",
@@ -44101,6 +44346,7 @@ README 用引用块写明：没有纯 HTML / vanilla CSS 版本，代码按 Reac
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "appllama-skills",
@@ -44129,7 +44375,7 @@ README 用引用块写明：没有纯 HTML / vanilla CSS 版本，代码按 Reac
       "接 MCP：端点 https://mcp.appllama.io/mcp，在客户端里作为自定义 connector 添加并用 Appllama 账号授权；Pro 才可用，每次调用 1 credit。",
       "不想走 npx 就手动装：clone 仓库后把 `skills/*` 拷进 `~/.claude/skills/`（项目级放 `.claude/skills/`），技能本质就是普通目录。",
     ],
-    alternatives: [],
+    alternatives: ["taste-skill", "typeui"],
     icon: {
       letter: "A",
       color: "#1F6F5C",
@@ -44186,6 +44432,7 @@ MCP 访问属于 Pro，每次调用消耗 1 credit，\`get_credits\` 免费，�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "7-css",
@@ -44282,6 +44529,7 @@ import "7.css/dist/7.css";
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "realtaiizor",
@@ -44366,6 +44614,7 @@ Install-Package ReaLTaiizor
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "typeui",
@@ -44393,7 +44642,7 @@ Install-Package ReaLTaiizor
       "不想接 MCP 也能用：设计技能以 DESIGN.md / SKILL.md 两种纯 markdown 形式发布，任何吃 markdown 的模型都能直接读。",
       "选风格时先看 design-skills 列表（Agentic、Bento、Brutalism、Editorial、Dashboard 等），一个项目锁定一套，混着用就失去一致性的意义。",
     ],
-    alternatives: [],
+    alternatives: ["taste-skill", "ui-ux-pro-max-skill"],
     icon: {
       letter: "T",
       color: "#111827",
@@ -44445,6 +44694,7 @@ GitHub 上这个仓库标的是 NOASSERTION，README 未给授权说明。个人
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "diaspora",
@@ -44526,6 +44776,7 @@ pod 是一台跑着 diaspora* 的服务器。你注册在某台 pod 上，但可
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "owncloud",
@@ -44622,6 +44873,7 @@ make
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "civitai",
@@ -44717,6 +44969,7 @@ README 的 Known limitations 明说本地不支持：编排（Generation / Train
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "module-federation-examples",
@@ -44811,6 +45064,7 @@ README 里有书、按小时咨询和 Zephyr Cloud 的推广。它们是维护�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "koala",
@@ -44912,6 +45166,7 @@ Ruby 版本矩阵写着 MRI 2.1–2.4，CI 还指向 Travis——都过时了。
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "deltachat-desktop",
@@ -45010,6 +45265,7 @@ Node 要 22 或更高。README 提醒：源码方式**不会**把应用装进系
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "freedomain",
@@ -45095,6 +45351,7 @@ README 还有一条安全公告：旧的 Telegram 账号与群已被攻陷，不
         },
       ],
     },
+    license: "AGPL-3.0",
   },
   {
     slug: "open-notebook",
@@ -45199,6 +45456,7 @@ ports:
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "wtfjs",
@@ -45280,6 +45538,7 @@ ports:
         },
       ],
     },
+    license: "WTFPL",
   },
   {
     slug: "tinyrenderer",
@@ -45404,7 +45663,7 @@ TGA 用 BGRA 顺序。你以为传的是红色，画出来是蓝色。这不是 
       "2.0 的文档在 beta.p5js.org，和稳定版不是同一套，抄示例前先看清版本。",
       "想给项目提 PR 注意：官方 AI 政策不接受整段 AI 生成的贡献，AI 只能辅助。",
     ],
-    alternatives: [],
+    alternatives: ["pts"],
     icon: {
       letter: "P",
       color: "#ED225D",
@@ -45565,6 +45824,7 @@ demo-wasm/hello-world ...
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "digital-video-introduction",
@@ -45653,6 +45913,7 @@ setup.sh 是第一个卡点。它要先把镜像准备好，网络差的时候�
         },
       ],
     },
+    license: "BSD-3-Clause",
   },
   {
     slug: "learn-vim",
@@ -45767,7 +46028,7 @@ docker compose -f book/docker-compose.yml up --build
       "微调要在环境里 `export HUGGING_FACE_HUB_TOKEN=\"<your_token>\"`，并且已在 HuggingFace 上接受该模型许可，否则卡在下载权重。",
       "第一次跑通建议用自带数据集：`ludwig train --config model.yaml --dataset \"ludwig://alpaca\"`，链路通了再换自己的 CSV。",
     ],
-    alternatives: [],
+    alternatives: ["unsloth", "llamafactory"],
     icon: {
       letter: "L",
       color: "#6A3FA0",
@@ -45841,6 +46102,7 @@ ludwig train --config model.yaml --dataset "ludwig://alpaca"
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "mdn-content",
@@ -45934,6 +46196,7 @@ npm start
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "flutterunit",
@@ -46022,6 +46285,7 @@ flutter build windows     # 或 linux / web
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "logisim-evolution",
@@ -46049,7 +46313,7 @@ flutter build windows     # 或 linux / web
       "Linux 上窗口全白但控件可点，用 `env _JAVA_AWT_WM_NONREPARENTING=1 java -jar logisim-evolution-<version>-all.jar` 启动，确认有效后写进启动器。",
       "macOS 首次启动要右键（或按住 Ctrl 点击）选「打开」；系统询问是否允许接受网络连接时可以拒绝，它当前不需要联网。",
     ],
-    alternatives: [],
+    alternatives: ["digital"],
     icon: {
       letter: "L",
       color: "#B3541E",
@@ -46116,6 +46380,7 @@ env _JAVA_AWT_WM_NONREPARENTING=1 java -jar logisim-evolution-<version>-all.jar
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "ctfd",
@@ -46218,6 +46483,7 @@ OAUTH_CLIENT_SECRET = None
         },
       ],
     },
+    license: "Apache-2.0",
   },
   {
     slug: "server-survival",
@@ -46301,6 +46567,7 @@ OAUTH_CLIENT_SECRET = None
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "digital",
@@ -46328,7 +46595,7 @@ OAUTH_CLIENT_SECRET = None
       "启动异常时，在 Digital 目录里跑 `java -jar Digital.jar`，报错会显示在终端，双击是看不到的。",
       "要仿真 VHDL / Verilog 描述的组件，得额外装 ghdl 或 Icarus Verilog；不装就只能画与仿真纯电路。",
     ],
-    alternatives: [],
+    alternatives: ["logisim-evolution"],
     icon: {
       letter: "D",
       color: "#4A4E69",
@@ -46388,6 +46655,7 @@ Digital 的做法是引入 settling time：开机时按随机的门延迟反复�
         },
       ],
     },
+    license: "GPL-3.0",
   },
   {
     slug: "opencat-quadruped-robot",
@@ -46487,6 +46755,7 @@ IMU 校准时把机器人平放在桌面上，会先长鸣六声，再读传感�
         },
       ],
     },
+    license: "MIT",
   },
   {
     slug: "pluto-jl",
@@ -46582,5 +46851,6 @@ using PlutoUI
         },
       ],
     },
+    license: "MIT",
   },
 ];
