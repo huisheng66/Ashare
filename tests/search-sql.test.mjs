@@ -100,10 +100,28 @@ after(async () => {
  *
  * 两条召回通道是 OR 关系（见 searchCatalog 的注释），所以预言机也要取并集 ——
  * 否则拼音命中（如 tupian → 图片）会被判成「多」。
+ *
+ * 词还要做与实现同口径的**布尔操作符净化**：实现会把 `- + > < ( ) ~ * " @`
+ * 从词里剥掉再查（否则 `-foo` 会被当成排除、`(` 会直接语法错误）。
+ * 预言机不剥就会把 `-foo` 当成原文而判「多」——zoxide 就是这么暴露的。
  */
 function oracle(raw) {
-  const terms = [...new Set(raw.normalize("NFKC").toLowerCase().split(" "))].filter(Boolean);
-  if (!terms.length) return [];
+  const normalized = raw.normalize("NFKC").toLowerCase();
+  const terms = [...new Set(normalized.split(" "))]
+    .map((term) => term.replace(/[+\-><()~*"@]/g, "").trim())
+    .filter(Boolean);
+
+  // 与实现同口径的兜底：词全被净化掉（如 "("、"+++"）时，退回「整串包含」。
+  // 实现里对应的是 searchCatalog 的 `if (!conditions.length) … LIKE %query%`。
+  if (!terms.length) {
+    const whole = normalized.trim();
+    if (!whole) return [];
+    return published
+      .filter((item) => searchTextOf(item).toLowerCase().includes(whole))
+      .map((item) => item.slug)
+      .sort();
+  }
+
   return published
     .filter((item) => {
       const text = searchTextOf(item).toLowerCase();
