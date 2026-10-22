@@ -72,6 +72,21 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   "GPL-1.0": { summary: "分发衍生作品需同样开源", tier: "strong-copyleft", allowsClosedSource: false },
   "GPL-1.0-only": { summary: "分发衍生作品需同样开源", tier: "strong-copyleft", allowsClosedSource: false },
   "GPL-1.0-or-later": { summary: "分发衍生作品需同样开源", tier: "strong-copyleft", allowsClosedSource: false },
+
+  // —— 以下为后补，均为实际收录时遇到、缺失会让前台静默不显示许可证说明的条目 ——
+  // MS-PL：微软公共许可，OSI 认可，允许闭源分发但需保留声明。ScreenToGif 用它。
+  "MS-PL": { summary: "允许商用闭源分发，需保留声明", tier: "permissive", allowsClosedSource: true },
+  // CC-BY-SA-4.0：允许商用，但要求署名且衍生作品同方式共享，属内容型强 copyleft。
+  "CC-BY-SA-4.0": { summary: "允许商用，需署名且衍生作品同方式共享", tier: "strong-copyleft", allowsClosedSource: false },
+  // ELv2：源码可见但**不是**开源许可，核心限制是「不得作为托管服务转售」。Airbyte 用它。
+  "ELv2": { summary: "源码可见，禁止作为托管服务转售", tier: "strong-copyleft", allowsClosedSource: false },
+  // FIT2CLOUD：DataEase 的厂商自定义许可，基于 GPL-3.0 附加品牌限制（不得改 Logo/名称）。
+  // 自定义许可无法归入 SPDX，按原文如实描述，不拔高也不贬低。
+  "FIT2CLOUD": {
+    summary: "基于 GPL-3.0，附加品牌限制（不得修改 Logo 与名称）",
+    tier: "strong-copyleft",
+    allowsClosedSource: false,
+  },
 };
 
 /**
