@@ -37898,4 +37898,4799 @@ services:
       ],
     },
   },
+  {
+    slug: "lx-music-desktop",
+    linksCheckedAt: "2026-10-22",
+    name: "LX Music",
+    nameZh: "洛雪音乐助手（桌面版）",
+    aliases: ["lx music", "lx-music", "洛雪", "洛雪音乐助手", "洛雪桌面版"],
+    summary: "Electron 写的音乐播放器，本身不含任何音源，播放链接全靠「自定义源」返回。适合愿意自己维护源、也能接受偶尔播错曲的人；想要装完即听的别选它。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "桌面", "自定义音源", "Electron"],
+    body: "LX Music 把自己定位成「播放器 + 列表管理」，不是音源提供方。README 的协议章节讲得很直白：它没有获取音频数据的能力，你点播放时它只是把歌名、歌手交给设置里选中的「源」，源返回一个链接它就照播——所以链接对不对、是不是你要的那首，软件无法校验，播错曲是设计上就可能发生的事。\n这决定了它的使用成本：搜索能不能用、能播多少歌，取决于你手里有哪些源，而源会随接口变动失效，需要自己更新。它内置的官方平台指的是酷我、酷狗、咪咕这类，界面里对它们的称呼只是别名。\n工程上它做得比同类细：v2.2.0 起单独发布了数据同步服务，可以部署在自有服务器上做多端同步；v2.7.0 起有开放 API，在本地起一个 HTTP 服务供第三方调用；Windows 上程序目录里放一个 portable 文件夹（v1.17.0+）就会改用该目录存数据，方便塞进 U 盘。数据默认落在各系统的应用配置目录。\n作者也提醒，开发精力已转向新项目 Any Listen，老项目仍在但不以加新功能为主。",
+    officialUrl: "https://lyswhut.github.io/lx-music-doc",
+    officialLabel: "lyswhut.github.io",
+    links: {
+      official: "https://lyswhut.github.io/lx-music-doc",
+      github: "https://github.com/lyswhut/lx-music-desktop",
+    },
+    whoFor: "愿意自己找源、维护源的桌面用户；需要跨平台一致体验，或想自建同步服务把列表留在自己服务器上的人。",
+    whoNot: "以为装完就能听全网歌的人；不想处理「某天突然搜不到」的；也建议绕开把音源当卖点的二手打包版。",
+    installTips: [
+      "安装包只从 GitHub Releases 取。README 明确写了原始发布地址只有 GitHub，其他渠道都是第三方转载，与本项目无关。",
+      "想在 U 盘或便携目录里存数据，Windows 上在程序文件夹里建一个名为 portable 的文件夹即可（v1.17.0 及以上）。",
+      "第一次启动先花十分钟把设置过一遍。作者自己说默认设置与 UI 不以新手友好为目标，不调会处处别扭。",
+      "要多端同步列表得另外部署 lx-music-sync-server，那是独立发布的项目，客户端本身不带云端。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#0F766E",
+    },
+    guide: {
+      intro: "按第一次使用的顺序讲：为什么装好却搜不到歌、自定义源到底决定什么、数据存在哪、以及什么时候才需要自建同步服务。",
+      markdown: `## 装完没声音，先别怀疑软件
+
+最常见的第一道坎不是安装，是「搜得到、点播放没反应或者播的不是这首歌」。原因在架构：LX Music 不存音频，它把歌名和歌手交给你在设置里选的「源」，源返回什么链接就播什么。所以源失效、源返回错曲、源被限流，表现都是播不动或播错。
+
+先去设置里确认当前用的是哪个源，再看源的说明是否还在维护。这一步没搞定，重装软件、换版本都不会有用。
+
+## 默认设置是给老手看的
+
+README 里那句「为了提高使用门槛，默认设置与 UI 操作不以新手友好为目标」不是谦虚。建议先读两份文档再动歌单：
+
+- 音乐播放列表机制：搞清「试听列表」「我的列表」的区别，否则会疑惑为什么关掉软件后列表空了。
+- 鼠标与键盘快捷操作：它大量依赖快捷键，只用鼠标会觉得功能少了一半。
+
+## 数据到底存在哪
+
+默认位置按系统不同：
+
+- Linux：\`$XDG_CONFIG_HOME/lx-music-desktop\`，未设置则为 \`~/.config/lx-music-desktop\`
+- macOS：\`~/Library/Application Support/lx-music-desktop\`
+- Windows：\`%APPDATA%/lx-music-desktop\`
+
+Windows 想便携，就在程序目录建 \`portable\` 文件夹，v1.17.0 起会自动改用它。搬机器前先确认这个目录，别只拷安装包。
+
+## 什么时候才轮到自建服务
+
+单机用不需要任何服务器。真正需要部署 \`lx-music-sync-server\` 的场景只有两个：多台设备要共用同一份列表，或者你不放心把列表放在别人的机器上。它是独立仓库，别在客户端里找开关。
+
+同理，v2.7.0 起的开放 API 是在本地起一个 HTTP 服务给第三方调用，属于「让别的程序控制播放器」，不是云端账号体系。
+
+## 版权这件事项目自己写清楚了
+
+协议第 2.1 条要求使用者在 24 小时内清除使用过程产生的版权数据，并明确「请尊重版权，支持正版」。这条不是客套话，是它划的责任边界：软件不提供内容，产生什么内容由使用者和源决定。`,
+      resources: [
+        {
+          kind: "html",
+          title: "桌面版常见问题",
+          url: "https://lyswhut.github.io/lx-music-doc/desktop/faq",
+          note: "搜不到、播不了、列表异常这类问题先查这里，比翻 issue 快。",
+        },
+        {
+          kind: "html",
+          title: "音乐播放列表机制",
+          url: "https://lyswhut.github.io/lx-music-doc/desktop/faq/playlist",
+          note: "讲清试听列表与我的列表的关系，第一次用最容易被这里绕晕。",
+        },
+        {
+          kind: "html",
+          title: "各平台安装包发布页",
+          url: "https://github.com/lyswhut/lx-music-desktop/releases",
+          note: "唯一官方下载地址，其余渠道均为转载。升级前先看更新日志。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pear-desktop",
+    linksCheckedAt: "2026-10-22",
+    name: "Pear Desktop",
+    nameZh: "Pear Desktop（YouTube Music 桌面端）",
+    aliases: ["pear", "pear desktop", "YouTube Music 桌面版", "ytmdesktop"],
+    summary: "把 YouTube Music 网页包成桌面客户端的 Electron 应用，界面靠插件改、外观靠 CSS 主题换。适合天天挂着 YT Music 又嫌浏览器标签页碍事的人；它没有下载能力。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "YouTube Music", "Electron", "插件"],
+    body: "Pear Desktop 的定位写在标题里：extension for music player。它不实现播放，播放还是 YouTube Music 那一套，需要你自己的账号；它做的事是把网页装进独立窗口，再补上桌面端该有的部分——原生菜单、媒体键、托盘、主题。\n真正让它和一堆「套壳站」拉开距离的是插件体系。插件是 src/plugins/你的插件名/index.ts，用 createPlugin 声明 name、restartNeeded、config、stylesheets、menu，再挂 backend / renderer / preload 三组钩子；backend 里能拿到 Electron 的 BrowserWindow 直接操作窗口，renderer 里能注入 CSS 和改 HTML，两边用 ipc 通信。想改外观而不写代码，就在设置里加载 CSS 文件（Options > Visual Tweaks > Themes）。\n代价是它对上游极度依赖：YouTube Music 网页改版，插件选择器和注入点就可能失效，得等维护者跟。安装渠道倒是很全，AUR、Solus、Homebrew、Scoop、winget 都有包，但 Windows 安装包签名是 unknown publisher，SmartScreen 会拦，这属于预期内。README 顶部还专门声明了与 Google / YouTube 无任何关联。",
+    officialUrl: "https://github.com/pear-devs/pear-desktop",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/pear-devs/pear-desktop",
+      github: "https://github.com/pear-devs/pear-desktop",
+    },
+    whoFor: "每天都在用 YouTube Music、想要独立窗口 + 媒体键 + 托盘，并且愿意折腾插件或 CSS 主题的人。",
+    whoNot: "想要离线缓存或下载歌曲的人——它只包装网页；也不用 YouTube Music 的人，装了没有内容可放。",
+    installTips: [
+      "macOS 用 brew install pear-devs/pear/pear-desktop；手动下载的包若启动报 is damaged and can't be opened，在终端执行 /usr/bin/xattr -cr /Applications/Pear\\ Desktop.app 去掉隔离属性。",
+      "Windows 用 scoop：先 scoop bucket add extras 再 scoop install extras/pear-desktop；或直接 winget install pear-devs.pear-desktop。",
+      "Windows 无网络环境安装要下两样东西：对应架构的 *.nsis.7z 与 *-Setup.exe，放在同一个目录里再运行安装程序。",
+      "换外观不用装插件：把 CSS 文件放进主题目录，在 Options > Visual Tweaks > Themes 里加载。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#7C9A3B",
+    },
+    guide: {
+      intro: "讲第一次用最容易卡住的三件事：安装被系统拦、菜单找不到（它不是没做，是被隐藏了）、以及想改界面时插件和主题该选哪条路。",
+      markdown: `## 先把「装不上」解决掉
+
+三个平台各有各的拦法，都不代表包有问题：
+
+- macOS 手动装完提示 **is damaged and can't be opened**，是 Gatekeeper 隔离属性，不是文件损坏。执行 \`/usr/bin/xattr -cr /Applications/Pear\\ Desktop.app\` 即可。
+- Windows 会弹 SmartScreen，因为签名是 unknown publisher。手动双击 exe 和 winget 装是同一种情况，走「更多信息 → 仍要运行」。
+- Windows 没网时装不上，是因为光有 Setup.exe 不够。把**对应架构的 .nsis.7z** 与 **Setup.exe** 下到同一目录再运行，x64 / ia32 / arm64 按机器选。
+
+## 菜单不见了不是 bug
+
+开了 Hide Menu 菜单栏就会消失，按 \`alt\` 叫回来；装了 in-app-menu 插件的话改用反引号键。
+
+## 改界面：先分清主题和插件
+
+只换配色、字体、圆角，用**主题**就够——一个 CSS 文件，在 Options > Visual Tweaks > Themes 里加载，不用碰代码。
+
+要改结构、加功能才需要**插件**，最小插件只要一个文件：
+
+\`\`\`ts
+// src/plugins/你的插件名/index.ts
+export default createPlugin({
+  name: 'Plugin Label',
+  restartNeeded: true,
+  stylesheets: [style],
+})
+\`\`\`
+
+restartNeeded 为 true 时软件会提示重启。
+
+## 自己跑起来
+
+\`\`\`bash
+git clone https://github.com/pear-devs/pear-desktop
+cd pear-desktop && pnpm install --frozen-lockfile && pnpm dev
+\`\`\`
+
+打包用 \`pnpm dist:win\` / \`dist:linux\` / \`dist:mac\`，macOS ARM 另有 \`dist:mac:arm64\`。`,
+      resources: [
+        {
+          kind: "html",
+          title: "最新版本发布页",
+          url: "https://github.com/pear-devs/pear-desktop/releases/latest",
+          note: "各平台安装包与离线安装所需的 .nsis.7z 都在这里，按架构选。",
+        },
+        {
+          kind: "html",
+          title: "Homebrew Cask 定义",
+          url: "https://github.com/pear-devs/homebrew-pear",
+          note: "macOS 用 brew 安装时的实际配方，出问题可对照版本。",
+        },
+        {
+          kind: "html",
+          title: "社区主题合集",
+          url: "https://github.com/kerichdev/themes-for-ytmdesktop-player",
+          note: "一堆现成 CSS 主题，可以先套一个再决定要不要自己写。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "yesplaymusic",
+    linksCheckedAt: "2026-10-22",
+    name: "YesPlayMusic",
+    nameZh: "YesPlayMusic（网易云第三方客户端）",
+    aliases: ["YesPlayMusic", "yesplaymusic", "网易云第三方客户端", "高颜值网易云"],
+    summary: "第三方网易云客户端，界面和 macOS 手感是卖点，还能用 UnblockNeteaseMusic 把变灰的歌换源播放。代价是要自己跑 NeteaseCloudMusicApi，且作者已宣布进入维护模式。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "网易云", "Electron", "第三方客户端"],
+    body: "YesPlayMusic 是把网易云网页版重做成客户端的那一类项目里最出名的之一，用 Vue 全家桶写，Electron 版由两位维护者适配，覆盖 macOS、Windows、Linux，同时也能当 PWA 装进浏览器。\n它的取舍很明确：砍掉社交，只留听歌相关的功能——扫码/手机/邮箱登录、MV、歌词、私人 FM 与每日推荐、音乐云盘、Last.fm 记录、自定义与全局快捷键、Linux 下的 Mpris。海外用户登录后可直接播放，这点对官方客户端不友好的人有实际价值。\n最有争议也最实用的功能是变灰歌曲替换：集成 UnblockNeteaseMusic，自动用各类音源补上不可播的曲目。两个前提要知道——网页版不支持这个能力，只有 Electron 客户端有；其中 YouTube 音源还需要你自己装 yt-dlp。\n真正的成本在部署侧。它的数据来自 Binaryify 的 NeteaseCloudMusicApi，官方客户端不需要你想这件事，自建网页版则必须先把这个 API 跑起来，再把 VUE_APP_NETEASE_API_URL 指过去；API 与页面不同域时不加反向代理会出现跨域问题，README 建议用 Nginx 把 API 映射到 /api。另外 2.0 Alpha 已经发布，当前这条线进入维护模式，除重大 bug 不再加新功能。",
+    officialUrl: "https://music.qier222.com",
+    officialLabel: "music.qier222.com",
+    links: {
+      official: "https://music.qier222.com",
+      github: "https://github.com/qier222/YesPlayMusic",
+    },
+    whoFor: "想要一个干净、无社交、能换源补歌的网易云客户端的人；以及愿意自己部署网页版、把数据留在自己服务器上的人。",
+    whoNot: "不想维护 API 服务的人——这几乎是它跑起来的前提；以及期待持续新功能的，作者已说明当前版本只修重大 bug。",
+    installTips: [
+      "桌面版直接下 Releases 的安装包；macOS 可 brew install --cask yesplaymusic，Windows 可 scoop install extras/yesplaymusic。",
+      "自己部署网页版，第一步必须先跑 Binaryify/NeteaseCloudMusicApi，否则页面能开但什么都加载不出来。",
+      "API 与页面不同域时用 Nginx 反代到 /api，并把 .env 里的 VUE_APP_NETEASE_API_URL 填成 /api，否则会碰到跨域导致的诡异 bug。",
+      "想用变灰歌曲替换只能用 Electron 客户端；网页版没有这个功能，YouTube 音源还要另外装 yt-dlp。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "Y",
+      color: "#1E88E5",
+    },
+    guide: {
+      intro: "先分清两条路径：直接下安装包，还是自己部署网页版。后者多一个必须自己跑的 API 服务，这一步卡住的人最多，所以重点讲它。",
+      markdown: `## 直接用安装包
+
+大多数人不用碰代码，去 Releases 下对应系统的包即可；macOS 与 Windows 也有包管理器：
+
+\`\`\`bash
+brew install --cask yesplaymusic
+scoop install extras/yesplaymusic
+\`\`\`
+
+装好登录（扫码、手机、邮箱都行）就能听。海外账号登录后可正常播放，这是它被推荐的主要原因之一。
+
+## 自建网页版：卡点全在 API
+
+网页版没有后端，它需要一个网易云 API 服务。**不先把这个跑起来，页面一定是空白或一直转圈。** 步骤按顺序：
+
+1. 按 Binaryify/NeteaseCloudMusicApi 的说明把它部署起来，也可以部署到 Vercel。
+2. 克隆本仓库：\`git clone --recursive https://github.com/qier222/YesPlayMusic.git\`，注意 --recursive，漏了子模块会编译失败。
+3. 装依赖：\`yarn install\`。
+4. \`cp .env.example .env\`，把 \`VUE_APP_NETEASE_API_URL\` 改成你的 API 地址。本地开发填 \`http://localhost:3000\`。
+5. 如果 API 和页面不同域，务必用 Nginx 反代，把 API 映射成 \`/api\`，环境变量也填 \`/api\`。README 明确说跨域「会有一些 bug」。
+6. \`yarn run build\`，把 \`/dist\` 传上服务器。
+
+偷懒的路径也有：Vercel 部署只要在仓库里加一个 vercel.json 做 rewrites，再设环境变量；Docker 是 \`docker build -t yesplaymusic .\` 后 \`docker run -d --name YesPlayMusic -p 80:80 yesplaymusic\`。
+
+## 关于补歌功能
+
+变灰歌曲靠 UnblockNeteaseMusic 换源，**网页版不支持**。Electron 客户端里默认音源直接可用，YouTube 音源要自己装 yt-dlp。
+
+## 版本状态
+
+2.0 Alpha 已发布，但当前这条线已进入维护模式，只修重大 bug。想长期跟进功能，得看 2.0 的分支。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线 Demo",
+          url: "https://music.qier222.com",
+          note: "部署在 Vercel 上的网页版，装之前可以先在浏览器里试手感。",
+        },
+        {
+          kind: "html",
+          title: "依赖的网易云 API 项目",
+          url: "https://github.com/Binaryify/NeteaseCloudMusicApi",
+          note: "自建或部署网页版的前置条件，它的安装说明比本项目更详细。",
+        },
+        {
+          kind: "html",
+          title: "Release 下载页",
+          url: "https://github.com/qier222/YesPlayMusic/releases",
+          note: "桌面端安装包与 2.0 Alpha 都在这里，注意区分两条线。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ultimatevocalremovergui",
+    linksCheckedAt: "2026-10-22",
+    name: "Ultimate Vocal Remover GUI",
+    nameZh: "UVR（人声分离图形界面）",
+    aliases: ["UVR", "Ultimate Vocal Remover", "人声分离", "伴奏提取", "去人声"],
+    summary: "本地跑深度模型把人声与伴奏拆开的图形界面，做伴奏、扒卡拉 OK 都用它。吃显卡，N 卡 6GB 显存起步；Windows 版必须装在 C 盘，装到副盘官方说会不稳定。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["人声分离", "音频处理", "PyTorch", "卡拉OK"],
+    body: "UVR 解决的是「一首成品混音里，能不能只留下伴奏」这件事。它用 PyTorch 上的一组源分离模型（MDX-Net、Demucs、VR 架构等）做频域分离，核心开发者自己训练了其中大部分模型，只有 Demucs v3/v4 的四轨模型来自上游。\n和在线去人声网站比，它的优势是本地计算：文件不上传、可以批量跑、参数能调。代价是硬件门槛实打实——官方写的最低要求是 GTX 1060 6GB，推荐 8GB 以上显存，且只支持 64 位系统。显存不够时会报内存分配错误，官方给的解法是把 Segment 或 Window 尺寸调小，而不是换模型。\n安装体验是它最反直觉的地方：官方提供了打包版，内含 Python、PyTorch 与依赖，不用自己配环境，但 Windows 上**必须装到 C 盘**，装到副盘会导致不稳定；AMD Radeon 与 Intel Arc 用户要换 DirectML 版本，N 卡走常规包。macOS 首次启动可能等 5–10 分钟。Linux 没有打包版，要走 venv 手动装，README 特别强调不要去删系统里的 EXTERNALLY-MANAGED 文件——那会破坏系统的 Python 包管理。\n另外两个必装的辅助件：FFmpeg 处理非 WAV 输入，Rubber Band 支撑变速与变调，缺了对应功能直接报错或不可用。",
+    officialUrl: "https://github.com/Anjok07/ultimatevocalremovergui",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/Anjok07/ultimatevocalremovergui",
+      github: "https://github.com/Anjok07/ultimatevocalremovergui",
+    },
+    whoFor: "要做伴奏、翻唱、卡拉 OK 音轨，且有一块像样的 N 卡（或愿意试 DirectML）的人；需要批量离线处理、不想把音频传到别人服务器的人。",
+    whoNot: "只有核显或 4GB 显存显卡的人；想要一键无损分离的也别抱期待——分离质量取决于模型与素材，人声和乐器频谱重叠时必然有残留。",
+    installTips: [
+      "Windows 直接装 UVR_v5.6.0_setup.exe，但必须装到 C 盘，官方说明装到副盘会不稳定。",
+      "AMD Radeon 或 Intel Arc 显卡要下 DirectML 版本，别装常规 N 卡包。",
+      "macOS 首次启动可能花 5–10 分钟；打不开先 sudo spctl --master-disable，再 sudo xattr -rd com.apple.quarantine /Applications/Ultimate\\ Vocal\\ Remover.app。",
+      "Linux 用 venv 隔离：apt 装 ffmpeg python3-pip python3-tk，python3 -m venv venv 后 pip install -r requirements.txt，最后 python UVR.py；不要删 EXTERNALLY-MANAGED。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "U",
+      color: "#B45309",
+    },
+    guide: {
+      intro: "重点讲第一次跑不起来的三种原因：显卡选错包、装错盘、缺 FFmpeg；再讲显存不够时该调哪个参数，而不是换模型。",
+      markdown: `## 先对号入座选安装包
+
+官方只维护三种分发形态，选错就是白装：
+
+- **N 卡用户**：常规 Windows 安装包。
+- **AMD Radeon / Intel Arc**：DirectML 版本，走的是另一套后端，速度与兼容性都不同。
+- **macOS**：M 系列下 arm64 的 dmg，Intel 下 x86_64 的 dmg；要求 Big Sur 及以上。
+
+Windows 还有个硬约束：**必须装在 C 盘**。装到 D 盘或移动盘会出现不稳定，这不是玄学，是它内部路径处理的问题。
+
+## 缺 FFmpeg 会怎样
+
+它只原生处理 WAV。喂 mp3、flac、m4a 时靠 FFmpeg 转，没装就直接抛错。最省事的做法是把 \`ffmpeg.exe\` 丢进 UVR 程序目录，而不是去配系统 PATH。
+
+同理，变速（Time Stretch）和变调（Change Pitch）依赖 Rubber Band，缺了这两个功能就是灰的。
+
+## 显存不够时调什么
+
+报内存分配错误时，官方建议调小 **Segment** 或 **Window** 尺寸。原理是把长音频切成更小的块送入模型，代价是边界处可能产生拼接痕迹，处理时间也更长。先降一档试，不要一上来就换小模型——模型换了音质是另一回事。
+
+## Linux 上别踩这个坑
+
+早期教程让人删 \`/usr/lib/python3.11/EXTERNALLY-MANAGED\`，README 现在明确说**不要删**，那会破坏系统包管理。正确做法是 venv：
+
+\`\`\`bash
+sudo apt-get install -y ffmpeg python3-pip python3-tk
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python UVR.py
+\`\`\`
+
+## 出了错怎么报
+
+点「Start Processing」左边的设置按钮，里面有 Error Log，把日志一起贴出去，比只说「跑不动」有用得多。`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目 README 与安装说明",
+          url: "https://github.com/Anjok07/ultimatevocalremovergui/blob/master/README.md",
+          note: "三平台安装步骤、硬件要求与常见报错都在这里，装之前通读一遍能省一次重装。",
+        },
+        {
+          kind: "html",
+          title: "v5.6 发布页",
+          url: "https://github.com/Anjok07/ultimatevocalremovergui/releases/tag/v5.6",
+          note: "各平台安装包与更新补丁的官方入口。",
+        },
+        {
+          kind: "html",
+          title: "开发进展 issue",
+          url: "https://github.com/Anjok07/ultimatevocalremovergui/issues/2399",
+          note: "README 顶部的开发更新指向这里，想知道后续走向看这条。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "spotify-downloader",
+    linksCheckedAt: "2026-10-22",
+    name: "spotDL",
+    nameZh: "spotDL（Spotify 歌单下载）",
+    aliases: ["spotdl", "spotDL", "spotify downloader", "Spotify 歌单下载"],
+    summary: "命令行工具，把 Spotify 歌单里的曲目在 YouTube 上找出对应音频下载，并写入封面、歌词与元数据。本质是换平台取音频，音质上限只有 YouTube 那一档。",
+    scenes: ["music", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐下载", "命令行", "Spotify", "元数据"],
+    body: "spotDL 做的事情可以一句话概括：用 Spotify 的歌单和元数据当索引，去 YouTube 找能下的音频，再把封面、歌词、曲目信息写回去。README 直说了这么设计的原因——绕开从 Spotify 直接下载音频的麻烦。\n代价也就摆在那：音质天花板是 YouTube 给的，普通用户 128kbps，YouTube Music Premium 用户 256kbps。想要无损的人在这里找不到答案，工具本身也不做转码提升。\n它的操作集比「下载器」这个名字丰富：默认的 download 是下载，save 只存元数据成 .spotdl 文件，url 把曲目换成更友好的链接，meta 给已有文件补元数据，web 起一个只能下单个曲目的简易界面。最该小心的是 sync——它拿目录和歌单当前状态比对，新歌下载、**已从歌单移除的歌会被删掉**，其他文件不动。用之前确认目录里没有你舍不得的东西。\n依赖两项外部组件：FFmpeg 处理转码，官方最推荐用 spotdl --download-ffmpeg 直接装进 spotDL 目录；Deno 是「强烈建议」，因为底层用 yt-dlp 下 YouTube，部分视频（比如标记为面向儿童的）没有 Deno 会下不下来。",
+    officialUrl: "https://spotdl.readthedocs.io/en/latest",
+    officialLabel: "spotdl.readthedocs.io",
+    links: {
+      official: "https://spotdl.readthedocs.io/en/latest",
+      github: "https://github.com/spotDL/spotify-downloader",
+    },
+    whoFor: "想把自己整理好的 Spotify 歌单落到本地、按专辑归档并带完整元数据的人；已经习惯命令行、能接受 128/256kbps 音质的人。",
+    whoNot: "追求无损或母带音质的人；以及不愿承担版权风险的人——README 明说用户对自己的行为与法律后果负责。",
+    installTips: [
+      "pip install spotdl 即可；用 pipx 或 uv 装成独立环境，能避免它把依赖混进系统 Python。",
+      "先跑 spotdl --download-ffmpeg，把 FFmpeg 装进 spotDL 目录；官方推荐这种局部安装，别折腾系统 PATH。",
+      "再跑 spotdl --download-deno。某些视频缺 Deno 会直接失败，这一步很多人跳过然后卡在「为什么这首下不了」。",
+      "用 sync 前看清行为：spotdl sync <歌单url> --save-file list.spotdl 建立记录，之后 spotdl sync list.spotdl 更新；从歌单移除的曲目会连带删掉本地文件。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#1DB954",
+    },
+    guide: {
+      intro: "按「能不能跑起来」的顺序讲：FFmpeg 与 Deno 两个必装件、单曲与歌单的用法、sync 的删除行为，以及音质天花板在哪。",
+      markdown: `## 两个前置件，缺一个就半残
+
+装完 spotdl 只是壳。它要靠 FFmpeg 做转码与封装，靠 Deno 让 yt-dlp 能下某些 YouTube 视频。
+
+最省事的装法是把两者都塞进 spotDL 自己的目录：
+
+\`\`\`bash
+pip install spotdl
+spotdl --download-ffmpeg
+spotdl --download-deno
+\`\`\`
+
+不装 FFmpeg 会卡在转码；不装 Deno 的表现更隐蔽——大部分歌能下，个别（尤其标记为面向儿童的视频）报错。
+
+## 一条命令的构成
+
+\`\`\`sh
+spotdl [operation] [options] QUERY
+\`\`\`
+
+operation 省略时默认为 download。QUERY 通常是 Spotify 链接，可以是单曲、专辑或歌单：
+
+\`\`\`sh
+spotdl https://open.spotify.com/playlist/xxxx
+\`\`\`
+
+不想装命令，也可以用 \`python -m spotdl\` 跑。完整参数看 \`spotdl -h\`。
+
+## 只想要元数据
+
+\`\`\`sh
+spotdl save <url> --save-file mylist.spotdl
+\`\`\`
+
+只抓信息不动音频，适合先备份歌单再决定下不下。
+
+## sync 会删文件，先看清
+
+这是最容易出事的功能：
+
+\`\`\`sh
+spotdl sync <歌单url> --save-file mylist.spotdl
+spotdl sync mylist.spotdl
+\`\`\`
+
+第一次生成记录文件，之后用它做增量。规则是：歌单里新增的下载，**歌单里已移除的，本地对应文件会被删除**，其余文件不动。所以别把 sync 指向一个混杂着你其他音乐的目录。
+
+## 音质的天花板
+
+音频来自 YouTube：普通账号最高 128kbps，YouTube Music Premium 最高 256kbps。它不会做任何「提升音质」的处理，也不该期待。
+
+## 部署到容器
+
+\`\`\`bash
+docker run --rm -v $(pwd):/music spotdl download <trackUrl>
+\`\`\`
+
+要能拿到文件，就必须把宿主目录挂到 /music，否则容器删了文件也没了。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档（Read the Docs）",
+          url: "https://spotdl.readthedocs.io",
+          note: "安装、各 operation 的完整参数、音频格式与音质说明都在这，比 README 细。",
+        },
+        {
+          kind: "html",
+          title: "GitHub Releases",
+          url: "https://github.com/spotDL/spotify-downloader/releases",
+          note: "不想装 Python 环境时下预编译可执行文件的入口。",
+        },
+        {
+          kind: "html",
+          title: "项目 README",
+          url: "https://github.com/spotDL/spotify-downloader/blob/master/README.md",
+          note: "Docker、Termux、AUR 等安装路径与支持的 operation 清单。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "algermusicplayer",
+    linksCheckedAt: "2026-10-22",
+    name: "Alger Music Player",
+    nameZh: "Alger Music Player",
+    aliases: ["Alger", "AlgerMusicPlayer", "Alger 音乐播放器"],
+    summary: "基于网易云接口的第三方播放器，把本地 API 服务、独立桌面歌词、下载和手机远程控制打包在一个客户端里。适合想一站式听歌带歌词的人，代价是跟着接口变动走。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "网易云", "桌面歌词", "远程控制"],
+    body: "Alger Music Player 的功能表长得像「官方客户端该有但没做」的清单：独立桌面歌词窗口、迷你模式、状态栏控制、EQ 均衡器、定时播放、倍速、搜索 bilibili、按单曲选择音源解析。\n技术上它有两个值得注意的选择。一是内置本地服务，基于 netease-cloud-music-api，README 写明「无需依赖在线 API」——也就是说它把接口层放在了本地跑，不像多数同类要你自己另起一个服务。二是资源解析借了 @unblockneteasemusic/server，所以变灰曲目有换源的可能。\n它的覆盖范围也比多数同类宽：Desktop、Web、Mobile Web 都在支持列表里，Android 标着测试，iOS 写着后续。桌面歌词是真正独立的窗口，不是叠在主界面上的浮层，多屏或全屏工作时更实用。远程控制则让你用手机指挥电脑上的播放，前提是两端在同一网络。\n需要清楚的边界：本项目是第三方客户端，声明仅供学习交流、禁止商用，也不具备官方版权授权；接口一变，登录、搜索、播放都可能一起坏。源码启动只有 npm install 与 npm run dev 两步，README 主要篇幅反而在功能列表与打赏上，细节文档放在语雀。",
+    officialUrl: "https://github.com/algerkong/AlgerMusicPlayer",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/algerkong/AlgerMusicPlayer",
+      github: "https://github.com/algerkong/AlgerMusicPlayer",
+    },
+    whoFor: "想要桌面歌词 + 迷你模式 + 手机遥控一体、并且主要听网易云曲库的人；想自己改界面、从源码跑起来的人。",
+    whoNot: "需要官方版权保障或稳定长期服务的场景；也不用网易云、或对第三方接口合规性有顾虑的人。",
+    installTips: [
+      "装现成的直接去 Releases 下对应平台包；想先看效果可以打开作者提供的网页预览 music.alger.fun。",
+      "从源码跑只要两步：npm install，然后 npm run dev。",
+      "沉浸式歌词是从左下角封面点进去的，不是一个独立菜单项，第一次找会找不到。",
+      "想要手机遥控电脑播放，用内置的远程控制功能，两端需要处在同一个局域网内。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#C2410C",
+    },
+    guide: {
+      intro: "讲清三个第一次会困惑的点：本地服务意味着什么、桌面歌词窗口在哪开、以及远程控制为什么连不上。",
+      markdown: `## 「本地服务」到底省了什么
+
+多数同类播放器要你另外部署一个网易云 API 服务，再填地址。Alger 把这一层做进了应用里，基于 netease-cloud-music-api 在本地跑，所以你装完登录就能用，不用先起一个 Node 服务。
+
+好处是省事，代价是排障时少了一层可见性：接口出问题时，界面上看到的只是「加载失败」，你没法像自建方案那样去翻 API 日志。遇到这种情况先确认是不是接口本身变了，而不是急着重装。
+
+## 桌面歌词是独立窗口
+
+它不是一个悬浮在主界面上的层，而是一个单独的窗口，可以拖到第二块屏幕、可以置顶在别的应用之上。第一次用最容易的困惑是「设置里开了但没看见」——多半是被主窗口挡住了，或者被系统判定为后台窗口。
+
+同类里另一个入口是**沉浸式歌词**：点左下角的封面进入，不是菜单项，这点 README 只写了一句，找的人很多。
+
+## 远程控制连不上
+
+手机指挥电脑播放依赖局域网直连，不是云端中转。所以两端不在同一个网段（比如手机走蜂窝、电脑接公司 VPN）时一定失败。先把两台设备放到同一 WiFi 下再试。
+
+## 从源码跑
+
+\`\`\`bash
+npm install
+npm run dev
+\`\`\`
+
+它没有复杂的构建脚本要求，适合想改界面的人直接上手。开发文档另见仓库里的 DEV.md。
+
+## 边界要清楚
+
+这是第三方客户端，项目自己声明仅供学习交流、禁止商业用途。曲库与登录能力来自第三方接口，不具备官方授权，接口变动时功能会一起受影响；使用前请自行判断合规性，并尽量支持正版。`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装与常见问题文档",
+          url: "https://www.yuque.com/alger-pfg5q/ip4f1a/bmgmfmghnhgwghkm",
+          note: "README 直接指向这份语雀文档，安装步骤与常见问题比仓库里全。",
+        },
+        {
+          kind: "html",
+          title: "网页预览版",
+          url: "https://music.alger.fun/",
+          note: "不用装就能看界面与交互，判断要不要下客户端前先试这个。",
+        },
+        {
+          kind: "html",
+          title: "发布页",
+          url: "https://github.com/algerkong/AlgerMusicPlayer/releases",
+          note: "各平台安装包入口，更新也走这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "tone-js",
+    linksCheckedAt: "2026-10-22",
+    name: "Tone.js",
+    nameZh: "Tone.js（Web Audio 音乐框架）",
+    aliases: ["tone", "tonejs", "Tone.js", "Web Audio 框架"],
+    summary: "浏览器里做音乐的 Web Audio 框架，把合成器、采样器、效果器和 Transport 调度包成 DAW 式 API。适合写交互式音乐页面；只想放个 mp3 的话它太重了。",
+    scenes: ["music", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Web Audio", "音频合成", "JavaScript", "音乐编程"],
+    body: "Tone.js 的设计目标写在 README 第一段：让音乐人和音频程序员都觉得顺手。它因此分成两层——高层给你 DAW 那套东西（全局 Transport 用来对齐与调度、现成的合成器与效果器），底层给你搭自己合成器与复杂控制信号的高性能积木。\n用它的第一个坑几乎人人都会踩：浏览器不允许在用户交互前播放任何音频。必须在一个由点击或按键触发的事件里 await Tone.start()，在那之前做调度只会得到静音或错位的时间。第二个坑是时间本身——JS 回调不准，所以 Loop 与 Transport 的回调会把精确的事件时间作为参数传给你，必须用这个参数去触发音符，而不是在回调里读 Tone.now()。\n概念上还有两个容易混的点：Tone.Synth、FMSynth、AMSynth 这些是单音的，一次只能一个音，要多音得用 Tone.PolySynth 包一层（Sampler 例外，它本身就是复音的）；时间参数既可以是秒，也可以是 4n、8t、1m 这类相对记谱。\n它不定位于处理音频文件。想裁剪、降噪、批量转码，用错了工具。它也不解决 MIDI 解析——MIDI 要先转成它认识的 JSON 格式。",
+    officialUrl: "https://tonejs.github.io",
+    officialLabel: "tonejs.github.io",
+    links: {
+      official: "https://tonejs.github.io",
+      github: "https://github.com/Tonejs/Tone.js",
+    },
+    whoFor: "要做网页里的交互式音乐、音序器、合成器玩具或音乐教学演示的前端；需要采样精确调度而不是 setTimeout 的人。",
+    whoNot: "只想在网页里播一段音频的人——原生 audio 标签就够；也不适合做音频文件的批量处理或离线渲染流水线。",
+    installTips: [
+      "npm install tone 后 import * as Tone from \"tone\"；想提前试未发布的特性用 tone@next。",
+      "音频必须等用户操作后才响：把 await Tone.start() 放进 click 或 keydown 回调里，页面加载时就调度会静音。",
+      "在 Loop 与 Transport 回调里用回调收到的 time 参数触发音符，不要用 Tone.now()，JS 回调的时间不精确。",
+      "同时响多个音要用 new Tone.PolySynth(Tone.Synth)，直接 new Tone.Synth() 一次只能发一个音。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#5B21B6",
+    },
+    guide: {
+      intro: "从「为什么没声音」开始：自动播放策略与调度时间是新手最常卡住的两处，之后才是合成器、多音与效果器路由。",
+      markdown: `## 第一声：必须先有用户手势
+
+页面一加载就调 \`triggerAttackRelease()\` 没用，浏览器不会放行。要把 \`Tone.start()\` 放进用户操作的回调里：
+
+\`\`\`js
+document.querySelector('button').addEventListener('click', async () => {
+  await Tone.start()
+  new Tone.Synth().toDestination().triggerAttackRelease('C4', '8n')
+})
+\`\`\`
+
+没等 start() 的 Promise resolve 就调度，结果是静音或时间错位——两者都不报错，最难查。
+
+## 时间：两个 API 别混
+
+- \`Tone.now()\`：AudioContext 当前时间，页面加载起按秒累加。
+- \`Tone.getTransport()\`：可启动、停止、循环、改速的主时钟，相当于 DAW 的编排视图。
+
+关键细节：**JS 回调本身不准时**，所以 Loop 的回调签名是 \`(time) => {}\`，那个 time 才是采样精确的事件时刻：
+
+\`\`\`js
+new Tone.Loop((time) => {
+  synth.triggerAttackRelease('C2', '8n', time)
+}, '4n').start(0)
+Tone.getTransport().start()
+\`\`\`
+
+时间参数除秒外也接受 4n、8t、1m 这类记谱。
+
+## 单音还是多音
+
+\`Synth\`、\`FMSynth\`、\`AMSynth\`、\`NoiseSynth\` 都是单音的，第二个音会掐掉第一个。和弦要包一层 \`new Tone.PolySynth(Tone.Synth)\`，且 triggerRelease 必须给音名或音名数组。
+
+## 路由与采样
+
+默认 \`.toDestination()\` 直达扬声器；加效果用 \`player.connect(distortion)\`，同一个源还能并联多个效果。要统一控音量，用一个 \`Tone.Gain\` 当汇流节点。
+
+Sampler 按音名放采样，缺的音自动移调补上，不必每个半音都录；用 \`Tone.loaded()\` 等就绪再播。MIDI 要先转成它认识的 JSON 格式。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方示例集",
+          url: "https://tonejs.github.io/examples/",
+          note: "每个概念都有可运行的例子，比读 API 文档更快建立手感。",
+        },
+        {
+          kind: "html",
+          title: "API 文档",
+          url: "https://tonejs.github.io/docs/",
+          note: "类与方法的完整参考，查参数默认值时用。",
+        },
+        {
+          kind: "markdown",
+          title: "时间编码说明（Wiki）",
+          url: "https://github.com/Tonejs/Tone.js/wiki/Time",
+          note: "4n、8t、1m 这些记谱到底怎么换算，调度写错多半是没看这篇。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "simpmusic",
+    linksCheckedAt: "2026-10-22",
+    name: "SimpMusic",
+    nameZh: "SimpMusic（YouTube Music 客户端）",
+    aliases: ["SimpMusic", "simpmusic", "YouTube Music 客户端"],
+    summary: "开源的 YouTube Music 第三方客户端，安卓和桌面都有，去广告、逐词歌词、SponsorBlock 都齐。beta 阶段，播放挂在 YouTube 的私有接口上，坏了只能等作者修。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "YouTube Music", "Kotlin", "跨平台"],
+    body: "SimpMusic 用 Compose Multiplatform 同时做安卓和桌面，功能表在同类里属于堆得很满的那种：三套正在播放样式、十段 EQ 加 AutoEq 耳机配置、逐词歌词与 12 种语言的罗马音、Wrapped 年度总结、桌面小组件、Android Auto、Discord 状态、SponsorBlock 与 Return YouTube Dislike。\n它和官方客户端最大的差别在于数据来源：走的是 YouTube Music 的隐藏接口，靠 InnerTune 与 SmartTube 那套思路取数据与流地址。这意味着两件事——一是能免费听歌、无广告、后台播放；二是**可用性不由项目掌握**，YouTube 那边一改，这边就可能整片失效。README 自己写了这是 beta，会崩、会有播放错误，并要求别问「什么时候稳定」。\n两个版本要分清：Full 版用 Sentry 收集崩溃数据，FOSS 版完全不收集，也没有任何第三方追踪服务器。介意隐私就装 FOSS。另有几处实际限制：256kbps 只对 YouTube Music Premium 账号开放；AI 歌词翻译要自备 OpenAI 或 Gemini 的 key；vivo 手机要装专用的 full-vivo 包才有原子岛与小组件，且它会作为独立应用存在；Windows 与 Linux 的 ARM64 设备要用 x64 构建跑。",
+    officialUrl: "https://simpmusic.org",
+    officialLabel: "simpmusic.org",
+    links: {
+      official: "https://simpmusic.org",
+      github: "https://github.com/maxrave-dev/SimpMusic",
+    },
+    whoFor: "安卓为主、想用一个客户端把 YouTube Music 的推荐与自己的歌单都用起来的人；在意隐私所以只装 FOSS 版的人。",
+    whoNot: "要求稳定不出错的人——作者自己标了 beta；也不用 YouTube Music 曲库，或需要 iOS 的人。",
+    installTips: [
+      "安卓优先从 F-Droid 或 IzzyOnDroid 装，能自动跟更新；也可直接下 Releases 的 apk。",
+      "vivo 手机要额外下 SimpMusic-full-vivo-*.apk 才有原子岛与音乐小组件，它会作为独立应用安装，不能和普通版相邻共存。",
+      "桌面版：Windows 下 SimpMusic-Windows-installer.zip 解压后跑 install.bat；macOS 需要 15 以上并用 .dmg；Linux 用 .AppImage。",
+      "介意崩溃上报就装 FOSS 版，Full 版会用 Sentry 收集崩溃数据。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#DC2626",
+    },
+    guide: {
+      intro: "先解决「下哪个包」这个最容易走错的问题，再讲登录、码率与版本差异；最后说清它为什么会时不时播不动。",
+      markdown: `## 五个下载入口选一个
+
+安卓端有 F-Droid、IzzyOnDroid、OpenAPK 与 Releases 多个来源，内容相同，区别只是更新方式。想省事就用 F-Droid，它会替你升级。
+
+两个特例要单独说：
+
+- **vivo 手机**必须装 \`SimpMusic-full-vivo-*.apk\` 才有 Origin Island 与音乐小组件。它会作为**另一个应用**安装，因此不能与普通版并排存在。
+- **桌面端**：Windows 是 \`SimpMusic-Windows-installer.zip\`，解压后运行 \`install.bat\`，不是 exe 双击；macOS 要求 15 以上才装 .dmg；Linux 统一用 .AppImage。
+
+## 登录
+
+桌面版登录有专门的图文指引，README 给了 simpmusic.org 的 how-to-log-in 页面。新版还支持把安卓上的登录态用二维码传到桌面，省得在两个设备各登一次。
+
+## 码率不是随便给的
+
+最高 256kbps（Opus 或 AAC）只对 **YouTube Music Premium** 账号开放。普通账号拿不到这档，别以为是设置没开对。
+
+## Full 与 FOSS 的差别只有一件事
+
+Full 版接 Sentry 收崩溃；FOSS 版不收集任何数据、也没有第三方服务器。功能上两者一致。如果你在看隐私说明时纠结，答案就是 FOSS。
+
+## 它为什么会突然播不动
+
+数据来自 YouTube Music 的隐藏接口。平台侧调整、地区限制、账号风控都会让某几首甚至整页失效，这不是你的网络问题，也不是重装能解决的。作者的态度很直接：因为依赖 YouTube Music，播放错误是正常的。遇到问题先看是不是普遍现象，再去 Discord 或 issue 反馈。
+
+## AI 功能要自带 key
+
+AI 歌词翻译、歌曲推荐这些需要用你自己的 OpenAI 或 Gemini API key，不是内置服务。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://simpmusic.org",
+          note: "下载入口、nightly 构建与登录指引的聚合页。",
+        },
+        {
+          kind: "html",
+          title: "桌面版登录指南",
+          url: "https://www.simpmusic.org/blogs/en/how-to-log-in-on-desktop-app",
+          note: "桌面端登录最容易卡住，官方单独写了这篇图文。",
+        },
+        {
+          kind: "html",
+          title: "F-Droid 页面",
+          url: "https://f-droid.org/en/packages/com.maxrave.simpmusic/",
+          note: "FOSS 版的官方分发渠道，可自动更新且不含崩溃上报。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "audiokit",
+    linksCheckedAt: "2026-10-22",
+    name: "AudioKit",
+    nameZh: "AudioKit（Apple 平台音频框架）",
+    aliases: ["AudioKit", "audiokit", "Swift 音频框架"],
+    summary: "Swift 的音频合成、处理与分析框架，iOS / macOS / tvOS 通用。写音频 App 能省掉大量 DSP 胶水代码，但它一步也不跨出 Apple 生态。",
+    scenes: ["music", "code"],
+    platforms: ["macos"],
+    source: "opensource",
+    tags: ["音频合成", "Swift", "iOS", "DSP"],
+    body: "AudioKit 是 Apple 平台上做音频应用的老牌基础设施，三块能力：合成（振荡器、包络、音序）、处理（效果器、滤波、动态）、分析（频谱、音高、节拍）。它不提供成品播放器界面，给的是可以拼装这些界面的引擎层。\n文档组织方式值得单独提：它把各个 AudioKit 库打包成一个 Swift Package Collection，在 Xcode 里加一次源，就能在 IDE 内浏览每个包的说明并勾选需要的部分，不用一个个去 GitHub 找仓库地址。这个设计对第一次接触的人很友好，也是它区别于「一堆散装库」的地方。\n边界很硬：只支持 iOS、macOS（含 Catalyst）与 tvOS。想做跨平台音频，或者目标里有 Android、Windows、Web，它完全帮不上忙，得换 JUCE 之类的方案。另外它是底层框架，学习曲线取决于你对 AVAudioEngine 与 DSP 概念的熟悉程度——README 没有教程，真正的上手材料在 Cookbook 仓库里，那是按组件组织的配方集。\n遇到问题时的官方路径也明确：先发 StackOverflow 带 #AudioKit 标签，确认不是自己实现的问题再开 issue。",
+    officialUrl: "https://audiokit.io/",
+    officialLabel: "audiokit.io",
+    links: {
+      official: "https://audiokit.io/",
+      github: "https://github.com/AudioKit/AudioKit",
+    },
+    whoFor: "做 iOS / macOS 音频 App 的 Swift 开发者；需要合成器、效果链或音频分析能力，又不想从 AVAudioEngine 裸写的人。",
+    whoNot: "目标是 Android、Windows、Web 或跨平台的人；想要开箱即用的播放器 UI，或者不熟悉 Swift 与音频基础概念的人。",
+    installTips: [
+      "在 Xcode 里走 File → Add Package Dependencies，点 Collections 侧栏左下角的 +，选 Add Package Collection，填 https://swiftpackageindex.com/AudioKit/collection.json 再 Load。",
+      "加完 collection 就能在 Xcode 内浏览各 AudioKit 包并只勾选需要的，不必手动找仓库地址。",
+      "离线文档用 Product → Build Documentation 生成，不必全程翻网站。",
+      "先照着 AudioKit/Cookbook 里对应组件的配方改，比从零读 API 快得多。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#0E7490",
+    },
+    guide: {
+      intro: "讲清两件事：怎么把这一堆库装进工程（用 Package Collection，不是逐个加仓库），以及为什么第一步该看 Cookbook 而不是 API 文档。",
+      markdown: `## 安装：一次加源，按需勾选
+
+AudioKit 拆成了多个包（核心、UI、各类扩展）。官方推荐用 Swift Package Collection 统一管理，而不是一个个往工程里塞仓库地址：
+
+1. Xcode 菜单 \`File\` → \`Add Package Dependencies...\`
+2. 在左侧 \`Collections\` 侧栏点左下角的 \`+\`
+3. 选 \`Add Package Collection...\`
+4. 填入 \`https://swiftpackageindex.com/AudioKit/collection.json\`，点 \`Load\`
+5. 之后就能在 IDE 里读到每个包的用途，勾选你真正需要的
+
+这一步的好处是：你不会因为「不知道有哪些包」而漏掉能力，也不会一口气拉进用不到的依赖。
+
+## 上手顺序：Cookbook → 文档 → API
+
+README 没有教程性质的内容，这是它和很多框架不同的地方。正确的路径是：
+
+1. 先看 **AudioKit Cookbook**，它按组件给了可直接跑的配方，改参数就能听到差别。
+2. 再去 audiokit.io 查概念与指南。
+3. 最后才翻 API 参考，查具体方法的签名与默认值。
+
+反过来做（先读 API）通常会在几百个类型里迷路。
+
+## 离线文档
+
+不想一直开网页：Xcode 里 \`Product\` → \`Build Documentation\`，会为已引入的包生成本地文档集。
+
+## 平台边界
+
+只支持 **iOS、macOS（含 Catalyst）、tvOS**。如果你的产品线里还有 Android 或 Windows，这个框架只能覆盖一半，架构上要早做隔离，别把 DSP 逻辑写进业务层。
+
+## 求助的正确姿势
+
+1. 先发 StackOverflow，带 \`#AudioKit\` 标签；
+2. 确认问题出在框架而不是自己的实现，再开 GitHub issue。
+
+顺序反了的话，issue 大概率会被引导回 StackOverflow。`,
+      resources: [
+        {
+          kind: "html",
+          title: "AudioKit Cookbook",
+          url: "https://github.com/AudioKit/Cookbook",
+          note: "按组件组织的可运行配方集，官方指定的第一份上手材料。",
+        },
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://audiokit.io/",
+          note: "概念说明与各包的介绍，配合 Cookbook 一起看。",
+        },
+        {
+          kind: "html",
+          title: "Package Collection 源",
+          url: "https://swiftpackageindex.com/AudioKit/collection.json",
+          note: "在 Xcode 里添加的这个地址，包清单与说明都从这里读。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "wavesurfer-js",
+    linksCheckedAt: "2026-10-22",
+    name: "wavesurfer.js",
+    nameZh: "wavesurfer.js（音频波形播放器）",
+    aliases: ["wavesurfer", "wavesurfer.js", "音频波形", "波形播放器"],
+    summary: "网页里的音频波形渲染加播放库，v8 起还提供响应式状态。做播客剪辑界面、语音标注很省事；但它只管画波形和放声音，不做剪辑与效果。",
+    scenes: ["music", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音频波形", "Web Audio", "TypeScript", "可视化"],
+    body: "wavesurfer.js 把「音频文件变成一条可点击跳转的波形」这件事封装到几行代码：给一个容器、一个 URL，它自己取数据、解码、绘制、接上播放控制。\n它最容易踩的坑都写在 FAQ 里，而且都不是代码问题。第一是 CORS：它必须把音频数据取回来解码，所以跨域文件所在服务器必须给 Access-Control-Allow-Origin，请求方改不了这件事。第二是体积：它用 Web Audio 在浏览器里完整解码，长音频会撞内存限制，官方建议用 audiowaveform 之类的工具预生成 peaks；流式播放也只有在预解码 peaks 与时长都具备时才可行。第三是 VBR 音频——波形和声音可能对不齐，转成 CBR 或改用 Web Audio shim 才能修。\n样式上和很多老库不同：v7 起渲染进 Shadow DOM，页面 CSS 穿不进去，得用 ::part() 选择器，元素上带 part 属性。插件生态是官方维护的，Regions、Timeline、Minimap、Envelope、Record、Spectrogram、Hover 各有例子。\nv8 还加了面向前端的响应式接口：getState() 返回可订阅的 signal（currentTime、isPlaying、volume、loadPhase 等），插件可用 definePlugin 注册并自动清理副作用。要清楚它不打算做 Web Audio 的封装层——不能剪、不能加效果、不能处理音频。",
+    officialUrl: "https://wavesurfer.xyz",
+    officialLabel: "wavesurfer.xyz",
+    links: {
+      official: "https://wavesurfer.xyz",
+      github: "https://github.com/katspaugh/wavesurfer.js",
+    },
+    whoFor: "要在网页里做波形播放器、播客剪辑界面或语音标注工具的前端；需要 Regions、Timeline 这类现成插件的人。",
+    whoNot: "需要音频剪辑、降噪、加效果的人——README 明说不要期待它处理音频；以及不想处理 CORS 与预解码的人。",
+    installTips: [
+      "npm install --save wavesurfer.js，然后 import WaveSurfer from 'wavesurfer.js'；v8 自带 TypeScript 类型，不用装 @types。",
+      "插件要单独引路径，例如 import Regions from 'wavesurfer.js/dist/plugins/regions.esm.js'。",
+      "音频跨域时必须由服务端返回 Access-Control-Allow-Origin，前端没有任何绕过的办法。",
+      "长音频不要直接丢给浏览器解码：先用 audiowaveform 预生成 peaks，再通过 predecoded 方式喂给它。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "W",
+      color: "#2563EB",
+    },
+    guide: {
+      intro: "从最小的可运行例子开始，然后集中处理三个高频故障：跨域、长音频内存、VBR 波形不同步；最后是 Shadow DOM 的样式写法。",
+      markdown: `## 最小可用
+
+\`\`\`js
+import WaveSurfer from 'wavesurfer.js'
+
+const wavesurfer = WaveSurfer.create({
+  container: '#waveform',
+  waveColor: '#4F4A85',
+  progressColor: '#383351',
+  url: '/audio.mp3',
+})
+\`\`\`
+
+不打包也行，塞一个 UMD 脚本即可，全局变量就是 \`WaveSurfer\`。
+
+## 故障一：跨域
+
+它要把音频取回来解码，所以必须满足 CORS。文件放第三方 CDN 或对象存储时，去那边配 \`Access-Control-Allow-Origin\`，客户端加什么参数都没用。
+
+## 故障二：长音频爆内存
+
+浏览器里完整解码，几十分钟的音频很容易失败。解法是预生成 peaks：
+
+\`\`\`bash
+audiowaveform -i long.mp3 -o peaks.json -z 256 -b 8
+\`\`\`
+
+再按 predecoded 的方式把 peaks 和时长一起传进去。**流式播放也只有在预解码 peaks 的前提下才支持**。
+
+## 故障三：波形和声音对不上
+
+VBR 文件会这样。两个办法：转成 CBR，或启用 Web Audio shim，后者时间更准。
+
+## 插件怎么加
+
+\`\`\`js
+import Regions from 'wavesurfer.js/dist/plugins/regions.esm.js'
+\`\`\`
+
+官方维护七个：Regions、Timeline、Minimap、Envelope、Record、Spectrogram、Hover，分别管区域标记、时间刻度、小地图、淡入淡出、麦克风录制、频谱与悬停竖线。
+
+## 样式：Shadow DOM 挡住了普通 CSS
+
+v7 起波形渲染在 Shadow DOM 里，页面选择器穿不进去，只能用 \`::part()\` 改写，元素上带 \`part\` 属性，devtools 里能看。
+
+## 别指望它做音频处理
+
+它只是个带波形可视化的播放器。可以拿到内部 audio 元素接进自己的 Web Audio 图，但不负责剪切、加效果或任何 DSP 加工。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档与指南",
+          url: "https://wavesurfer.xyz/docs/",
+          note: "面向初学者的实用文档，覆盖常见用例、插件与框架集成。",
+        },
+        {
+          kind: "html",
+          title: "示例集合",
+          url: "https://wavesurfer.xyz/examples/",
+          note: "每个插件与特性都有可运行例子，改参数最直观。",
+        },
+        {
+          kind: "html",
+          title: "API 参考",
+          url: "https://wavesurfer.xyz/docs/api/",
+          note: "方法、选项与事件的完整清单，查默认值时用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "musicbox",
+    linksCheckedAt: "2026-10-22",
+    name: "NetEase-MusicBox",
+    nameZh: "NetEase-MusicBox（命令行网易云）",
+    aliases: ["musicbox", "NetEase-MusicBox", "网易云命令行", "musicbox cli"],
+    summary: "终端里的网易云客户端，Vim 键位、能放无损，也能当 CLI 被脚本或 AI Agent 调用。代价是要自己装 mpg123/mpv，而且只支持扫码登录。",
+    scenes: ["music", "tools"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["命令行", "网易云", "Python", "终端"],
+    body: "MusicBox 把整个播放器塞进终端：歌曲、艺术家、专辑、本地列表的模糊搜索，排行榜、新碟、精选歌单、主播电台、我的歌单、云盘、私人 FM、每日推荐，都有对应视图。操作走 Vim 风格键位，j/k 上下、h/l 前后、空格播放暂停，还支持数字前缀做「快速跳 n 首」这类组合。\n它比多数 TUI 播放器多做了一步：把同样的能力暴露成 CLI，每条命令都能加 --json 输出，于是 musicbox search 邓丽君 --type song --json 这种调用可以进脚本，也能被 Codex、Claude Code 这类 Agent 直接驱动（作者还提供了 skills 安装方式）。\n真正的门槛在系统依赖。MP3 播放必须有 mpg123；无损 FLAC 与高清臻音要靠 mpv，装了才会自动切换，不装就只有 MP3 档。桌面歌词还要 Qt 相关的一串包，基本可以当作可选项。另一处坑是登录：现在只支持扫码，不支援账号密码，二维码用字符块在终端里渲染，窗口低于 25 行或字体不等宽就糊得扫不出来。\n还有地域限制——歌曲接口只接受中国大陆访问，海外用户得自己配代理。播放时总时长显示 00:01 基本是版权原因，不是软件坏了。",
+    officialUrl: "https://github.com/darknessomi/musicbox",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/darknessomi/musicbox",
+      github: "https://github.com/darknessomi/musicbox",
+    },
+    whoFor: "长期泡在终端、不想为听歌切窗口的人；想把播放控制接进脚本或 AI Agent 工作流的人；树莓派等低配设备上听歌的人。",
+    whoNot: "不熟悉命令行的；需要图形界面、桌面歌词或手机端的人；以及不在中国大陆又不打算配代理的人。",
+    installTips: [
+      "先装系统依赖：macOS 用 brew install mpg123 mpv uv，Ubuntu/Debian 用 sudo apt-get install mpg123 mpv。缺 mpg123 连 MP3 都放不了。",
+      "再用 uv tool install netease-musicbox 或 pipx install NetEase-MusicBox 装成全局命令；从源码装用 uv tool install .。",
+      "登录只支持扫码：终端窗口至少 25 行、必须等宽字体，否则二维码扫不出来。Cookie 存在 ~/.local/share/netease-musicbox/cookie.txt。",
+      "要放无损得装 mpv 并把配置里的 music_quality 设为 lossless 或 hires；只装 mpg123 时最高只有 MP3 档。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#C026D3",
+    },
+    guide: {
+      intro: "按顺序解决三个坎：依赖装不全导致没声音、二维码扫不出来、以及它其实可以当脚本接口用这件事怎么用。",
+      markdown: `## 第一步：声音从哪来
+
+它不自带解码器，声音由外部程序输出：**mpg123** 放 MP3，没有它就什么都放不了；**mpv** 负责 FLAC 与 Hi-Res，装了遇到无损会自动切过去，没装就永远停在 MP3 音质。
+
+\`\`\`bash
+brew install mpg123 mpv uv            # macOS
+sudo apt-get install mpg123 mpv       # Ubuntu / Debian
+uv tool install netease-musicbox      # 或 pipx install NetEase-MusicBox
+\`\`\`
+
+树莓派这类低配设备建议先只装 mpg123，避免一次拉进 mpv 的大堆图形依赖。注意项目要求 Python 3.10 及以上，卡在 3.9 的旧系统装不上。
+
+## 第二步：二维码扫不出来
+
+登录**只支持扫码**，账号密码早就不行了。二维码是用字符块在终端画的，两个条件必须满足：窗口高度 ≥ 25 行、等宽字体。不满足时看着有图案，手机却识别不了。登录后 Cookie 落在 \`~/.local/share/netease-musicbox/cookie.txt\`。
+
+## 第三步：它其实是套 CLI
+
+很多人只把它当交互界面，忽略了每条命令都能独立调用并输出 JSON：
+
+\`\`\`bash
+musicbox search 邓丽君 --type song --json
+musicbox play --id 1847408145 --json
+musicbox download --playlist 3778678 --path ./music --json
+\`\`\`
+
+这让它可以直接进脚本，或被 Agent 调用——作者提供了一行式 skills 安装方式接进 Codex / Claude Code 这类工具。
+
+## 出问题先看这两处
+
+某首歌总时长显示 \`00:01\` 通常是版权限制，不是 bug；日志在 \`~/.local/share/netease-musicbox/musicbox.log\`。非中国大陆网络要自己配代理，否则接口直接不可用；音质与播放后端在 \`~/.netease-musicbox/config.json\` 里改。`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目 README",
+          url: "https://github.com/darknessomi/musicbox/blob/master/README.md",
+          note: "完整快捷键表、音质配置取值、树莓派安装与排错说明。",
+        },
+        {
+          kind: "html",
+          title: "PyPI 页面",
+          url: "https://pypi.org/project/NetEase-MusicBox/",
+          note: "用 pip/pipx 安装时的版本来源，注意 PyPI 可能落后于源码。",
+        },
+        {
+          kind: "html",
+          title: "更新日志",
+          url: "https://github.com/darknessomi/musicbox/blob/master/CHANGELOG.md",
+          note: "CLI 子命令与配置项变动都记在这里，升级前扫一眼。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "musicfreedesktop",
+    linksCheckedAt: "2026-10-22",
+    name: "MusicFree Desktop",
+    nameZh: "MusicFree 桌面版",
+    aliases: ["MusicFree", "MusicFree 桌面版", "musicfree desktop"],
+    summary: "只做播放器的桌面客户端，音源全靠插件，主题包是 index.css 加 config.json 两件套。适合愿意自己装插件、想要干净界面的人；不装插件它就是个空壳。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "插件化", "Electron", "主题"],
+    body: "MusicFree 桌面版的设计前提和安卓版一致：软件本身不集成任何平台的音源。搜索、播放、歌单导入全部由插件完成，插件是一段满足协议的模块，负责搜索、播放、查专辑、查作者、导入歌单、取歌词这些函数，分页与缓存的活由播放器接管。\n好处是它不会被某个平台绑死——只要有人写插件，什么源都能接；坏处是第一次打开几乎什么都不能做，必须先去装插件，否则连搜歌都点不动。第三方插件是任意代码，README 也提醒要自己判断安全性，别装来路不明的。\n主题系统是它比较特别的一块：一个主题包就是一个文件夹，里面必须有 index.css 与 config.json。前者可以覆盖界面样式，主要靠一组 CSS 变量（--primaryColor、--backgroundColor、--textColor 等）；后者定义名称、预览图与 iframes 字段，能把任意 HTML 当作整个界面、顶栏、侧边栏或底栏的背景，实现纯 CSS 做不到的效果。路径里用 @/ 表示主题包自身目录，方便引用包内图片。示例主题有暗黑、背景图、fliplo、樱花、雨季等。\n定位上它是个播放器，不提供下载、不做曲库管理，隐私方面所有数据留在本地。",
+    officialUrl: "https://musicfree.catcat.work",
+    officialLabel: "musicfree.catcat.work",
+    links: {
+      official: "https://musicfree.catcat.work",
+      github: "https://github.com/maotoumao/MusicFreeDesktop",
+    },
+    whoFor: "已经有可用插件源、想要一个干净无广告桌面播放器的人；想用 HTML 当背景、把界面改到认不出原样的人。",
+    whoNot: "不想装插件、期待开箱能听歌的人；也不想自己承担第三方插件安全风险的人。",
+    installTips: [
+      "安装包在 GitHub Releases 与作者提供的飞书云文档里，Windows / macOS / Linux 都有。",
+      "装完第一件事是去插件设置里装插件：软件本身不带音源，没有插件连搜索都是空的。",
+      "写主题包时文件夹内必须同时有 index.css 与 config.json，缺一个主题就不生效。",
+      "主题里引用包内文件用 @/ 前缀，例如 iframes 填 @/bg.html，它会被替换成主题包路径。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#0D9488",
+    },
+    guide: {
+      intro: "讲第一次用最直接的困惑：为什么装完搜不到歌；以及想改外观时主题包的两个文件到底怎么写。",
+      markdown: `## 装完是空的，这是设计如此
+
+它只是一个播放器。所有搜索、播放、歌单能力来自插件，插件是一个满足协议的功能模块。所以顺序一定是：先装播放器，再装插件，最后才搜歌。
+
+插件协议与安卓版完全一致，已有插件可以直接用。第三方插件本质是可执行代码，装之前至少扫一眼有没有奇怪的外发请求——README 明确说由此产生的损失与软件无关。
+
+## 主题包：两个文件，一个文件夹
+
+结构固定，缺一不可：
+
+\`\`\`bash
+my-theme/
+  index.css
+  config.json
+\`\`\`
+
+**index.css** 负责颜色与样式，最省力的方式是覆盖变量：
+
+\`\`\`css
+:root {
+  --primaryColor: #f17d34;
+  --backgroundColor: #fdfdfd;
+  --textColor: #333333;
+  --listHoverColor: rgba(0, 0, 0, 0.05);
+  --dividerColor: rgba(0, 0, 0, 0.1);
+}
+\`\`\`
+
+完整变量表在 README 里，包含遮罩、阴影、输入区、成功/危险/通知色等。变量不够用时，可以查源码按类名直接覆盖。
+
+**config.json** 定义元信息与背景层：
+
+\`\`\`json
+{
+  "name": "主题名",
+  "preview": "#000000",
+  "description": "描述",
+  "iframes": {
+    "app": "@/bg.html",
+    "page": "",
+    "music-bar": ""
+  }
+}
+\`\`\`
+
+iframes 是它和普通换肤的分界线：能把 HTML 当背景铺在整体、头部、侧边栏、主页面或底部播放栏，做出纯 CSS 做不到的动效。
+
+## 路径的 @/
+
+主题包内部互相引用时用 \`@/\`，它会被替换为主题包目录。preview、iframes 以及 iframes 指向的 HTML 都支持这个写法，所以主题可以带着自己的图片和页面一起分发。
+
+## 从源码跑
+
+\`\`\`bash
+npm install
+npm start
+\`\`\`
+
+改完直接重启即可，没有额外的构建步骤要记。`,
+      resources: [
+        {
+          kind: "html",
+          title: "插件开发与使用文档",
+          url: "https://musicfree.catcat.work/plugin/introduction.html",
+          note: "插件协议与函数签名，想自己写一个源或者判断插件安全性时看这个。",
+        },
+        {
+          kind: "html",
+          title: "示例主题仓库",
+          url: "https://github.com/maotoumao/MusicFreeThemePacks",
+          note: "暗黑、樱花、雨季等现成主题，直接抄 CSS 变量比从零写快。",
+        },
+        {
+          kind: "html",
+          title: "示例插件仓库",
+          url: "https://github.com/maotoumao/MusicFreePlugins",
+          note: "作者写的示意插件，README 说明其功能可能不完整，适合当模板。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "spotifast",
+    linksCheckedAt: "2026-10-22",
+    name: "Spotifast",
+    nameZh: "Spotifast（Rust 版 Spotify 客户端）",
+    aliases: ["spotifast", "Spotifast", "Spotify 轻量客户端"],
+    summary: "Rust 加 egui 写的 Spotify 客户端，没有浏览器内核，内存 100–250MB、启动不到一秒。播放必须 Spotify Premium，免费号只能浏览和搜索。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "Spotify", "Rust", "轻量"],
+    body: "Spotifast 卖的是「不背着一个 Chromium」这件事。技术栈是 Rust + egui + fastframe，播放走 librespot，官方给的数字是常驻 100–250MB 内存、启动明显不到一秒。对长期挂着听歌的人来说，这比功能多一两项更有感知。\n功能覆盖并不寒酸：曲库与搜索（歌单、喜欢的歌、专辑、艺人、播客）、本地文件播放（在设置里指定文件夹，支持任意采样率）、Spotify Connect（把这台电脑当播放端，也能控制其他设备，包括 Google Cast 音箱与分组）、队列与「下一首播放」、主题（浅色/深色/跟随系统，可自定义两套配色）。\n两个很「复古」的加分项：Winamp 迷你播放器支持 Winamp 2 的 .wsz 皮肤，带均衡器、播放列表和动态电平显示；MilkDrop 可视化首次使用会下载一万多个预设，但**Windows ARM 版本不含**。\n真正的门槛是账号：播放需要 Spotify Premium，免费账号只能浏览与搜索，点了也放不出声。其次是首次配置要过两道授权——登录是一道，允许这台机器播放是另一道，很多人卡在第二步没做，表现为「登录成功但一直不播」。README 也提醒它与 Spotify 无关联，并专门留了一页讲封号风险。",
+    officialUrl: "https://spotifast.rocks",
+    officialLabel: "spotifast.rocks",
+    links: {
+      official: "https://spotifast.rocks",
+      github: "https://github.com/crmne/spotifast",
+    },
+    whoFor: "有 Spotify Premium、嫌官方客户端吃内存、想要秒开的人；也适合喜欢 Winamp 皮肤与 MilkDrop 那套视觉的老用户。",
+    whoNot: "Spotify 免费账号用户——装了也放不了歌；以及需要官方客户端那些播客/社交等完整功能的人。",
+    installTips: [
+      "macOS 用 brew install --cask crmne/tap/spotifast；Arch 用 yay -S spotifast-bin；Windows 与其他 Linux 去官网下载页选构建（Flatpak / AppImage / Nix 都有）。",
+      "登录要两次授权：先 Sign in with Spotify，再在底部播放栏的设备菜单里选 Set up playback here，在浏览器里批准。少这一步就没声音。",
+      "不想登录只想看界面，用演示模式：cargo run --features demo -- --demo。",
+      "本地音乐在设置里指定文件夹即可，按你在歌单里列出的本地文件播放，支持任意采样率。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#15803D",
+    },
+    guide: {
+      intro: "重点讲两件最容易卡住的事：为什么登录了还是没声音（两道授权），以及没有会员能用到什么程度。",
+      markdown: `## 第一道坎：会员
+
+播放**需要 Spotify Premium**。免费账号可以登录、浏览曲库、搜索、看歌单，但播不出来。这是 librespot 那条播放链路的要求，不是设置问题。
+
+先确认自己的账号类型，再决定要不要装，能省很多时间。
+
+## 第二道坎：两次授权
+
+这是最容易误判成 bug 的地方。第一次授权只给了**曲库访问**，播放是另一次独立的授权。
+
+1. 打开 Spotifast，点 \`Sign in with Spotify\`，在浏览器里同意，回到应用能看到曲库。
+2. 打开底部播放栏的设备菜单，选 \`Set up playback here\`（设置里也有同样入口）。
+3. 浏览器里再批准一次。完成后，这台电脑会以 \`Spotifast\` 的名字出现在 Spotify Connect 设备列表里。
+
+两次授权都保存在系统受保护的存储里，之后不必重复。
+
+## 安装
+
+\`\`\`bash
+# macOS
+brew install --cask crmne/tap/spotifast
+# Arch
+yay -S spotifast-bin
+\`\`\`
+
+Windows 与其他 Linux 发行版去官网下载页，按平台取构建。
+
+## 这台机器当播放端，还是遥控别的设备
+
+它两种都能做。同一设备菜单里既能选「本机播放」，也能选音箱或另一台设备——Google Cast 音箱与分组会随发现出现在列表里，常用的会自动排到前面。Sonos 音箱要先在本机启用播放，再在设备选择器里挑。
+
+## 两个老派彩蛋
+
+- **Winamp 迷你播放器**：\`Ctrl+M\` 切换（macOS 是 \`Cmd+Shift+M\`），支持 Winamp 2 的 .wsz 皮肤、均衡器与播放列表。
+- **MilkDrop**：首次打开会下载一万多个预设，可从可视化按钮或迷你播放器的 V 菜单进；注意 Windows ARM 版没有这个功能。
+
+## 关于账号风险
+
+项目与 Spotify 无任何关联，官方文档专门有一页讨论是否会封号。在意的话先读那页再决定，别默认它「肯定没事」。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网下载页",
+          url: "https://spotifast.rocks/download/",
+          note: "Windows 与各 Linux 发行版的构建入口，macOS 也可下 dmg。",
+        },
+        {
+          kind: "html",
+          title: "上手指南",
+          url: "https://spotifast.rocks/getting-started/",
+          note: "两次授权的完整图文流程，卡在没声音时先看这页。",
+        },
+        {
+          kind: "html",
+          title: "Spotify 允许什么",
+          url: "https://spotifast.rocks/what-spotify-allows/",
+          note: "说明 librespot 与平台限制的边界，判断功能缺失是 bug 还是限制。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "folia-major",
+    linksCheckedAt: "2026-10-22",
+    name: "Folia",
+    nameZh: "Folia（全屏歌词音乐播放器）",
+    aliases: ["Folia", "folia", "folia-major", "辞曲新境"],
+    summary: "以全屏歌词动画为核心的播放器，网易云、QQ、酷狗、Navidrome 与本地库都能接，歌词排版做得像文字 PV。适合把听歌当视觉体验的人，代价是配置项多到劝退。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "歌词动画", "多音源", "Electron"],
+    body: "Folia 的差异化非常清楚：大多数播放器把歌词当成一行字幕，它把歌词当成舞台。多套歌词动画各有独立的排版氛围与可调参数，号称接近文字 PV 的效果，同时做响应式适配，改窗口尺寸不会错位。\n接入面铺得很宽：在线部分支持网易云、酷狗、QQ 音乐，自建曲库可以接 Navidrome，本地文件也可以导入；桌面端还额外支持波点音乐、YouTube Music 与 Spotify。本地音乐这块做得比我预期的细——读取元数据、同目录歌词与封面，自动按网易云、QQ、酷狗顺序回退补全信息，匹配不准还能手动选候选、恢复首次导入时的本地信息，甚至合并拆分艺术家与专辑实体。\n歌词格式覆盖是它的硬功夫：自动识别同名 .lrc、.vtt、.ttml、.qrc、.yrc、.krc，也读音频内嵌的 LRC，并适配 LDDC 生成的逐字歌词。另有 Now Playing 服务接入，可以把外部播放器的歌曲与时间轴推进来驱动它的舞台渲染。\n代价有两条。一是部署心智负担：网页版走 Vercel 或 Cloudflare 时要单独配 QQ 音乐的两个环境变量，自托管的本地音乐目录还依赖可信 HTTPS 上下文，NAS 场景要处理反代与证书。二是模组系统 Folium 虽强但仍是实验性、默认关闭，装模组前要在原生窗口里确认，属于「功能多、边界也多」的类型。",
+    officialUrl: "https://folia-site.cielaniska.top",
+    officialLabel: "folia-site.cielaniska.top",
+    links: {
+      official: "https://folia-site.cielaniska.top",
+      github: "https://github.com/chthollyphile/folia-major",
+    },
+    whoFor: "把听歌当视觉体验、愿意为歌词动效折腾参数的人；已经用 Navidrome 自建曲库，想要一个好看前端的人。",
+    whoNot: "只想安静听歌、不想碰部署与环境变量的人；以及需要移动端原生应用的人——手机端目前只能 PWA 或社区移植版。",
+    installTips: [
+      "桌面端直接下 Releases 的 Windows / macOS / Linux 安装包；国内网络慢就用作者给的夸克或百度网盘（提取码 flia，仅 Windows 与 Apple silicon 正式版）。",
+      "部署到 Vercel / Cloudflare 时，QQ 音乐把 VITE_QQ_API_BASE 填成 /api/qq，另配 QQ_SESSION_SECRET（注意服务端密钥不要加 VITE_ 前缀）。",
+      "本地音乐目录访问依赖可信 HTTPS 安全上下文，自托管在 NAS 上用反代时必须配好证书，http 访问读不到本地库。",
+      "模组系统默认关闭，要先在 设置 → 模组 → 模组系统 打开；每个模组首次启用都要在原生窗口确认，文件改动后需再确认一次。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#7E22CE",
+    },
+    guide: {
+      intro: "三条路径摆清楚：桌面端即装即用、Web 端要自己部署、手机端只能 PWA。重点讲部署时最容易漏的环境变量与 HTTPS 前提。",
+      markdown: `## 先选一条路
+
+- **桌面端**：内置前后端运行环境，装完就能用，最省事。
+- **Web 版**：Vercel / Cloudflare 一键部署，或 Docker Compose 自托管，适合想在手机浏览器或平板上用的人。
+- **手机 App**：没有官方原生包。部署好 Web 版后在 Chrome for Android 或 iOS Safari 里「添加到主屏幕」当 PWA 用；安卓还有社区移植版，但功能与 PC 版有差异。
+
+## Web 部署里最容易漏的两个变量
+
+QQ 音乐是特例：在 Vercel / Cloudflare 上不需要另起常驻 API 实例，但要配两个东西——
+
+\`\`\`
+VITE_QQ_API_BASE=/api/qq
+QQ_SESSION_SECRET=<服务端密钥，不要加 VITE_ 前缀>
+\`\`\`
+
+第二个变量名**不能**带 \`VITE_\`，因为它是服务端读的；加了前缀等于漏给了前端，表现为扫码登录一直失败。手机 QQ 扫码还要求 qq-music-api 3.3.3 以上，且播放前必须先登录。
+
+## 自托管的 HTTPS 前提
+
+本地音乐库的目录访问依赖**可信 HTTPS 安全上下文**。所以 NAS 上用反向代理时，证书必须配好——用 http 直连页面能开，但读不到本地文件。这一点在部署文档里有专门一节讲反代与证书。
+
+## 自建同步服务
+
+想在多台设备同步外观设置与 AI 主题库，可以部署独立的 \`sync-server\`：Cloudflare Workers + D1（推荐，免运维）、Docker，或 Node.js + SQLite。部署完在「设置 → 连接与集成」里填服务端地址与 \`SYNC_TOKEN\`。
+
+注意它同步的是设置与主题，不是你的音乐文件。
+
+## 本地库匹配
+
+导入后它会读元数据、同目录歌词与封面，再按网易云 → QQ → 酷狗的顺序回退补全。匹配错了可以手动选候选，或恢复首次导入时的信息；艺术家与专辑还能合并、拆分。
+
+## 模组别当默认功能
+
+Folium 模组能加歌词动画、背景、播放页图层与命令，也能通过 Node 入口调用本地能力——以可信代码运行。所以它默认关闭，且每次启用都要在原生窗口确认，改了文件还要再确认。只装带 Folium 签名的市场模组，风险会小很多。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方使用指南",
+          url: "https://folia-site.cielaniska.top/guide/",
+          note: "部署、环境变量与日常使用的完整文档，比仓库 README 细。",
+        },
+        {
+          kind: "html",
+          title: "Vercel 一键部署指南",
+          url: "https://folia-site.cielaniska.top/guide/deploy-vercel",
+          note: "网页版从零上线的分步教程，含 QQ 音乐相关配置。",
+        },
+        {
+          kind: "markdown",
+          title: "技术说明文档",
+          url: "https://github.com/chthollyphile/folia-major/blob/main/docs/technical.md",
+          note: "技术栈、环境变量、Stage API 与本地开发脚本都在这里，改源码前必读。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "librosa",
+    linksCheckedAt: "2026-10-22",
+    name: "librosa",
+    nameZh: "librosa（音频分析库）",
+    aliases: ["librosa", "音频分析", "音乐信息检索", "MIR"],
+    summary: "Python 的音频与音乐信号处理库，MIR 领域的默认底座，MFCC、节拍、音高、频谱这些都能直接调。它是算法库，不是播放器，也没有任何图形界面。",
+    scenes: ["music", "data", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音频分析", "Python", "DSP", "音乐信息检索"],
+    body: "librosa 提供的是搭 MIR（音乐信息检索）系统所需要的基础算法与工具，而不是一个成品。你要做曲风分类、节拍检测、音高提取、音频指纹、数据集特征工程，通常都会从它开始，因为标准实现、参数命名与论文对得上，复现别人工作时省事。\n它和「音频编辑器」是两类东西：不做播放、不做界面、不做实时低延迟处理。拿到一段音频后，你得到的是数组与特征矩阵，后续建模交给 scikit-learn、PyTorch 之类。\n学术使用上它做得比多数库规范，有两套引用方式要分清：引用「我用了这个软件」就取对应版本的 Zenodo DOI（0.10.2 起可直接 librosa.cite() 拿链接，1.0 起 librosa.cite(bib=True) 输出 BibTeX）；引用「这个库本身的设计」则引 2015 年 SciPy 那篇论文。README 还建议，除了引用库本身，也把函数文档里给出的原始方法论文一并引上。\n安装是标准的 pip / conda 两条路，没有额外系统依赖的复杂说明；文档结构清楚，新手从 tutorials 进、查细节去 API reference。真正的学习成本在概念——STFT、Mel 刻度、hop length 这些搞不清，调参就会一直靠猜。",
+    officialUrl: "https://librosa.org",
+    officialLabel: "librosa.org",
+    links: {
+      official: "https://librosa.org",
+      github: "https://github.com/librosa/librosa",
+    },
+    whoFor: "做音乐信息检索、音频特征工程、声学研究的人；需要一套能对上论文的标准实现，而不想自己重写 STFT 与 Mel 滤波器组的人。",
+    whoNot: "想找能听歌或剪音频的软件的人——它两者都不做；以及需要实时低延迟音频处理的场景。",
+    installTips: [
+      "pip install librosa 即可；用 conda 的话 conda install -c conda-forge librosa 更省事，二进制依赖由 conda 处理。",
+      "先过一遍官方 tutorials 再看 API reference，函数很多但主线只有取音频、算特征、分析节拍这几条。",
+      "写论文引用时用 librosa.cite() 拿带版本的 DOI；1.0 起 librosa.cite(bib=True) 直接输出 BibTeX。",
+      "它只做分析与特征提取，播放、录音、界面都要自己另外接。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#0369A1",
+    },
+    guide: {
+      intro: "给第一次用的人一条最短路径：装好、载入音频、算出一组特征；顺带把引用方式理清，免得论文里引错。",
+      markdown: `## 装
+
+\`\`\`bash
+pip install librosa
+# 或用 conda
+conda install -c conda-forge librosa
+\`\`\`
+
+可选依赖与进阶配置官方另有说明，普通特征提取不需要额外折腾。
+
+## 第一次跑通的最小流程
+
+它不是播放器，所以入口永远是「把音频读成数组」：
+
+\`\`\`python
+import librosa
+
+y, sr = librosa.load("song.mp3", sr=22050)
+print(y.shape, sr)
+\`\`\`
+
+注意 \`sr\` 是重采样目标：不指定会按文件原始采样率返回，不同文件混在一起算特征时会不一致，建议一开始就固定成一个值。
+
+接下来才是特征：
+
+\`\`\`python
+tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+\`\`\`
+
+## 最容易卡住的概念
+
+真正让人卡住的不是 API，是三个参数：
+
+- **hop_length**：帧移。它决定特征矩阵的时间分辨率，也决定你后面能不能把帧号换算回秒。
+- **n_fft**：窗长。它决定频率分辨率，跟 hop_length 一起决定了整条流水线的手感。
+- **Mel 刻度**：为什么人耳感知和线性频率不一样，不理解这个就不会明白为什么用 melspectrogram 而不用 spectrum。
+
+这三个在教程里都有图示，花二十分钟看懂，比反复试参数快得多。
+
+## 引用：两件事要分开
+
+- 你**用了**这个库：取对应版本的 Zenodo DOI。0.10.2 起 \`librosa.cite()\` 直接给链接；1.0 起 \`print(librosa.cite(bib=True))\` 输出 BibTeX。
+- 你**讨论库本身**的设计与动机：引 2015 年 SciPy 会议那篇《librosa: Audio and music signal analysis in python》。
+
+README 还建议把函数文档里标注的原始方法论文一并引上。
+
+## 边界
+
+不做播放、不做录音、不做 GUI，也不追求实时低延迟。要这些能力得另找工具，把 librosa 当作分析环节的一环即可。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方教程",
+          url: "https://librosa.org/doc/latest/auto_tutorials",
+          note: "新手入口，把载入、特征、节拍这几条主线走一遍就能上手。",
+        },
+        {
+          kind: "html",
+          title: "API 参考",
+          url: "https://librosa.org/doc/latest/api",
+          note: "查函数签名与参数默认值，注意每个函数文档里都附了原始论文出处。",
+        },
+        {
+          kind: "html",
+          title: "版本更新日志",
+          url: "https://librosa.org/doc/latest/changelog.html",
+          note: "接口有重命名与弃用，升级前对一下自己用的函数有没有变。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "mopidy",
+    linksCheckedAt: "2026-10-22",
+    name: "Mopidy",
+    nameZh: "Mopidy（可扩展音乐服务器）",
+    aliases: ["Mopidy", "mopidy", "MPD 音乐服务器"],
+    summary: "Python 写的音乐服务器，把本地文件、Spotify、网络电台统一成 MPD 接口，手机上的任意 MPD 客户端都能遥控。适合树莓派或 NAS 常驻，不适合想双击就听的人。",
+    scenes: ["music", "tools"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["音乐服务器", "MPD", "自建", "Python"],
+    body: "Mopidy 的定位常被误解：它不是播放器界面，是**服务端**。它把不同来源的音乐（本地磁盘、Spotify、SoundCloud、网络电台等）统一抽象，对外暴露 MPD 协议，于是你手机、平板、电脑上任何一个 MPD 或 Web 客户端都能连上来控制播放。\n这个架构的好处是不绑定界面：换前端不影响后端，多设备可以同时连；在树莓派或 NAS 上常驻，家里任何设备都当遥控器用。代价同样来自架构——装完只有一个核心，Spotify、网络电台这些能力要另外装对应的扩展并在配置里启用，界面也得自己配客户端。习惯了「打开软件就有窗口」的人会觉得它什么都没做。\n它的扩展生态是这个项目真正的价值，也是维护重心：核心保持精简，功能靠扩展拼。因此排障时经常要判断问题出在核心、扩展还是客户端，这需要一点耐心。\n安装包覆盖 Debian、Ubuntu、Raspberry Pi OS、Arch Linux、macOS 以及手动安装，官方文档写得比 README 详细得多，README 基本只做导航。许可为 Apache-2.0，社区活跃在 Discourse 与 Zulip 上——出问题去论坛问，比开 issue 更快得到答复。",
+    officialUrl: "https://mopidy.com",
+    officialLabel: "mopidy.com",
+    links: {
+      official: "https://mopidy.com",
+      github: "https://github.com/mopidy/mopidy",
+    },
+    whoFor: "想在树莓派或 NAS 上搭一套常驻音乐服务、用手机当遥控的人；已经有偏好的 MPD 客户端，只缺后端的人。",
+    whoNot: "想要装完就双击听歌的人——它没有播放器界面；也不想折腾配置与扩展的人。",
+    installTips: [
+      "装之前先看 docs.mopidy.com 的安装页，按你的系统选包（Debian / Ubuntu / Raspberry Pi OS / Arch / macOS），别直接把核心 pip 装进系统 Python。",
+      "装完只有核心。Spotify、网络电台这些要另外装扩展，并在配置文件里启用，扩展没开就等于不存在。",
+      "它对外只提供 MPD 接口，界面要自己配一个 MPD 或 Web 客户端，手机上随便挑一个都行。",
+      "树莓派上先确认音频输出设备，默认输出可能不是你想要的那个口，那样会「在播但没声音」。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#4B5563",
+    },
+    guide: {
+      intro: "先纠正一个预期：它是服务端不是播放器。然后讲装完为什么「什么都没有」、扩展怎么开、客户端怎么挑。",
+      markdown: `## 先接受这个事实：它没有界面
+
+Mopidy 是音乐服务器。启动之后你在屏幕上什么也看不到，它在后台提供 MPD 服务，等客户端连上来。所以正确的使用顺序是：
+
+1. 装 Mopidy；
+2. 装并启用你要的**后端扩展**（本地库、Spotify、网络电台……）；
+3. 配一个 **MPD 客户端**当界面。
+
+跳过第 2 步会觉得「装了没用」，跳过第 3 步会觉得「没有界面」。
+
+## 安装走官方包，别硬 pip
+
+README 直接把人指向安装文档，因为不同系统的依赖差异不小。Debian、Ubuntu、Raspberry Pi OS、Arch、macOS 都有对应的包或说明，手动安装也在那份文档里。
+
+用 pip 直接往系统 Python 装，容易和发行版的包管理打架，尤其在树莓派上。
+
+## 扩展才是功能所在
+
+核心只做「把来源抽象成统一接口」这件事。Spotify、SoundCloud、网络电台、本地库扫描，全在扩展里。装完还要在配置里启用——**装了不启用等于没装**，这是最常见的误判。
+
+排障时的判断顺序：先确认扩展加载成功，再看客户端能不能连上 MPD，最后才怀疑核心。问题多半在前两步。
+
+## 客户端怎么挑
+
+任何支持 MPD 协议的客户端都能连，手机、平板、桌面、Web 都有。因为是标准协议，换客户端不影响服务端配置，这也是它比「一体化播放器」灵活的地方。
+
+## 树莓派的常见静音
+
+播放进度在走却没声音，先查音频输出设备。树莓派默认输出可能指向 HDMI 而不是 3.5mm 或 USB 声卡，这属于系统层配置，不在 Mopidy 里。
+
+## 去哪儿问
+
+官方推荐 Discourse 论坛与 Zulip 聊天，issue 区留给明确的 bug 与功能请求。配置类问题在论坛回答得快得多。`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://docs.mopidy.com/stable/installation/",
+          note: "各发行版与 macOS 的安装方式，以及手动安装步骤，装之前先读。",
+        },
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.mopidy.com/",
+          note: "配置、扩展与开发说明都在这里，README 只是导航。",
+        },
+        {
+          kind: "html",
+          title: "Discourse 论坛",
+          url: "https://discourse.mopidy.com/",
+          note: "配置与使用问题的主要求助渠道，搜历史帖常能直接找到答案。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "snapcast",
+    linksCheckedAt: "2026-10-22",
+    name: "Snapcast",
+    nameZh: "Snapcast 多房间同步音频",
+    aliases: ["snapcast", "snapserver", "snapclient", "多房间音频", "同步播放", "sonos 替代"],
+    summary: "把已有播放器变成 Sonos 那样的多房间同步系统，客户端按服务器时间排播，偏差通常在 0.2ms 以内。它自己不选歌，得先有 MPD / Mopidy / librespot 往里灌音频。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["多房间音频", "同步播放", "自建服务", "音乐"],
+    body: "Snapcast 把「播放器」和「出声的设备」拆开。Snapserver 从命名管道、ALSA、PipeWire、librespot、AirPlay 或某个进程的 stdout 抓 PCM，按 flac（默认）/ opus / vorbis / pcm 编码并打上本地时间戳，经 TCP 发给各个 Snapclient；客户端持续与服务器对时，把收到的数据块排到正确的时刻播放，偏差靠删除或复制单个采样来修正。\n关键认知是它自己不选歌。想放音乐得先有 MPD、Mopidy、librespot 之类把音频灌进 /tmp/snapfifo，或者直接配 alsa 抓线路输入。这一步是新手最容易卡住的地方——两个包都装好了，界面上却什么都没发生。\n控制走 JSON-RPC（TCP / HTTP / WebSocket 均可），服务端自带 Snapweb，默认在 1780 端口（开 SSL 是 1788），可以改客户端名、调音量、拖进不同 group。代价是它跟 Linux 音频栈绑得最紧：Windows 与 macOS 有客户端，但服务端和音源基本得跑在 Linux 上。",
+    officialUrl: "https://github.com/snapcast/snapcast",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/snapcast/snapcast",
+      github: "https://github.com/snapcast/snapcast",
+    },
+    whoFor: "家里已经有一台常开的 Linux 机器和一套音箱，想低成本做全屋同步播放的人；或者被 Sonos 的账号与云端依赖劝退的人。",
+    whoNot: "只想在单机上听歌的人——装个 mpv 就行，多出来的服务端与 fifo 只是负担；以及不打算碰命令行与音频后端的人。",
+    installTips: [
+      "Linux 优先用发行版包，README 里给了 Debian、OpenWrt、Alpine、Arch、Void 的入口；macOS 和 Linux 也可以 brew install snapcast。",
+      "音源写在 /etc/snapserver.conf 的 [stream] 段，例如 source = pipe:///tmp/snapfifo?name=Radio&sampleformat=48000:16:2&codec=flac，改完重启 snapserver。",
+      "先用 cat /dev/urandom > /tmp/snapfifo 灌噪声验证链路，所有在线客户端都应该出声，再换成真正的播放器。",
+      "客户端用 --player 指定后端（Linux alsa / pulse、Windows wasapi、macOS coreaudio），-l 列出可用声卡，-s 选设备。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#1F6F6B",
+    },
+    guide: {
+      intro: "按第一次用会卡住的顺序讲：为什么装完了没有声音、音源怎么配、怎么用噪声验证链路、以及分组与音量在哪里调。",
+      markdown: `## 先接受一件事：它不会自己放歌
+
+Snapcast 是分发层。snapserver 与 snapclient 都跑起来了，你依然听不到声音——因为没有音源。第一次用卡在这里的人最多。
+
+整条链路长这样：
+
+\`\`\`
+播放器 -> /tmp/snapfifo -> snapserver -> 网络 -> snapclient -> 声卡
+\`\`\`
+
+## 配一个能出声的音源
+
+最快是让服务器直接读文件：
+
+\`\`\`ini
+[stream]
+source = file:///home/user/Musik/test.wav?name=test
+\`\`\`
+
+重启服务后客户端应该开始播。更常见的是接 MPD / Mopidy：把它们的输出指向 fifo，服务器侧配 pipe 源：
+
+\`\`\`ini
+source = pipe:///tmp/snapfifo?name=Radio&sampleformat=48000:16:2&codec=flac
+\`\`\`
+
+sampleformat 必须和音源实际输出一致，写错了表现是变速或爆音，而不是报错。
+
+## 用噪声验证链路
+
+不想先折腾播放器，就直接灌随机数据：
+
+\`\`\`bash
+cat /dev/urandom > /tmp/snapfifo
+\`\`\`
+
+所有在线客户端都该开始放噪声。如果链路通了但某台设备没声，先查它的 --player 后端和 -s 声卡选择；树莓派这类板子默认输出可能是 HDMI，需要 amixer 切到 3.5mm 口。
+
+## 分组与音量
+
+浏览器打开 http://<服务器地址>:1780 就是 Snapweb，可以改名、调音量、把客户端拖进不同 group。要脚本化就走 JSON-RPC。
+
+最后一个坑：同一 zone 内个别客户端始终差半拍时，别去动服务器，单独调那台客户端的 latency 更省事。`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "服务端配置说明",
+          url: "https://github.com/snapcast/snapcast/blob/master/doc/configuration.md",
+          note: "pipe / alsa / librespot / tcp / meta 各音源的完整参数写在这里，配 [stream] 时对着抄。",
+        },
+        {
+          kind: "markdown",
+          title: "接各种播放器",
+          url: "https://github.com/snapcast/snapcast/blob/master/doc/player_setup.md",
+          note: "MPD、Mopidy、mpv、VLC、PlexAmp、AirPlay 的输出怎么改到 fifo，按你手上的播放器找对应小节。",
+        },
+        {
+          kind: "html",
+          title: "Snapweb 控制台",
+          url: "https://github.com/snapcast/snapweb",
+          note: "服务端自带的前端源码与说明，确认 1780 端口打不开时先看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pixijs",
+    linksCheckedAt: "2026-10-22",
+    name: "PixiJS",
+    nameZh: "PixiJS 2D 渲染引擎",
+    aliases: ["pixijs", "pixi", "pixi.js", "2d 渲染引擎", "webgl 渲染"],
+    summary: "网页 2D 渲染里最快的一档，WebGL / WebGPU 双后端，几十行就能把精灵、滤镜、遮罩跑满帧。它只负责画，物理、场景管理、游戏循环之外的逻辑都得自己接。",
+    scenes: ["games", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["2D 渲染", "WebGL", "游戏开发", "前端"],
+    body: "PixiJS 是浏览器里的 2D 渲染层，对标的是「用 Canvas 2D 或 DOM 硬画」这条路线。它把批处理、纹理图集、滤镜、遮罩、混合模式这些麻烦事包了，输出走 WebGL 或 WebGPU，所以在同屏精灵数量上是数量级的差别。\n它跟 three.js 不是一个品类：three 是 3D 场景图，PixiJS 只做 2D（v8 起有 WebGPU 渲染器，但没有 3D 管线）。跟游戏引擎比，它也不含物理、UI、资源热更、场景切换——这些要么自己写，要么找第三方。\n真正的门槛在 v8 的异步初始化：Application 不能直接 new 完就用，必须先 await app.init({...})，而且画布是 app.canvas 不是 app.view，老教程里的写法会直接报错。TypeScript 5 会由包自动带上 @webgpu/types，TS 6/7 则需要换成 @types/web，否则 GPUTextureUsage 之类会缺定义。",
+    officialUrl: "https://pixijs.com",
+    officialLabel: "pixijs.com",
+    links: {
+      official: "https://pixijs.com",
+      github: "https://github.com/pixijs/pixijs",
+    },
+    whoFor: "要做数据可视化、互动广告、H5 小游戏或 2D 渲染密集型界面，又不想引入完整引擎的前端开发者。",
+    whoNot: "需要开箱即用的物理、关卡、UI 系统的人——选 Phaser 或引擎更省事；也不要指望它做 3D。",
+    installTips: [
+      "新建项目用 npm create pixi.js@latest，会生成带打包与示例的骨架；已有项目直接 npm install pixi.js。",
+      "v8 必须先 await app.init({ background, resizeTo }) 再 appendChild(app.canvas)，同步 new 完就用是旧版写法。",
+      "资源统一走 Assets.load()，它自带缓存与进度；不要再用旧的 loader。",
+      "TypeScript 6/7 项目要把 types 换成 @types/web，并移除 @webgpu/types，两者会冲突。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#E72264",
+    },
+    guide: {
+      intro: "讲第一次上手最容易踩的三处：v8 的异步 init、画布对象改名、以及 ticker 的 deltaTime 为什么不能当帧数用。",
+      markdown: `## 第一个能跑的画面
+
+官方的起步代码是这样的结构，注意初始化是异步的：
+
+\`\`\`ts
+import { Application, Assets, Sprite } from 'pixi.js';
+
+const app = new Application();
+await app.init({ background: '#1099bb', resizeTo: window });
+document.body.appendChild(app.canvas);
+
+const texture = await Assets.load('https://pixijs.com/assets/bunny.png');
+const bunny = new Sprite(texture);
+bunny.anchor.set(0.5);
+bunny.position.set(app.screen.width / 2, app.screen.height / 2);
+app.stage.addChild(bunny);
+\`\`\`
+
+从 v7 升级过来的人最容易在这里翻车：没有 await、appendChild(app.view)。v8 里画布属性叫 app.canvas，旧名字已经不存在。
+
+## ticker 的 delta
+
+\`\`\`ts
+app.ticker.add((time) => {
+  bunny.rotation += 0.1 * time.deltaTime;
+});
+\`\`\`
+
+deltaTime 在满帧运行时约为 1，掉帧时会变大。乘上去，动作才是「按时间」而不是「按帧」推进的。不乘也能转，但换台机器速度就变了。
+
+## 资源与纹理
+
+Assets.load 会缓存同 URL 的结果，重复调用不会重复下载。纹理用完记得 destroy，尤其是动态生成的 RenderTexture，否则显存只涨不落。
+
+## 类型报错怎么办
+
+TS 5 由 pixi.js 自带 @webgpu/types，无需配置。TS 6/7 把 WebGPU 类型并进了 dom，但常缺 GPUTextureUsage 之类，此时装 @types/web 并在 tsconfig 的 types 里指定它，同时删掉 @webgpu/types。`,
+      resources: [
+        {
+          kind: "html",
+          title: "v8 指南",
+          url: "https://pixijs.com/8.x/guides",
+          note: "按主题讲渲染、场景图、资源与滤镜，遇到具体 API 先在这里找。",
+        },
+        {
+          kind: "html",
+          title: "官方示例",
+          url: "https://pixijs.com/8.x/examples",
+          note: "每个效果都能在浏览器里直接跑，改参数看结果比读文档快。",
+        },
+        {
+          kind: "html",
+          title: "API 文档",
+          url: "https://pixijs.download/release/docs/index.html",
+          note: "查类与方法的准确签名，版本升级后行为变了也以这里为准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "gdevelop",
+    linksCheckedAt: "2026-10-22",
+    name: "GDevelop",
+    nameZh: "GDevelop 无代码游戏引擎",
+    aliases: ["gdevelop", "无代码游戏引擎", "事件表游戏", "no-code 游戏"],
+    summary: "用事件表拼逻辑、不写代码就能做出 2D / 3D 和联机游戏，一键导出到网页、安卓、iOS 和桌面。玩法一复杂就会撞上事件表的表达上限，最后还是要写扩展。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["无代码", "游戏引擎", "2D", "游戏开发"],
+    body: "GDevelop 的核心是事件表：一条事件由「条件」和「动作」组成，从下拉框里选对象与行为，不用写语句就能让角色跳、让敌人追、让分数涨。配合现成的 behavior（平台跳跃、拖拽、生命值之类），做出能玩的原型确实很快。\n引擎本身叫 GDJS，用 TypeScript 写，2D 走 PixiJS、3D 走 Three.js，物理用跑在 WebAssembly 里的 Box2D 或 Jolt。编辑器和引擎都是 MIT；用 GDevelop 导出的游戏也归你，可以闭源、可以卖，README 特意写明了这一点。\n代价出现在项目变大之后：事件表本质是可视化脚本，逻辑一多就变成几十条互相嵌套的事件，复用和调试都难受。这时要么把逻辑收敛成自定义扩展（扩展可以用事件写，也可以用 JavaScript），要么换引擎。另外 3D 能力明显弱于专门的 3D 引擎，联机与在线服务那部分则指向官方的付费方案。",
+    officialUrl: "https://gdevelop.io",
+    officialLabel: "gdevelop.io",
+    links: {
+      official: "https://gdevelop.io",
+      github: "https://github.com/4ian/GDevelop",
+    },
+    whoFor: "第一次做游戏、或者要快速验证玩法的人；也适合给不想学编程的学生做项目。",
+    whoNot: "要做复杂系统（大量状态机、网络同步、自定义渲染）的团队——事件表会拖慢你；也不要指望它替代 Unity 做 3D。",
+    installTips: [
+      "从 gdevelop.io 下载桌面版，Windows / macOS / Linux 都有；装完先开内置示例，比看文档快。",
+      "新建项目先加一个 Sprite 对象和一个 Platformer 行为，在事件表里加「按键按下 → 模拟跳跃」就能跑通最小闭环。",
+      "扩展在编辑器内的扩展管理器里装，官方与实验性扩展仓库是 GDevelopApp/GDevelop-extensions。",
+      "导出网页版直接出静态文件；导出安卓走内置的打包流程，需要本地装好对应的构建依赖。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#7B3FA0",
+    },
+    guide: {
+      intro: "从打开编辑器到导出第一个可玩 demo 的路径：事件表怎么读、行为怎么挂、以及什么时候该停手去写扩展。",
+      markdown: `## 先分清楚三个面板
+
+场景（Scenes）管关卡，对象（Objects）管「场上有哪些东西」，事件（Events）管「什么时候发生什么」。新手最常见的混乱是把逻辑写进对象里——对象只描述外观与属性，逻辑基本都在事件表。
+
+## 最小可玩闭环
+
+1. 新建场景，拖一张背景图。
+2. 加一个 Sprite 对象，导入角色图。
+3. 给它挂 Platformer 行为，给地面对象挂 Platform 行为。
+4. 在事件表里加一条事件：条件选「按键按下（右方向）」，动作选「给角色施加水平力」。
+
+点预览就能跑。跑不起来时先看行为参数里的加速度、最大速度，默认值往往小得让人以为没动。
+
+## 事件表怎么读
+
+每条事件从左到右是「条件 → 动作」，下面的缩进表示「否则」或子事件。读别人的项目时先看缩进层级，再逐条看条件，比从头读快。
+
+想让一段逻辑复用，选中事件右键抽成外部事件（External Events），多个场景共用一份。
+
+## 什么时候该停手
+
+当你在事件表里开始复制粘贴同一组十来条事件时，说明该收敛成扩展了。扩展可以用事件写，也可以用 JavaScript 写，写完后在扩展管理器里本地安装，行为像内置对象一样用。
+
+## 学它的顺序
+
+官方 wiki 的入门章节会给一个完整小游戏：角色移动、碰撞、计分。照着做完一遍，比同时开三个教程有用。之后再翻内置示例，重点看它怎么拆场景与对象，而不是抄事件。
+
+读别人的项目时，先把事件表折叠到最外层，从「什么时候发生」开始看，再逐层展开。从头读到尾，多数人会在中途放弃。
+
+## 导出
+
+网页导出是一堆静态文件，丢到任意静态托管就能玩。安卓与 iOS 走编辑器里的导出流程，打包依赖第一次配置比较费时，建议先用网页版验证玩法。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方入门文档",
+          url: "https://wiki.gdevelop.io/gdevelop5/start",
+          note: "从界面到第一个游戏的分步教程，卡在某个概念时按章节查。",
+        },
+        {
+          kind: "html",
+          title: "别人做的游戏",
+          url: "https://gdevelop.io/games",
+          note: "看同类作品能做到什么程度，用来判断自己的项目该不该换引擎。",
+        },
+        {
+          kind: "html",
+          title: "扩展仓库",
+          url: "https://github.com/GDevelopApp/GDevelop-extensions",
+          note: "官方与实验性扩展的源码，想抄一份扩展结构或自己写扩展时从这里开始。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "libgdx",
+    linksCheckedAt: "2026-10-22",
+    name: "libGDX",
+    nameZh: "libGDX Java 游戏框架",
+    aliases: ["libgdx", "libGDX", "java 游戏框架", "跨平台游戏开发"],
+    summary: "一套 Java 代码出桌面、Android、iOS 和 HTML5 游戏，基于 OpenGL ES，不强制任何架构。代价是它不提供编辑器、场景管理和现成 UI，什么都要自己搭。",
+    scenes: ["games", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Java", "游戏框架", "跨平台", "游戏开发"],
+    body: "libGDX 是给「会写 Java、想自己掌控每一层」的人准备的框架。它提供窗口与输入、2D/3D 渲染、音频、文件系统、网络这些底层能力，跨桌面、Android、浏览器和 iOS，渲染基于 OpenGL ES。\n它刻意不做决定：没有强制的实体系统、没有场景编辑器、没有资源管线规范，代码怎么组织由你定。好处是不用跟框架的设计打架，坏处是项目骨架、UI、物理、动画状态机这些都得自己选库——官方的做法是看 awesome-libgdx 那份清单。\n上手成本主要在 Gradle：一个项目通常拆成 core、desktop、android、ios 等多个模块，跑桌面版要启动 desktop 模块里的 main，改 core 之后各平台一起编译。第一次配置环境、第一次遇到 Gradle 同步失败，往往比写游戏逻辑更耗时。",
+    officialUrl: "https://www.libgdx.com",
+    officialLabel: "www.libgdx.com",
+    links: {
+      official: "https://www.libgdx.com",
+      github: "https://github.com/libgdx/libgdx",
+    },
+    whoFor: "有 Java 基础、想做跨平台 2D 游戏并且愿意自己搭架构的开发者；也适合要把已有 Java 逻辑搬上移动端的人。",
+    whoNot: "想要拖拽编辑器、开箱即用的关卡与 UI 的人；不熟 Gradle 多模块项目的新手，前期挫败感会很强。",
+    installTips: [
+      "不需要手动下载框架，Gradle 会自动拉依赖；项目骨架用官网的 setup 工具生成，别手抄目录结构。",
+      "生成项目时勾选需要 platforms，多余的平台会让第一次构建变慢且更容易失败。",
+      "跑桌面版是运行 desktop 模块的 main 类，不是运行 core；core 里只放与平台无关的逻辑。",
+      "API 查询用 javadoc.io 上的 gdx 文档，版本与依赖里的一致。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#C8452F",
+    },
+    guide: {
+      intro: "写给被 Gradle 结构劝退的人：模块怎么分、生命周期怎么走、以及第一个能动的方块该写在哪。",
+      markdown: `## 项目结构先看懂
+
+setup 工具生成出来的东西大概是这样：
+
+\`\`\`
+core/     与平台无关的游戏逻辑
+desktop/  桌面启动器，里面有 main
+android/  安卓启动器
+assets/   资源目录
+\`\`\`
+
+你 90% 的时间在 core 里写，运行的是 desktop 里的启动类。改完 core 直接重跑 desktop 即可，不用管别的模块。
+
+## 生命周期只有几个方法
+
+继承 ApplicationAdapter，重写 create / render / resize / dispose：
+
+\`\`\`java
+public class MyGame extends ApplicationAdapter {
+    SpriteBatch batch;
+    Texture img;
+
+    @Override public void create() {
+        batch = new SpriteBatch();
+        img = new Texture("badlogic.jpg");
+    }
+
+    @Override public void render() {
+        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+        batch.begin();
+        batch.draw(img, 0, 0);
+        batch.end();
+    }
+
+    @Override public void dispose() {
+        batch.dispose();
+        img.dispose();
+    }
+}
+\`\`\`
+
+注意 render 默认每秒被调用几十次，所有绘制都要在这一帧里提交；忘了 batch.begin/end 是最常见的黑屏原因。
+
+## 坐标系与资源路径
+
+原点在左下角，y 轴向上，和网页相反。资源用相对 assets 目录的路径，写 "badlogic.jpg" 而不是绝对路径，否则打包到安卓会找不到。
+
+## 第一次构建失败
+
+先看 Gradle 同步日志，多数是 JDK 版本与 Android SDK 没配。只做桌面游戏时，可以只保留 core + desktop 两个模块，构建会快很多。`,
+      resources: [
+        {
+          kind: "html",
+          title: "环境搭建",
+          url: "https://libgdx.com/wiki/start/setup",
+          note: "生成项目、导入 IDE、跑起第一个程序的完整步骤，环境问题优先看这页。",
+        },
+        {
+          kind: "html",
+          title: "第一个游戏",
+          url: "https://libgdx.com/wiki/start/a-simple-game",
+          note: "从空项目到一个能操控的小游戏，照着敲一遍能建立对生命周期的直觉。",
+        },
+        {
+          kind: "markdown",
+          title: "生态清单",
+          url: "https://github.com/rafaskb/awesome-libgdx",
+          note: "物理、UI、粒子、地图各自有哪些成熟库，避免自己造轮子。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "osu",
+    linksCheckedAt: "2026-10-22",
+    name: "osu!",
+    nameZh: "osu! 开源节奏游戏客户端",
+    aliases: ["osu", "osu lazer", "osu!", "节奏游戏", "音游"],
+    summary: "osu! 的官方开源客户端 lazer，跨 Windows / macOS / Linux / Android，还能自己写 ruleset 改玩法。它仍在演进，官方建议和旧的 stable 版并存安装，别急着删。",
+    scenes: ["games", "music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["节奏游戏", "音游", "C#", "开源"],
+    body: "这是 osu! 的下一个（也是最后一个）客户端版本，代号 lazer。它用 C# / .NET 重写，界面、判定、渲染都是新的，同时保留了对谱面库与社区的兼容。README 的态度很明确：它还在持续开发，玩家应该把 lazer 与旧的 stable 客户端并存安装，直到大多数人自愿切过来。\n真正有意思的是 ruleset 机制：osu! 的四种玩法（std / taiko / catch / mania）在这里是插件式的 ruleset，第三方可以写自己的判定逻辑，直接复用谱面库与游戏引擎。仓库里给了模板工程，照着改就能出一个新模式。\n两个现实约束：iOS 走 TestFlight，苹果硬性限制 1 万测试名额，满了只能等重置；另外官方明确不接受由 AI 生成或辅助编写的 PR、issue，会直接关闭加锁。前者影响尝鲜，后者影响你想贡献代码的路径。",
+    officialUrl: "https://osu.ppy.sh",
+    officialLabel: "osu.ppy.sh",
+    links: {
+      official: "https://osu.ppy.sh",
+      github: "https://github.com/ppy/osu",
+    },
+    whoFor: "已经在玩 osu! 想试新客户端的人；以及想基于成熟音游引擎写自定义 ruleset 的 C# 开发者。",
+    whoNot: "只想要一个稳定、判定与旧版完全一致的客户端参加排名的人——现阶段 stable 更稳妥；也不适合指望用 AI 提 PR 的人。",
+    installTips: [
+      "直接从 releases 下对应平台包：Windows 是 install.exe，Linux 是 osu.AppImage，macOS 分 Intel 与 Apple Silicon 两个 zip。",
+      "装的时候不要覆盖旧客户端，两者可以共存，谱面与设置各自独立，方便随时切回。",
+      "跑开发版需要装 .NET SDK，然后在仓库里 dotnet run --project osu.Desktop；做性能测试要加 -c Release。",
+      "用 IDE 打开时选 .slnf（如 osu.Desktop.slnf）而不是主 .sln，能少加载一堆用不到的平台依赖。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#FF66AA",
+    },
+    guide: {
+      intro: "分两条路：只想玩的人怎么装、怎么和旧版共存；想改玩法的人从哪个模板开始、构建时容易卡在哪。",
+      markdown: `## 只是来玩的
+
+去 releases 页下对应包，Windows 直接跑 install.exe，Linux 用 AppImage，macOS 按芯片选 Intel 或 Apple Silicon 的 zip。
+
+装完不要卸掉旧的 stable。lazer 的数据目录与旧版分开，两边可以同时存在，谱面导入后会各自识别。想回旧版直接开旧客户端即可，互不影响。
+
+iOS 用户注意：TestFlight 名额上限 1 万人，满了就只能等官方重置，没有别的入口。
+
+## 想改玩法：从 ruleset 开始
+
+lazer 把四种模式都做成了 ruleset 插件。仓库的 Templates 目录里有现成模板，复制一份改命名空间，就能得到一个能被客户端加载的空玩法。
+
+最小闭环是三件事：定义判定逻辑、给出谱面解析、画出打击对象。先让模板跑起来（哪怕只显示一个圆圈），再往里填规则，比一上来就写判定容易得多。
+
+## 从源码跑
+
+\`\`\`bash
+git clone https://github.com/ppy/osu
+cd osu
+dotnet run --project osu.Desktop
+\`\`\`
+
+第一次会拉不少 NuGet 包。要在本地测性能就加 -c Release，Debug 配置下的帧率不能作为参考。IDE 里请打开 osu.Desktop.slnf，主 .sln 会把 Android / iOS 的工程也加载进来。
+
+想同时改 osu-framework 或 osu-resources，把两个仓库放在同级目录，再用仓库里的 UseLocalFramework / UseLocalResources 脚本切换引用。
+
+## 提交代码前
+
+先跑 dotnet format。另外 README 写明：任何由 AI 生成或辅助的 issue 与 PR 都会被关闭并锁定，这条没有商量余地。`,
+      resources: [
+        {
+          kind: "html",
+          title: "下载页",
+          url: "https://osu.ppy.sh/home/download",
+          note: "按当前设备自动推荐版本，比在 releases 里翻文件名省事。",
+        },
+        {
+          kind: "markdown",
+          title: "ruleset 模板",
+          url: "https://github.com/ppy/osu/tree/master/Templates",
+          note: "自定义玩法的起点，先让模板编译通过再改逻辑。",
+        },
+        {
+          kind: "html",
+          title: "lazer 更新日志",
+          url: "https://osu.ppy.sh/home/changelog/lazer",
+          note: "每次更新改了什么、哪些行为与 stable 不同，遇到判定差异先查这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "lila",
+    linksCheckedAt: "2026-10-22",
+    name: "Lila",
+    nameZh: "Lichess 开源棋站服务端",
+    aliases: ["lila", "lichess", "lichess 服务端", "开源棋站", "国际象棋服务器"],
+    summary: "lichess.org 的整套服务端，Scala 写的实时对局、战术训练、赛事与棋谱库都在里面。想自建棋站或研究大型实时 Web 应用才用得着，只想下棋直接上官网。",
+    scenes: ["games"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["国际象棋", "Scala", "实时对战", "自建服务"],
+    body: "Lila（li[chess in sca]la）是 lichess.org 的服务端。实时对局、对局搜索、电脑分析（由 fishnet 分发到志愿者节点跑 Stockfish）、锦标赛、车轮战、论坛、战队、战术训练、共享分析板，这些功能都在这个仓库里。\n技术栈不轻：Scala 3 + 改过的 Play 2.8，纯棋逻辑抽在 scalachess 子模块，WebSocket 由独立的 lila-ws 进程处理并用 Redis 通信，对局存在 MongoDB（十几亿盘），检索走 Elasticsearch，前面通常还有 nginx。这让它成为一个相当硬核的实时系统样本。\n对绝大多数人来说，正确的用法是调它的 HTTP API，而不是自己部署一套。自建意味着要同时运维上述四五个组件，本地开发环境也得按 wiki 一步步配。它采用 AGPL-3.0：改了并对外提供服务，源码要开放。",
+    officialUrl: "https://lichess.org",
+    officialLabel: "lichess.org",
+    links: {
+      official: "https://lichess.org",
+      github: "https://github.com/lichess-org/lila",
+    },
+    whoFor: "想搭一个自己的国际象棋站点、或者要研究 Scala 实时系统与棋类规则实现的开发者。",
+    whoNot: "只想下棋或用棋谱数据的人——官网和公开 API 就够，自建纯属给自己找运维；不熟 JVM 生态的也别从它入门。",
+    installTips: [
+      "仓库里 ./lila.sh 是 sbt 的薄包装，进入交互后执行 run 启动；直接跑 sbt 也行。",
+      "启动前必须有 MongoDB、Redis、Elasticsearch，缺任何一个都会在初始化阶段失败。",
+      "WebSocket 不在主进程里：需要单独跑 lila-ws，并让它连同一个 Redis。",
+      "只想拿数据或做对局工具，直接用 lichess.org/api 的 HTTP 接口，不用部署服务端。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#3D6B52",
+    },
+    guide: {
+      intro: "先判断你该不该自建，再讲本地跑起来要备齐哪些组件，以及为什么大多数需求用 API 更划算。",
+      markdown: `## 先算一笔账
+
+跑一套完整的 Lila，你至少要维护：MongoDB（存对局）、Redis（跨进程通信）、Elasticsearch（搜索）、lila-ws（WebSocket）、以及前面的反向代理。这是生产级实时系统的正常配置，但对个人项目来说，运维成本远大于收益。
+
+如果你的目标是「有棋下」「拿棋谱」「做战术题」，用 lichess.org 和它的 API 就够了。
+
+## 本地跑起来
+
+\`\`\`bash
+./lila.sh
+run
+\`\`\`
+
+lila.sh 只是 sbt 的包装。第一次会下载大量依赖，编译时间很长，先去把数据库起好，否则进程会在连接阶段退出。
+
+开发环境的完整步骤（JDK 版本、数据库初始化、种子数据）在 wiki 的 Lichess Development Onboarding 里，别跳过。
+
+## 分成两个进程这件事
+
+主进程不处理 WebSocket。对局推送、观战、聊天都走 lila-ws，它通过 Redis 与主进程交换消息。所以本地只起 lila 时，页面能打开但对局不动——不是前端坏了。
+
+## 用 API 的正确姿势
+
+\`\`\`bash
+curl https://lichess.org/api/user/thibault
+\`\`\`
+
+导出棋谱、查用户、开对局、读排行榜都有对应端点。注意频率限制，做批量任务前先看清楚政策，别把公共接口当自家数据库。`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "开发环境搭建",
+          url: "https://github.com/lichess-org/lila/wiki/Lichess-Development-Onboarding",
+          note: "依赖、数据库、初始化数据的官方步骤，本地跑不起来先对着它逐项核。",
+        },
+        {
+          kind: "html",
+          title: "Lichess API",
+          url: "https://lichess.org/api",
+          note: "绝大多数需求在这里就能满足，比自建服务端省事得多。",
+        },
+        {
+          kind: "html",
+          title: "lila-ws",
+          url: "https://github.com/lichess-org/lila-ws",
+          note: "WebSocket 独立进程的仓库，对局推不动时应先确认它是否在跑。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pyxel",
+    linksCheckedAt: "2026-10-22",
+    name: "Pyxel",
+    nameZh: "Pyxel 复古游戏引擎",
+    aliases: ["pyxel", "python 游戏引擎", "像素游戏", "复古游戏引擎"],
+    summary: "用 Python 写像素小游戏，自带图像与声音编辑器，几十行就能出可玩 demo。它就是冲着复古规格去的，不是通用 2D 引擎，复杂项目会很快撞到天花板。",
+    scenes: ["games", "education"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Python", "像素游戏", "游戏引擎", "教学"],
+    body: "Pyxel 的定位很窄：让写 Python 的人用最短的路径做出一个复古风格的小游戏。整个 API 保持在很小的规模，画图、播放声音、读输入就那几个函数，不用先学一套游戏框架的概念。\n它把美术和音效工具也一起给了：官方 showcase 里有内置的图像编辑器和声音编辑器，画完的素材直接在游戏里加载。示例覆盖跳跃游戏、平台跳跃，还有网格与运动、3D 碰撞、3D 物理这些偏进阶的玩法，都能在浏览器里直接试玩。\n代价是它的「复古」不是风格，是约束：分辨率、色板、声道都按老机器的规格来。做像素小品很舒服，做需要大量 UI、复杂动画或高清素材的项目就会处处别扭。另外它生态小，遇到问题基本只能看文档与示例，没有大型社区兜底。",
+    officialUrl: "https://github.com/kitao/pyxel",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/kitao/pyxel",
+      github: "https://github.com/kitao/pyxel",
+    },
+    whoFor: "想用 Python 快速做像素小游戏、或拿它当编程入门项目的人；也适合做 48 小时 game jam。",
+    whoNot: "要做商业级 2D 项目、需要成熟 UI 与资源管线的团队；以及不愿意接受低分辨率与有限色板的人。",
+    installTips: [
+      "用 pip 安装：pip install -U pyxel，装完 import pyxel 不报错就算就绪。",
+      "最小程序只有两步：pyxel.init(160, 120) 建窗口，pyxel.run(update, draw) 进循环，两个回调分别负责逻辑与绘制。",
+      "素材用内置的图像/声音编辑器做好后存成资源文件，游戏里用 pyxel.load() 读入，别在代码里硬编码图形。",
+      "官网 showcase 里的示例可以直接在浏览器试玩，先挑一个接近你想做的类型改。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#D94F70",
+    },
+    guide: {
+      intro: "写给第一次用它的人：最小的两个回调长什么样、素材怎么存怎么读、以及为什么不要在代码里画图。",
+      markdown: `## 最小骨架
+
+\`\`\`python
+import pyxel
+
+class App:
+    def __init__(self):
+        pyxel.init(160, 120)
+        pyxel.run(self.update, self.draw)
+
+    def update(self):
+        if pyxel.btnp(pyxel.KEY_Q):
+            pyxel.quit()
+
+    def draw(self):
+        pyxel.cls(0)
+        pyxel.text(10, 10, "hello", 7)
+
+App()
+\`\`\`
+
+两个回调分工明确：update 只算状态，draw 只画。把所有东西塞进 draw 是新手最常见的写法，结果是帧率一掉逻辑就跟着慢。
+
+注意 pyxel.run 是阻塞的，它后面不要再写代码。
+
+## 坐标与颜色
+
+左上角是原点，y 向下增长——和大多数 2D 库一致，和数学坐标系相反。颜色用编号而不是 RGB，所以你在编辑器里画完直接用编号画就行。
+
+## 素材：别在代码里画
+
+内置的图像编辑器导出的资源文件用 pyxel.load() 在读入，之后按图块索引取用：
+
+\`\`\`python
+pyxel.load("assets.pyxres")
+pyxel.blt(x, y, 0, 0, 0, 16, 16)
+\`\`\`
+
+声音同理，先在声音编辑器里写好，再用 pyxel.play 播。代码里硬拼图形，改一次美术就要重写一遍逻辑。
+
+## 卡住了怎么办
+
+它的 API 面很小，先翻官网页面的示例，找一个结构接近的改；实在找不到就把 update 里的逻辑拆成几个小方法逐个 print 调试——窗口模式下 print 输出在终端里。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与文档",
+          url: "https://kitao.dev/pyxel/",
+          note: "安装说明与 API 参考都在这，版本差异也以官网为准。",
+        },
+        {
+          kind: "html",
+          title: "示例合集",
+          url: "https://kitao.dev/pyxel/user-examples/",
+          note: "从跳跃游戏到 3D 物理都能直接试玩，用来判断它能不能撑起你的点子。",
+        },
+        {
+          kind: "html",
+          title: "源码仓库",
+          url: "https://github.com/kitao/pyxel",
+          note: "发布记录与 issue，遇到平台相关的安装问题先搜这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "openra",
+    linksCheckedAt: "2026-10-22",
+    name: "OpenRA",
+    nameZh: "OpenRA 经典 RTS 开源引擎",
+    aliases: ["openra", "红警开源版", "命令与征服", "rts 引擎", "沙丘 2000"],
+    summary: "把红警、泰伯利亚黎明、沙丘 2000 重做成现代系统能跑的开源 RTS，引擎与 mod 分离，可以用 Lua 写剧情。注意它是重制而非复刻，手感与原版不一样。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["RTS", "即时战略", "红警", "游戏引擎"],
+    body: "OpenRA 是个用 C# 写的即时战略引擎，配套三个发行 mod：Command & Conquer: Red Alert、Tiberian Dawn（初代命令与征服）、Dune 2000。README 用的词是 reimagining——重制，不是像素级复刻，单位数值、建造节奏、界面交互都按现代习惯调过。\n它的结构值得说：引擎和 mod 完全分离，规则用 YAML 描述，任务脚本走 Lua API，换一套规则就是另一个游戏。想做大改就下 Mod SDK，官方另给了 traits 的自动生成文档，照着填就能加新能力。地图编辑、资源中心、专用服务器都有对应入口。\n代价有两层。一是数据与法务：EA 没有背书这个项目，名字与素材的边界自己心里要有数。二是预期管理：老玩家常抱怨「这不是我记忆里的红警」，因为它确实改了大量数值与操作逻辑；想要原汁原味，用原版客户端反而更合适。",
+    officialUrl: "https://www.openra.net",
+    officialLabel: "www.openra.net",
+    links: {
+      official: "https://www.openra.net",
+      github: "https://github.com/OpenRA/OpenRA",
+    },
+    whoFor: "想在现在的系统上重温红警 / 沙丘、并且愿意接受平衡与操作被重做过的老玩家；以及想做经典 RTS 风格 mod 的开发者。",
+    whoNot: "要求与 1996 年原版逐帧一致的人；只想装完就打排名赛、不打算读 wiki 的人。",
+    installTips: [
+      "从 openra.net 下载安装包，Windows / macOS / Linux 都有现成构建，不需要自己编译 C#。",
+      "安装后启动器里会列出三个 mod（RA / TD / Dune 2000），首次进入会自动准备该 mod 的内容。",
+      "想联机自建房间，按 wiki 的 Dedicated Server 说明跑服务端，别直接暴露自家机器。",
+      "做 mod 用 OpenRA Mod SDK 起项目，规则改 YAML，剧情脚本用 Lua API。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#8A5A2B",
+    },
+    guide: {
+      intro: "从装完到打上一局，以及想做 mod 时该先动哪个文件——顺带说清它跟原版的差异在哪。",
+      markdown: `## 装完先选 mod
+
+启动器里有三个 mod，各自独立：Red Alert、Tiberian Dawn、Dune 2000。第一次进某个 mod 时会准备它自己的内容，等一会儿是正常的。
+
+先打两局遭遇战再考虑联机。单人模式的 AI 难度跨度很大，从「几乎不动」到「压着你打」，别用最高难度判断自己手残。
+
+## 键位与原版不同
+
+它会按现代 RTS 的习惯重新映射操作。找不到某个命令时按 Esc 看设置里的键位表，别照搬二十年前的记忆。
+
+同样地，单位数值、建造时间、视野都调过。拿原版攻略打 OpenRA 会得到奇怪的结论。
+
+## 联机与服务器
+
+自建房间最简单的是客户端里开，端口映射由路由器负责。要做长期服务器，按 wiki 的 Dedicated Server 页面走，它讲清了配置文件和启动参数。
+
+## 想做 mod
+
+规则是 YAML，路径在 mod 目录下。改之前先看自动生成的 traits 文档，确认字段名，再动手；直接猜字段只会得到启动即崩。
+
+剧情任务用 Lua API，官方 docs.openra.net 上有完整函数列表。地图做好后可以传到 resource.openra.net，别人能直接下载。
+
+## 地图与 mod 才是它的长尾
+
+官方有 Mapping 教程，强调改规则能大幅改变玩法；做好的地图传到资源中心后，别人在启动器里就能取。这也是它比原版活得更久的原因——社区地图与 mod 一直在更新，而原版早就停止维护了。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://www.openra.net",
+          note: "各平台安装包与新闻，判断当前版本是否还在维护也看这里。",
+        },
+        {
+          kind: "markdown",
+          title: "上手指南",
+          url: "https://github.com/OpenRA/OpenRA/wiki/Playing-the-game",
+          note: "操作、建造、多人对局的官方说明，与原版的差异基本都在这里交代。",
+        },
+        {
+          kind: "html",
+          title: "Lua API 文档",
+          url: "https://docs.openra.net/en/release/lua/",
+          note: "写剧情脚本时的函数参考，按版本区分，注意对齐你装的版本。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "openrct2",
+    linksCheckedAt: "2026-10-22",
+    name: "OpenRCT2",
+    nameZh: "OpenRCT2 过山车大亨 2 重制",
+    aliases: ["openrct2", "过山车大亨", "rollercoaster tycoon 2", "rct2"],
+    summary: "把 1999 年的过山车大亨 2 搬到现代系统：宽屏、更高建造上限、多人合作。它不附带任何素材，必须先有原版游戏文件才能玩。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["模拟经营", "经典重制", "多人联机", "游戏"],
+    body: "OpenRCT2 是 RollerCoaster Tycoon 2 的开源重实现。原版是 Chris Sawyer 用 x86 汇编写的，这个项目用 C++ 重写引擎，保留原有玩法与存档格式，同时补上现代平台支持、更顺的界面、改进的游客与员工 AI、更多编辑工具、更高的建造上限，以及合作多人模式。\n它还把 RCT1 里被 2 代去掉的东西加了回来：游戏内山地工具、have fun 目标、直接发射的过山车、工具栏上的几个按钮。有 RCT1 与资料片的话，可以让它指向那些数据来玩初代剧本。\n绕不过去的一点：它不含美术与音频资源，必须自备 RCT2 原版文件（Steam 或 GOG 都有），只装 OpenRCT2 是打不开的。这个设计规避了版权问题，但也意味着「免费开玩」并不成立。",
+    officialUrl: "https://openrct2.io",
+    officialLabel: "openrct2.io",
+    links: {
+      official: "https://openrct2.io",
+      github: "https://github.com/OpenRCT2/OpenRCT2",
+    },
+    whoFor: "手上有 RCT2 正版、想在现代系统上继续造园的人；以及想和朋友一起经营同一个园区的人。",
+    whoNot: "没有原版游戏文件、指望装完就能玩的人——这一步绕不过去；以及只想要原版画面手感、排斥任何改动的怀旧玩家。",
+    installTips: [
+      "官网提供 launcher（Windows / macOS / Linux），它会自动更新到最新构建，比手动下包省心。",
+      "Linux 用户优先用 Flathub 的官方包，能保证一直是最新版；发行版仓库里的往往滞后。",
+      "首次启动会让你指定 RCT2 安装目录，指向原版文件夹即可；有 RCT1 数据也可以一并指过去。",
+      "想要新功能用 develop 通道，想稳定玩用 release 通道，两者可以共存但别混用存档。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#C4632B",
+    },
+    guide: {
+      intro: "第一次启动会被要求指路原版文件，这一步最容易卡住；之后讲通道选择、联机与插件。",
+      markdown: `## 第一步不是装，是找文件
+
+OpenRCT2 自己不带素材。装好启动器后，它会让你选 RCT2 的安装目录——Steam 版在库目录下，GOG 版在安装路径里都能找到，认准含 Data 目录的那一层。
+
+没有原版就去买一份，Steam 与 GOG 都有 RollerCoaster Tycoon 2。指错了目录的表现是「能进程序但没有任何场景」。
+
+有 RCT1 与它的资料片，可以在设置里额外指过去，初代剧本就能直接玩。
+
+## 通道选择
+
+launcher 里通常有 release 与 develop 两条。想稳定造园选 release；想试新工具、或者要给项目报 bug 选 develop，但 develop 的存档不保证向下兼容，重要园区先备份。
+
+## 联机
+
+多人是合作经营同一个园区，不是对战。发起方开服务器，其他人填地址加入；版本必须一致，这也是建议大家都用 launcher 的原因。
+
+## 插件
+
+它有一套插件系统，用 JavaScript 写，放进插件目录后在游戏内启用。写之前先读仓库里的 scripting 文档，事件名与 API 都在那里；论坛插件目录里有现成作品可以参考。
+
+## 原版没有的几样东西
+
+游戏内山地工具、have fun 目标、不经过站台的发射式过山车——这些是 RCT1 有、RCT2 砍掉的机制，它加了回来。再加上更高的建造上限与合作多人，当年被引擎限制卡住的园区终于能做完整。
+
+第一次玩建议先开沙盒把山地工具摸熟，它是改地形最快的手段；在剧本里乱试，容易把预算花光。
+
+## 常见卡点
+
+画面全黑但音乐在响，多半是渲染后端与显卡驱动的问题，换一个渲染器再试。存档打不开，先确认是不是被更高版本的 develop 构建写过。`,
+      resources: [
+        {
+          kind: "html",
+          title: "下载与启动器",
+          url: "https://openrct2.io/download",
+          note: "release / develop 两条通道的下载入口，以及 launcher 的说明。",
+        },
+        {
+          kind: "markdown",
+          title: "项目 Wiki",
+          url: "https://github.com/OpenRCT2/OpenRCT2/wiki",
+          note: "首次启动指路、多人联机、插件开发的步骤都在这里，卡住先搜。",
+        },
+        {
+          kind: "markdown",
+          title: "插件开发文档",
+          url: "https://github.com/OpenRCT2/OpenRCT2/blob/develop/distribution/scripting/scripting.md",
+          note: "插件 API 与事件列表，写脚本前必读，能省掉大量试错。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "openage",
+    linksCheckedAt: "2026-10-22",
+    name: "openage",
+    nameZh: "openage 帝国时代引擎重写",
+    aliases: ["openage", "帝国时代开源引擎", "aoe2 引擎", "genie 引擎"],
+    summary: "给帝国时代 / 帝国时代 II 的 Genie 引擎做自由实现，路线同 OpenRA、OpenTTD。但 README 自己写着游戏玩法基本不可用，现在只适合愿意参与开发的人。",
+    scenes: ["games", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["帝国时代", "游戏引擎", "C++", "开源重制"],
+    body: "openage 想重写的是 Genie 引擎——帝国时代、帝国时代 II（HD）、星球大战：银河战场用的那套。思路和 OpenMW、OpenRA、OpenTTD、OpenRCT2 一致：用原版游戏的数据，引擎自己实现，不附带任何素材，所以玩之前你得有 AoE1 / AoE2 或它们的决定版。\n技术选型很杂：核心是 C++26，脚本、素材转换、内置控制台和代码生成用 Python3，中间靠 Cython 粘，界面 Qt6，构建 CMake，渲染 OpenGL。内容格式用自己设计的 nyan，目标是好读好改；再配一个 Python 控制台和 API，理论上能把 AI 脚本、新单位、新规则都接进来。\n必须先说清现状：README 明写 gameplay 基本不可用。为了让游戏模拟层更干净可扩展，他们把上一版那个勉强能跑的实现删掉了，现在能做的更多是跑引擎、转素材、参与开发。官方也直说「只想玩的人会失望」。此外它不与原版网络或二进制兼容，地图与存档只能单向转换。",
+    officialUrl: "https://openage.dev",
+    officialLabel: "openage.dev",
+    links: {
+      official: "https://openage.dev",
+      github: "https://github.com/SFTtech/openage",
+    },
+    whoFor: "想参与一个长期开源引擎项目、能读 C++ 与 Python 的人；或者想研究 RTS 引擎架构的开发者。",
+    whoNot: "只想重温帝国时代的人——现在没有可玩的游戏，去玩决定版；也不适合只想下个安装包就开机的人。",
+    installTips: [
+      "Linux 先查发行版是否打包（repology 上有索引），没有就源码构建；项目不发布 deb / rpm / Flatpak / snap / AppImage。",
+      "Windows 有 release 安装包，macOS 目前只能从源码编。",
+      "源码构建是 ./configure --download-nyan 然后 make；依赖清单在 doc/building.md，Qt6 与 Python 开发头文件最容易漏。",
+      "编完在 bin 目录下执行 ./run main 启动；想省事也可以用仓库里的 Docker 方式。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#5C6B4A",
+    },
+    guide: {
+      intro: "重点讲第一次构建会卡在哪，以及为什么编完了也玩不了——先把预期摆正，再谈怎么参与。",
+      markdown: `## 先确认你要的是什么
+
+如果你想要的是「在电脑上玩帝国时代」，答案是买决定版，不是这个项目。
+
+如果你想要的是「参与一个从零重写经典 RTS 引擎的开源项目」，继续往下。
+
+## 构建流程
+
+\`\`\`bash
+git clone https://github.com/SFTtech/openage
+cd openage
+./configure --download-nyan
+make
+\`\`\`
+
+--download-nyan 会去取内容配置格式的依赖，第一次构建要编译大量 C++，耗时以小时计，机器风扇会响。
+
+依赖最容易缺的是 Qt6 的开发包和 Python3 头文件。README 给了分平台清单，按 doc/building.md 一项项装，别跳。
+
+## 跑起来
+
+\`\`\`bash
+cd bin && ./run main
+\`\`\`
+
+能开出窗口，但不要期待有对局。README 的 Current State 一节写得很直白：玩法在重做，暂时不可用。看到报错或崩溃也不用怀疑装错了，官方自己拿这个开玩笑。
+
+## 素材怎么来
+
+引擎读的是转换后的格式。仓库里的 convert 脚本负责把原版 AoE 的数据转成 openage 可用格式，你需要自己准备原版游戏文件。转换细节在 doc/media_convert.md。
+
+## 想贡献
+
+先从 good first issue 标签挑任务，Matrix 频道里问一句通常有人接。文档在 doc/ 目录下，但要留意它经常落后于代码。`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目官网",
+          url: "https://openage.dev",
+          note: "当前进度与方向的第一手说明，动手前先看这里的现状描述。",
+        },
+        {
+          kind: "markdown",
+          title: "构建文档",
+          url: "https://github.com/SFTtech/openage/blob/master/doc/building.md",
+          note: "分平台依赖清单，构建失败基本都能在这里找到缺的那个包。",
+        },
+        {
+          kind: "html",
+          title: "开发博客",
+          url: "https://blog.openage.dev",
+          note: "引擎重写的设计决策与月度进展，判断项目还活不活跃看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ebiten",
+    linksCheckedAt: "2026-10-22",
+    name: "Ebitengine",
+    nameZh: "Ebitengine Go 2D 引擎",
+    aliases: ["ebiten", "ebitengine", "go 游戏引擎", "golang 游戏"],
+    summary: "Go 里最省事的 2D 游戏引擎，只要实现 Update / Draw / Layout 三个方法就能跑，能出桌面、移动端和 WebAssembly。代价是它没有编辑器和场景系统，音频、字体、UI 都得自己接。",
+    scenes: ["games", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Go", "2D 游戏", "游戏引擎", "跨平台"],
+    body: "Ebitengine（原名 Ebiten）是给 Go 用的 2D 引擎，卖点是「dead simple」：不用继承一堆类，实现三个方法——Update 算逻辑、Draw 画画面、Layout 定逻辑分辨率——就能跑起来。窗口、输入、音频、着色器、纹理合批这些它都包了，代码量比同类框架小一截。\n渲染上它做了不少自动优化：自动合批、自动纹理图集，写的时候不用太操心绘制调用。支持自定义着色器，音频能读 Ogg/Vorbis、MP3、WAV 和裸 PCM，输入覆盖鼠标、键盘、手柄与触摸。\n它的边界也很清楚：没有可视化编辑器，没有内建场景/实体系统，UI 得自己画或找第三方。移动端与主机平台（Android、iOS、Switch、Xbox）必须开 Cgo，交叉编译会比纯 Go 麻烦不少；Switch 与 Xbox 的支持还有额外门槛，不是想用就能用。",
+    officialUrl: "https://ebitengine.org",
+    officialLabel: "ebitengine.org",
+    links: {
+      official: "https://ebitengine.org",
+      github: "https://github.com/hajimehoshi/ebiten",
+    },
+    whoFor: "已经会 Go、想用同一门语言写小游戏或工具的人；也适合把算法演示做成可交互画面。",
+    whoNot: "需要编辑器、现成 UI、关卡系统的团队；以及不愿意处理 Cgo 与移动端工具链的人。",
+    installTips: [
+      "用 go get github.com/hajimehoshi/ebiten/v2 拉模块，然后用 go run 直接跑桌面版，不需要额外 SDK。",
+      "最小实现是三个方法：Update 返回 error、Draw 接收 *ebiten.Image、Layout 返回外部与逻辑分辨率。",
+      "第一次跑如果窗口立刻退出，检查 Update 是否返回了 ebiten.Termination，这是正常退出的返回约定。",
+      "要出 Android / iOS 必须开 CGO 并配好对应工具链；WebAssembly 走 GOOS=js GOARCH=wasm 构建。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "E",
+      color: "#2E8B8B",
+    },
+    guide: {
+      intro: "讲清它和「有个 main 循环」的框架差别在哪：三个回调怎么分工、分辨率与缩放怎么定、以及移动端为什么要 Cgo。",
+      markdown: `## 没有主循环，只有三个回调
+
+\`\`\`go
+type Game struct{}
+
+func (g *Game) Update() error { return nil }
+
+func (g *Game) Draw(screen *ebiten.Image) {
+    ebitenutil.DebugPrint(screen, "hello")
+}
+
+func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+    return 320, 240
+}
+
+func main() {
+    ebiten.RunGame(&Game{})
+}
+\`\`\`
+
+Update 每秒被调用固定次数（默认 60），Draw 按显示器刷新率跑。别把逻辑写进 Draw，否则帧率一高游戏就变快。
+
+## 分辨率那点事
+
+Layout 返回的是逻辑分辨率，窗口缩放时引擎会按这个比例做缩放。想保持像素风就用固定值（比如 320×240）并关掉平滑；想自适应就把 outsideWidth 直接返回回去。
+
+## 坐标与绘制
+
+原点是左上角，单位是逻辑像素。画图用 DrawImage 配合 GeoM 做变换：
+
+\`\`\`go
+op := &ebiten.DrawImageOptions{}
+op.GeoM.Translate(100, 50)
+screen.DrawImage(img, op)
+\`\`\`
+
+每个 DrawImageOptions 都是新对象，复用前记得重置 GeoM，否则变换会叠加。
+
+## 退出与音频
+
+Update 返回 ebiten.Termination 表示正常退出，返回别的 error 会被当作崩溃。音频要先拿 audio.Context，再用 mp3 / vorbis / wav 子包解码成流，注意采样率要跟 context 对齐。
+
+## 移动端
+
+Android 与 iOS 都要 Cgo，意味着不能纯靠交叉编译，得准备 NDK / Xcode。先做桌面版验证玩法，最后再处理移动端。`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装说明",
+          url: "https://ebitengine.org/en/documents/install.html",
+          note: "分平台的依赖与首次运行检查，跑不起来先照它逐条核。",
+        },
+        {
+          kind: "html",
+          title: "速查表",
+          url: "https://ebitengine.org/en/documents/cheatsheet.html",
+          note: "常用 API 一页看完，写的时候比翻 godoc 快。",
+        },
+        {
+          kind: "html",
+          title: "API 文档",
+          url: "https://pkg.go.dev/github.com/hajimehoshi/ebiten/v2",
+          note: "包结构与各子包（audio、vector、text）的签名，版本变更看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "nakama",
+    linksCheckedAt: "2026-10-22",
+    name: "Nakama",
+    nameZh: "Nakama 游戏后端服务",
+    aliases: ["nakama", "heroiclabs", "游戏后端", "game backend", "匹配服务器"],
+    summary: "开箱即用的游戏后端：账号、好友、聊天、排行榜、匹配、实时对战都是现成的，服务端逻辑可用 Lua / TS / Go 扩。代价是必须配 CockroachDB，自建运维不轻。",
+    scenes: ["games", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["游戏后端", "实时对战", "Go", "自建服务"],
+    body: "Nakama 把「每个游戏都要重写一遍」的那堆服务做成了现成品：社交登录与设备登录、用户存档、好友与公会、单聊群聊与全局聊天、排行榜与赛季、锦标赛、组队（party）、内购校验、推送通知、匹配器，还有实时或回合制的多人对战。\n接入方式按场景分：请求响应走 gRPC 或 HTTP+JSON，实时通信用 WebSocket 或 rUDP。服务端逻辑可以用 Lua、TypeScript/JavaScript 写，也可以直接编 Go 进去，不必为了加一个自定义接口去改核心。\n部署上有个硬前提：数据库必须是 CockroachDB 或 Postgres 协议兼容的库。单机开发用 Docker Compose 一条命令就起，生产则要按官方建议把 Nakama 与数据库分节点部署——这一步才是真正的成本。控制台内嵌在同一个二进制里，默认 7351 端口，不用另装。",
+    officialUrl: "https://heroiclabs.com",
+    officialLabel: "heroiclabs.com",
+    links: {
+      official: "https://heroiclabs.com",
+      github: "https://github.com/heroiclabs/nakama",
+    },
+    whoFor: "做多人游戏、需要账号/排行榜/匹配这些通用能力，又不想自己从零写后端的独立团队。",
+    whoNot: "单机或纯本地对战的游戏——后端纯属多余；以及不想维护数据库与集群的人，官方托管方案更适合你。",
+    installTips: [
+      "本地开发最快是 Docker：准备 docker-compose.yml 后 docker-compose -f ./docker-compose.yml up。",
+      "用二进制方式要先起 CockroachDB，再执行 nakama migrate up --database.address \"root@127.0.0.1:26257\" 建表，然后才启动 nakama。",
+      "默认服务端 key 是 defaultkey，客户端连 7350，控制台在 http://127.0.0.1:7351。",
+      "验证安装可以用 README 里的 REST 示例：向 /v2/account/authenticate/device?create=true 发一个设备 ID，能拿到 token 就通了。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "N",
+      color: "#2C6E9B",
+    },
+    guide: {
+      intro: "从起服务到跑通第一个认证请求：数据库先起、迁移再启服务、客户端 key 从哪来、控制台能看什么。",
+      markdown: `## 顺序不能反
+
+Nakama 启动时要连数据库，连不上就直接退出。所以顺序是：先起 CockroachDB（或兼容库），再跑迁移，最后启动 Nakama。
+
+\`\`\`bash
+nakama migrate up --database.address "root@127.0.0.1:26257"
+nakama --database.address "root@127.0.0.1:26257"
+\`\`\`
+
+迁移命令不只是建表，升级版本时也要再跑一次，否则会因为缺字段报错。
+
+## 第一个请求
+
+启动日志里会打印实际生效的配置。用默认 key 认证一个设备：
+
+\`\`\`bash
+curl "127.0.0.1:7350/v2/account/authenticate/device?create=true" \\
+  --user "defaultkey:" \\
+  --data '{"id": "someuniqueidentifier"}'
+\`\`\`
+
+返回里带 token 就说明链路通了。注意 --user 的格式是 key 加冒号，冒号不能省。
+
+## 控制台
+
+浏览器开 http://127.0.0.1:7351，能看到用户、存储对象、在线对局和基础指标。生产环境记得改默认凭据并配权限档位。
+
+## 客户端怎么接
+
+官方给 Unity、Unreal、Godot、JS、Java/Android、.NET、Defold、Swift 的库。先照文档把连接与认证跑通，再往业务里接——一开始就上匹配与实时房间，出问题很难判断是网络、鉴权还是逻辑。
+
+## 什么时候别自建
+
+如果你的团队没有运维，直接用官方托管。自建的难点从来不是装，而是数据库备份、升级与扩容。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Docker 快速开始",
+          url: "https://heroiclabs.com/docs/nakama/getting-started/install/docker",
+          note: "一份 compose 文件就能起全套，本地开发照这篇走最快。",
+        },
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://heroiclabs.com/docs",
+          note: "客户端接入、服务端运行时、生产部署的完整说明，按需跳章节。",
+        },
+        {
+          kind: "html",
+          title: "发布记录",
+          url: "https://github.com/heroiclabs/nakama/releases",
+          note: "二进制下载与变更说明，升级前确认是否需要重跑迁移。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "cataclysm-dda",
+    linksCheckedAt: "2026-10-22",
+    name: "Cataclysm: Dark Days Ahead",
+    nameZh: "CDDA 末世生存 Roguelike",
+    aliases: ["cdda", "cataclysm", "dark days ahead", "末世生存", "roguelike"],
+    summary: "深度夸张的回合制末世生存 Roguelike：从缝合伤口到拆车造车都能量化。代价是上手极陡、界面以键盘为主，连官方教程都可能因代码改动而失效。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Roguelike", "生存", "回合制", "开源游戏"],
+    body: "Cataclysm: Dark Days Ahead 是个回合制生存游戏，世界程序生成、持续演化：搜刮废墟、凑装备、找一辆还有油的车逃出去，对付从僵尸到巨型昆虫再到杀人机器人乃至更怪的东西，还要防着和你一样想抢物资的幸存者。\n它的深度体现在系统互相咬合：物品有体积重量与磨损，伤势分部位，制作有配方与工具要求，载具可以拆件重组。这也解释了它为什么被叫「僵尸游戏」却不只是打僵尸——真正耗时间的是生存链条本身。\n门槛同样真实。界面以键盘驱动，默认操作要背；官方 FAQ 直接说明教程可能因为改动太多而不正常。它同时提供 ncurses 纯文本前端与 tiles 图形前端，前者轻、后者好认。想少踩坑就装 stable 版，实验版更新快但存档与内容变动自己承担。",
+    officialUrl: "https://cataclysmdda.org",
+    officialLabel: "cataclysmdda.org",
+    links: {
+      official: "https://cataclysmdda.org",
+      github: "https://github.com/CleverRaven/Cataclysm-DDA",
+    },
+    whoFor: "喜欢 Dwarf Fortress 那类高自由度、能接受画面上限低、愿意读文档的硬核玩家。",
+    whoNot: "想要即开即玩、鼠标操作、有引导流程的人；以及受不了反复死亡重开的玩家。",
+    installTips: [
+      "Debian / Ubuntu: sudo apt install cataclysm-dda-curses 或 cataclysm-dda-sdl；Arch 装 cataclysm-dda 与 cataclysm-dda-tiles。",
+      "官网分 stable 与 experimental 两个下载通道，新手先用 stable，实验版内容新但随时可能变。",
+      "没有包管理器就下 Flatpak 版，或在 releases 页取对应系统的压缩包解压即用。",
+      "进游戏先按 ? 再按 1 看完整键位表，按 + 可以改键；主菜单 World → Create World 生成新世界。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#6B4A3A",
+    },
+    guide: {
+      intro: "写给第一次打开就被满屏字符吓到的人：先跑教程、认识主菜单、知道哪几个键能救命。",
+      markdown: `## 第一次打开
+
+主菜单里 Special 下有教程，但官方 FAQ 也承认，因为改动频繁，教程不一定能正常跑。跑不通不用怀疑自己，直接开新世界。
+
+World → Create World 生成一个新世界，然后创建角色。世界是持久的，角色死了世界还在，可以换个角色接着在这个世界里活。
+
+## 键位先记这几个
+
+- ? 打开帮助，再按 1 是完整键位表
+- + 添加自定义键位：先选动作字母，再按你想绑的键
+- 移动是方向键或小键盘，别用 WASD（那是别的游戏的习惯）
+- , 和 . 用来在物品之间切换，拾取与检视都靠这套选择界面
+
+界面是多层弹出式的，Esc 只能退一层，退不出来的时候看清顶部提示。
+
+## 死亡是常态
+
+这游戏的默认难度不打算让你活下来。第一天死在城郊很正常，重要的是每次死前搞清楚是什么杀的你：是口渴、是感染、还是贸然进了有响声的房子。
+
+## 文本版还是贴图版
+
+curses 版启动快、在服务器上也能跑；tiles 版好看得多，初次上手建议 tiles。两者存档通用。
+
+## 卡住了去哪问
+
+官方 FAQ、Discourse 论坛和 Discord 都活跃。提问前先按 ? 查一遍键位，很多「不能操作」其实是没选中目标。
+
+## 再说一次版本选择
+
+stable 与 experimental 的差别不只是新功能多少，而是内容会不会在你玩到一半时变。实验版合入频繁，配方、物品、怪物数值都可能在更新后失效。第一次玩请用 stable，等熟悉系统、或者想帮项目报 bug 时再切过去。`,
+      resources: [
+        {
+          kind: "html",
+          title: "下载页",
+          url: "https://cataclysmdda.org/releases/",
+          note: "stable 与 experimental 的分流入口，先确认自己下的是哪条线。",
+        },
+        {
+          kind: "markdown",
+          title: "项目 Wiki",
+          url: "https://github.com/CleverRaven/Cataclysm-DDA/wiki",
+          note: "安装、编译与常见问题的汇总，跨平台构建的坑基本都记在这。",
+        },
+        {
+          kind: "html",
+          title: "官方论坛",
+          url: "https://discourse.cataclysmdda.org",
+          note: "玩法讨论与新手指引，遇到「这系统怎么用」的问题比 issue 区更合适。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "tiled",
+    linksCheckedAt: "2026-10-22",
+    name: "Tiled",
+    nameZh: "Tiled 瓦片地图编辑器",
+    aliases: ["tiled", "mapeditor", "tmx", "瓦片地图", "关卡编辑器"],
+    summary: "通用瓦片地图编辑器，TMX 格式几乎被所有 2D 引擎支持。它只管画地图和摆对象，游戏逻辑与碰撞响应仍要自己在引擎里写。",
+    scenes: ["games", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["地图编辑", "关卡设计", "游戏开发", "TMX"],
+    body: "Tiled 是给所有瓦片类游戏用的地图编辑器——RPG、平台跳跃、打砖块都行。它不限定瓦片尺寸、层数或瓦片数量，地图、图层、瓦片、对象都能挂任意自定义属性，一个地图里可以混用多个 tileset，而且 tileset 随时能换。\n导出格式是 TMX（本质是 XML），结构直观，所以生态很广：Godot、Unity、Flame、libGDX 等都有现成加载器，实在没有也能自己解析。除了瓦片层，它还有对象层用来放出生点、触发区、路径点，这部分才是关卡逻辑落地的地方。\n安装上有个实际建议：多数 Linux 发行版仓库里的版本偏旧，官方更推荐 AppImage、Flatpak 或 snap。想自己编译则需要 Qt 6.2 以上加 Qbs，依赖不算轻。它不支持在编辑器里跑游戏，所见即所得只到「摆好」为止。",
+    officialUrl: "https://www.mapeditor.org",
+    officialLabel: "www.mapeditor.org",
+    links: {
+      official: "https://www.mapeditor.org",
+      github: "https://github.com/mapeditor/tiled",
+    },
+    whoFor: "用 2D 引擎做关卡、需要可视化摆放瓦片与对象点的独立开发者；也适合做像素 RPG 的地图。",
+    whoNot: "做 3D 关卡或用体素的人；以及指望编辑器直接产出可玩关卡的人——它只产出数据。",
+    installTips: [
+      "从 GitHub Releases 或 itch.io 下载安装包，Windows 与 macOS 的构建都有签名。",
+      "Linux 别直接用发行版包（通常滞后），优先 AppImage、Flathub 或 snap 的官方版本。",
+      "自己编译需要 Qt ≥ 6.2 与 Qbs：qbs setup-toolchains --detect 之后执行 qbs 构建，qbs run -p tiled 启动。",
+      "需要 Python 插件的话还要装 Python3 开发库，否则插件页签不会出现。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#4B7A8F",
+    },
+    guide: {
+      intro: "第一次用最容易卡在 tileset 怎么导入、层和对象有什么区别、以及导出后引擎怎么读。",
+      markdown: `## 先建 tileset，再建地图
+
+顺序别搞反：先准备一张瓦片图（等距或正交都行），在编辑器里新建 tileset 并设好瓦片宽高与间距。间距（margin / spacing）填错，瓦片就会错位——这是新手最常见的「图裂了」。
+
+然后把 tileset 挂到地图上，才能开始刷。
+
+## 层与对象的分工
+
+瓦片层负责「看起来是什么」，对象层负责「逻辑上是什么」。出生点、传送门、敌人位置、碰撞区都放对象层，写成带属性的对象，引擎读属性来决定行为。
+
+不要用瓦片层去表达逻辑，例如用某个特殊瓦片表示传送——后期换美术时会痛不欲生。
+
+## 属性是自己的协议
+
+地图、层、瓦片、对象都能加自定义属性，键值随便起。建议一开始就定好命名规范（例如 collision、spawn_type），因为引擎侧要按这些键读。
+
+## 导出与在引擎里读
+
+File → Export 出 TMX 或 JSON。多数引擎有现成加载器，找不到就按 TMX 的 XML 结构自己解析，层与 gid 的对应关系是核心。
+
+注意导出时选择「嵌入 tileset」还是「外部 tsx」：外部方式便于多个地图共享同一套瓦片，但发布时容易漏拷文件。
+
+## 什么时候不该用它
+
+关卡是程序化生成的、或者小到用代码摆几个矩形就够的项目，引入 TMX 只是多一层解析负担。3D 关卡更不适用。
+
+它也不做碰撞模拟与寻路：对象层能标出碰撞区，但「撞上去会怎样」始终是引擎的事。
+
+## Linux 上的坑
+
+发行版仓库里的 Tiled 经常落后一两个大版本，导致 .tmx 打开提示版本过高。换官方 AppImage 或 Flatpak 即可。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://www.mapeditor.org",
+          note: "下载入口与版本说明，判断该用哪个安装渠道看这里。",
+        },
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://doc.mapeditor.org/en/stable/",
+          note: "tileset、层、对象、模板的完整说明，属性怎么用讲得最清楚。",
+        },
+        {
+          kind: "html",
+          title: "发布记录",
+          url: "https://github.com/mapeditor/tiled/releases",
+          note: "各平台安装包与版本变更，遇到格式不兼容先核对版本号。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "unciv",
+    linksCheckedAt: "2026-10-22",
+    name: "Unciv",
+    nameZh: "Unciv 文明 5 开源重制",
+    aliases: ["unciv", "文明5 开源版", "civ v remake", "4x 策略"],
+    summary: "文明 5 的开源重制，安卓和桌面都能跑，体积小到老机器也带得动，规则用 JSON 描述所以很好改。别指望画面和 AI，它强在轻量与可 mod。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["4X", "策略游戏", "文明", "可 mod"],
+    body: "Unciv 是用 LibGDX 做的文明 5 重制，主打两件事：能在很弱的设备上跑，以及可 mod。作者自己在 README 里划了界线——想要高清画面、配乐、动画，去玩 Firaxis 的正版；想要一个小、快、免费开源、有深度的 4X，才轮到它。\n它的规则与内容以数据描述为主，改数值、加单位、做剧本都不需要动引擎代码，这也是它 mod 生态活跃的原因。当前路线图是先打磨 UI 与游戏内自动化/AI，再补 G&K 机制，然后才是 BNW 的贸易路线与世界议会——换句话说，资料片内容还在路上。\n平台覆盖很全：安卓（Google Play / F-Droid）、Windows（MSI / Chocolatey / Scoop）、Linux（Flatpak / AUR / itch.io）、macOS（brew）、树莓派（Pi-apps），甚至能用 Docker 跑一个带 VNC 的无头实例。它明确不做 iOS，Steam 也拒绝上架。",
+    officialUrl: "https://github.com/yairm210/Unciv",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/yairm210/Unciv",
+      github: "https://github.com/yairm210/Unciv",
+    },
+    whoFor: "想在手机或旧笔记本上玩文明、又不想花几百块的人；以及想改规则做自己的 4X mod 的玩家。",
+    whoNot: "在意画面、动画、配音的人——正版体验好得多；以及只玩最新资料片机制的人，G&K / BNW 内容还没补齐。",
+    installTips: [
+      "安卓从 Google Play 或 F-Droid 装；Windows 直接下 Unciv.msi，或走 Chocolatey / Scoop。",
+      "Linux 用 Flathub 的 Flatpak 或 AUR 的 unciv-bin；macOS 用 brew install unciv。",
+      "官方不推荐下 jar 手动跑（java -jar Unciv.jar），因为更新频繁，很快就落后于版本。",
+      "想无头跑（比如放服务器上）可以用 Docker：映射 6901 与 5901，然后浏览器开 /vnc.html 连进去。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "U",
+      color: "#3F6E4E",
+    },
+    guide: {
+      intro: "装哪个包、第一次开局怎么设、教程在哪，以及想改规则时从哪份文档入手。",
+      markdown: `## 选安装方式
+
+安卓用户走应用商店最省事，更新也及时。桌面上 Windows 用 MSI，macOS 用 brew，Linux 用 Flatpak——这些渠道都会跟进版本。
+
+不要图省事去下单独的 jar。它确实能跑，但项目更新很勤，你很快就会发现自己的版本落后好几个。
+
+## 第一次开局
+
+新游戏里可以选地图类型、大小、难度与文明。不确定就从最小地图、低难度开始，先摸清单位与城市的操作节奏，再往上加。
+
+游戏内的教程在菜单 → Civilopedia → Tutorials 里，全部内置，不用联网查。因为它是文明 5 的重制，网上搜「文明5 怎么玩」的答案基本都适用。
+
+## 想改东西
+
+它的规则文件是描述式的，改数值、加单位、写剧本都不需要编译。Modders 文档给了目录结构与字段说明，从一个现成 mod 抄结构最快。
+
+## Docker 无头跑
+
+\`\`\`bash
+docker run -d -p 6901:6901 -p 5901:5901 ghcr.io/yairm210/unciv
+\`\`\`
+
+然后浏览器访问 http://localhost:6901/vnc.html?password=headless。适合放在家里的常开机器上，用平板接着玩。
+
+## 别期待的事
+
+iOS 版不会做（作者没有设备测试，也不想付苹果的费用），Steam 也拒绝上架。想要这两个平台，只能换游戏。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://yairm210.github.io/Unciv/",
+          note: "安装、模组、翻译与本地构建的入口，按角色选对应章节。",
+        },
+        {
+          kind: "html",
+          title: "发布页",
+          url: "https://github.com/yairm210/Unciv/releases",
+          note: "MSI、jar、APK 都在这里，核对版本与更新说明用。",
+        },
+        {
+          kind: "html",
+          title: "Mod 开发文档",
+          url: "https://yairm210.github.io/Unciv/Modders/Mods/",
+          note: "规则文件的目录结构与字段说明，想做自己的文明或剧本从这里开始。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "flame",
+    linksCheckedAt: "2026-10-22",
+    name: "Flame",
+    nameZh: "Flame Flutter 游戏引擎",
+    aliases: ["flame", "flame engine", "flutter 游戏引擎", "dart 游戏"],
+    summary: "用 Flutter / Dart 写 2D 游戏，直接复用 Flutter 的打包链路与 widget 生态，一套代码出移动端、桌面和 Web。3D 仍是实验状态，性能上限不如原生引擎。",
+    scenes: ["games", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Flutter", "Dart", "2D 游戏", "跨平台"],
+    body: "Flame 的定位是「Flutter 之上缺的那层游戏基础设施」：游戏循环、组件系统（FCS）、碰撞检测、手势与输入、精灵与动画、粒子与特效、图片与资源加载。它不重新发明渲染，而是把 Flutter 的 Canvas 与 widget 体系当成底座。\n这使得它的接入成本很低：已经在写 Flutter 的团队，加一个依赖就能在同一个工程里做游戏；反过来，游戏里嵌 UI（设置页、商店、排行榜）也可以直接用 Flutter widget，不必自己画。\n它的能力靠桥接包扩展：物理用 flame_forge2d（Box2D），瓦片地图用 flame_tiled，骨骼动画用 flame_spine，音频用 flame_audio，还有 rive、svg、behavior tree、riverpod 等一长串。3D 方面 flame_3d 标注为实验性，能玩但别当卖点。\n代价：Dart 生态在游戏领域比 C#、C++ 小得多，缺什么往往要自己补；重度渲染场景下性能不如专门的引擎。",
+    officialUrl: "https://flame-engine.org",
+    officialLabel: "flame-engine.org",
+    links: {
+      official: "https://flame-engine.org",
+      github: "https://github.com/flame-engine/flame",
+    },
+    whoFor: "已经在用 Flutter、想在同一个代码库里做小游戏或游戏化功能的人；也适合需要游戏画面 + 原生 UI 混排的应用。",
+    whoNot: "要做重度 3D、或需要极致帧率的动作游戏团队；以及完全不熟 Flutter 的人——先学框架再学引擎太绕。",
+    installTips: [
+      "在 Flutter 项目里 flutter pub add flame 即可，不需要单独安装引擎或配置原生侧。",
+      "游戏用 GameWidget 挂进 widget 树，别试图在普通 widget 里手动跑游戏循环。",
+      "物理、瓦片地图、音频这些是独立包（flame_forge2d / flame_tiled / flame_audio），按需逐个添加。",
+      "官方示例站能在浏览器里直接试玩，点右上角按钮可以看每个示例的源码。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#E05A33",
+    },
+    guide: {
+      intro: "讲清 Flutter 的 widget 树和游戏的 Game 循环怎么接上，以及组件系统该按什么粒度拆分。",
+      markdown: `## 两种世界观怎么接
+
+Flutter 是声明式 widget 树，游戏是每帧更新的循环。Flame 的接法是 GameWidget：
+
+\`\`\`dart
+class MyGame extends FlameGame {
+  @override
+  Future<void> onLoad() async {
+    add(SpriteComponent()
+      ..sprite = await loadSprite('player.png')
+      ..position = Vector2(100, 100));
+  }
+}
+
+// 在页面里
+GameWidget(game: MyGame())
+\`\`\`
+
+游戏内的东西不要做成 widget，做成 Component；反过来，菜单、设置、商店这类界面用 Flutter widget 做，压在 GameWidget 上层，比在游戏里画按钮省事得多。
+
+## Component 的粒度
+
+按「有独立状态、需要单独更新」来拆。一个角色一个 Component，一堆子弹可以是多个 Component 也可以是一个自己管理的池——后者在高频生成时更快，但调试更麻烦。
+
+update(dt) 的 dt 是秒，移动要写成 position += velocity * dt，不乘 dt 换台设备速度就变了。
+
+## 坐标与相机
+
+默认原点左上、单位是逻辑像素。用 CameraComponent 做跟随与缩放，别自己去改 canvas 变换，混用两套坐标系是常见 bug 来源。
+
+## 需要物理时
+
+加 flame_forge2d，它是 Box2D 的绑定。注意物理世界有自己的单位制（米），和屏幕像素不是一回事，需要设一个缩放比例。
+
+## 打包
+
+和普通 Flutter 应用完全一样：flutter build apk / ipa / web / windows。这也是它相对其他引擎最省心的地方。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.flame-engine.org/",
+          note: "组件、输入、相机、桥接包的分章说明，注意选对版本号。",
+        },
+        {
+          kind: "html",
+          title: "在线示例",
+          url: "https://examples.flame-engine.org/",
+          note: "每个特性都能在浏览器里跑，右上角可看源码，抄改最快。",
+        },
+        {
+          kind: "markdown",
+          title: "生态清单",
+          url: "https://github.com/flame-engine/awesome-flame",
+          note: "现成的库、教程与开源游戏，缺功能时先在这找有没有人做过。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "et",
+    linksCheckedAt: "2026-10-22",
+    name: "ET",
+    nameZh: "ET 分布式游戏框架",
+    aliases: ["et", "et framework", "egametang", "unity 服务端框架", "mmo 框架"],
+    summary: "Unity 客户端 + C# 服务端一体化的 MMO 框架，纤程 / Actor 架构，配套分析器约束代码风格。开源版只允许学习，商用要另买授权，先看清 License 再动手。",
+    scenes: ["games", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Unity", "C#", "MMO", "分布式框架"],
+    body: "ET 是国人维护的 Unity 客户端 + C# 服务端框架，现在的主线是 ET10，自称面向 AI 编码时代。架构上是多进程多线程的 Actor 模型，抽象出纤程（fiber）——写起来像单线程同步代码，底层可以铺到多核上。前后端共用一套 C# 代码，服务端可跨 Windows 与 Linux 发布。\n它的一整套配套才是重点：分析器在编译期强制架构约束（await 安全、Entity 生命周期、包依赖），行为树、技能与 Buff、条件表达式、服务发现、.NET Aspire 编排都是独立包；测试框架能直接拉起多个客户端机器人跑完整的前后端交互，这也是它宣传的「AI 写完自己验证」的基础。\n必须把 License 摆在前面：开源版只允许学习，不能二次开源修改，商业使用需要购买许可，README 标价 4999。另外它体量大、概念多（Scene、Entity、System、Fiber、Package），没有 Unity 与 C# 基础的人很难啃下来。",
+    officialUrl: "https://github.com/egametang/ET",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/egametang/ET",
+      github: "https://github.com/egametang/ET",
+    },
+    whoFor: "要做 MMO 或长线在线游戏、团队用 Unity + C# 且愿意接受一套完整框架约束的人。",
+    whoNot: "做单机或小体量联机的人——框架的复杂度远超收益；以及打算商用却不准备买授权的人。",
+    installTips: [
+      "先读仓库里的运行指南（Book 目录）再动手，直接打开工程会因为缺包与配置跑不起来。",
+      "框架按 ET Package 分发，功能包从 ET Packages 组织下的仓库获取，不要东拼西凑源码。",
+      "客户端是 Unity 工程，服务端可从同一套代码发布成独立进程；开发时通常先跑单进程 all-in-one 模式。",
+      "商用前务必读 LICENSE 文件：开源版仅限学习，商业使用需要单独购买许可。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "E",
+      color: "#5B4B8A",
+    },
+    guide: {
+      intro: "先讲清楚授权与适用规模，再讲第一次跑起来要准备什么、为什么会卡在包与配置上。",
+      markdown: `## 先读 License
+
+这一步不能跳。开源版本只能用于学习，不允许二次开源修改；商业使用需要购买授权（README 写明 4999）。如果你是在公司项目里评估它，先把这条发给负责人。
+
+## 它适合什么规模
+
+ET 面向的是长线运营的 MMO：多进程、分布式、热重载、机器人压测、服务发现，这些都是为「几十人在线以上、要持续更新」准备的。做一个三五个人的联机小游戏，这套东西的重量会让你寸步难行。
+
+## 第一次跑起来
+
+不要直接拿 Unity 打开仓库就点运行。正确顺序是照 Book 目录里的运行指南走：装依赖、恢复包、配好启动配置（StartConfig）、再启动。
+
+缺少包是最常见的失败原因。ET 的功能以 ET Package 形式分发，包括 harness、unitybridge、test、behaviortree、servicediscovery、spell 等，从 ET Packages 组织下按需取，别从别处拷源码拼。
+
+## 概念地图
+
+- Scene 是运行时的域，进程里可以有多个
+- Entity 是数据，System 是行为，两者分离
+- Fiber 是调度单位，像轻量进程
+- 分析器在编译期拦下不符合规范的写法
+
+理解这四样，再看 demo 才不至于迷路。
+
+## 出问题去哪
+
+官方论坛 et-framework.cn 与仓库 issue。提问时带上完整报错与包版本，这类框架的问题大多和版本错配有关。`,
+      resources: [
+        {
+          kind: "html",
+          title: "ET 论坛",
+          url: "https://et-framework.cn",
+          note: "中文社区与教程汇总，跑不通时先在这搜同类问题。",
+        },
+        {
+          kind: "markdown",
+          title: "源码仓库",
+          url: "https://github.com/egametang/ET",
+          note: "README 里有版本说明、License 与运行指南入口，动工前通读一遍。",
+        },
+        {
+          kind: "html",
+          title: "ET Packages",
+          url: "https://github.com/orgs/ET-Packages/packages",
+          note: "功能包的分发处，缺包导致的编译错误基本都在这找。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "devilutionx",
+    linksCheckedAt: "2026-10-22",
+    name: "DevilutionX",
+    nameZh: "DevilutionX 暗黑破坏神移植",
+    aliases: ["devilutionx", "devilution", "diablo 开源移植", "暗黑破坏神"],
+    summary: "把 1996 年的暗黑破坏神搬到现代系统上跑，带 bug 修复、宽屏和可选的血条经验条。仍然需要你自己的 DIABDAT.MPQ，它不附带任何游戏素材。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["暗黑破坏神", "经典游戏", "C++", "游戏移植"],
+    body: "DevilutionX 是 Diablo 与 Hellfire 的源码移植，目标很朴素：让老游戏在现代系统上能顺利跑起来，顺带修 bug、加一些可选的人性化开关。血条与经验条默认是关的，可以在设置里打开；不喜欢宽屏也能关掉。\n它跑的平台多得离谱：Windows、macOS、Linux、Android、iOS，还有 PS4、Xbox、Switch、Vita、3DS 甚至 Amiga。这份列表本身就说明代码被移植得相当干净。\n前提条件必须讲明：它不含游戏数据，你得有原版 Diablo 的 DIABDAT.MPQ（GOG 或暴雪商城能买，也可以从 GOG 安装包里提取）；想玩 Hellfire 资料片还要另外四个 mpq。没有正版的话，可以用共享版的 spawn.mpq 代替，但只能玩前几层内容。授权是 Sustainable Use License，仅限非商业使用，不能拿它或其衍生作品收费。",
+    officialUrl: "https://github.com/diasurgical/DevilutionX",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/diasurgical/DevilutionX",
+      github: "https://github.com/diasurgical/DevilutionX",
+    },
+    whoFor: "手里有暗黑破坏神正版数据、想在现在的系统或掌机上重温的人；以及想研究老游戏引擎移植的开发者。",
+    whoNot: "没有原版数据文件的人——装完只会停在找不到 mpq 的提示上；以及任何打算用它做商业发行的人，授权不允许。",
+    installTips: [
+      "下最新 release 解压到任意目录，同目录放入 DIABDAT.MPQ 即可运行，不需要安装程序。",
+      "玩 Hellfire 还要补 hellfire.mpq、hfmonk.mpq、hfmusic.mpq、hfvoice.mpq 四个文件。",
+      "没有正版数据时，可以下共享版的 spawn.mpq 改名为 DIABDAT.MPQ，只能体验前几层地牢。",
+      "如果数据来自 GOG 安装包，需要先按 wiki 的方法把 mpq 提取出来，安装包本身不能直接用。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#7A2E2E",
+    },
+    guide: {
+      intro: "第一次运行十有八九卡在数据文件上：从哪来、怎么提取、放哪里，以及为什么它不附带素材。",
+      markdown: `## 它为什么没有游戏内容
+
+DevilutionX 只重写了引擎，美术、音乐、任务数据仍然属于暴雪。所以它必须靠你提供的 DIABDAT.MPQ 才能运行——这是法律上的必要设计，不是打包失误。
+
+## 数据从哪来
+
+- 买 GOG 或暴雪商城的正版 Diablo，从安装目录里找 DIABDAT.MPQ
+- GOG 的安装包是压缩格式，需要按 wiki 的说明把 mpq 提取出来
+- 完全没有正版时，可以下共享版的 spawn.mpq，改名成 DIABDAT.MPQ，只能玩前几层
+
+## 放哪里
+
+把 mpq 放在 DevilutionX 可执行文件同级的目录里。目录放错的表现是启动后弹出提示说找不到数据文件，而不是静默失败——照着提示里的路径名核对即可。
+
+Hellfire 资料片要额外四个文件：hellfire.mpq、hfmonk.mpq、hfmusic.mpq、hfvoice.mpq，缺一个就进不去。
+
+## 那些开关
+
+血条与经验条默认关闭，在游戏设置里开。宽屏同样可以关掉，想要原汁原味的 4:3 就去设置里改。设置项存在配置文件里，wiki 上有完整的键名说明。
+
+## 与原版的差别
+
+它改的是引擎层：修 bug、适配现代系统、可选的血条经验条与宽屏。玩法数值、任务、掉落都按原版来，不会出现「重制版手感变了」的问题——这一点和市面上的各种高清重制正好相反。
+
+换句话说，你玩的还是 1996 年那套规则，只是不再需要 DOSBox。
+
+## 出问题
+
+先确认 mpq 版本（不同地区发行版的校验值不同），再看是否是 32/64 位包混用。崩溃类问题带上日志去 GitHub issue，仓库里也有各平台的测试构建可以对照。`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "项目 Wiki",
+          url: "https://github.com/diasurgical/DevilutionX/wiki",
+          note: "安装、数据提取、配置文件与功能说明，卡在 mpq 就看这里。",
+        },
+        {
+          kind: "html",
+          title: "最新发布",
+          url: "https://github.com/diasurgical/devilutionx/releases/latest",
+          note: "各平台构建的下载入口，注意选对自己系统的包。",
+        },
+        {
+          kind: "link",
+          title: "共享版数据",
+          url: "https://github.com/diasurgical/devilutionx-assets/releases/latest/download/spawn.mpq",
+          note: "没有正版时用这个文件改名顶上，只能玩到前几层地牢。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "compactgui",
+    linksCheckedAt: "2026-10-22",
+    name: "CompactGUI",
+    nameZh: "CompactGUI 游戏压缩工具",
+    aliases: ["compactgui", "compact gui", "游戏压缩", "磁盘压缩", "透明压缩"],
+    summary: "把 Windows 游戏和程序目录做透明压缩，靠系统自带的 WOF 驱动省磁盘，压完照常启动；适合 SSD 快满又不想删游戏的人，代价是用 DirectStorage 的游戏千万别压。",
+    scenes: ["games", "tools"],
+    platforms: ["windows"],
+    source: "opensource",
+    tags: ["磁盘压缩", "游戏", "Windows", "透明压缩", "开源"],
+    body: "CompactGUI 本身是个薄壳，真正干活的是 Windows 自带的 WOF（Windows Overlay Filter）驱动：它按 NTFS 透明压缩的方式把文件夹压起来，文件在资源管理器里照常显示、游戏照常双击启动，读取时由系统在内存里解压——不像 zip / rar 那样得整包解出来才能用。等于把 Win10 起才有的 compact.exe 命令行能力做成了图形界面。\n它和「右键 → 属性 → 压缩以节省空间」的老办法不是一回事：老办法算法更弱，Win10 引入的 XPRESS 系列压缩率明显更高。默认算法是 XPRESS8K，Windows 自己默认用 XPRESS4K（更快但压得少），还能选 XPRESS16K 和 LZX，越往后压得越狠、解压也越慢，LZX 更适合存档和冷数据。\n几条边界必须先知道：它只能压文件或文件夹，压不了整块硬盘和整个系统盘，那件事要用命令行的 `compact /compactOS`；用 DirectStorage 的 Win11 游戏不要压，压缩文件送进 GPU 前要先解压，正好把 DirectStorage 的收益抵消掉；只有 Windows 版。\n附带功能挺实在：社区十万级提交攒出来的压缩率预估库（非 Steam 游戏用算法估算）、资源管理器右键菜单、后台监视文件夹在游戏更新后自动重新压缩。",
+    officialUrl: "https://github.com/IridiumIO/CompactGUI",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/IridiumIO/CompactGUI",
+      github: "https://github.com/IridiumIO/CompactGUI",
+    },
+    whoFor: "小容量 SSD 的玩家、装了一堆大型软件的人：几百 GB 的游戏库能压掉三到六成，换来不用再删游戏腾地方。",
+    whoNot: "玩 DirectStorage 游戏的人（压了反而更慢）；想压缩整个系统盘的（请用 compact /compactOS）；非 Windows 用户。",
+    installTips: [
+      "安装走 `winget install CompactGUI`，或到 releases 页下载压缩包；它是对文件夹操作的独立工具，不需要另装编译环境。",
+      "只对文件夹生效：选中游戏或程序的安装目录再压，整盘压缩不在它的能力范围，那要用命令行 `compact /compactOS`。",
+      "默认 XPRESS8K 是速度与体积的折中；硬盘实在吃紧可换 XPRESS16K 或 LZX，代价是读盘时解压更慢。",
+      "玩 DirectStorage 的游戏跳过；压之前先看预估压缩率，压完几乎不省空间的目录没必要动。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#4B5563",
+    },
+    guide: {
+      intro: "按第一次使用的顺序讲：它到底改了磁盘上的什么、算法怎么选、哪些目录不该碰，以及压完怎么回退。",
+      markdown: `## 先搞清它改了什么
+
+CompactGUI 不打包、不移动文件，只是给文件夹打上 NTFS 的透明压缩标记。程序照常从原路径启动，差别只在磁盘占用和读取时多一步内存解压。
+
+所以有个前提：**文件系统必须是 NTFS**。exFAT 的移动硬盘、FAT32 的 U 盘都不行，界面上会直接失败。
+
+## 算法怎么选
+
+打开界面选中目录后，会让你选压缩模式：
+
+- \`XPRESS4K\`：最快，压得最少，适合对读速度极敏感的游戏
+- \`XPRESS8K\`：工具默认值，速度与体积的平衡点
+- \`XPRESS16K\`：慢一些、压得更狠，适合空间紧张且不怎么在乎加载时间
+- \`LZX\`：最慢最强，适合存档、备份、冷数据
+
+选完它会先给一个预估压缩率。这个预估来自社区提交的实测库，Steam 游戏命中率高，非 Steam 游戏走算法估算，只是参考值。压完再点一次「分析」能看到真实结果。
+
+## 哪些目录不要压
+
+第一类是**用 DirectStorage 的游戏**，README 里专门写了警告：压缩数据在送进 GPU 前要先解开，等于把 DirectStorage 绕开 SSD、直读显存的意义抹掉。
+
+第二类是**频繁写入的目录**。压缩是给静态内容省空间的，一个每天都在被覆盖的目录只会反复解压再压缩，得不偿失。
+
+第三类是**系统盘整体**。它不是干这个的，整个系统盘的压缩要用 \`compact /compactOS\`。
+
+## 压完怎么回退
+
+在同一个界面里选中目录，选解压即可，文件会恢复成普通状态。不想手动管，可以开后台监视：它盯着你加过的目录，游戏更新后自动重新压一遍，省得每次大版本更新后空间又涨回去。
+
+最后提一句：压缩不替代备份。磁盘出错时压缩文件恢复难度更高，重要的存档目录别只靠省空间。`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目仓库与安装包",
+          url: "https://github.com/IridiumIO/CompactGUI",
+          note: "releases 页有各版本压缩包，README 里也写了 winget 安装命令；先看这里确认最新版本。",
+        },
+        {
+          kind: "link",
+          title: "社区压缩结果库",
+          url: "https://github.com/ImminentFate/CompactGUI/wiki/Community-Compression-Results",
+          note: "十万级用户实测的游戏压缩率清单，压之前查一下目标游戏能省多少，避免白忙。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "openttd",
+    linksCheckedAt: "2026-10-22",
+    name: "OpenTTD",
+    nameZh: "OpenTTD 运输大亨",
+    aliases: ["openttd", "运输大亨", "运输大亨豪华版", "运输模拟", "ttd"],
+    summary: "《运输大亨》的开源重写版，铁路信号、地图规模和多人联机都远超原版；免费但不含图形声音素材，第一次装必须自己配 OpenGFX，这是新手最常卡住的一步。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["模拟经营", "运输", "联机", "像素", "开源"],
+    body: "OpenTTD 是《运输大亨豪华版》（Transport Tycoon Deluxe）的开源重写，玩法是修铁路公路、排班次、算货运，把一家运输公司从蒸汽时代做到电气时代。它尽量贴近原版手感，同时把地图尺寸、载具数量、信号系统、多人联机都做了大幅扩展。\n和原版最实际的差别是它还活着：官方承诺每个新版本的存档都能读入旧存档（存档本身损坏除外），多人既合作也对抗，NewGRF 插件生态持续加新车新产业，还能挂 Steam / Discord 的社交集成插件。\n第一次装会卡在素材上。游戏本体不含图形和声音资源：部分平台的安装包会自动下载，部分平台要自己装 OpenGFX（图形）、OpenSFX（声音）、OpenMSX（音乐）三个免费素材包；想用原版画面，得把 TTD 光盘里的 trg1r.grf、sample.cat 等文件复制进 baseset/ 目录。\n代价说清楚：画面就是九十年代的像素风，信号与调度有真实学习曲线（官方 wiki 有玩法手册），联机时版本不一致会连不上。官网提供 stable 与 nightly 两条线，绝大多数人该选 stable；Windows、macOS、Linux 都有官方构建，Steam / GOG 上也能免费拿到。",
+    officialUrl: "https://www.openttd.org",
+    officialLabel: "www.openttd.org",
+    links: {
+      official: "https://www.openttd.org",
+      github: "https://github.com/OpenTTD/OpenTTD",
+    },
+    whoFor: "喜欢慢节奏模拟经营、愿意研究铁路信号的人；以及当年玩过运输大亨想重温的老玩家。",
+    whoNot: "想要即装即玩、不愿配素材和查 wiki 的人；对画面要求是当代 3D 的玩家。",
+    installTips: [
+      "官网下载 stable 版；nightly 有最新改动但可能不稳定，只适合愿意提 issue 的人。",
+      "首次启动若提示缺图形或声音，装 OpenGFX / OpenSFX / OpenMSX 三个素材包；Windows 安装器可以顺带勾选下载。",
+      "想用原版素材：把 TTD 的 trg1r.grf、trgcr.grf、trghr.grf、trgir.grf、trgtr.grf 和 sample.cat 复制到 baseset/ 目录。",
+      "装 mod 用主菜单的 Check Online Content，别手动往游戏目录里丢文件，手动装更复杂且容易版本错位。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#1E6B52",
+    },
+    guide: {
+      intro: "第一次装 OpenTTD 会连续卡三关：素材缺失、不知道怎么加 mod、以及看不明白的铁路信号。按顺序拆开讲。",
+      markdown: `## 第一关：装完进不去
+
+启动后如果只看到一片灰底或者直接报缺文件，是素材没装。OpenTTD 本体不含美术资源，先装三件套：
+
+- \`OpenGFX\`：图形
+- \`OpenSFX\`：音效
+- \`OpenMSX\`：音乐
+
+三者在官网 downloads 页都有独立安装包，各自的 readme 写了放置位置。Windows 的安装器会问要不要顺带下载，勾上最省事。
+
+想用 1995 年原版画面的话，把光盘里的 \`trg1r.grf\`、\`trgcr.grf\`、\`trghr.grf\`、\`trgir.grf\`、\`trgtr.grf\`、\`sample.cat\` 放进游戏目录下的 \`baseset/\`。DOS 版和 Windows 版的文件都能用。
+
+## 第二关：怎么加 mod
+
+主菜单里有一个 **Check Online Content** 按钮，点开就是内置的内容库，NewGRF（车、产业、地形）、AI、场景都能从这里搜和装，装完在游戏设置里启用。不要手动往目录里拷文件——官网明确说手动安装更麻烦，目录结构在 \`docs/directory_structure.md\` 里有说明，但没必要为此折腾。
+
+## 第三关：信号
+
+单线铁路只要信号灯两两相对，火车就能自动会让。真正让人放弃的是**路径信号**与**双线双向**：一条轨道上同时跑两个方向的列车，需要按区块切分并让信号指向一致，否则会死锁。官方 wiki 的 gameplay manual 有分步图例，比看视频快。
+
+前十分钟建议先开一局沙盒地图，只铺一条货运线，把「车站 → 装货 → 卸货 → 回程」跑通，再去碰信号。
+
+## 存档与版本
+
+官方保证新版能读所有旧存档，所以升级不用担心存档报废。联机时双方版本必须一致，服务器用什么版本，客户端就跟什么版本。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://www.openttd.org",
+          note: "stable 与 nightly 的下载入口，也列了 OpenGFX 等素材包的页面；装机第一步从这里开始。",
+        },
+        {
+          kind: "html",
+          title: "安装指南（wiki）",
+          url: "https://wiki.openttd.org/en/Manual/Installation",
+          note: "各平台素材放置位置与安装细节，README 缺图形文件时直接指向这一页。",
+        },
+        {
+          kind: "html",
+          title: "玩法手册（wiki）",
+          url: "https://wiki.openttd.org/",
+          note: "社区维护的玩法与信号教程，卡在铁路调度时查这里比看视频快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "photocraft",
+    linksCheckedAt: "2026-10-22",
+    name: "PhotoCraft",
+    nameZh: "PhotoCraft 图片编辑器",
+    aliases: ["photocraft", "photo craft", "photoshop 替代", "psd 编辑器", "rust 修图"],
+    summary: "用纯 Rust 从零写的 Photoshop 替代品，图层、蒙版、调整层、PSD 读写都在，本地离线跑；适合不愿订阅 Adobe 又要开 PSD 的人，代价是格式与功能边界还挺多。",
+    scenes: ["photo", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图像编辑", "PSD", "图层", "离线", "Rust"],
+    body: "PhotoCraft 是按 Photoshop 的工作模型重写的原生图片编辑器：图层、图层组、剪贴蒙版、像素与矢量蒙版、填充层、调整层、图层样式、智能对象与智能滤镜，一样是 67 个工具、16 种调整层、27 种 Photoshop 混合模式。快捷键也照着 PS 排（⌘J 复制图层、⇧⌘D 取消选区），会 PS 的人基本能盲操。\n它跟同类开源编辑器最大的差别在 PSD：官方说重存后渲染结果与原始文件一致的比例是 psd-tools 测试集 309 个文件里的 307 个。但要注意，重存并不是逐字节相同——它会重写图像资源、图层记录和合成图，所以拿它当「无损归档工具」是不对的，原始 PSD 该留备份。\n性能路线是 GPU 合成（wgpu，Metal / Vulkan / DX12 / WebGPU 后端）加多线程滤镜，大半径高斯模糊走 running-sum，官方给的例子是 3.6MP 图上半径 180 的高斯一秒内出结果。所有操作都是一条命令，同一引擎能从 UI、CLI、JSON 控制通道或 MCP server 驱动，适合做批量。\n代价写在明处：AVIF 只能写不能读，JPEG XL 完全不支持，HEIC 只读，Affinity 文档只读且不支持的调整会列警告；CMYK / Lab 与 8/16/32 位虽然有，但复杂文档的兼容性仍要以实测为准。",
+    officialUrl: "https://getartcraft.com/apps/photocraft",
+    officialLabel: "getartcraft.com",
+    links: {
+      official: "https://getartcraft.com/apps/photocraft",
+      github: "https://github.com/storytold/photocraft",
+    },
+    whoFor: "被订阅制劝退、又必须打开客户 PSD 的人；愿意接受功能边界、主要做图层合成与调色的自由设计师。",
+    whoNot: "重度依赖 JPEG XL / AVIF 读取、或需要 Affinity 导出的人；把 PSD 当唯一存档、要求逐字节一致的人。",
+    installTips: [
+      "界面按 Photoshop 的键位排布，⌘J 复制图层、⇧⌘D 取消选区都能直接用，迁移成本主要在面板位置。",
+      "所有操作都是命令，批量或无头处理走 CLI / JSON 控制通道，不必开着 GUI 点。",
+      "重存 PSD 会重写图像资源与图层记录，渲染一致但不是字节一致；原始文件务必留备份。",
+      "用前先核对格式支持：JPEG XL 不支持、AVIF 只能写、HEIC 与 Affinity 文档只读。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#7C3AED",
+    },
+    guide: {
+      intro: "从「能不能替代 PS」这个真问题切进去：先讲它强在哪、第一次用会在哪几处踩到格式边界，再讲 PSD 与批量的正确用法。",
+      markdown: `## 先判断适不适合
+
+打开它之前先问一句：你的工作流里有没有 JPEG XL、AVIF 读入，或者要给客户导 Affinity 文件？如果有，它现在就帮不上忙——README 写得很直白：AVIF 只能写不能读，JPEG XL 不可用，Affinity 只能导入不能导出。
+
+反过来，如果你的活是「开 PSD、改图层、调色、出 PNG」，它基本能接住。
+
+## 第一次打开会看到什么
+
+左侧工具栏、右侧图层面板、顶部菜单，位置和 PS 接近。几个容易找不到的地方：
+
+- **调整层在图层面板底部的半黑半白圆点**里，不是在菜单里新建
+- **选区转蒙版**：选区建好后点图层面板的蒙版按钮，而不是右键
+- **滤镜预览是实时的**，拖动参数时画布直接变，点确定才落到像素上
+
+## PSD 该怎么用
+
+可以开、可以改、可以存，图层和样式都会带过去。但要记住它的承诺范围：
+
+> 重存后的**渲染结果**一致，文件本身不是原样。
+
+它会重写图像资源、图层记录和合成图。所以正确的做法是：原始 PSD 单独归档，PhotoCraft 存出来的是「工作副本」。做交付时导出 PNG / TIFF，别把重存的 PSD 当作唯一母版。
+
+另外它导入时会把不认识的块（raw blocks、descriptors）原样带过去而不是丢掉，这点对兼容性友好。
+
+## 批量怎么跑
+
+每个动作都是一条命令，所以同一套引擎能被 CLI、JSON 控制通道或 MCP server 驱动。要处理一批图，不必开界面重复点，直接写命令序列调同一套滤镜和导出参数，输出与手工操作一致。
+
+这也是它区别于多数开源修图软件的地方：它把「可编程」当一等公民，而不是事后加个批处理。`,
+      resources: [
+        {
+          kind: "html",
+          title: "PhotoCraft 官方页面",
+          url: "https://getartcraft.com/apps/photocraft",
+          note: "下载入口与平台支持情况以这里为准，README 只给了产品介绍。",
+        },
+        {
+          kind: "link",
+          title: "ArtCraft 官网",
+          url: "https://getartcraft.com/",
+          note: "同系列应用的总入口，判断这套工具的整体方向与更新节奏看这里。",
+        },
+        {
+          kind: "link",
+          title: "源码与 issue",
+          url: "https://github.com/storytold/photocraft",
+          note: "格式支持的实现细节与已知问题都在仓库里，报 bug 附 PSD 更容易被处理。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "vue-fabric-editor",
+    linksCheckedAt: "2026-10-22",
+    name: "vue-fabric-editor",
+    nameZh: "快图设计 图片编辑器",
+    aliases: ["vue-fabric-editor", "快图设计", "kuaitu", "fabric.js 编辑器", "海报编辑器"],
+    summary: "基于 fabric.js + Vue 的网页图片编辑器，PSD 解析、图层、模板、右键菜单都齐，适合嵌进自己产品做海报和商品图；开源版只有前端，后端与批量出图要另买。",
+    scenes: ["design", "photo"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图片编辑", "fabric.js", "Vue", "海报设计", "插件化"],
+    body: "快图设计是一个跑在浏览器里的图片编辑器，底座是 fabric.js，外层用 Vue 封装，定位是「轻量、简洁的图形编辑器」而不是在线版 PS。已有能力覆盖了做海报、商品图、公众号头图这类活：导入 JSON 与 PSD、导出 PNG / SVG / JSON、图层与组合、渐变、字体与描边阴影、辅助线与标尺、二维码条码、水印、裁剪与滤镜、中英文国际化。\n它真正的卖点是插件化架构：右键菜单、快捷键、素材、字体、模板都能按插件扩展，作者把「编辑器与 fabric.js 之间的封装层」当成主要产出，希望别人拿它当二次开发的起点，而不是一个只能用的成品。\n代价有两层。第一层是它只开源了前端：完整的前后端、管理后台、批量出图、H5 版本都在付费版里，想直接拿去做业务系统得自己补后端。第二层是环境绑得死：必须 Node 18–20 配 pnpm 8.4.0，README 明确说高版本 pnpm 会导致依赖不一致、页面运行报错。\n适合谁很清楚：会 Vue、要做自有设计器的团队。不适合想装个软件就用的人——它是代码库，不是桌面应用。",
+    officialUrl: "https://ikuaitu.github.io/doc/#",
+    officialLabel: "ikuaitu.github.io",
+    links: {
+      official: "https://ikuaitu.github.io/doc/#",
+      github: "https://github.com/ikuaitu/vue-fabric-editor",
+    },
+    whoFor: "需要把图片编辑器嵌进自家后台/商城的团队；想学 fabric.js 怎么封装成编辑器的前端开发者。",
+    whoNot: "只想找个能用的在线修图工具的人；不愿维护 Node 环境、又不打算买商业版的团队。",
+    installTips: [
+      "先把 Node 锁在 18–20、pnpm 锁在 8.4.0，版本不对会直接出现依赖错乱、页面跑不起来。",
+      "装依赖用 `pnpm i`，起服务用 `pnpm dev`；国内网络可给 pnpm 加淘宝源，但版本号别跟着升。",
+      "开源仓库只有前端，导入导出、批量、后台这些要自己对接，或评估付费版。",
+      "扩展功能优先看插件机制（右键菜单、快捷键、素材、模板），别直接改核心代码。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "V",
+      color: "#10B981",
+    },
+    guide: {
+      intro: "它不是一个装好就能用的软件，而是一个要跑起来改的前端工程。讲清跑起来的三个坑、能改哪里、以及哪些能力其实在付费版里。",
+      markdown: `## 跑起来的三个坑
+
+第一个是版本。README 点名要求 node.js 18–20 与 pnpm 8.4.0，并且加了一句「必须使用 pnpm 8.x，高版本会导致依赖不一致、页面运行报错」。这不是客套话，先按这个锁版本再谈别的。
+
+\`\`\`bash
+npm install -g pnpm@8.4.0
+pnpm i
+pnpm dev
+\`\`\`
+
+国内拉包慢可以加镜像：\`npm install -g pnpm@8.4.0 --registry=https://registry.npmmirror.com\`。
+
+第二个是 PSD。它能导入 PSD，但这是「解析图层后重建」，不是像素级还原——字体缺字、特殊混合模式、智能对象都可能变样。给客户交付前先拿真实文件试一遍。
+
+第三个是坐标与导出。画布尺寸、DPI、导出倍率是三个独立概念，做商品图打印时按 300DPI 算尺寸，别拿屏幕像素直接导。
+
+## 能改哪里
+
+项目是插件化结构，扩展点集中在几处：右键菜单、快捷键、素材面板、字体列表、模板。这些都是插件形式挂进去的，优先在这里加，而不是改核心渲染逻辑——核心一改，fabric.js 升级就会打架。
+
+## 哪些能力不在开源版
+
+README 写得很清楚：开源版本只含前端代码。完整前后端、管理后台、批量生成（HTTP 接口、表格批量出图）、PC 与 H5 双端适配，都在商业版里。
+
+所以选型时先算清楚：你要的是一个可嵌入的编辑器内核（开源够用），还是一套开箱即用的设计 SaaS（得买或自研后端）。
+
+## 学习路径
+
+作者把 fabric.js 的开发笔记整理在博客里，从「怎么用 fabric 快速做编辑器」到「插件化架构」都有。想基于它二次开发，先读这几篇比直接读源码快。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线演示",
+          url: "https://ikuaitu.github.io/vue-fabric-editor/",
+          note: "先点一遍看功能边界：它偏轻量图形编辑，不是在线 PS。",
+        },
+        {
+          kind: "html",
+          title: "开发文档",
+          url: "https://ikuaitu.github.io/doc/#",
+          note: "插件机制、目录结构与二次开发的入口，README 把文档地址固定指向这里。",
+        },
+        {
+          kind: "html",
+          title: "商业版介绍",
+          url: "https://pro.kuaitu.cc/",
+          note: "对比开源版缺的后端、后台与批量能力，决定是自研还是采购前必看。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "jspaint",
+    linksCheckedAt: "2026-10-22",
+    name: "JS Paint",
+    nameZh: "JS Paint 网页版画图",
+    aliases: ["jspaint", "js paint", "网页画图", "在线画图", "ms paint"],
+    summary: "把 Windows 95/XP 的画图搬进浏览器，工具和菜单逐项复刻，还加了无限撤销、透明图和主题；适合怀旧与轻量像素图，做正经修图会嫌它太简陋。",
+    scenes: ["photo", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["画图", "像素图", "网页应用", "怀旧", "开源"],
+    body: "JS Paint 是把 MS Paint 搬到浏览器里的复刻项目，目标是「每个工具、每个菜单都对得上」，连冷门功能也补了。它明确说自己复刻的是 Win95/98/XP 那三代——不是带 Ribbon 的 Win7 版，也不是 Paint 3D。\n在还原之外它补了老画图真正缺的东西：无限撤销与重做（XP 只有 3 步、Win7 只有 50 步），而且撤销历史是树状的——撤销后再画一笔不会把后面的重做丢掉，而是开新分支，可以用 Edit > History 跳到任意节点；能直接编辑透明图（Image > Attributes 选 Transparent，再 Clear Image）；能把编辑历史导成动图 GIF（Ctrl+Shift+G）；支持多套主题、Dwell Clicker（悬停点击）、头控与语音识别这类无障碍功能。\n代价也很直白。它是像素编辑器，没有图层、没有蒙版、没有 RAW，JPEG 存出来会有伪影，官方建议存 PNG。剪贴板完整支持依赖 Chrome 76+ 那一代 Async Clipboard API，其他浏览器里从 JS Paint 复制的内容只能粘回 JS Paint。多用户协作只是雏形，会话不私密、可能丢稿，官方自己建议别指望它。自动备份每张图只有一份。\n当工具用它是合格的：打开网页就能画，手机上也支持双指缩放。当生产力软件它不够格。",
+    officialUrl: "https://jspaint.app/about",
+    officialLabel: "jspaint.app",
+    links: {
+      official: "https://jspaint.app/about",
+      github: "https://github.com/1j01/jspaint",
+    },
+    whoFor: "想找个零安装、打开就能涂两笔的人；教小孩用电脑画图、或需要无障碍输入（眼控/头控）的场景。",
+    whoNot: "需要图层、蒙版、批量处理的修图工作；要求剪贴板跨软件互通、或多人同时编辑同一张图的人。",
+    installTips: [
+      "打开 jspaint.app 就能用，不需要安装；也可以本地起仓库自己部署一份。",
+      "存图优先 PNG：README 明确提示存 JPEG 会产生伪影，影响油漆桶和透明选区。",
+      "要透明背景：Image > Attributes 选 Transparent，再 Image > Clear Image。",
+      "协作会话不私密、可能丢稿，别拿它传敏感图片或当正式协作工具。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "J",
+      color: "#F59E0B",
+    },
+    guide: {
+      intro: "第一次用最困惑的是三件事：透明图怎么开、撤销为什么能跳回去、以及为什么粘贴跨不到别的软件。逐个说明，再给几条省事的快捷键。",
+      markdown: `## 透明图不是默认开的
+
+老画图默认白底，直接擦只会擦成白色。要真透明：
+
+1. \`Image > Attributes...\`
+2. 选中 \`Transparent\`
+3. 点 OK
+4. \`Image > Clear Image\` 或直接用橡皮
+
+打开一张本身带半透明像素的图，它会自动进透明模式。
+
+## 撤销是一棵树，不是一条线
+
+多数软件里撤销后再画一笔，后面的重做就没了。JS Paint 会开一个分支，旧分支还在。用 \`Edit > History\`（Ctrl+Shift+Y）能看到整棵树并跳回任意节点。
+
+这条设计意味着：**你可以放心大胆地试**，试坏了跳回去，不必先另存。历史节点多时图会变大，记得正常保存。
+
+## 几个能省事的操作
+
+- \`Ctrl\` + 拖选区 = 直接裁剪
+- \`Ctrl+.\` / \`Ctrl+,\` = 旋转 90°
+- \`Alt\` + 滚轮 = 缩放
+- 油漆桶按住 \`Shift\` = 全图替换同色（非连续填充）
+- \`Ctrl+Shift+G\` = 把编辑过程导成 GIF 动图
+
+## 剪贴板为什么会「粘不出去」
+
+浏览器要读写图片剪贴板，需要 Async Clipboard API w/ Images 支持，写文档时是 Chrome 76+。不支持的浏览器里，Ctrl+C 出来的东西只有 JS Paint 自己能识别。
+
+跨软件传图的替代方案：用 \`File > Save\` 存到本地再拖进别的软件；或 \`File > Load From URL\` 反向把网图拉进来。
+
+## 别忘了备份只有一份
+
+它会自动给当前图留一份本地备份，但一份就是一份。长时间画的东西请手动 \`Ctrl+S\`，并定期另存。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线使用",
+          url: "https://jspaint.app",
+          note: "直接开就能画，无需注册；想先试手感从这一页进。",
+        },
+        {
+          kind: "html",
+          title: "项目介绍",
+          url: "https://jspaint.app/about",
+          note: "官方对功能范围与复刻目标的说明，用来判断它是不是你要的那版画图。",
+        },
+        {
+          kind: "link",
+          title: "源码仓库",
+          url: "https://github.com/1j01/jspaint",
+          note: "想自建、改主题或看未完成功能清单（TODO.md）时从这里进。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "esearch",
+    linksCheckedAt: "2026-10-22",
+    name: "eSearch",
+    nameZh: "eSearch 截屏 OCR 工具",
+    aliases: ["esearch", "e-search", "截屏 ocr", "屏幕搜索", "截图翻译"],
+    summary: "截屏、离线 OCR、翻译、贴图、录屏塞进一个托盘工具，框选后回车就能识字翻译；适合常截屏查资料的人，代价是 Electron 体积大、模型要另外下。",
+    scenes: ["tools", "photo", "office"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["截屏", "OCR", "翻译", "贴图", "录屏"],
+    body: "eSearch 想解决的是手机上的「大爆炸 / 传送门」在电脑上没有对应物：随手框一块屏幕，立刻能取字、翻译、搜图。它常驻托盘，默认 Alt+C 唤出，框选完可以配置成自动 OCR，回车出文字。\n能力堆得很满：截屏带取色器、画笔、几何、马赛克、模糊，框选尺寸支持直接输四则运算；滚动截屏能横向竖向任意方向拼接；贴图窗口可缩放、调透明度、鼠标穿透；离线 OCR 基于 PaddleOCR 的 eSearch-OCR，支持竖排、旋转、段落，更多语种与生僻字要另下模型；翻译可接免费引擎，也能填 DeepL、百度或本地 AI 的 API，支持多引擎同时译；此外还有以图搜图、屏幕翻译（定时替换画面文字，适合看视频和游戏）、录屏与「超级录屏」（自动聚焦鼠标位置）、二维码识别。\n代价来自技术选型，作者自己写进了 FAQ：Electron 打包体积大，因为里面塞了 onnx 运行库、离线识别模型、人像识别模型、物体移除模型和 FFmpeg；Win7/Win8 不再支持；Gnome 要自己装 appindicator 扩展才有托盘；macOS 首次打开可能提示文件损坏。\n一句话：功能密度换体积和配置成本，愿意折腾就很好用。",
+    officialUrl: "https://esearch-app.netlify.app",
+    officialLabel: "esearch-app.netlify.app",
+    links: {
+      official: "https://esearch-app.netlify.app",
+      github: "https://github.com/xushengfeng/eSearch",
+    },
+    whoFor: "经常从截图里抠字、查外文、做笔记的人；在 Linux 上找不到顺手截图+OCR 组合的用户。",
+    whoNot: "只有一台低配机器、在意安装包体积的人；还在 Win7/Win8 上的人（官方已不支持）。",
+    installTips: [
+      "官网下载页或 GitHub releases 选对应系统的包；Windows 也能 `winget install esearch`，Arch 用户装 AUR 的 `e-search`。",
+      "默认快捷键是 Alt+C，可在设置里改；程序启动后只在托盘，没有主窗口。",
+      "离线 OCR 开箱可用，但生僻字、竖排与更多语种要在设置里另外下载 v5 模型。",
+      "Windows 安装后可能提示补截屏依赖库，按提示去微软官网装完再重启；Gnome 要先装 appindicator 扩展。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "E",
+      color: "#0EA5E9",
+    },
+    guide: {
+      intro: "照着第一次使用的顺序走：怎么唤出、OCR 与翻译怎么接、以及 FAQ 里那几个必踩的坑。",
+      markdown: `## 唤出与基本流程
+
+装完它不会弹主窗口，只在托盘里。按 \`Alt+C\` 进入截图，框选区域后：
+
+- 直接回车 = 走你配置的默认动作（常见是 OCR）
+- 也可以先框选再看工具条：取色器、画笔、几何、马赛克、模糊都在上面
+
+框选尺寸支持直接输算式，比如想精确到某个比例，不用一格一格拖。
+
+想要「框完就自动 OCR」，在设置里把框选后的默认动作改掉，这是这个工具最省事的一步。
+
+## OCR 与翻译
+
+离线 OCR 用的是 PaddleOCR 的打包版，中文英文开箱可用，按下回车就出字。要认生僻字、竖排文本、或者中文以外的语种，得进设置下载 v5 模型——这是首次使用最常见的「怎么识别不准」的原因。
+
+识别完可以直接调翻译。翻译引擎可选免费的（谷歌等），也能填 DeepL、百度这类需要 key 的 API，甚至指向本地模型。支持多个引擎同时出结果挑最好的。译文可以存到本地文件，也能通过接口推到 Anki 这类记忆软件。
+
+## 贴图与屏幕翻译
+
+贴图是把一块截图钉在屏幕上，可缩放、调透明度、设鼠标穿透——对照着抄东西时比来回切窗口快。屏幕翻译是它的进阶用法：生成一个贴图窗口，把画面里的文字替换成译文，还能设成定时刷新，看视频和玩外文游戏时有用。
+
+## FAQ 里那几条坑
+
+1. **Win7/Win8 用不了**：Electron 官方已停止支持，只能自己编译，且部分功能会缺。
+2. **Windows 提示装依赖库**：截屏库需要，按提示装完可能要重启。
+3. **Gnome 点了没反应**：装 appindicator 扩展，否则没有托盘图标。
+4. **安装包为什么这么大**：onnx、离线模型、FFmpeg 都在里面，这是功能密度的代价。
+5. **升级后报旧错误**：配置不兼容，去「设置 → 高级 → 高级设置」恢复默认。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://esearch-app.netlify.app",
+          note: "各平台安装包与下载镜像入口，README 首选这里而不是 releases 页。",
+        },
+        {
+          kind: "html",
+          title: "使用文档",
+          url: "https://github.com/xushengfeng/eSearch/blob/master/docs/use/start.md",
+          note: "功能逐项说明与设置项解释，比 README 详细，上手前翻一遍能少走弯路。",
+        },
+        {
+          kind: "html",
+          title: "常见问题",
+          url: "https://github.com/xushengfeng/eSearch/blob/master/docs/use/qa.md",
+          note: "托盘不显示、识别不准、升级报错这类问题的官方答案都在这页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "lychee",
+    linksCheckedAt: "2026-10-22",
+    name: "Lychee",
+    nameZh: "Lychee 自托管相册",
+    aliases: ["lychee", "lycheeorg", "自托管相册", "php 相册", "照片管理系统"],
+    summary: "PHP 写的自托管相册，装完就是能上传、整理、分享照片的网站，Docker 一条 compose 起；适合有服务器想自己管照片的人，只想手机自动备份的普通用户会觉得折腾。",
+    scenes: ["photo"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["相册", "自托管", "照片管理", "Docker", "PHP"],
+    body: "Lychee 是一个跑在自己服务器或虚拟主机上的照片管理网站：把照片传上去，按相册组织，生成缩略图，再通过链接分享出去，用起来像本地相册应用，但数据在自己手里。它要求 PHP 8.4 或 8.5 加 MySQL / MariaDB，Redis 可选。\n它的定位是「照片库站点」，不是手机备份服务——重点在浏览、组织与分享，而不是自动把手机相册同步上来。免费版功能已经齐，官方另有一个 Supporter Edition 卖增值能力，README 只给了入口没有列清单。\n部署路径很清楚：想先试试就用官方给的 minimal compose，一条 curl 拉下来 `docker compose up -d`，开 localhost:8000 就能用，里面已经带了独立的 worker 容器跑后台任务；正式用则用完整 compose，自己补数据库密码和 APP_KEY。升级到 7.0 时 Docker 镜像结构变了，官方要求先读升级指南再动。\n代价集中在运维：要自己管 PHP 版本、数据库、上传目录的卷映射和日志；没有服务器的人不必考虑。它也不是「装完就自动整理」的智能相册，人脸、地点这些自动归类不在 README 承诺范围内。",
+    officialUrl: "https://lycheeorg.dev",
+    officialLabel: "lycheeorg.dev",
+    links: {
+      official: "https://lycheeorg.dev",
+      github: "https://github.com/LycheeOrg/Lychee",
+    },
+    whoFor: "有 VPS 或 NAS、想给家人朋友开一个自己控制的相册站点的人；需要把照片按相册分享链接出去的摄影爱好者。",
+    whoNot: "只想手机拍完自动备份、不想碰数据库和 Docker 的人；没有 PHP 运行环境又不打算学的用户。",
+    installTips: [
+      "先试：`curl -O` 拉官方 docker-compose.minimal.yaml，`docker compose up -d`，浏览器开 localhost:8000。",
+      "正式部署用完整 compose，记得自己生成 APP_KEY：`echo \"base64:$(openssl rand -base64 32)\"` 填进环境变量。",
+      "上传目录、日志、临时目录要挂卷，否则重建容器照片就没了。",
+      "从旧版本升级到 7.0 前先读官方 upgrade 指南，Docker 镜像有结构性变化。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#E11D48",
+    },
+    guide: {
+      intro: "第一次部署最常卡在三处：APP_KEY 没填、上传目录没挂卷、以及升级 7.0 时镜像变了。按顺序讲清。",
+      markdown: `## 先跑起来看看
+
+不想先配数据库，用官方的最小 compose：
+
+\`\`\`bash
+curl -O https://raw.githubusercontent.com/LycheeOrg/Lychee/master/docker-compose.minimal.yaml
+docker compose -f docker-compose.minimal.yaml up -d
+\`\`\`
+
+打开 \`http://localhost:8000\` 就能进。这个模板里除了应用还有一个 worker 容器，负责后台任务（缩略图之类），两个都要起来。
+
+## 正式部署最容易漏的三件事
+
+**一、APP_KEY。** 不填的话应用起不来或会话异常。生成方式官方写在注释里：
+
+\`\`\`bash
+echo "base64:$(openssl rand -base64 32)"
+\`\`\`
+
+把结果整串（含 \`base64:\` 前缀）填进 \`APP_KEY\`。
+
+**二、卷。** 至少三个目录要挂出来：uploads（照片）、logs（日志）、tmp（临时文件）。只在容器里存，重建容器等于清库。
+
+**三、数据库健康检查。** 完整 compose 里应用依赖 \`lychee_db\` 的 healthcheck，MariaDB 起得慢，删掉这段会偶发启动失败。
+
+## 升级 7.0 的坑
+
+README 用了一个单独的警告块：7.0 对 Docker 镜像做了较大改动，必须先读升级指南再升。跨大版本直接替换镜像容易因为目录结构变化丢配置。稳妥做法是先备份 uploads 与数据库，再按指南一步步来。
+
+## 它不做什么
+
+别指望它自动把手机照片同步上来——它不是那个定位。它做的是「你把照片放进去，它帮你组织与分享」。要手机自动备份，得另找工具。
+
+另外注意 Supporter Edition 是另一种授权形态，README 只给了介绍入口，功能差异要自己去官网核对。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与文档",
+          url: "https://lycheeorg.dev/docs/",
+          note: "安装、配置、升级的完整文档，README 里所有细节问题都指向这里。",
+        },
+        {
+          kind: "html",
+          title: "升级指南",
+          url: "https://lycheeorg.dev/docs/administration/upgrade/",
+          note: "7.0 改了 Docker 镜像结构，跨版本升级前必须看这一页。",
+        },
+        {
+          kind: "link",
+          title: "容器镜像",
+          url: "https://github.com/LycheeOrg/Lychee/pkgs/container/lychee",
+          note: "latest 与 edge 两个标签的来源，确认拉的是稳定版还是开发版。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pinta",
+    linksCheckedAt: "2026-10-22",
+    name: "Pinta",
+    nameZh: "Pinta 简易画图",
+    aliases: ["pinta", "pinta paint", "gtk 画图", "paint.net 替代", "轻量修图"],
+    summary: "Paint.NET 3.0 的 GTK 克隆，图层和基础修图够用、启动快、三平台都有；适合 Linux 上想要「比画图强、比 GIMP 轻」的人，代价是功能停在 Paint.NET 3.x 那一代。",
+    scenes: ["photo", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["绘图", "图像编辑", "GTK", "轻量", "开源"],
+    body: "Pinta 的自我定位非常直接：Paint.NET 3.0 的 GTK 克隆，支持 Linux、Windows、macOS。也就是说不追求大而全，只要「图层 + 选区 + 基础调整 + 画刷」这一层，把启动速度和界面简洁放在前面。\n技术栈是 C# 配 GTK4 与 libadwaita，所以依赖比较硬：源码构建要 .NET 10，Linux 上要 gtk ≥ 4.18、libadwaita ≥ 1.8，macOS 还要装 libadwaita、adwaita-icon-theme、gettext 与 webp-pixbuf-loader，Apple Silicon 得手动设 DYLD_LIBRARY_PATH 才能加载到 GTK 库。这也是它在旧发行版上装不上的主要原因。\n实际使用建议走 Flatpak 或 Snap，两个官方徽章都挂在 README 顶部，比自己编依赖省事得多。\n代价讲清楚：功能集对齐的是 2000 年代末的 Paint.NET 3.x，没有内容感知填充、没有 AI 抠图、没有 RAW。做图标、截图标注、简单合成很顺；要做摄影后期或复杂合成，还是得回 GIMP / Krita / darktable。许可证 MIT，代码干净，也适合拿来读。",
+    officialUrl: "https://github.com/PintaProject/Pinta",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/PintaProject/Pinta",
+      github: "https://github.com/PintaProject/Pinta",
+    },
+    whoFor: "Linux 桌面用户想找个开箱即用、启动快的轻量绘图/修图工具；只需要图层、选区、裁剪、调色的日常任务。",
+    whoNot: "要 RAW 显影、内容感知填充、批量处理的摄影后期；以及发行版太旧、GTK 版本凑不齐又不愿用 Flatpak 的人。",
+    installTips: [
+      "优先装 Flatpak 或 Snap 版，README 顶部就挂着这两个渠道的徽章，省掉自己配 GTK 依赖。",
+      "源码构建要 .NET 10 加 GTK4 / libadwaita；Linux 最低 gtk 4.18、libadwaita 1.8，达不到就换 Flatpak。",
+      "macOS 上 Apple Silicon 需要 `export DYLD_LIBRARY_PATH=/opt/homebrew/lib`，Intel 用 `/usr/local/lib`，否则启动找不到 GTK。",
+      "跑起来调试用 `dotnet run --project Pinta`，正式安装走 `./autogen.sh && make install`（tarball 里用 ./configure）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#64748B",
+    },
+    guide: {
+      intro: "它简单，但装的时候容易卡在 GTK 版本上。这页讲清三条安装路径，以及第一次画图要知道的几个操作差异。",
+      markdown: `## 三条安装路径，按难度排
+
+**最省事：Flatpak。** 装上 Flatpak 后从 Flathub 装，GTK 依赖由运行时提供，不受发行版版本限制。
+
+**次选：Snap。** 同理，适合 Ubuntu 系。
+
+**最麻烦：源码。** 先把依赖凑齐：
+
+\`\`\`bash
+sudo apt install autotools-dev autoconf-archive gettext intltool libadwaita-1-dev
+\`\`\`
+
+再加 .NET 10。最低库版本是 gtk 4.18 和 libadwaita 1.8——Ubuntu 22.04 这类老发行版达不到，硬编会失败。
+
+Windows 构建要先装 MSYS2，在 CLANG64 终端里装 libadwaita 与 webp-pixbuf-loader，然后用 Visual Studio 打开 Pinta.sln，或者命令行 \`dotnet build\`。
+
+## macOS 那个必设的环境变量
+
+Apple Silicon 上不设 \`DYLD_LIBRARY_PATH=/opt/homebrew/lib\`，程序启动会找不到 GTK 的 dylib，表现是闪退或报库缺失。Intel 机器改成 \`/usr/local/lib\`。这个坑在读 README 时很容易被跳过。
+
+## 第一次用会注意到的差异
+
+- 它没有「一键抠图」，选区靠矩形、椭圆、套索和魔棒
+- 调整（亮度、对比度、曲线）是**作用在图层上的**，不是调整层，改完就落到像素，想反悔靠撤销
+- 图层混合模式和 Paint.NET 一致，从 PS 迁过来会少几种
+- 保存格式以 PNG 为主，存 JPEG 前先确认没有透明区域
+
+## 什么时候该换工具
+
+需求一旦出现「按颜色选区后局部调色」「批量缩图加水印」「打开 CR2/NEF」，就别在这上面硬撑了。它擅长的是一次性、小规模的图，不是流程化的活。`,
+      resources: [
+        {
+          kind: "link",
+          title: "源码与发布",
+          url: "https://github.com/PintaProject/Pinta",
+          note: "官网只提供 http 地址，安装包与最新版本以仓库的 releases 为准。",
+        },
+        {
+          kind: "html",
+          title: "Flatpak 安装页",
+          url: "https://flathub.org/apps/com.github.PintaProject.Pinta",
+          note: "最省事的安装方式，依赖由运行时提供，不受发行版 GTK 版本限制。",
+        },
+        {
+          kind: "link",
+          title: "更新日志",
+          url: "https://github.com/PintaProject/Pinta/blob/master/CHANGELOG.md",
+          note: "看每个版本加了什么，判断你想要的功能到底有没有。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "lap",
+    linksCheckedAt: "2026-10-22",
+    name: "Lap",
+    nameZh: "Lap 本地照片管理",
+    aliases: ["lap", "lap photo", "本地相册管理", "离线照片管理", "照片查重"],
+    summary: "离线优先的桌面照片管理器，直接读你现有文件夹不做导入，本地 AI 搜索与人脸在十万张量级也能用；代价是标签评分只存在它自己的库里，换软件就没了。",
+    scenes: ["photo"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["照片管理", "本地优先", "人脸识别", "查重", "离线"],
+    body: "Lap 是一个本地优先的桌面照片管理器，面向家庭相册和大量个人媒体库：不强制导入、不要求云账号，直接指向你已有的照片文件夹，它只建索引。技术栈是 Tauri + Rust，前端 Vue + Vite，数据落在 SQLite，AI 部分走 ONNX Runtime，用 CLIP 做图文相似、InsightFace 做人脸。\n功能面铺得很开：按日期/文件夹/地点/相机/镜头/标签/评分/人脸浏览，Smart Albums 存规则视图，重复照片清理带可回收空间统计，四图对比挑片，内置基础编辑（裁剪、任意角度摆正、旋转、缩放、基础调整），还能拼图；支持 Apple Live Photo 与 Google Motion Photo、RAW+JPEG/HEIC 成对显示、60 多种格式、地图视图，以及离线时用缓存缩略图浏览网络盘上的相册。\n最该先读懂的是它的元数据边界：Collections、Tags、Comments、Favorites、Ratings、挑片状态、Smart Album 规则、AI 索引，这些**只存在 Lap 自己的数据库里**，不写进 EXIF/IPTC/XMP 边车。也就是说你在 Lap 里给照片打的星、写的标签，拷走文件就带不走，别的软件也读不到。要在 Lap 之外改文件名或移动文件，还可能让它已有的组织关系错位。\n代价还包括平台细节：Windows 安装包未签名，SmartScreen 会拦；Linux 播视频依赖系统的 GStreamer 插件；这些都要各自处理。",
+    officialUrl: "https://julyx10.github.io/lap",
+    officialLabel: "julyx10.github.io",
+    links: {
+      official: "https://julyx10.github.io/lap",
+      github: "https://github.com/julyx10/lap",
+    },
+    whoFor: "有十万张量级本地照片、被 Lightroom 目录锁死过、想找一个不做导入的浏览与整理工具的人。",
+    whoNot: "希望标签评分跟着文件走、换软件也能带走的人；只用手机拍照、不打算整理的人。",
+    installTips: [
+      "从 releases 页按平台下包：mac 是 dmg（已公证），Linux 是 deb 或 AppImage，Windows 是 msi。",
+      "macOS 可以用 Homebrew：`brew tap julyx10/lap` 再 `brew install --cask lap`。",
+      "Windows 包未签名，SmartScreen 拦截时点 Keep anyway；Linux 播不了视频先装 `gstreamer1.0-libav` 与 `gstreamer1.0-plugins-good`。",
+      "数据库默认在用户目录，要用就把它和照片一起备份；设置 → Storage 里能改位置并做备份。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#0F766E",
+    },
+    guide: {
+      intro: "第一次用 Lap 最大的风险不是操作，而是误会它把标签写进了照片。先讲清数据归属，再讲导入与备份。",
+      markdown: `## 先分清两类数据
+
+**跟着文件走的**：EXIF 里的拍摄时间、相机、镜头、GPS、方向。这些是文件自带的，Lap 只是读出来。
+
+**只存在 Lap 库里的**：收藏、标签、评论、评分、挑片状态（Picks / Rejects）、Smart Album 规则、AI 索引与人脸数据、缩略图缓存。
+
+第二类不会写进 EXIF / IPTC / XMP 边车。结论很直接：**你要靠这些组织照片，就必须在 Lap 里改文件名和移动文件**，并且把数据库和照片一起备份。
+
+反过来，删掉 Lap 的数据库不会删你的原图，只是丢掉这些组织信息。
+
+## 第一次打开
+
+1. 新建一个 Library，指向已有照片文件夹——不会搬动文件
+2. 等它建索引：十万张级别会跑一阵，AI 索引更慢
+3. 想看搜索结果前，先在设置里确认模型已就绪
+
+## 备份怎么做
+
+去 **Settings → Storage** 看数据库位置，可以做备份。整库迁移的顺序是：先退出 Lap，再把照片文件夹和数据库一起拷走，最后在新机器上重新指向。
+
+只备份照片、不备份数据库，会得到一堆没有标签评分的原始文件。
+
+## 平台小坑
+
+- **Windows**：安装包未签名。SmartScreen 提示时点「仍要保留」，这是预期行为。
+- **Linux**：视频播放走系统 GStreamer，Ubuntu / Debian / Mint 上装 \`gstreamer1.0-libav\` 和 \`gstreamer1.0-plugins-good\`。
+- **卸载**：卸载程序不会删原图，但会留下数据库；要彻底清干净得手动删配置目录，README 给了三平台的命令。
+
+## 它不适合谁
+
+如果你要的是「标签写进文件、任何软件都能读」，Lap 的模型先天不合。如果你的库只有几百张，它的索引与 AI 能力也浪费。`,
+      resources: [
+        {
+          kind: "html",
+          title: "下载页",
+          url: "https://github.com/julyx10/lap/releases/latest",
+          note: "按平台与架构选包，mac 已公证、Windows 未签名，README 的安装表就是照这里写的。",
+        },
+        {
+          kind: "html",
+          title: "项目主页",
+          url: "https://julyx10.github.io/lap",
+          note: "功能概览与截图，判断它是否覆盖你的浏览与整理需求。",
+        },
+        {
+          kind: "link",
+          title: "隐私说明",
+          url: "https://github.com/julyx10/lap/blob/main/PRIVACY.md",
+          note: "哪些数据留在本地、哪些可选在线服务会联网，介意隐私的人先读这页。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "libjxl",
+    linksCheckedAt: "2026-10-22",
+    name: "libjxl",
+    nameZh: "libjxl（JPEG XL 编解码）",
+    aliases: ["libjxl", "jpeg xl", "jxl", "cjxl", "djxl"],
+    summary: "JPEG XL 的官方参考实现，附带 cjxl / djxl 两个命令行工具；想把图库无损转成新格式、或给软件加 JXL 支持就用它，代价是系统与浏览器原生支持仍稀薄。",
+    scenes: ["photo", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图片压缩", "编解码", "JPEG XL", "命令行", "C++"],
+    body: "libjxl 是 JPEG XL（2022 年成为 ISO/IEC 18181）的参考实现，同时提供编码器、解码器和库 API。日常用得最多的是两个命令行：`cjxl` 编码、`djxl` 解码。\n它最能说服人的能力是对 JPEG 的处理：默认对 JPEG 做无损重压缩，`djxl` 输出 .jpg 时会还原出原始 JPEG 文件。也就是说可以把现有 JPEG 图库整体转成 .jxl 省空间，需要时再一字不差地还原，不必回到原片。\n参数上，视觉质量用 `--distance` 控制，单位是「刚可分辨差异」，0 表示无损，实用有损区间是 0.5 到 3.0；也可以用 `--quality` 走 0–100 的刻度，大致对标 libjpeg。编码投入用 `--effort` 调，越高质量越好、越慢。\n官方提醒过一个安全问题：v0.12 修了大量安全缺陷，应尽快升级。另外库 API、命令行选项和工具行为都明确写着「可能变化」，但 cjxl 编出来的文件符合规范，现在的 djxl 与未来的 djxl 都能解。\n代价在于生态而不是工具本身：JXL 的系统级与浏览器原生支持一直不算普及，转完之后别人打不开是常事，所以更适合自己归档，不适合作为对外分发的唯一格式。",
+    officialUrl: "https://github.com/libjxl/libjxl",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/libjxl/libjxl",
+      github: "https://github.com/libjxl/libjxl",
+    },
+    whoFor: "要长期归档大量 JPEG、想省磁盘又要求可无损还原的人；需要给自家软件接入 JXL 编解码的开发者。",
+    whoNot: "要让图片在任何浏览器、任何聊天软件里都能直接打开的人；不想碰命令行的普通用户。",
+    installTips: [
+      "Debian / Ubuntu：`apt install libjxl-tools` 装到 cjxl 与 djxl；`benchmark_xl` 这类基准工具在 libjxl-devtools 包里。",
+      "macOS 用 `brew install jpeg-xl`；Windows 直接下 releases 页的二进制包。",
+      "编码先试 `cjxl input.png output.jxl`，再用 `--distance` 2 左右看体积与画质；无损要写 0。",
+      "务必升到 v0.12 或更新，官方标注该版本修了大量安全问题。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#1D4ED8",
+    },
+    guide: {
+      intro: "从「把 JPEG 图库转成 JXL」这个最实际的用法切入，讲清 distance 与 quality 怎么选、怎么还原，以及生态限制。",
+      markdown: `## 装
+
+Linux 一条命令：
+
+\`\`\`bash
+apt install libjxl-tools      # 提供 cjxl / djxl
+\`\`\`
+
+macOS 用 Homebrew：\`brew install jpeg-xl\`。Windows 从 releases 页下二进制。
+
+装完先确认：\`cjxl --help\` 有输出就对了。
+
+## 最实用的一招：无损转 JPEG
+
+\`\`\`bash
+cjxl photo.jpg photo.jxl
+\`\`\`
+
+对 JPEG 输入，默认走无损重压缩。想还原：
+
+\`\`\`bash
+djxl photo.jxl photo.jpg
+\`\`\`
+
+输出扩展名是 .jpg 时，djxl 会重建原始 JPEG 文件。这意味着归档可以只留 .jxl，需要交给别人的时候再还回去。
+
+## 有损压缩怎么调参
+
+两个刻度，别混用：
+
+- \`--distance\`：以「刚能看出差别」为单位，0 是无损，0.5–3.0 是常用有损区间
+- \`--quality\`：0–100，大致对标 libjpeg 的直觉
+
+再叠加 \`--effort\` 控制编码投入。想要更小的文件就往高 effort 走，代价是编码时间线性上升，解码不受影响。
+
+看全部参数：\`cjxl --help\`，或者 \`cjxl -v -v --help\` 拿完整清单。
+
+## 批量脚本的骨架
+
+\`\`\`bash
+for f in *.jpg; do cjxl "$f" "\${f%.jpg}.jxl"; done
+\`\`\`
+
+跑之前先用三五张图对比体积，确认收益值得再全量跑。压完抽样 djxl 还原一次，确认能读回来再删原文件。
+
+## 生态这条线
+
+工具本身没问题，问题在别人能不能打开。给外部交付时保留一份 JPEG / PNG，别只给 .jxl。
+
+另外留意版本：官方在 README 顶部挂了安全更新提示，v0.12 修了多个漏洞，旧版本别继续用。`,
+      resources: [
+        {
+          kind: "html",
+          title: "格式概述",
+          url: "https://github.com/libjxl/libjxl/blob/main/doc/format_overview.md",
+          note: "码流与文件格式特性的官方说明，判断某项能力是否属于标准而不是实现细节。",
+        },
+        {
+          kind: "html",
+          title: "编码投入说明",
+          url: "https://github.com/libjxl/libjxl/blob/main/doc/encode_effort.md",
+          note: "effort 参数到底牺牲什么换什么，调参前读这一页比反复试快。",
+        },
+        {
+          kind: "link",
+          title: "支持的应用清单",
+          url: "https://github.com/libjxl/libjxl/blob/main/doc/software_support.md",
+          note: "哪些软件已经能用 JXL，直接决定你转完的图有没有人打得开。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "metadata-extractor",
+    linksCheckedAt: "2026-10-22",
+    name: "metadata-extractor",
+    nameZh: "metadata-extractor 元数据库",
+    aliases: ["metadata-extractor", "metadata extractor", "exif 解析", "java exif", "元数据读取"],
+    summary: "Java 读图片视频元数据的老牌库，EXIF、IPTC、XMP、ICC 与厂商 makernote 都能解析；适合做素材管理或批量提取拍摄参数的后端，代价是只读不写。",
+    scenes: ["code", "photo"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["EXIF", "元数据", "Java", "图像处理", "库"],
+    body: "metadata-extractor 是一个 Java 库，专职从媒体文件里把元数据读出来：Exif、IPTC、XMP、ICC 色彩配置、JFIF、Photoshop 字段、GeoTIFF 坐标参考，以及各类容器的属性。\n支持的文件类型覆盖得比想象中广：JPEG、TIFF（含 BigTIFF）、WebP、PSD、PNG、BMP、GIF、HEIC/AVIF、ICO、PCX、MP4、QuickTime、Matroska / WebM、WAV、AVI，还有相机 RAW（NEF、CR2、CR3、ORF、ARW、RW2、RWL、SRW）。厂商私有的 makernote 也做了专门解码，覆盖佳能、尼康、索尼、富士、奥林巴斯、松下、宾得、徕卡、三星、适马等近二十家。\n用法极简，一行就出结果：`Metadata metadata = ImageMetadataReader.readMetadata(imagePath);`，之后遍历或按 tag 查询。Maven 坐标是 `com.drewnoakes:metadata-extractor`，README 里给的版本是 2.19.0，目标 Java 8。\n两个实际约束：它是**只读**库，不负责写回 EXIF；Android 上 API 低于 24 时要开 Java 8 的 interface method desugaring，否则 `TiffHandler` 的默认方法会炸。\n提 issue 时官方要求尽量附样例图片——元数据问题基本无法靠描述复现，这条比多数项目严格。",
+    officialUrl: "https://github.com/drewnoakes/metadata-extractor",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/drewnoakes/metadata-extractor",
+      github: "https://github.com/drewnoakes/metadata-extractor",
+    },
+    whoFor: "做数字资产管理、图库导入、相机参数统计的 Java 后端；需要在不解析像素的前提下拿到拍摄与版权信息的人。",
+    whoNot: "需要读写双向（回写 EXIF / 清理隐私）的场景；不是 Java 技术栈又不想跨语言调用的项目。",
+    installTips: [
+      "Maven 引入 `com.drewnoakes:metadata-extractor:2.19.0`，或从 releases 页下 jar；目标运行时是 Java 8。",
+      "一行入口：`ImageMetadataReader.readMetadata(path)`，之后按目录（Directory）或 tag 取值。",
+      "Android API < 24 要开启 Java 8 interface method desugaring，否则 TiffHandler 的默认方法不可用。",
+      "遇到解析异常先准备样例图：没有样本文件，维护者基本无法复现元数据问题。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#B45309",
+    },
+    guide: {
+      intro: "这个库的 API 只有一行，真正的坑在「怎么组织读出来的东西」和 Android 上的兼容。按实际接入顺序讲。",
+      markdown: `## 最小可用代码
+
+\`\`\`java
+Metadata metadata = ImageMetadataReader.readMetadata(imagePath);
+for (Directory directory : metadata.getDirectories()) {
+    for (Tag tag : directory.getTags()) {
+        System.out.println(directory.getName() + " / " + tag.getTagName() + " = " + tag.getDescription());
+    }
+}
+\`\`\`
+
+读完拿到的是一棵「目录 → 标签」的结构，不是一个扁平 map。同一个概念（比如拍摄时间）可能同时出现在 Exif、XMP、IPTC 里，值还可能不一致，业务上要定好优先级。
+
+## 常见的取值方式
+
+按目录找比按标签名找稳：
+
+- 拍摄时间：Exif 的 \`DateTimeOriginal\`
+- 相机与镜头：Exif 的 \`Make\` / \`Model\` / \`Lens Model\`
+- 定位：Exif 的 \`GPS Latitude\` / \`GPS Longitude\`（是度分秒字符串，要自己转十进制）
+- 版权：IPTC 或 XMP
+
+注意 \`getDescription()\` 返回的是人类可读字符串，做计算前要转换，别直接 parseInt。
+
+## Android 上的那个坑
+
+库的目标是 Java 8，用的默认接口方法在 Android 上要 API 24 以上才原生支持。低于 24 时必须在 Gradle 里开 desugaring：
+
+\`\`\`gradle
+compileOptions {
+    coreLibraryDesugaringEnabled true
+}
+\`\`\`
+
+不开启的表现是运行时抛 \`NoSuchMethodError\`，且堆栈指向 TiffHandler，很容易误判成库的 bug。
+
+## 它不做什么
+
+只读，不写。想批量清理 GPS、改写版权信息，得换工具（比如 exiftool）。很多人拿它做「导入时抽参数」，这个场景最合适；拿它做「隐私清理」就会失望。
+
+## 出问题怎么报
+
+附样例图片。README 明确写了：多数 issue 没有图根本查不了。同时说明用的是哪个厂商、哪个机型，makernote 的解析最依赖这些。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Getting Started",
+          url: "https://github.com/drewnoakes/metadata-extractor/wiki/Getting-Started",
+          note: "官方入门，比 README 多出目录遍历与按 tag 查询的完整示例。",
+        },
+        {
+          kind: "html",
+          title: "样例输出",
+          url: "https://github.com/drewnoakes/metadata-extractor/wiki/SampleOutput",
+          note: "各类文件实际能读出哪些标签，判断你的需求在不在覆盖范围内。",
+        },
+        {
+          kind: "link",
+          title: "Maven 构件",
+          url: "https://mvnrepository.com/artifact/com.drewnoakes/metadata-extractor",
+          note: "查最新版本号与依赖声明，README 里的 2.19.0 只是当时的示例。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "snapotter",
+    linksCheckedAt: "2026-10-22",
+    name: "SnapOtter",
+    nameZh: "SnapOtter 自托管文件处理",
+    aliases: ["snapotter", "snap otter", "自托管文件转换", "本地 ai 处理", "文件处理流水线"],
+    summary: "一个 Docker 起两百多个图片、视频、音频、PDF 处理工具，带 REST API 与流水线，文件不出内网；适合想替掉一堆在线转换站的团队，代价是 AGPL 与吃资源。",
+    scenes: ["photo", "tools", "office"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["文件转换", "自托管", "OCR", "本地 AI", "Docker"],
+    body: "SnapOtter 把自己定位成「自托管的文件处理基础设施」：把在线工具箱里那些按次收费的活搬到自己的机器上。README 给的规模是 200+ 个工具、五种模态——图片 112 个、视频 57 个、音频 27 个、PDF 35 个、文件 23 个，页面上每个都带 REST API 入口，文档在 /api/docs。\nAI 部分全在本地跑：去背景、超分、老照片修复上色、擦除物体、人脸模糊与增强、图片与 PDF 的 OCR、音频转录、视频字幕生成，官方强调不需要联网。还带一个浏览器里的图层图片编辑器，以及把多个工具串起来的 Pipelines——默认 20 步上限（MAX_PIPELINE_STEPS），可导入导出 JSON。\n上手极简：一条 docker run 起单容器（内含 Postgres 17 与 Redis 8），开 1349 端口，用 admin/admin 登录，首次会让你改密码。生产环境换成三容器 compose，把数据库与 Redis 拆出来。\n代价写清楚：许可证是 AGPLv3 与商业双轨，改过的版本对外提供网络服务就必须按 AGPL 开源源码，公司内部用没问题但对外做 SaaS 得买商业授权；AI 加速只支持 NVIDIA CUDA，Intel/AMD 核显明确不支持，这些机器上 AI 工具会退回 CPU；镜像不小，跑起来吃内存。",
+    officialUrl: "https://snapotter.com",
+    officialLabel: "snapotter.com",
+    links: {
+      official: "https://snapotter.com",
+      github: "https://github.com/snapotter-hq/SnapOtter",
+    },
+    whoFor: "把客户文件当敏感数据的团队（律所、医疗、内部 IT）；想把 TinyPNG、Smallpdf 这类按量付费的活收回内网的人。",
+    whoNot: "只想转一两个文件、不在意上传的人；没有 Docker 环境或机器很弱（尤其想靠核显跑 AI）的人。",
+    installTips: [
+      "快速试：`docker run -d --name SnapOtter -p 1349:1349 -v SnapOtter-data:/data snapotter/snapotter:latest`，开 localhost:1349。",
+      "默认账号 admin / admin，首次登录会强制改密码，别跳过。",
+      "生产用三容器 compose（应用 + Postgres 17 + Redis 8），并改掉 compose 里写死的数据库密码。",
+      "AI 加速只走 NVIDIA CUDA；Intel/AMD 核显不在支持范围，会退到 CPU 跑。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#EA580C",
+    },
+    guide: {
+      intro: "一条命令就能起，但默认密码、数据卷、许可证这三件事必须先处理。按部署顺序讲。",
+      markdown: `## 五分钟跑起来
+
+\`\`\`bash
+docker run -d --name SnapOtter -p 1349:1349 -v SnapOtter-data:/data snapotter/snapotter:latest
+\`\`\`
+
+打开 \`http://localhost:1349\`，用 \`admin\` / \`admin\` 登录。单容器里已经带了 Postgres 17 和 Redis 8，所以不需要额外起服务。
+
+**登录后第一件事是改密码。** 默认口令是公开写在 README 里的，任何能访问端口的人都能用。
+
+## 生产环境要拆开
+
+单容器适合试，正式用换成 compose：应用 + Postgres + Redis 三个服务，把 \`DATABASE_URL\` 与 \`REDIS_URL\` 指过去，数据卷分别挂出来。
+
+compose 示例里的数据库密码是 \`snapotter\`，README 自己加了批注「非本地部署请修改」。别照抄上线。
+
+## 流水线怎么用
+
+Pipelines 是把多个工具串成一个可复用流程：比如「批量去背景 → 转 WebP → 压到指定体积 → 输出到目录」。默认上限 20 步，可以用 \`MAX_PIPELINE_STEPS\` 调；批量大小在官方镜像里不限，自己构建的版本默认 100（\`MAX_BATCH_SIZE\`）。
+
+流程能导出成 JSON，方便版本管理或者给同事复用。
+
+## API 与集成
+
+每个工具都有对应的 REST 接口，用 API key 认证，交互式文档在 \`/api/docs\`。要接进既有系统，从这页拿请求示例比读源码快。
+
+## 许可与合规
+
+双许可：AGPLv3 或者商业授权。关键在 AGPL 的那句——**通过网络提供服务也算分发**，改了代码再对外提供服务，就得公开源码。公司内部自用不受影响；要做成对外产品先算清这条。
+
+官方还留了个统计开关：不想上报，构建时设 \`SNAPOTTER_ANALYTICS=off\`，或在管理后台关掉。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.snapotter.com/guide/getting-started",
+          note: "部署、配置、升级的完整说明，README 里所有细节都指向这站。",
+        },
+        {
+          kind: "html",
+          title: "REST API 文档",
+          url: "https://docs.snapotter.com/api/rest",
+          note: "要把处理能力接进自家系统时看这里，比对着界面猜参数快。",
+        },
+        {
+          kind: "link",
+          title: "在线演示",
+          url: "https://demo.snapotter.com",
+          note: "不装也能先试工具清单与操作手感，再决定要不要占一台机器。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "afilmory",
+    linksCheckedAt: "2026-10-22",
+    name: "Afilmory",
+    nameZh: "Afilmory 摄影作品集",
+    aliases: ["afilmory", "摄影作品集", "照片画廊", "自托管相册", "exif 展示"],
+    summary: "给摄影师做的作品集站，S3/GitHub 同步加 EXIF、地图和 WebGPU 看图，可自托管也可用官方 SaaS；适合想有个像样个人图库站的人，代价是先跑构建生成 manifest。",
+    scenes: ["photo"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["摄影", "作品集", "自托管", "WebGPU", "EXIF"],
+    body: "Afilmory 面向的是「摄影师的个人作品集站」这个具体场景，不是家庭相册也不是备份工具。它的看点在展示质量：自研的 GPU 看图器默认走 WebGPU、不支持时退回 WebGL，大图在 worker 里解码后按块送进 GPU；支持 HDR gain map（含 iPhone 的 HDR 照片）、Live Photo、富士胶片模拟参数、ThumbHash 占位图，EXIF 由 ExifTool 抽全（机身、镜头、焦距、光圈、ISO、GPS）。\n内容来源是多种存储适配器：S3 兼容（含 MinIO、阿里云 OSS）、Backblaze B2、GitHub 仓库、Eagle 素材库、本地文件系统。构建流程会把照片处理成 manifest 与多尺寸缩略图，之后每次只增量处理新增或改动的文件。\n两条路：直接用官方 SaaS，注册即上线；或者自托管，走 `pnpm install` → 复制 config 与 builder 配置 → `pnpm run build:manifest` → `pnpm dev`，Docker 部署另有独立仓库。\n代价有两处必须提前知道。一是它不是「上传就完事」的相册：自托管要改两个配置文件、跑一次全量构建，之后加图还得重新构建 manifest。二是许可证是 Attribution Network License（ANL）v1.0，不是常见的 MIT / Apache，商业使用前得自己读一遍条款。",
+    officialUrl: "https://afilmory.art",
+    officialLabel: "afilmory.art",
+    links: {
+      official: "https://afilmory.art",
+      github: "https://github.com/Afilmory/afilmory",
+    },
+    whoFor: "要一个能挂自己域名、EXIF 展示完整的摄影作品集；愿意跑一次构建、把照片放在 S3 或 GitHub 上的人。",
+    whoNot: "想要「拖进去就出现」的相册的人；需要多用户上传、评论社区的重型图站（那是另一类产品）。",
+    installTips: [
+      "自托管：clone 后 `pnpm install`，再把 `config.example.json`→`config.json`、`builder.config.default.ts`→`builder.config.ts` 各复制一份改。",
+      "跑 `pnpm run build:manifest` 生成清单与缩略图，再 `pnpm dev` 起本地；改图后要重新构建才会出现。",
+      "存储用 S3 / B2 / GitHub / 本地都行，先在 builder 配置里选好 provider 再构建。",
+      "不想运维就用官方 SaaS；自托管走 Docker 的话看 Afilmory/docker 仓库。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#111827",
+    },
+    guide: {
+      intro: "它不是上传型相册，而是「先构建、再展示」的静态思路。讲清配置两个文件、构建 manifest、以及换图的正确姿势。",
+      markdown: `## 两套配置别搞混
+
+自托管要复制两个模板：
+
+\`\`\`bash
+cp config.example.json config.json
+cp builder.config.default.ts builder.config.ts
+\`\`\`
+
+- \`config.json\`：站点长什么样。名称、标题、域名、主色、作者信息、社交账号、地图开关
+- \`builder.config.ts\`：照片从哪来、怎么处理。存储 provider、桶名、区域、并发数、是否检测 Live Photo
+
+新手最容易只改第一个，结果页面起来了但一张图都没有——因为存储没配。
+
+## 构建才是「导入」
+
+\`\`\`bash
+pnpm run build:manifest
+\`\`\`
+
+这一步扫描存储、抽 EXIF、生成多尺寸缩略图与 ThumbHash、写出 manifest。之后：
+
+\`\`\`bash
+pnpm dev
+\`\`\`
+
+**加新照片后要重新构建**，页面不会自己去扫桶。增量构建只处理新增或改动过的文件，全量重建加 \`--force\`，只重算缩略图有单独参数。
+
+## 看图器为什么值得
+
+默认 WebGPU，遇到不支持的浏览器自动回退 WebGL，不需要你判断。大图在 worker 里解码后分块上传 GPU，所以几十 MB 的图也能流畅缩放。HDR gain map 需要显示器支持 HDR 才会体现。
+
+## 部署与许可
+
+自托管有三种常见路径：官方 SaaS（零运维）、独立 Docker 仓库、或按手动步骤自己挂。域名与 HTTPS 自己配，OG 图由 SSR 层动态生成。
+
+许可要单独看：Attribution Network License v1.0，不是 OSI 常见的那几个。个人作品集站基本没问题，但拿它做商业产品前请读 LICENSE 原文。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.afilmory.art/",
+          note: "自托管步骤、存储适配器配置、部署方式的完整说明，比 README 细。",
+        },
+        {
+          kind: "link",
+          title: "线上实例",
+          url: "https://afilmory.innei.in",
+          note: "作者自己的作品集，先看渲染效果与交互，再决定要不要搭一套。",
+        },
+        {
+          kind: "link",
+          title: "源码仓库",
+          url: "https://github.com/Afilmory/afilmory",
+          note: "monorepo 结构与 builder 插件写法都在这，二次开发从这里入手。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "photodemon",
+    linksCheckedAt: "2026-10-22",
+    name: "PhotoDemon",
+    nameZh: "PhotoDemon 便携修图",
+    aliases: ["photodemon", "photo demon", "便携修图", "免安装修图", "windows 修图"],
+    summary: "22MB 免安装的 Windows 修图软件，PSD/PSP/XCF 与相机 RAW 都能开，宏录制加批量处理是它少见的长处；适合放 U 盘随身用，代价是只有 32 位、只支持 Windows。",
+    scenes: ["photo", "design"],
+    platforms: ["windows"],
+    source: "opensource",
+    tags: ["图像编辑", "便携", "免安装", "批量处理", "Windows"],
+    body: "PhotoDemon 是一个 22MB 的便携修图软件，从 Windows XP 到 Win11 都能跑，不需要安装，可以放在 U 盘或 SD 卡里带走。除了你指定的临时目录，它基本不在硬盘上留痕迹。\n功能不是玩具级：支持 PSD、PSP、XCF 和主流相机 RAW，多层编辑含可编辑文字层与非破坏式修改，带 ICC 色彩管理，有画笔、克隆、图案画笔、高级选区、交互式渐变，调整面板覆盖色阶、曲线、HDR、阴影高光恢复、白平衡，滤镜里有透视校正、锐化、降噪、内容感知填充与缩放。当前版本提供 200 多个工具。\n它真正少见的是**宏录制 + 批处理**：像 Office 那样把一串操作录成宏，再对整文件夹的图套用。多数免费修图软件要么没批处理，要么只有固定动作，这个组合对小工作室很实用。\n代价是两条硬限制，官方自己写在 Limitations 里：只面向 Windows，mac/Linux 靠 Wine 能跑但不被支持；因为要便携所以只有 32 位版本，这意味着**单张图不能超过约 2GB**。另外它对「AI」态度鲜明——作者有一个 No LLM / No AI 政策，除了界面翻译之外，代码与文档都不使用生成式工具，介意或在意这点的人可以据此选择。",
+    officialUrl: "https://photodemon.org",
+    officialLabel: "photodemon.org",
+    links: {
+      official: "https://photodemon.org",
+      github: "https://github.com/tannerhelland/PhotoDemon",
+    },
+    whoFor: "需要在多台 Windows 机器、甚至无安装权限的机器上修图的人；要批量套同一串操作的小工作室。",
+    whoNot: "macOS / Linux 用户（Wine 不在支持范围）；需要处理超大图或 64 位内存的人；依赖 AI 抠图与生成式功能的人。",
+    installTips: [
+      "下 ZIP 解压即用，没有安装程序；想稳定就用标着 2025.12 的 stable 包，nightly 是每日构建。",
+      "放在 U 盘或只读介质上也能跑，临时目录可以在 Tools > Options 里指定。",
+      "要批量处理：先录一个宏，再用内置批处理器把它套到整个文件夹。",
+      "记住 32 位上限：单张图超过约 2GB 就打不开也存不了。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#0891B2",
+    },
+    guide: {
+      intro: "免安装带来两个必须提前接受的限制（32 位、仅 Windows），然后才是它真正的强项：宏录制与批处理。",
+      markdown: `## 先接受两条限制
+
+**一、只支持 Windows。** 官方明确说不用 Wine 支持 macOS / Linux，能跑是运气，不算兼容。
+
+**二、只有 32 位。** 便携的代价是进程地址空间受限，单张图大约 2GB 就到顶。全景拼接、超大扫描件这类素材，别指望它。
+
+接受这两条，剩下的体验相当完整。
+
+## 第一次打开
+
+解压 ZIP，双击主程序。没有安装向导，也不会写注册表。第一件事建议去 \`Tools > Options\` 把临时目录指到一个固定位置，否则它会用系统临时目录，清理工具可能把中间文件删掉。
+
+界面是传统 Windows 布局：左侧工具栏、右侧图层与历史、调整和滤镜在菜单里。它支持无限撤销，参数面板上每个工具都能存预设。
+
+## 宏录制：这才是它跟同类拉开差距的地方
+
+思路和 Office 的宏一样：
+
+1. 开一张样图
+2. 点开始录制
+3. 依次做你的操作——调色、锐化、加水印、缩放
+4. 停止录制，给宏起个名
+
+录好的宏可以直接重放，也能交给**内置批处理器**对整个文件夹执行。批量输出格式、尺寸、命名规则在批处理面板里设，不用写脚本。
+
+这套流程适合固定风格的电商图、活动照片、扫描件处理。
+
+## 什么时候别用它
+
+- 要开 4GB 的扫描件
+- 要用 AI 抠图、生成式填充（作者立场明确不做）
+- 团队里混用 macOS
+
+这几种情况换工具比硬撑省事。它的定位是「随身、够用、免费」，不是全能。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://photodemon.org",
+          note: "stable 与 nightly 的下载入口，README 让你先来这里而不是直接翻仓库。",
+        },
+        {
+          kind: "link",
+          title: "夜间构建",
+          url: "https://photodemon.org/download/",
+          note: "想提前试新功能可以下 nightly，但别拿它处理不能重做的活。",
+        },
+        {
+          kind: "link",
+          title: "提交记录",
+          url: "https://github.com/tannerhelland/PhotoDemon/commits/main",
+          note: "官方把「最近改了什么」直接指向提交日志，查某个问题是否已修就看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "chevereto",
+    linksCheckedAt: "2026-10-22",
+    name: "Chevereto",
+    nameZh: "Chevereto 自建图床",
+    aliases: ["chevereto", "图床", "图片托管", "自建图床", "图片分享站"],
+    summary: "2007 年就在做的自建图床与图片视频分享站，多用户、多语言、多站点都支持；适合要做 Flickr/Imgur 那类站点的人，代价是 PHP+MySQL 运维与 AGPL 约束。",
+    scenes: ["photo", "social"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["图床", "自托管", "图片分享", "PHP", "多用户"],
+    body: "Chevereto 是一个自托管的图片与视频分享平台，README 说它从 2007 年做到现在，定位是「自己搭一个 Flickr / Imgur 那样的站」。核心能力是媒体管理（图片、视频、分类、标签、相册）、用户体系（注册、资料、2FA、角色）、内容隐私控制、CDN 与缓存优化、30 多种语言，以及一个安装就能托管多个独立站点的多租户模式。\n技术栈是传统 LAMP 路线：Web 服务器 + PHP + MySQL / MariaDB，Redis 可选。安装方式给得很全——Docker（多架构，x86_64 与 arm64）、VPS、cPanel、Plesk，也有 Installatron 这类一键安装。不想自己运维还有 Chevereto Cloud。\n许可证要先看清楚，因为它是双轨的：社区版走 AGPLv3，Lite 与 Pro 走商业授权。AGPL 里有一条容易被忽略——**通过网络提供服务也算分发**，所以对外提供访问时，改过的代码要按 AGPL 开源；不想开源就得买商业授权。\n代价因此很明确：它不是装完就忘的软件，要自己管 PHP 版本、数据库升级、图片存储与备份；而「自建图床」这件事的意义就在于这些活你得自己扛。做纯个人图床有点重，做多用户社区站才划算。",
+    officialUrl: "https://chevereto.com",
+    officialLabel: "chevereto.com",
+    links: {
+      official: "https://chevereto.com",
+      github: "https://github.com/chevereto/chevereto",
+    },
+    whoFor: "要搭多用户图片/视频分享社区的团队；需要在自己的域名下集中托管大量素材、且不想受第三方平台规则限制的人。",
+    whoNot: "只想给博客挂几张图的人（对象存储加个 CDN 更省事）；不愿维护 PHP 与数据库、又不想买托管服务的人。",
+    installTips: [
+      "安装走 Docker 最省事（多架构镜像）；VPS、cPanel、Plesk 也都有官方指南。",
+      "环境至少要 Web 服务器 + PHP + MySQL/MariaDB，Redis 可选但建议加上做缓存。",
+      "先确认许可：社区版是 AGPLv3，网络提供服务即视为分发；要闭源商用得买商业授权。",
+      "从 V3 或 V2 升级要按对应版本的升级指南走，跨大版本不能直接覆盖。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#DC2626",
+    },
+    guide: {
+      intro: "先判断你是要「图床」还是「图片社区」，两者的成本差一个量级。然后讲安装路径、许可边界与升级。",
+      markdown: `## 先分清用途
+
+- **纯图床**（自己上传、拿外链）：对象存储 + CDN 就够，上 Chevereto 属于杀鸡用牛刀
+- **图片社区**（多用户注册、相册、隐私设置、评论）：这才是它的主场
+
+它把用户、角色、2FA、多语言、多租户都做进去了，这些都是社区站才需要的功能。
+
+## 装
+
+两条主路：
+
+**Docker**：官方镜像支持 x86_64 与 arm64，文档给了 Pure Docker 与完整 compose 两种写法。
+
+**传统主机**：VPS 或 cPanel 环境，需要 Web 服务器 + PHP + MySQL / MariaDB，Redis 可选。装完按安装向导填数据库信息。
+
+装之前先确认 PHP 版本符合要求——它是这套系统最常出问题的地方。
+
+## 许可这条线最容易被忽略
+
+社区版是 AGPLv3。要点不是「能不能免费用」，而是：**你把服务放在网上给别人访问，就构成分发**，改了代码就得公开。
+
+自用、内部用没问题。要做成对外产品、又不想开源改动，就得走 Lite / Pro 的商业授权。README 专门写了这段，说明它是认真执行的。
+
+## 升级路径
+
+- V3 → V4：按升级指南，先看「Welcome Back」那份变更说明
+- V2 → V4：可以跳过 V3，但仍要按指南顺序执行
+
+跨版本直接覆盖文件是最常见的翻车方式，先备份数据库与上传目录。
+
+## 不想运维
+
+官方有 Chevereto Cloud，本质是把这套东西托管出去。它的存在说明一件事：这软件的运维成本是真实存在的，不是营销话术。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://v4-docs.chevereto.com",
+          note: "安装、配置、升级的权威说明，环境要求以这站为准。",
+        },
+        {
+          kind: "html",
+          title: "版本对比",
+          url: "https://docs.chevereto.com/introduction/editions/compare.html",
+          note: "免费版与 Lite / Pro 的功能差异，选版本前必看。",
+        },
+        {
+          kind: "link",
+          title: "在线演示",
+          url: "https://demo.chevereto.com",
+          note: "不装就能看后台与前台的实际形态，判断是否符合你的社区设想。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ui-ux-pro-max-skill",
+    linksCheckedAt: "2026-10-22",
+    name: "UI UX Pro Max",
+    nameZh: "UI UX Pro Max 设计技能",
+    aliases: ["ui ux pro max", "uupm", "ai 设计技能", "ui 设计提示词库", "claude skill 设计"],
+    summary: "给 AI 编码工具用的 UI/UX 技能包，一句产品描述就能吐出配色、字体、版式与反模式的完整设计系统；适合想让 AI 界面少点「AI 味」的人，代价是它只给建议不给成品代码。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["UI 设计", "设计系统", "AI 技能", "配色", "字体搭配"],
+    body: "UI UX Pro Max 是一个「AI skill」——不是独立软件，而是喂给 AI 编码工具的一套设计知识库与推理规则。v2.0 的核心是 Design System Generator：给它一句需求（README 里举的例子是「给我的美容 SPA 做落地页」），它并行检索五个维度——192 个产品品类、79 种可搜风格、192 套配色、34 种落地页结构、74 组字体搭配——再按行业规则过滤反模式，输出一份完整方案：版式、风格、配色（带十六进制值）、字体、关键效果、要避免的坑，以及交付前检查清单。\n它的规则库是分类别的：科技与 SaaS、金融、医疗、电商、服务业、创意、生活、前沿科技各有一套。比如给银行做站，它会把「AI 紫粉渐变」标为反模式；给健康类品牌则推柔和阴影与低饱和配色。风格目录分三档：50 个活跃、29 个补充、9 个已弃用，弃用项不会进入正常排序。\n覆盖面还包括 22 个技术栈的建议（React、Next、Vue、Svelte、SwiftUI、Flutter、shadcn/ui、Jetpack Compose…）、25 种图表类型、119 条 UX 指南——后者专门处理长标题换行、窄屏溢出、chip 截断、徽章不能只靠颜色传达含义这类真实上线才会暴露的问题。\n代价要说清楚：它输出的是设计决策，不是能直接跑的页面。落地质量取决于宿主模型与你自己补的代码；README 里 Basic 与 Premium 的对比也被截断在仓库快照里，选版本前应去官网核对功能边界。",
+    officialUrl: "https://www.uupm.cc",
+    officialLabel: "www.uupm.cc",
+    links: {
+      official: "https://www.uupm.cc",
+      github: "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+    },
+    whoFor: "用 Claude Code、Cursor 这类工具写前端，想让生成出来的界面有统一审美而不是模板味的人；需要快速定一套配色与字体方向的设计师。",
+    whoNot: "期待装完就有可视化编辑器的人；已经有一套成熟设计系统、不需要外部建议的团队。",
+    installTips: [
+      "它是「AI skill」而不是桌面软件，要装进支持 skill 的 AI 编码工具里用。",
+      "命令行版本见 README 顶部挂的 npm 包 `ui-ux-pro-max-cli`。",
+      "提问时给足上下文：产品类型 + 目标用户 + 风格倾向，输出的设计系统才准。",
+      "把它当设计决策参考，不是代码生成器；最终的组件与交互仍要自己实现。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "U",
+      color: "#6D28D9",
+    },
+    guide: {
+      intro: "先理解它的定位（知识库 + 推理），再讲怎么问才有效、输出怎么落地，以及 Basic 与 Premium 的边界。",
+      markdown: `## 它到底是什么
+
+不是 Figma 插件，也不是代码生成器，而是一份给 AI 读的设计决策库。你在 AI 编码工具里描述需求，它按规则检索、过滤、组合，输出一套设计系统。
+
+所以判断标准不是「界面好不好看」，而是「它给的方向对不对」。
+
+## 怎么问
+
+README 里的示例只有一句：\`Build a landing page for my beauty spa\`。它能工作，是因为背后有 192 个产品品类的规则去匹配。
+
+要更准，补三样信息：
+
+1. **产品类型**：B2B 工具、电商、诊所，规则完全不同
+2. **目标用户**：决定语气与密度
+3. **约束**：必须用现有品牌色？要暗色模式？有无障碍要求？
+
+信息越具体，反模式过滤越有效——比如金融类会被明确排除高饱和渐变。
+
+## 输出里最该看的两块
+
+**一是反模式清单。** 它不只告诉你做什么，还告诉你别做什么。这类负面约束往往比正向建议更有用。
+
+**二是交付前检查清单。** 里面是能直接验的项：图标不用 emoji、可点击元素要有 cursor-pointer、正文对比度至少 4.5:1、键盘焦点可见、尊重 prefers-reduced-motion、在 375/768/1024/1440 四个宽度都不溢出。
+
+这几条拿去 review 自己或 AI 写的页面，命中率很高。
+
+## 三条别误解的地方
+
+- 它不会替你写组件，只给方向
+- 风格目录有 50 个活跃项，另有 29 个补充、9 个弃用，别照抄过时风格
+- 仓库快照里的 Basic / Premium 对比被截断，功能边界以官网为准
+
+## 适合的用法
+
+新项目起步时用它定调：配色、字体、版式结构一次定完，后面所有页面按这套走。比每次让模型自由发挥稳定得多。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://www.uupm.cc",
+          note: "版本差异与最新说明的官方入口，README 快照不全时以这里为准。",
+        },
+        {
+          kind: "link",
+          title: "命令行包",
+          url: "https://www.npmjs.com/package/ui-ux-pro-max-cli",
+          note: "README 顶部的 npm 徽章指向这里，CLI 用法与版本号看这页。",
+        },
+        {
+          kind: "link",
+          title: "风格目录数据",
+          url: "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/blob/main/src/ui-ux-pro-max/data/styles.csv",
+          note: "79 种风格的完整清单与状态（活跃/补充/弃用），想核对推荐来源时查它。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "daisyui",
+    linksCheckedAt: "2026-10-22",
+    name: "daisyUI",
+    nameZh: "daisyUI 组件库",
+    aliases: ["daisyui", "daisy ui", "tailwind 组件库", "css 组件", "前端组件库"],
+    summary: "Tailwind 生态里最流行的组件库，用 btn、card、modal 这类语义 class 省掉手写样式；适合已经在用 Tailwind、又想快速出成品的项目，代价是长相统一、深度定制更绕。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["组件库", "Tailwind CSS", "前端", "CSS", "开源"],
+    body: "daisyUI 是给 Tailwind CSS 用的组件库，README 的第一句话就是「最流行的免费开源 Tailwind 组件库」，当前主线是 daisyUI 5。它的做法不是给你一堆 JS 组件，而是提供一套语义化 class：按钮写 `btn`、卡片写 `card`、弹窗写 `modal`，样式由库统一接管，你不再需要为每个组件手写一长串原子类。\n这条路线的好处很具体：同一套 class 换主题就能整体换皮，页面结构不会被几十个颜色与间距工具类淹没，设计一致性靠库兜底而不是靠自觉。代价也同样具体：默认长相高度统一，做品牌感强的界面时改起来反而绕——你得覆盖变量或自己写额外样式，深度定制的自由度不如纯原子类。\n另一个要接受的事实是它的组件只负责「长什么样」，不负责「怎么动」。下拉、弹窗、标签页这类交互，仍要靠原生元素（details、dialog）或自己补脚本，它不会替你把行为接好。\nREADME 本身很薄，主要是四个链接：官网、组件清单、安装文档、贡献指南。真正的说明书在 daisyui.com 上，所以上手前先看官网而不是仓库。版本上注意标题写的是 5，遇到网上 v4 时代的教程要先核对是否还适用。",
+    officialUrl: "https://daisyui.com",
+    officialLabel: "daisyui.com",
+    links: {
+      official: "https://daisyui.com",
+      github: "https://github.com/saadeghi/daisyui",
+    },
+    whoFor: "已经在用 Tailwind、要快速搭后台或营销页的前端；希望整站风格统一又不想自己维护一套设计系统的小团队。",
+    whoNot: "需要强品牌识别、每个组件都要精雕的界面；不想引入额外样式层的极简项目。",
+    installTips: [
+      "安装步骤看官网的 install 页（README 的 How to use 就指向那里），它要挂在 Tailwind 之上，不能单独用。",
+      "组件用法查 daisyui.com/components，直接把 class 抄进 HTML，不需要逐个装包。",
+      "README 与官网都是 v5 的说法；照抄旧教程前先核对版本，避免类名对不上。",
+      "它只提供样式，下拉、弹窗这类交互要自己用原生元素或补 JS。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#1AD1A5",
+      simpleIcon: "daisyui",
+    },
+    guide: {
+      intro: "薄 README 意味着大部分答案在官网。这页讲清接入顺序、样式不生效时怎么查，以及什么时候它并不合适。",
+      markdown: `## 接入顺序
+
+daisyUI 不是独立框架，它是 Tailwind 的插件式组件层。正确的顺序是：
+
+1. 先把 Tailwind 跑通，能正常生成工具类
+2. 再按官网 install 页的步骤加 daisyUI
+3. 最后才开始抄组件 class
+
+顺序反了会得到「class 写了但没样式」的结果，而且很难判断是哪一层出的问题。
+
+## 样式不生效怎么查
+
+按这个顺序排查，基本十分钟内能定位：
+
+- Tailwind 本身有没有在生成 CSS？先写个 \`text-red-500\` 试试
+- 构建的 content 扫描范围有没有覆盖到你写 class 的文件
+- 是否漏了构建步骤——改完配置要重新构建才会生效
+- class 名是否来自旧版本（v5 与 v4 有差异）
+
+## 组件怎么用
+
+官网 components 页每个组件都给了完整 HTML 片段，复制过去就能用。几个常用组合：
+
+- 按钮：\`btn\`，加 \`btn-primary\` / \`btn-ghost\` 变体
+- 卡片：\`card\` 包 \`card-body\`
+- 表单：\`input\`、\`select\`、\`checkbox\` 各自独立
+- 布局：\`navbar\`、\`drawer\`、\`tabs\`
+
+关键是**别混着手写原子类**。既然用了语义 class，就让它统一管样式，否则两套体系打架，后面改主题会很难受。
+
+## 交互要自己补
+
+它不附带 JS 行为。弹窗可以用原生 \`<dialog>\`，折叠用 \`<details>\`，复杂下拉自己写几行脚本。这也意味着无障碍属性得你自己加：aria-expanded、aria-controls、焦点管理，库不会代劳。
+
+## 什么时候别用
+
+需要像素级还原设计稿的品牌站，或者团队已经有一套成熟组件体系——这时引入它只会多一层要覆盖的默认样式。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://daisyui.com/",
+          note: "主题、安装、配置的总入口，README 只有链接，实际文档都在这。",
+        },
+        {
+          kind: "html",
+          title: "组件清单",
+          url: "https://daisyui.com/components/",
+          note: "每个组件的完整 HTML 用法，抄代码从这页开始。",
+        },
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://daisyui.com/docs/install/",
+          note: "按你用的构建工具给出接入步骤，装不上先看这页而不是翻 issue。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "lucide",
+    linksCheckedAt: "2026-10-22",
+    name: "Lucide",
+    nameZh: "Lucide 图标库",
+    aliases: ["lucide", "lucide icons", "图标库", "svg 图标", "feather icons"],
+    summary: "1600+ 个统一线性风格的 SVG 图标，React、Vue、Svelte、Angular 都有官方包，也能直接拿静态文件；适合要一套不撞脸的界面图标，代价是它明确不收品牌 logo。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图标", "SVG", "设计资源", "前端", "开源"],
+    body: "Lucide 是一个社区维护的图标库，提供 1600 多个 SVG 文件，风格统一、线条粗细一致，是从 Feather Icons 分叉出来的项目。它的定位很务实：让设计稿和代码里用的是同一套图标，而不是各找各的。\n分发方式覆盖得比较全：官方包按框架拆开，`lucide-react`、`@lucide/vue`、`@lucide/svelte`、`lucide-solid`、`lucide-preact`、`lucide-react-native`、`@lucide/angular`、`@lucide/astro` 各一份；不写框架的项目用 `lucide-static` 直接拿 SVG；设计侧装 Figma 社区插件。这种「一个源、多条出口」的结构，好处是换框架时图标不用重画。\n许可很宽松：ISC，商用与个人用都免费，这也是它被大量项目默认选用的原因之一。\n有一条限制值得先知道：**它明确不收品牌 logo**，而且不打算加。README 给的理由是法律风险、设计一致性、维护成本三方面，并单独写了一篇声明。所以拿 Lucide 找 GitHub、微信、支付渠道图标是找不到的，这类需求得另配一套品牌图标资源。\n风格上它偏线性、克制，适合后台、工具类、文档类界面；要做插画感强或彩色拟物的视觉，它不是合适的选择。",
+    officialUrl: "https://lucide.dev",
+    officialLabel: "lucide.dev",
+    links: {
+      official: "https://lucide.dev",
+      github: "https://github.com/lucide-icons/lucide",
+    },
+    whoFor: "要找一套风格统一、授权宽松的界面图标的前端与设计；需要在 React / Vue / Svelte 之间切换而不换图标的团队。",
+    whoNot: "需要品牌 logo（社交平台、支付、软件商标）的场景；要彩色插画或拟物图标的设计。",
+    installTips: [
+      "按框架选包：React 用 `lucide-react`，Vue 用 `@lucide/vue`，Svelte 用 `@lucide/svelte`，Angular 与 Astro 也各有官方包。",
+      "不写框架或用原生 HTML 时用 `lucide-static`，直接取 SVG 文件。",
+      "设计侧在 Figma 社区装 Lucide 插件，保证设计稿与代码同一套图标。",
+      "别指望它提供品牌 logo：官方明确不收，且不计划加。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#F56565",
+      simpleIcon: "lucide",
+    },
+    guide: {
+      intro: "选包、找图标、处理品牌 logo 缺口，是第一次用会遇到的三个问题。按实际流程走一遍。",
+      markdown: `## 第一步：选对包
+
+包名不是统一的，按技术栈查：
+
+| 技术栈 | 包名 |
+| --- | --- |
+| 原生 / 无框架 | \`lucide\` |
+| React | \`lucide-react\` |
+| Vue | \`@lucide/vue\` |
+| Svelte | \`@lucide/svelte\` |
+| Solid | \`lucide-solid\` |
+| Preact | \`lucide-preact\` |
+| React Native | \`lucide-react-native\` |
+| Angular | \`@lucide/angular\` |
+| Astro | \`@lucide/astro\` |
+| 只要 SVG 文件 | \`lucide-static\` |
+
+注意 Vue 与 Svelte 带 scope（\`@lucide/\`），React 不带，抄文档时容易写错。
+
+## 第二步：找图标
+
+在 lucide.dev/icons 里按名字搜。命名是描述性的，比如搜 \`settings\`、\`trash\`、\`chevron-right\`。搜不到多半是名字不对，换同义词再试。
+
+找到后页面上会同时给 React / Vue / 原始 SVG 三种用法，直接复制对应片段。
+
+## 第三步：品牌 logo 怎么办
+
+Lucide 明确不收品牌 logo，理由是法律、设计一致性与维护成本。所以会出现「通用图标够用，但一到第三方登录按钮就缺」的情况。
+
+处理方式：品牌图标单独找一套专门资源，尺寸与描边尽量对齐 Lucide（通常是 24×24、stroke-width 2），混用时视觉上才不会突兀。
+
+## 一致性上的两个细节
+
+- 统一用同一档 stroke-width，混用 1.5 与 2 会显得参差
+- 图标尺寸按 16 / 20 / 24 三档走，别随手写 18、22
+
+这两条比选哪个图标更影响观感。
+
+## 许可
+
+ISC，商用免费，不需要署名。想确认细节看仓库里的 LICENSE。`,
+      resources: [
+        {
+          kind: "html",
+          title: "图标检索",
+          url: "https://lucide.dev/icons/",
+          note: "按名字搜图标并拿到各框架的用法片段，日常用得最多的页面。",
+        },
+        {
+          kind: "html",
+          title: "接入指南",
+          url: "https://lucide.dev/guide/",
+          note: "各框架的安装与基础用法，包名差异在这里有权威说明。",
+        },
+        {
+          kind: "link",
+          title: "品牌 logo 声明",
+          url: "https://github.com/lucide-icons/lucide/blob/main/BRAND_LOGOS_STATEMENT.md",
+          note: "官方解释为什么不收品牌图标，做图标选型时能省掉一轮争论。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "tachyons",
+    linksCheckedAt: "2026-10-22",
+    name: "Tachyons",
+    nameZh: "Tachyons 函数式 CSS",
+    aliases: ["tachyons", "tachyons css", "函数式 CSS", "functional css", "原子化 CSS"],
+    summary: "把样式拆成单职责的小类，写 HTML 就等于画界面，压缩后约 14kB。适合不想引入组件框架、要快速出原型的静态页或自建设计系统；代价是标记会变啰嗦，改版得批量换类名。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["CSS", "设计系统", "响应式", "原子化样式", "开源"],
+    body: "Tachyons 解决的是「写界面先要发明一套类名」的问题。它的做法是把 CSS 拆成只做一件事的类：一个类管一条规则，不组合、不嵌套语义，写页面时直接在 HTML 上拼这些小类，不再单独维护一份样式表。README 的定位很直白：不写 CSS 就能做出新 UI。\n它与组件框架的差别在交付物。Bootstrap 这类给的是按钮、导航栏这样的成品组件，Tachyons 给的是积木和一套约束：移动优先的架构、8px 基线网格、490 种可访问性达标的配色组合、可无限嵌套的响应式栅格。样式源文件是按模块切分的 PostCSS，单个模块很小，能直接读、直接改。整体压缩后约 14kB，且针对 gzip 做过优化。\n代价也很明确。第一，HTML 会变长，一屏界面可能挂十几个类，可读性靠约定而非语义；类名得记，README 里专门列了速查表与记忆测验，说明这确实是个门槛。第二，没有 JS 行为，交互仍要自己写。第三，改设计往往不是改一个变量，而是全站替换类名——这也是它适合原型与稳定设计系统的原因，不适合设计还在天天变的项目。\n另一个常被忽略的点：它默认全量引入。要裁剪就得克隆仓库改 src 再 `npm run build`，因为它的 CSS 是编译出来的，不是运行时按需生成的。",
+    officialUrl: "https://tachyons.io",
+    officialLabel: "tachyons.io",
+    links: {
+      official: "https://tachyons.io",
+      github: "https://github.com/tachyons-css/tachyons",
+    },
+    whoFor: "要快速把界面拼出来的人：静态页、内部工具、产品原型，以及想拿它的模块结构当模板来搭自家设计系统的团队。会写 HTML 但不擅长 CSS 的后端也合适。",
+    whoNot: "设计稿还在频繁变动、需要随时改主题色的项目——全量类名替换的成本很高；或者需要现成按钮、下拉、弹窗等交互组件的场景，它只提供样式，不带 JS。",
+    installTips: [
+      "最快用法是 CDN：在 HTML 的 head 里加 `<link rel=\"stylesheet\" href=\"https://unpkg.com/tachyons@4/css/tachyons.min.css\">`，不需要任何构建步骤。",
+      "要改源码：`git clone https://github.com/tachyons-css/tachyons.git` 后 `npm install`，再 `npm start`（等同 `npm run build:watch`），会把压缩与非压缩两份 CSS 输出到 CSS 目录并监听 src。",
+      "只需构建一次用 `npm run build`；和自有 CSS 或别的库混用时跑 `npm run mutations`，检查有没有类名被重复定义。",
+      "类名与刻度查 https://tachyons.io/docs，模块文件本身很短，直接读 src 比翻文档更快。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#2D3748",
+    },
+    guide: {
+      intro: "按第一次上手会卡住的顺序讲：先用 CDN 跑通一页，再理解「类名即样式」的写法，最后是怎么裁剪体积、以及和自有样式共存时的检查办法。",
+      markdown: `## 第一步：先别装环境
+
+最省事的起步是把样式表挂上去，不碰构建：
+
+\`\`\`html
+<link rel="stylesheet" href="https://unpkg.com/tachyons@4/css/tachyons.min.css">
+\`\`\`
+
+地址里钉死了 \`tachyons@4\`。不写版本会跟着 latest 走，样式可能某天悄悄变掉。
+
+## 卡点一：不知道写哪个类
+
+它没有「导航栏」这种成品类，只有单职责的积木：间距、字号、颜色、宽度各管各的，一个元素叠七八个类是常态。
+
+第一件事不是写代码，是打开 https://tachyons.io/docs 对照找类名。顺序：先定容器宽度与间距，再定字号与颜色，最后补响应式。别一边翻文档一边猜，社区有速查表。
+
+## 卡点二：响应式没生效
+
+移动优先的意思是**默认值属于小屏**：不加后缀的类在所有尺寸生效，加后缀的只在该断点及以上覆盖。
+
+排查顺序：先确认写的是「小屏基础 + 大屏覆盖」而不是反过来；再看变体类有没有被后面的规则盖掉。这个心智模型不换，会一直调不对。
+
+## 卡点三：把 14kB 再压小
+
+默认全量引入。README 的路径是克隆仓库、改 \`src\` 模块再编译：
+
+\`\`\`bash
+git clone https://github.com/tachyons-css/tachyons.git
+cd tachyons
+npm install
+npm run build
+\`\`\`
+
+开发用 \`npm start\`，同时产出压缩与非压缩两份并监听 \`src\`。模块按功能切开，删文件比在压缩产物里抠靠谱。
+
+## 卡点四：和自有 CSS 打架
+
+类名被定义两遍不会报错，只会让某处样式莫名赢或输。查重命令：
+
+\`\`\`bash
+npm run mutations
+\`\`\`
+
+它扫一遍所有类定义，重复就提示。接进提交流程比事后 debug 便宜。
+
+## 现实提醒
+
+价值在约束不在省事。设计天天改时，全站类名替换会反噬；设计稳定后，可预测性与体积优势才成立。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档与类名索引",
+          url: "https://tachyons.io/docs",
+          note: "查具体类名、刻度与配色组合的地方。第一次用基本要靠它对照着写。",
+        },
+        {
+          kind: "html",
+          title: "组件示例库",
+          url: "https://tachyons.io/components",
+          note: "用这套类拼出来的成品组件，可直接对照抄结构，比从零拼快。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库与源码模块",
+          url: "https://github.com/tachyons-css/tachyons",
+          note: "src 目录按模块切分，要裁剪体积或改默认值从这里下手。",
+        },
+      ],
+    },
+  },
 ];
