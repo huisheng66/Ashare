@@ -42693,4 +42693,3894 @@ npm run mutations
       ],
     },
   },
+  {
+    slug: "nuclear",
+    linksCheckedAt: "2026-10-22",
+    name: "Nuclear",
+    nameZh: "Nuclear 开源音乐播放器",
+    aliases: ["nuclear", "nuclear player", "Nuclear 播放器", "开源音乐播放器"],
+    summary: "开源桌面音乐播放器，本身不含曲库，播放能力靠插件提供的流媒体源。适合不想订阅流媒体、愿意自己挑源的人；代价是装好不等于能听，搜索能出结果但没装源插件时放不出声。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "桌面应用", "插件", "Tauri", "开源"],
+    body: "Nuclear 是 Tauri（Rust + React）写的跨平台音乐播放器，主打无广告、无追踪：搜索任意歌曲或歌手、建歌单、直接播放。它的结构与常见的「播放器 + 内置曲库」不同——README 把功能全部设计成插件驱动，流媒体源、元数据、歌单、首页内容都由插件提供，内置插件商店可以直接装。\n这决定了它的实际体验：界面和播放列表是现成的，但你听到什么取决于装了哪些源插件。搜索会列出多个来源，需要自己挑；同一个歌手在不同源上的曲目覆盖差别很大。它的加分项是附带歌手传记、唱片目录与相似歌手页面，支持歌单从其他服务导入导出、自定义 CSS 主题、同步歌词，还能在设置里打开 MCP server，让 Claude Code、Codex、Cursor 这类客户端通过 http://127.0.0.1:8800/mcp 控制播放。\n代价在维护面：插件质量参差，某个源失效就得换；AGPL-3.0 授权对二次分发有约束；想从源码跑还要 Node 22+、pnpm 9+、Rust stable 与各平台的 Tauri 依赖。",
+    officialUrl: "https://nuclearplayer.com",
+    officialLabel: "nuclearplayer.com",
+    links: {
+      official: "https://nuclearplayer.com",
+      github: "https://github.com/nukeop/nuclear",
+    },
+    whoFor: "不想按月付费订阅、愿意折腾播放源的人；以及想把播放器接进 AI 客户端、用自然语言点歌的折腾型用户。",
+    whoNot: "只想装完就能听完整曲库的人——Nuclear 不提供内容，源插件的可用性不由它保证；也不适合要求「一次配置长期稳定」的场合。",
+    installTips: [
+      "从 Releases 页取对应平台安装包：Windows 是 .exe / .msi，macOS 是 .dmg（Apple Silicon 与 Intel 分开），Linux 提供 .AppImage、.deb、.rpm、.flatpak。",
+      "启动后先去插件商店装流媒体源插件，否则搜索能出结果也放不出声音——播放能力是插件给的，不在主程序里。",
+      "要用 AI 控制播放器：设置 → Integrations 打开 MCP server，地址是 http://127.0.0.1:8800/mcp；Claude Code 用 claude mcp add nuclear --transport http http://127.0.0.1:8800/mcp。",
+      "从源码开发需要 Node.js 22+、pnpm 9+、Rust stable 和对应平台的 Tauri 依赖，然后 pnpm install 再 pnpm dev；pnpm dev:remote 会把 Vite 绑到 0.0.0.0，方便局域网内用手机远程控制。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "N",
+      color: "#2F3E9E",
+    },
+    guide: {
+      intro: "按第一次打开的顺序讲：为什么装完没声音、搜索结果里怎么选源、MCP 怎么接，以及自建开发环境要注意的三件事。",
+      markdown: `## 装完第一件事：装源
+Nuclear 的界面会正常显示、搜索也会返回结果，但按下播放没有声音——这是第一次用最容易误判成「坏了」的地方。原因写在 README 的功能列表里：流媒体源是插件提供的，主程序只负责界面与播放调度。先打开内置插件商店，装上你要用的源，再回去播放。
+
+## 搜索结果为什么有好几个版本
+同一个歌名会列出多个来源。这不是重复条目，而是让你在音质、时长、可用性之间自己挑。某个源经常失败就换一个，别在设置里反复调网络参数——通常不是网络问题。
+
+## 把播放器接给 AI
+设置 → Integrations 打开 MCP server，它监听在本机 http://127.0.0.1:8800/mcp。各客户端的写法不一样，README 给了现成片段：
+
+\`\`\`bash
+# Claude Code
+claude mcp add nuclear --transport http http://127.0.0.1:8800/mcp
+
+# Codex CLI
+codex mcp add nuclear --url http://127.0.0.1:8800/mcp
+\`\`\`
+
+Cursor、Windsurf、Claude Desktop 走 JSON 配置，键名是 mcpServers，只填 url 一项即可。注意端口只在本机回环上，别指望从别的机器直接连。
+
+## 自己编译前先对齐三件套
+仓库是 pnpm + Turborepo 的 monorepo，主程序用 Tauri。README 的硬要求是 Node.js 22 以上、pnpm 9 以上、Rust stable，外加 Tauri 官方列出的平台依赖（Linux 上常见的是 webkit2gtk 一类系统库）。缺一件 pnpm dev 就起不来，报错往往指向 Rust 而不是 Node，容易看错方向。
+
+## 什么时候该换工具
+如果你要的是「打开就有海量正版曲库」，Nuclear 的结构本身就不匹配：它给你的是播放器和插件框架，内容由源决定。选它之前先想清楚你愿意为「换源」这件事付出多少维护成本。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://nuclearplayer.com",
+          note: "项目定位与下载入口。先看它对「音乐从哪来」的说明，再决定要不要装。",
+        },
+        {
+          kind: "html",
+          title: "Releases 下载页",
+          url: "https://github.com/nukeop/nuclear/releases",
+          note: "各平台安装包与更新记录。macOS 要按芯片选 dmg，Linux 四种包按发行版挑。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/nukeop/nuclear",
+          note: "插件 SDK、MCP 配置片段与源码构建步骤都在这里，README 是最完整的一手说明。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "graphite",
+    linksCheckedAt: "2026-10-22",
+    name: "Graphite",
+    nameZh: "Graphite 程序化 2D 图形编辑器",
+    aliases: ["graphite", "graphite editor", "graphite.art", "程序化图形编辑器", "节点式设计工具"],
+    summary: "把图层合成和节点化生成式设计合到一个编辑器里的开源 2D 图形工具，非破坏性编辑，改参数能回溯。适合想同时做矢量与位图、又不想丢参数化能力的人；代价是还在 alpha，照片编辑、动效、排版都还挂在路线图上。",
+    scenes: ["design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图形设计", "矢量编辑", "节点编辑器", "Rust", "开源"],
+    body: "Graphite 的定位是「2D 内容创作的程序化工具箱」：底层是一个节点图引擎，上层的画笔、形状、图层工具都只是这个引擎的封装。它把两件通常分开的事合在一起——图层式合成（像 Photoshop）与节点式生成式设计（像 Houdini 那一路），并且全流程非破坏性：调整上游节点，下游结果跟着变，而不是把像素烤死。\n它从矢量编辑器起家，现在同时处理矢量与位图。README 把「像游戏引擎多过像传统创作软件」当作卖点，好处是同一套图文可以反复参数化复用，代价是概念门槛明显高于 Illustrator 那类工具：只会画布操作、不理解节点的人，第一小时基本在找「效果在哪」。\n现实约束要讲清楚：官网标注目前是 alpha，照片编辑、动态图形、数字绘画、桌面出版、VFX 合成这些能力都写在规划中的 roadmap 上，不是现成功能。它的开源方式是 MIT / Apache-2.0 双许可，由社区资助，没有商业版兜底，所以别把它放进「必须按时交付」的生产流程。",
+    officialUrl: "https://graphite.art",
+    officialLabel: "graphite.art",
+    links: {
+      official: "https://graphite.art",
+      github: "https://github.com/GraphiteEditor/Graphite",
+    },
+    whoFor: "愿意接受节点思维的设计师与创意编码者；以及想在一个工具里同时处理矢量、位图和参数化生成的人。",
+    whoNot: "需要成熟照片修图、排版或动效流水线的团队——这些能力还在 roadmap 上；也不适合不能接受 alpha 阶段功能变动的人。",
+    installTips: [
+      "最快的方式是直接在浏览器打开 editor.graphite.art，官方标注当前为 alpha，不用本地编译就能试。",
+      "想从源码构建或参与开发，按官网 volunteer guide 的环境说明准备（Rust 项目），README 没有给一键安装命令，别照别的 Rust 项目套。",
+      "上层的画笔与形状工具是节点图的封装：要改生成逻辑得进节点编辑，找「滤镜菜单」会找不到。",
+      "选型前先看官网 features 页的 roadmap，确认你要的能力是已实现还是「计划中」。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#5B4B8A",
+    },
+    guide: {
+      intro: "讲清两件事：它和 Illustrator / Photoshop 的心智差异（节点 vs 图层），以及 alpha 阶段该怎么评估能不能用。",
+      markdown: `## 先接受它是「引擎 + 工具」，不是「画布 + 滤镜」
+第一次打开容易卡住的地方，是拿 Photoshop 的顺序去找功能：先画、再叠效果。Graphite 的模型相反——所有工具最终都落到一个节点图上，图形是节点算出来的结果。README 的原话是编辑器的工具「包裹」节点图核心，给矢量、位图提供好用的工作流。
+
+这意味着两件事：
+
+- 你按常规方式画，能得到结果，但改不动深层参数；
+- 想做真正的程序化复用，必须打开节点图，理解数据怎么在节点间流动。
+
+## alpha 阶段该怎么评估
+官网把当前版本明确标为 alpha。README 里列出的照片编辑、动态图形、数字绘画、桌面出版、VFX 合成，全部属于 roadmap 上的「额外能力」，不是今天就能用的模块。评估时按这个顺序问自己：
+
+1. 我要做的东西，是不是「矢量 + 位图 + 参数化」这三样里的；
+2. 我能不能接受导出/工程结构在版本间变动；
+3. 我有没有备用工具兜住交付节点。
+
+三条里有一条是否，就先别把它放进主流程。
+
+## 上手路径
+先用浏览器版 editor.graphite.art 试真实手感，不装任何东西。确认节点模型能接受，再考虑本地构建：这部分要按官网 volunteer guide 走，仓库是 Rust 项目，README 没有提供 install 脚本，别拿通用 Rust 命令硬套。
+
+## 它的取舍在哪
+把图层合成和节点生成放在一个文件里，是这个项目最有价值的地方——不用在两个软件之间来回导。代价是学习曲线与生态：社区资助、无商业支持，遇到问题只能靠 Discord 和仓库 issue。作为长期押注可以，作为明天要交稿的工具不行。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://graphite.art/",
+          note: "定位、roadmap 与捐赠/志愿入口。判断能力是否已实现看这里，不看截图。",
+        },
+        {
+          kind: "html",
+          title: "在线编辑器",
+          url: "https://editor.graphite.art",
+          note: "不用安装就能试的 alpha 版本，适合花二十分钟确认自己能不能接受节点式工作流。",
+        },
+        {
+          kind: "html",
+          title: "功能与路线图",
+          url: "https://graphite.art/features/",
+          note: "逐项列出已实现与计划中的能力。选型辩论时拿这一页当依据，别凭宣传语。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ant-design-vue",
+    linksCheckedAt: "2026-10-22",
+    name: "Ant Design Vue",
+    nameZh: "Ant Design Vue 组件库",
+    aliases: ["ant-design-vue", "antdv", "antd vue", "Ant Design Vue", "Vue 中后台组件库"],
+    summary: "把 Ant Design 的设计规范搬到 Vue 上的企业级组件库，支持 Vue 2 与 Vue 3，中后台表单表格开箱可用。适合不想自己搓一套后台 UI 的团队；代价是它和 React 版不是同一份代码，API 有差异，照 ant.design 文档抄会踩空。",
+    scenes: ["code", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Vue", "组件库", "中后台", "设计规范", "开源"],
+    body: "Ant Design Vue 是 Ant Design 体系的 Vue 实现：组件、交互、视觉规范与 React 版共享设计资源，但代码是独立的一套。README 的定位很直接——面向桌面端应用的企业级 UI 设计系统，附带一整套开箱即用的高质量 Vue 组件。\n它解决的是中后台的重复劳动：表单校验、可编辑表格、树形选择、抽屉与弹层这些高频但难写对的组件，直接用比自研省几个月。环境支持写得清楚：现代浏览器、服务端渲染、Vue 2 与 Vue 3、Electron；1.x 时代还通过 polyfill 支持过 IE9。周边生态也比较完整，有 Formily 的适配、Nuxt 模块、VS Code 的模板提示插件和 vue-cli 插件。\n要提醒的取舍：一是它体量大，不做按需引入会把整包拖进产物；二是「共享设计资源」不等于「API 相同」，跨 Vue / React 迁移时组件属性名与事件命名要逐个核；三是 Vue 2 与 Vue 3 分属不同版本线，项目里混用会直接跑不起来。",
+    officialUrl: "https://antdv.com",
+    officialLabel: "antdv.com",
+    links: {
+      official: "https://antdv.com",
+      github: "https://github.com/vueComponent/ant-design-vue",
+    },
+    whoFor: "做 Vue 中后台、需要成熟表单与表格组件的团队；以及想沿用 Ant Design 视觉规范但技术栈已经是 Vue 的项目。",
+    whoNot: "很小的展示型站点——整套规范与体积都不划算；也不适合指望它和 ant.design 的 React 文档逐字对得上的人。",
+    installTips: [
+      "npm install ant-design-vue --save（或 yarn add ant-design-vue），README 明确推荐走 npm / yarn 安装，而不是直接引 CDN。",
+      "国内网络差时可以换 registry 或用 cnpm，README 专门提了这一条。",
+      "README 声明同时支持 Vue 2 与 Vue 3，装之前先确认你项目所处的 Vue 大版本有对应版本线，别跨版本硬装。",
+      "官方生态里还有 vue-cli 插件、VS Code 的 ant-design-vue-helper 与 Nuxt 模块，脚手架阶段先接上能省掉手写模板的时间。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#1677FF",
+    },
+    guide: {
+      intro: "第一次接入时真正会卡的三处：装哪个版本线、怎么避免整包体积、以及为什么不能照 React 文档抄。",
+      markdown: `## 第一步不是装，是确认 Vue 大版本
+README 的环境支持一栏写的是「支持 Vue 2 & Vue 3」。这句话容易被读成「一份代码通吃」，实际是两个版本线并行维护。装之前先看 package.json 里的 vue 版本，再决定装哪个线；跨线安装的典型症状是组件能编译但运行时找不到内部依赖。
+
+\`\`\`bash
+npm install ant-design-vue --save
+# 或
+yarn add ant-design-vue
+\`\`\`
+
+README 推荐用 npm / yarn 而不是 CDN，原因是这个库依赖生态里的工具链（按需引入、主题定制都要走构建期）。
+
+## 体积：别整包注册
+企业级组件库最容易踩的坑是「全量引入」。组件数量多，全量注册会让首屏产物明显变大。做法是按页面用到的组件局部注册或按需引入，路由级代码分割配合使用。README 没有给具体的按需插件名，按官方文档当前的推荐做法来，不要照老博客抄已废弃的方案。
+
+## 不能照 React 文档抄
+它和 Ant Design of React「共享设计资源」——指的是设计规范与视觉，不是代码。属性名、事件名、插槽写法都有可能不同。判断依据只有一处：antdv.com 的 Vue 文档。遇到 React 文档里有、Vue 文档里找不到的属性，基本就是没实现或不叫这个名字。
+
+## 生态能省事的地方
+- Formily 的 \`@formily/antdv\`：复杂动态表单直接用 schema 驱动；
+- \`@ant-design-vue/nuxt\`：Nuxt 项目不用自己配 SSR 相关的样式注入；
+- VS Code 的 ant-design-vue-helper：模板里补全组件名与属性，减少查文档次数。
+
+## 什么项目不该用它
+纯展示的官网、活动页，用不上表格与表单体系，引它只会增加维护面。中后台才是它的主场。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://www.antdv.com/",
+          note: "组件 API 的唯一权威来源。与 ant.design 的 React 文档对照着看时，以这一站为准。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/vueComponent/ant-design-vue",
+          note: "版本线、issue 与更新记录。确认某个 Vue 大版本是否还在维护，看这里的分支与发版节奏。",
+        },
+        {
+          kind: "link",
+          title: "npm 包页",
+          url: "https://www.npmjs.com/package/ant-design-vue",
+          note: "查当前发布版本号与周下载量，用来判断该锁哪个版本、生态是否活跃。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pencil",
+    linksCheckedAt: "2026-10-22",
+    name: "Pencil",
+    nameZh: "Pencil 开源线框原型工具",
+    aliases: ["pencil", "pencil project", "Pencil Project", "线框图工具", "原型设计工具"],
+    summary: "老牌开源线框图工具，V4 起内置 MCP，AI 能直接在画布上放可编辑的矢量图元，而不是贴一张生成图。适合要快速出低保真原型和流程图的人；代价是 AI 部分得自己配客户端，效果取决于你接的模型。",
+    scenes: ["design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["线框图", "原型设计", "MCP", "流程图", "开源"],
+    body: "Pencil 从 2008 年做到现在，定位一直很窄也很清楚：免费的桌面线框图与原型工具，用标准矢量模具库拼界面、系统图和用户流程。它的工作方式是画布 + 模具（stencil），内置 shadcn/ui、Bootstrap、Material Design、iOS、Android、Web Elements 等 UI 模具，以及流程图、UML、ER 图、思维导图，图标库接的是 Tabler、Lucide、FontAwesome。\nV4 的变化值得单独说：内置 MCP server，跑在 http://127.0.0.1:1919/mcp。Claude Desktop、Cursor、Antigravity、VS Code 这些支持标准 MCP 的客户端连上后，可以用自然语言建页面、改间距、调颜色。关键在于它生成的是原生矢量图元，能继续拖拽改属性，而不是一张扁平截图——这是它和「让 AI 画个图」类工具的本质区别。它还开放了 render_preview，让模型能截图自查对齐与对比度，做多轮修正。\n代价有三点：AI 辅助需要手动配客户端，README 只给配置文件片段，不替你装；本地优先意味着没有云端协作，多人改同一份稿子要自己传文件；界面与交互是十几年前的路子，和 Figma 那类工具的流畅度不在一个量级。",
+    officialUrl: "https://pencil.evolus.vn/",
+    officialLabel: "pencil.evolus.vn",
+    links: {
+      official: "https://pencil.evolus.vn/",
+      github: "https://github.com/evolus/pencil",
+    },
+    whoFor: "要快速出低保真线框、流程图、ER 图的人；以及想让 AI 直接改画布而不是生成图片的团队。",
+    whoNot: "需要多人实时协作、云端版本管理的高保真设计团队；也不适合想要「开箱即用 AI」又不愿改配置文件的人。",
+    installTips: [
+      "从官网 Downloads 页或 GitHub Releases 取安装包，Windows 支持 Win7/10/11 64 位，macOS 10.9+ 有 arm64 与 x64，Linux 覆盖 Ubuntu 18.04+/Debian 10+/Fedora 30+/Arch（Arch 用 AUR）。",
+      "要接 AI：设置 → MCP 选对应客户端标签，点 Copy Configuration 粘贴；服务地址是 http://127.0.0.1:1919/mcp。",
+      "验证服务是否活着：curl -I http://127.0.0.1:1919/mcp，返回头正常再去客户端里加配置，别在客户端侧瞎猜。",
+      "从源码构建要 Node 14+、npm 或 yarn、Git；git clone 后切 development 分支，yarn install 再 yarn start，打包用 npm run dist:osx / dist:win32 / dist:linux。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#3C6E71",
+    },
+    guide: {
+      intro: "第一次用会卡在两处：模具库怎么装、MCP 客户端怎么连；再补一段源码构建与打包的注意点。",
+      markdown: `## 模具决定你能画多快
+Pencil 的画布本身很朴素，能力主要来自模具库。内置的已经够画常见界面：shadcn/ui、Bootstrap、Material Design、iOS、Android、Web Elements，加上流程图、UML、ER 图。不够用时走「工具 → 管理集合」，可以从在线仓库装，也可以加载本地 .zip（用 Stencil Generator 做的）。
+
+## 接 AI：先验端口，再配客户端
+MCP 服务在应用内部跑，地址固定为 http://127.0.0.1:1919/mcp（Streamable HTTP / JSON-RPC 2.0）。先在终端确认它活着：
+
+\`\`\`bash
+curl -I http://127.0.0.1:1919/mcp
+\`\`\`
+
+有响应再去客户端加配置。节点顺序别搞反——应用没开、端口没起，客户端只会报连接失败，看起来像配置写错了。
+
+Claude Desktop 要用代理进程转一层：
+
+\`\`\`json
+{
+  "mcpServers": {
+    "pencil": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://127.0.0.1:1919/mcp"]
+    }
+  }
+}
+\`\`\`
+
+Cursor 与 Antigravity 直接填 url，VS Code 用 "type": "http"。最省事的其实是应用里的「复制配置」按钮。
+
+## 提示词要指名模具
+README 给的经验：让助手显式用某个模具库，例如「用 shadcn/ui 模具做一个 SaaS 登录页」，否则它容易退化成画一堆裸矩形。
+
+## 从源码跑与打包
+需要 Node 14+。克隆后要切到 development 分支再装依赖，直接在主分支上跑可能对不上文档：
+
+\`\`\`bash
+git clone https://github.com/evolus/pencil.git
+cd pencil
+git checkout development
+yarn install && yarn start
+\`\`\`
+
+打包按平台分三条命令（dist:osx / dist:win32 / dist:linux），产物在 dist/。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://pencil.evolus.vn/",
+          note: "项目主页与整体介绍。先确认它是不是「线框级」而不是「高保真级」工具。",
+        },
+        {
+          kind: "html",
+          title: "下载页",
+          url: "https://pencil.evolus.vn/Downloads.html",
+          note: "各平台安装包入口。Linux 用户优先看这里有没有对应发行版的包，再去 AUR。",
+        },
+        {
+          kind: "html",
+          title: "模具与模板目录",
+          url: "https://pencil.evolus.vn/Stencils-Templates.html",
+          note: "额外模具库的下载地址。能不能画出你要的界面，基本取决于这里有没有对应库。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "plasmic",
+    linksCheckedAt: "2026-10-22",
+    name: "Plasmic",
+    nameZh: "Plasmic 可视化建站与 CMS",
+    aliases: ["plasmic", "plasmic.app", "visual builder", "React 可视化编辑器", "可视化 CMS"],
+    summary: "能接进现有 React 代码库的可视化编辑器，让运营拖你自己的组件拼页面，发布后走 webhook 或 CDN 生效。适合营销页、内容页频繁改版的团队；代价是 @plasmicapp 系列包版本强耦合，装重了 registerComponent 会直接失效。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["可视化编辑", "React", "CMS", "低代码", "开源"],
+    body: "Plasmic 想解决的是低代码的天花板问题：常规可视化建站工具自带一套组件，复杂了就拧不动；Plasmic 反过来，先把你的 React 组件注册进编辑器，让非开发者用真实组件拼页面，产物仍然走你自己的构建与部署。README 列的三个主场景很具体：市场团队搭落地页（带设计约束）、快速做内部工具与客户门户、以及不绑定特定电商/CMS/托管的建站。\n接入方式是三段式：装对应框架的 loader 包（Next.js 用 @plasmicapp/loader-nextjs），用 PLASMIC.registerComponent 把自有组件和允许暴露的 props 开放给编辑器，再在页面里放 PlasmicComponent 占位。发布后通过 webhook 触发重建，或走 ISR、从 Plasmic CDN 动态取。它也支持从 Figma 导入设计稿、导出 React 代码（codegen），以及多人协作、分支、跨项目引用。\n真正要提前知道的是版本问题。README 专门用一节讲：@plasmicapp 各包之间互相依赖且钉死精确版本，@plasmicapp/host 这类靠全局副作用工作的包一旦出现重复副本，registerComponent 就会作用在错的实例上。表现是组件注册了但编辑器里看不到，排查方向不是代码写错，而是 npm list 里有几个版本。",
+    officialUrl: "https://www.plasmic.app",
+    officialLabel: "www.plasmic.app",
+    links: {
+      official: "https://www.plasmic.app",
+      github: "https://github.com/plasmicapp/plasmic",
+    },
+    whoFor: "已有 React 代码库、想让非开发同事直接改页面但不脱离代码流程的团队；以及需要把设计稿变成可维护组件的项目。",
+    whoNot: "纯静态小站，直接用现成模板更快；也不适合不愿意处理 monorepo 依赖去重问题的团队——版本冲突是它的常态成本。",
+    installTips: [
+      "按框架选 loader 包，README 的示例是 npm install @plasmicapp/loader-nextjs；Vue、Gatsby 等各有对应包，别混装。",
+      "用 PLASMIC.registerComponent 暴露自有组件时只开放必要的 props，注册面越大，编辑器里越容易被改成不想要的样子。",
+      "装完跑 npm list 检查 @plasmicapp 与 @plasmicpkgs 是否出现重复版本；有重复先 npm dedupe 或删锁文件重装。",
+      "发布链路要提前定：webhook 触发重建、ISR，还是运行时从 CDN 取，三种的缓存行为不同，别上线后再改。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#8B5CF6",
+    },
+    guide: {
+      intro: "按接入顺序讲：loader 包怎么选、组件怎么注册、页面占位怎么写，以及最容易翻车的依赖去重。",
+      markdown: `## 三段式接入
+Plasmic 的接入是固定的三步，顺序不能乱：装 loader → 注册组件 → 放占位。
+
+\`\`\`bash
+npm install @plasmicapp/loader-nextjs
+\`\`\`
+
+## 注册：只开放你愿意被改的 props
+\`\`\`tsx
+export default function HeroSection({ children }) {
+  return <div className="hero-section">{children}</div>;
+}
+
+PLASMIC.registerComponent(HeroSection, {
+  props: {
+    children: "slot",
+  },
+});
+\`\`\`
+
+这是 README 的最小例子。注意 props 里写什么，编辑器里就能改什么。把 className、style 全开放出去，等于放弃了设计约束，前面说的「内容创建模式」也就形同虚设。
+
+## 占位：页面里留一个洞
+\`\`\`tsx
+import { PlasmicComponent, PlasmicRootProvider } from "@plasmicapp/loader-nextjs";
+
+<PlasmicRootProvider plasmic={PLASMIC}>
+  <PlasmicComponent component="Summer22LandingPage" />
+</PlasmicRootProvider>
+\`\`\`
+
+## 最容易翻车的地方：重复版本
+官方专门写一节警告过。\`@plasmicapp\` 包之间钉的是精确版本，而 \`@plasmicapp/host\` 依赖全局副作用工作——存在两份副本时，registerComponent 注册进的是另一份实例，编辑器里就是「组件注册了但看不见」。
+
+排查顺序：
+1. \`npm list @plasmicapp/host\` 看有没有多版本；
+2. 有就 \`npm dedupe\`；
+3. 还不行就删 node_modules 与 lock 文件重装，连 \`@plasmicpkgs\` 一起。
+
+## 只有 platform/ 是 AGPL
+其余目录是 MIT。要 fork 平台本身做商业分发，先看清楚这一条。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://www.plasmic.app",
+          note: "产品定位与案例。先看它把「网站」和「应用」合并的思路是否符合你的场景。",
+        },
+        {
+          kind: "html",
+          title: "快速开始",
+          url: "https://docs.plasmic.app/learn/quickstart/",
+          note: "按框架给出接入步骤。loader 包名以这里为准，别照 README 的 Next.js 示例套别的框架。",
+        },
+        {
+          kind: "html",
+          title: "技术概览",
+          url: "https://docs.plasmic.app/learn/technical-overview/",
+          note: "解释 codegen 与 headless 两条路线的差别，决定发布链路前必读。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "anti-slop",
+    linksCheckedAt: "2026-10-22",
+    name: "anti-slop",
+    nameZh: "anti-slop 反 AI 味规则集",
+    aliases: ["anti-slop", "antislop", "反 AI 味", "AI 设计规则", "agent 设计规则"],
+    summary: "给编码代理装的一套「减法」规则：拦掉模板化的 UI、假数据和 AI 腔文案，共 38 条硬规则并附交付前 PASS/FAIL 自检。适合受够了 AI 生成千篇一律页面的人；代价是它不给方向，你不写 DESIGN.md 就只得到干净而寡淡的结果。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI 代理", "设计规则", "文案", "Claude Code", "开源"],
+    body: "anti-slop 不是一个生成工具，而是一份给 AI 编码代理读的规则书，目标是把「AI 味」从三个层面清掉：界面（凭空出现的渐变、假仪表盘、装饰性圆点）、文案（空泛的形容词、编造的数据）、代码（为凑数写的注释与冗余抽象）。README 把自己的定位说得很清楚：它是过滤器，不是风格指南——不规定颜色字体排版，方向仍然由你定。\n规则共 38 条（R-01 到 R-38），分三档：Hard Gate 是必须过的底线，Purpose-Gate 要求每个视觉手法都得有理由，Quality Locks 锁住成品下限。另外配了一套 Liveliness Toolkit（ENERGY / RHYTHM / MOTION 三个旋钮）避免「干净但死板」，以及交付前的 Delivery Gate——四段式 PASS/FAIL 报告。它拆成 6 个 skill，按任务加载：UI、文案、无障碍、响应式、注释各一个，核心那条常驻。\n两种运行模式需要提前理解：during 边做边约束，after 事后审计出问题清单。README 反复强调的边界是 R-37：结果寡淡说明缺的是设计方向（你的 DESIGN.md），不是过滤器失效。安装方式很多，从 npx 安装器到各家 agent 的插件命令，官方建议一个环境只走一条路。",
+    officialUrl: "https://github.com/miqdadbadjuber/anti-slop",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/miqdadbadjuber/anti-slop",
+      github: "https://github.com/miqdadbadjuber/anti-slop",
+    },
+    whoFor: "天天让代理写界面、又要把产出交给真实用户的人；以及需要给团队统一「什么算 AI 味」的可执行标准的人。",
+    whoNot: "只想让 AI 快点出稿、不在意风格同质化的人——这套规则会增加往返轮次；也不适合指望它替你决定视觉方向的项目。",
+    installTips: [
+      "推荐走安装器：npx antislop-ai，它会问你装哪些 skill、装到本项目还是全局、用哪些 agent，然后写好每次会话重载的指针。",
+      "Claude Code 走插件：/plugin marketplace add https://github.com/miqdadbadjuber/anti-slop 再 /plugin install antislop@anti-slop；一个环境只选一条安装路径。",
+      "只想试一下：用 curl 下载仓库里的 antislop.md 单文件，直接贴进对话即可，不需要任何安装。",
+      "默认每次新会话都会问 during / after；想固定下来跑 npx antislop-ai --mode during，设置写到 ~/.config/antislop/settings.json（Windows 在 %APPDATA%）。",
+      "它不会自动更新，升级要手动 npx antislop-ai --update，之后重开会话才生效。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#111827",
+    },
+    guide: {
+      intro: "讲清它到底管什么、不管什么，安装路径怎么选，以及 during / after 两种模式第一次该用哪个。",
+      markdown: `## 它不是风格指南
+最容易被误解的地方：以为装了它，AI 就会做出好看的界面。README 的比喻是「过滤器」——它只负责拦掉不该出现的东西（编造的数字、装饰性渐变、没有理由的动效），不负责发明方向。
+
+所以官方把流程拆成两半：anti-slop 过滤，\`DESIGN.md\`（你自己写的）提供方向。两个都不做，结果是「干净但没劲」；只做 DESIGN.md，结果是「有方向但仍有 AI 味」。R-37 就是专门说这件事的。
+
+## 选一条安装路径
+门很多：安装器、skills.sh 目录、Claude Code / Codex / Cursor / Kimi Code / Cline / Oh My Pi 的插件命令、Pi 的包、以及单文件。新手直接用安装器：
+
+\`\`\`bash
+npx antislop-ai
+\`\`\`
+
+它会依次问三件事：要哪些 skill、装到当前项目还是全局、你有哪些 agent。同一环境别叠加安装（比如插件 + 手动装完整版），技能会被加载两遍。
+
+只要核心过滤、不想装整套，用单文件：
+
+\`\`\`bash
+curl -o antislop.md https://raw.githubusercontent.com/miqdadbadjuber/anti-slop/main/antislop.md
+\`\`\`
+
+## during 还是 after
+第一次用建议 **during**：在新项目上边做边约束，会话结束会给你一份 Delivery Gate 报告，四段式 PASS/FAIL。**after** 是给已有产物做审计——先出编号问题清单，你挑要修的，再出一份跟进报告。
+
+默认每次新会话都会问一遍。嫌烦可以先固定：
+
+\`\`\`bash
+npx antislop-ai --mode during   # 或 after / ask
+\`\`\`
+
+这个设置跨 agent、跨项目共享，写在用户配置目录里；当前对话里临时指定的模式只对本次会话生效。
+
+## 六个 skill，别全装
+核心 skill 常驻，其余按需：UI、文案、无障碍、响应式、注释。只做后端的项目装全部是浪费上下文。
+
+## 更新
+它不自动更新。装过之后跑 \`npx antislop-ai --update\`，会替换项目与用户目录下的旧副本并打印被替换的版本，然后重开会话。`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/miqdadbadjuber/anti-slop",
+          note: "38 条规则与全部安装方式的原文出处。判断它是否适合你的团队，读规则本身而不是宣传语。",
+        },
+        {
+          kind: "html",
+          title: "GUIDE.md 上手手册",
+          url: "https://github.com/miqdadbadjuber/anti-slop/blob/main/GUIDE.md",
+          note: "从零开始的分步教程，含各 agent 的安装、更新与卸载。装坏了照这里恢复。",
+        },
+        {
+          kind: "link",
+          title: "skills.sh 目录页",
+          url: "https://skills.sh/miqdadbadjuber/anti-slop",
+          note: "用 npx skills add 安装时的入口，能看到这个 skill 的元信息与版本。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "oat",
+    linksCheckedAt: "2026-10-22",
+    name: "Oat UI",
+    nameZh: "Oat 极简语义化 UI 库",
+    aliases: ["oat", "oat ui", "oat.ink", "极简 UI 库", "无依赖 CSS 框架"],
+    summary: "约 10KB、零依赖的 HTML/CSS/JS 组件库，语义标签自带样式，不用堆类名。适合小项目、文档站、内部工具这类不想引框架的场合；代价是组件覆盖面窄，复杂交互仍得自己写。",
+    scenes: ["code", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["CSS", "组件库", "语义化 HTML", "轻量", "开源"],
+    body: "Oat 的作者在 README 里写了动机：受够了 JS UI 库的体积、依赖和「先把你圈进来再改规则」的做法，于是自己写了一个。它的赌注是语义化 HTML——标签和属性本身就带上下文样式，不需要写一堆 class，既强制了结构规范，也减少了标记污染。少数动态组件用 WebComponent 实现，只带极少量 JS。\n技术上它没有框架、没有构建步骤、没有运行时依赖，压缩后约 10KB，直接引两个文件就能做出体面的界面。这个取舍很明确：换来的是极低的接入成本和几乎为零的维护包袱，放弃的是组件密度与定制深度。\n判断它适不适合你，只需要看一件事——你的界面是不是以「文档、表单、列表、简单后台」为主。是，它很舒服；如果你需要日期范围选择器、虚拟滚动表格、可拖拽树这类重组件，它不会有，自己补的成本会超过直接用一个成熟库。另外它目前更像单人维护的项目，README 只有一页，组件清单与浏览器兼容范围要去 oat.ink 看，选型前别只看体积数字。",
+    officialUrl: "https://oat.ink",
+    officialLabel: "oat.ink",
+    links: {
+      official: "https://oat.ink",
+      github: "https://github.com/knadh/oat",
+    },
+    whoFor: "做小工具、内部面板、文档站、静态页的人；以及想用语义 HTML 顺手拿到可读样式、不愿引入构建链的开发者。",
+    whoNot: "需要重型数据组件（复杂表格、日期区间、树形拖拽）的产品；也不适合要求长期商业支持与大体量组件覆盖的团队。",
+    installTips: [
+      "不需要包管理器：把 CSS 与 JS 两个文件放进项目直接引入即可，没有构建步骤。",
+      "写法上先按语义标签组织结构，再对照 oat.ink 的 demo 看哪些标签/属性已有默认样式，别照 Bootstrap 的习惯先堆类名。",
+      "动态组件由 WebComponent 实现、依赖那一个 JS 文件，禁用 JS 时这部分会退化，别指望纯 CSS 兜住。",
+      "README 只有一页，组件清单、可定制变量与浏览器支持以 oat.ink 的在线文档与 demo 为准。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#B45309",
+    },
+    guide: {
+      intro: "第一次用要改的两个习惯：先写语义结构而不是先堆类名；以及搞清哪些组件依赖那点 JS。",
+      markdown: `## 先写结构，再想要不要类名
+Oat 的核心主张是「语义标签和属性开箱就有上下文样式」。这跟 Bootstrap / Tailwind 的使用顺序相反：那两套是你先想视觉、再选类；Oat 是你先把 HTML 写对，样式自然出来。
+
+实操建议：拿一个已有页面，把 div 换成它该有的语义标签，删掉装饰性 class，再看缺什么。多数「简陋但可用」的界面，这一步就成型了。
+
+## 只有两个文件
+README 的说法是「引入体积很小的 CSS 和 JS 就能开始」，没有框架、没有构建、没有依赖。这意味着：
+
+- 不需要 npm，也不需要打包器；
+- 版本升级就是替换文件，不会有 peer dependency 冲突；
+- 代价是没有 tree-shaking 这一说——但总量才 10KB 左右，本来也不值得摇。
+
+## 哪些地方会依赖 JS
+少数动态组件是 WebComponent。判断标准很简单：如果它的行为需要状态（开合、切换、输入联动），大概率在那一个 JS 文件里。所以：
+
+1. 别把 JS 文件漏掉，只引 CSS 会得到「长得对但点不动」的组件；
+2. 对无 JS 环境有要求的场景，先确认这些组件降级后的样子，再决定用不用。
+
+## 选型时该问的问题
+README 很短，这本身就是信息：它是个人项目，为了自己的需求而写。所以评估重点不在功能列表，而在：
+
+- 我的界面里有没有它明显不覆盖的重组件（复杂表格、日期区间、树）；
+- 我能不能接受遇到 bug 时自己读源码修；
+- 浏览器兼容范围是否覆盖我的用户（去 oat.ink 查，别假设）。
+
+三个问题里有一个答不上来，就先用成熟组件库，别为了 10KB 赌项目周期。
+
+## 它真正省下的不是体积
+省下的是「决定要不要引框架」这件事。对一周做完就上线的小工具，这个决定成本比 100KB 的包体积贵得多。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与在线文档",
+          url: "https://oat.ink",
+          note: "README 只有一页，组件清单、示例与可定制项都在这里。选型前必须先看 demo。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/knadh/oat",
+          note: "源码与 issue。判断维护活跃度、看作者对兼容性的表态，都以这里为准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "transitions-dev",
+    linksCheckedAt: "2026-10-22",
+    name: "Transitions.dev",
+    nameZh: "Transitions.dev 动效片段库",
+    aliases: ["transitions.dev", "transitions dev", "CSS 过渡片段", "UI 动效库", "motion skill"],
+    summary: "可复制的 CSS 过渡片段集：弹窗、数字翻滚、通知角标、图标切换这类高频动效都有现成实现，片段自带命名空间与减动效保护。适合不想手调缓动曲线的前端；代价是 Pro 片段要登录才能拉，免费部分覆盖有限。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["动效", "CSS", "交互动画", "Tailwind", "开源"],
+    body: "Transitions.dev 是一个动效片段站：每张卡片演示一种交互模式，配一段可直接粘贴的 CSS。README 的表格列了 12 个高频场景——卡片尺寸切换、数字弹入、通知角标、文本状态切换、菜单展开（带方向感知）、模态开合、面板滑出、页面左右切换、图标交换、成功打勾（含 SVG 路径描边）、头像组悬停、校验失败抖动。\n它比在 CodePen 上随手抄一段靠谱的地方在于片段的封装方式：自定义属性统一挂在 :root，过渡规则用 t-* 前缀做命名空间，还带了 @media (prefers-reduced-motion: reduce) 兜底。也就是说粘进项目不会污染全局类名，也不会让对动效敏感的用户难受。\n除了网站，它还有三条使用路径：CLI、agent skill（npx skills add 后让 Cursor / Claude Code 直接在你的项目里套用）、以及 Refine 工具——一条命令往运行中的应用注入时间轴面板，点选元素让 agent 对齐动效参数，改动是实时且可回滚的。\n要留意的是商业边界：Pro 片段先要 npx transitions-dev login 走浏览器设备码，再按名字拉取；授权允许个人与商业项目免费使用和修改，但不许把库本身重新分发成竞品。",
+    officialUrl: "https://transitions.dev",
+    officialLabel: "transitions.dev",
+    links: {
+      official: "https://transitions.dev",
+      github: "https://github.com/Jakubantalik/transitions.dev",
+    },
+    whoFor: "要做落地页、后台交互细节、演示原型的的前端；以及想让 agent 按统一动效语言改界面的团队。",
+    whoNot: "需要成套动画框架（时间轴编排、物理引擎）的项目——这里给的是单点过渡片段；也不适合不能接受 Pro 内容需登录的人。",
+    installTips: [
+      "npx transitions-dev list 先看清单，npx transitions-dev add card-resize 拉单个片段——免费项不需要账号。",
+      "npx transitions-dev add --free 一次装齐所有免费过渡，适合先统一项目的动效基线。",
+      "Pro 片段要先 npx transitions-dev login（浏览器设备码确认，终端里不留 API key），再 npx transitions-dev add confetti-burst 之类。",
+      "当 agent skill 用：npx skills add Jakubantalik/transitions.dev，skill 目录里有每个过渡的参考文件与 _root.css。",
+      "粘进项目后别删片段里的 prefers-reduced-motion 那段，那是它对无障碍的承诺。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#DB2777",
+    },
+    guide: {
+      intro: "从拿到片段到真正用对：CLI 怎么拉、粘进项目要改哪两处、以及 Refine 那条「边看边调」的路怎么走。",
+      markdown: `## 先分清三条路径
+同一个库有三种用法，别混：
+
+1. **网站复制**：打开 transitions.dev，点卡片上的复制按钮，拿到自包含 CSS；
+2. **CLI**：终端里按名字拉，适合批量；
+3. **agent skill**：把片段知识装进 Cursor / Claude Code，让它在你的项目里直接改。
+
+\`\`\`bash
+npx transitions-dev list            # 看有哪些
+npx transitions-dev add card-resize # 拉一个免费项
+npx transitions-dev add --free      # 全部免费项
+\`\`\`
+
+Pro 的流程不一样，要先登录：
+
+\`\`\`bash
+npx transitions-dev login
+npx transitions-dev add confetti-burst
+\`\`\`
+
+设备码在浏览器里确认，终端不保存密钥。
+
+## 粘进项目后要改的两处
+片段的结构是三段：\`:root\` 上的自定义属性、\`t-\` 前缀下的过渡规则、以及减动效的媒体查询。
+
+第一处要改的是**变量值**：时长、位移距离、缓动都在 :root 里，改这里比改规则体安全。
+第二处要改的是**挂载点**：片段只给规则，不给标记。你得把对应的 \`t-*\` 类加到自己的元素上，并保证状态切换（开/关、选中/未选）有对应的类名变化，否则不会有过渡。
+
+## 只想调一个已有动效：用 Refine
+Refine 是给「已经有动效但不满意」的场景准备的：它往运行中的应用注入一个时间轴面板和一个 Refine 面板，不需要 npm install，也不需要你改源码。
+
+\`\`\`bash
+npx transitions-refine live        # 注入面板 + 起本地中继
+npx transitions-refine live --llm  # 顺带接上 Cursor CLI，让模型给建议
+npx transitions-refine stop        # 移除注入的 script
+\`\`\`
+
+每次点 Refine，它会让 agent 把选中元素的过渡对齐到库里的动效 token，或直接换成库里的一条。建议以「实时覆盖」的形式出现，你可以逐条接受，也可以整体撤掉。`,
+      resources: [
+        {
+          kind: "html",
+          title: "动效展示站",
+          url: "https://transitions.dev/",
+          note: "每张卡片都能现场看效果并复制片段，是判断「这个动效要不要」最快的地方。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/Jakubantalik/transitions.dev",
+          note: "CLI、skill 与 Refine 的源码都在这里；授权条款也以仓库里的 LICENSE 为准。",
+        },
+        {
+          kind: "link",
+          title: "CLI npm 包",
+          url: "https://www.npmjs.com/package/transitions-dev",
+          note: "核对 CLI 版本。旧名 transitions-pro 会转发到这个包，别装错。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pts",
+    linksCheckedAt: "2026-10-22",
+    name: "Pts",
+    nameZh: "Pts 创意编程与可视化库",
+    aliases: ["pts", "pts.js", "ptsjs", "creative coding", "生成艺术库"],
+    summary: "面向可视化与创意编程的 TypeScript 几何/动效库，给的是点、线、组与画布循环这套底层积木，不是现成图表。适合写生成艺术、互动装置的人；代价是图表要自己画，没有开箱的坐标轴与图例。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["创意编程", "生成艺术", "Canvas", "可视化", "开源"],
+    body: "Pts 是 William Ngan 写的可视化与创意编程库，TypeScript 编写，ESM 优先并保留 CommonJS 入口。它的抽象层很基础：Pt（点）、Group（点集）、Line、CanvasSpace（画布与播放循环）。你拿到的是一套几何运算加一个逐帧循环，图形由你算出来，而不是从配置里生成。\n这类库的定位要和图表库分清。ECharts、Chart.js 解决的是「给数据出图」，Pts 解决的是「用几何与运动表达」。做生成海报、粒子系统、互动装置、教学演示里的向量动画，它的线性代数与几何辅助函数能省掉大量推导；做业务报表，它给不了坐标轴、图例、tooltip，这些得自己搭。\n接入很轻：浏览器里引一个 pts.min.js（挂到 globalThis.Pts），或者 npm install pts 后按需引入。仓库同时提供 React、Vue、skia-canvas 与单文件 vanilla 的集成示例，也有 starter kit 可以直接克隆。维护方面，作者对构建环境的要求写得很明确——开发用 Node 24.18 以上，发布的库在 Node 20 与 22 上也测过。",
+    officialUrl: "https://ptsjs.org",
+    officialLabel: "ptsjs.org",
+    links: {
+      official: "https://ptsjs.org",
+      github: "https://github.com/williamngan/pts",
+    },
+    whoFor: "写生成艺术、互动装置、教学演示的创意编码者；以及需要在 Canvas 上做几何运算但不想自己实现向量数学的前端。",
+    whoNot: "要做业务图表的人——没有坐标轴、图例、tooltip 这些成品件；也不适合团队里没人愿意读几何 API 文档的项目。",
+    installTips: [
+      "npm install pts 后按需引入，例如 import { CanvasSpace, Group, Line, Pt } from \"pts\"；ESM 与 CommonJS 都有入口。",
+      "不想上构建链就引 CDN 上的 pts.min.js，经典脚本方式会把库挂到 globalThis.Pts。",
+      "先克隆 starter kit 或看 pts-react-example，比从空白页开始快；React 项目也可直接用 react-pts-canvas。",
+      "它只有画布与几何，没有图表组件——别按 ECharts 的预期找配置项。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#0F766E",
+    },
+    guide: {
+      intro: "给第一次接触创意编程库的人：先分清它和图表库的区别，再跑通一个最小画布，最后是几个容易误解的 API 边界。",
+      markdown: `## 先确认你要的不是图表
+Pts 的 README 第一句是「用于可视化与创意编程的 TypeScript / JavaScript 库」。这里的可视化指的是用几何与运动表达，不是把 CSV 画成柱状图。
+
+判断方法：如果你需要的是「横轴时间、纵轴数值、hover 出 tooltip」，用图表库；如果你需要的是「一万个点按某个力场流动」，用 Pts。两者可以共存，但别指望后者长出前者。
+
+## 最小可跑的画布
+\`\`\`bash
+npm install pts
+\`\`\`
+
+\`\`\`js
+import { CanvasSpace, Pt, Group } from "pts";
+
+const space = new CanvasSpace("#pt").setup({ bgcolor: "#123" });
+const form = space.getForm();
+
+space.add((time, ftime) => {
+  const pts = Group.fromArray([[50, 50], [200, 120], [120, 220]]);
+  form.strokeOnly("#fff", 2).polygon(pts);
+});
+
+space.play();
+\`\`\`
+
+这段体现的是它的结构：CanvasSpace 负责画布与时间循环，Group 负责点集，form 负责把几何画出来。没有 DOM 组件，没有配置对象——一切都是你自己在每一帧里算。
+
+## 三个容易误解的地方
+1. **它不管布局**：画布尺寸、响应式缩放、设备像素比要自己处理。
+2. **点集不是数组**：Group 有自己的运算方法（插值、细分、包围盒），混用原生数组方法会丢功能。
+3. **动画靠循环**：space.add 里的回调每帧执行，状态要自己在闭包里维护，没有声明式的状态机。
+
+## 怎么学最快
+官网的 guides 是按主题递进的，从 Get started 开始；demos 里每个都是可运行的小例子，改参数立刻看到差异。仓库还提供 starter kit 与 React 示例，先跑通再拆。
+
+## 维护与许可
+Apache-2.0。开发要求 Node 24.18 以上（发布产物也在 Node 20 / 22 验过），全量检查用 pnpm check。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与在线 Demo",
+          url: "https://ptsjs.org",
+          note: "所有例子都能在浏览器里直接改参数运行，是理解它抽象层最快的方式。",
+        },
+        {
+          kind: "html",
+          title: "入门指南",
+          url: "https://ptsjs.org/guide/Get-started-0100.html",
+          note: "从零讲画布、点集与动画循环。第一次上手照这条线走，别东看一个 demo 西看一个。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/williamngan/pts",
+          note: "集成示例（React / Vue / skia-canvas）与构建要求都在这里，接现有项目时看它。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "animal-island-ui",
+    linksCheckedAt: "2026-10-22",
+    name: "Animal Island UI",
+    nameZh: "Animal Island UI 治愈系组件库",
+    aliases: ["animal-island-ui", "Animal Island UI", "动物岛 UI", "可爱组件库", "React 治愈系 UI"],
+    summary: "一套原创「岛屿治愈风」的 React + TypeScript 组件库，图标、插画、动效全部自己画，不做二次封装。适合想要温暖可爱观感的作品集、活动页、小产品；代价是风格强绑定，放进严肃后台会非常违和，而且必须记得引默认样式。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["React", "组件库", "可爱风", "设计系统", "开源"],
+    body: "Animal Island UI 是轻量的 React + TypeScript 组件库，卖点不在功能数量，而在视觉语言的原创性：每个元素、布局、图标、动画都是从零画的，不走「基于某大厂设计系统改皮」的路。README 说得很明白——它是一个独立创作的开源项目，与任何游戏公司都没有关联，素材都是原创。\n用法上它和普通组件库没区别：npm 装包，引组件，用 type、color 这类属性换风格。但它有一条硬要求：必须 import 'animal-island-ui/style'，否则组件完全没有样式和字体——这是第一次接入最常见的翻车点，页面会退化成裸 HTML。\n项目还额外准备了给 AI 用的两条路：一是可安装的 agent skill（skills add guokaigdg/animal-island-ui），让编码代理按它的设计规范写页面；二是一段「一键提示词」，不写代码的人在任意能取网址的 AI 工具里粘贴，回的是一份可直接双击打开的 index.html。设计规范本身也整理成了 docs/design-system 里的单一事实源。\n适用边界要自己判断：它适合需要情绪价值的小产品、个人主页、活动页、练习项目；不适合需要密集表格与信息层级的企业后台，那种场景它的圆角、插画和配色会成为负担。",
+    officialUrl: "https://guokaigdg.github.io/animal-island-ui",
+    officialLabel: "guokaigdg.github.io",
+    links: {
+      official: "https://guokaigdg.github.io/animal-island-ui",
+      github: "https://github.com/guokaigdg/animal-island-ui",
+    },
+    whoFor: "做个人作品集、活动页、小工具、儿童向产品的前端；以及想要一套统一可爱视觉又不想自己画 SVG 的人。",
+    whoNot: "做数据密集的企业后台——圆角与插画会压住信息层级；也不适合必须沿用公司既有设计体系的项目。",
+    installTips: [
+      "npm install animal-island-ui 后即可按需引入组件，如 import { Button, Card } from 'animal-island-ui'。",
+      "必须同时写 import 'animal-island-ui/style'，漏掉这一行组件会没有任何样式与字体——README 用加粗专门提示过。",
+      "想让 AI 按这套规范生成页面：skills add guokaigdg/animal-island-ui；不写代码的人用 docs/one-click-prompt.md 里的一键提示词。",
+      "配套图标库是 naive-icons，Vue 版是 animal-island-vue，跨框架时别把两套组件混着用。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#F59E0B",
+    },
+    guide: {
+      intro: "第一次接入最容易漏的一行样式、风格该怎么落地，以及让 AI 按这套规范产页面的两条路。",
+      markdown: `## 第一件事：引样式
+\`\`\`tsx
+import { Button, Card } from 'animal-island-ui';
+import 'animal-island-ui/style';
+\`\`\`
+
+第二行不是可选项。README 用警告框写了：不引 style，组件会没有样式和字体。症状是按钮变成浏览器默认样式、字体回落到系统字体，看起来像「装错了包」。排查时先看这一行，再去看版本。
+
+## 它不是中性组件库
+多数组件库的设计目标是被忘记——你的产品长什么样由你决定。这一套相反，它的价值就是那股岛屿治愈风：圆角、柔和配色、手绘图标、轻微弹跳的动效。所以用法应该是「顺着它的语言走」，而不是把它改成中性再套自己的品牌。
+
+实操上：先用它的色板（Card 的 color 这类属性）定基调，再补自己的内容；不要一上来就覆盖 CSS 变量，那会把整套视觉拆散。
+
+## 页面不够用时：让 AI 按规范产
+项目准备了两条路，适合不同的人：
+
+- **会写代码**：装 skill，\`skills add guokaigdg/animal-island-ui\`，之后让 Claude Code / Codex / Cursor 按它的组件 props 与设计规范写。
+- **不写代码**：复制 \`docs/one-click-prompt.md\` 里的提示词，粘进任何能取网址的 AI 工具，回你一个 index.html，双击就能看。
+
+第二条路的关键是：提示词让 AI 自己去取规范文件，而不是靠模型记忆瞎编颜色。所以那句「不要改写提示词里的链接」是有意义的。
+
+## 设计规范在哪
+\`docs/design-system/\` 是单一事实源：token、规则、逐组件的像素级规格、CSS 变量模板都在里面。要二次开发或做设计对齐，读这一份，别从组件源码反推。
+
+## 边界
+它刻意不做密集表格、复杂表单校验那类企业级组件。硬要在后台项目里用它，最后会变成「一半自己的组件 + 一半它的组件」，风格割裂比全用中性库更难看。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线预览",
+          url: "https://guokaigdg.github.io/animal-island-ui/#/",
+          note: "所有组件的实际观感都在这里。判断这套风格能不能进你的产品，看五分钟就够。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/guokaigdg/animal-island-ui",
+          note: "设计规范文档、agent skill 与一键提示词都随仓库提供，是二次开发的一手资料。",
+        },
+        {
+          kind: "link",
+          title: "npm 包页",
+          url: "https://www.npmjs.com/package/animal-island-ui",
+          note: "核对版本与更新频率。风格类库最容易停在半成品，发版节奏能说明它还活着。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "style-dictionary",
+    linksCheckedAt: "2026-10-22",
+    name: "Style Dictionary",
+    nameZh: "Style Dictionary 设计 token 构建",
+    aliases: ["style-dictionary", "style dictionary", "设计 token", "design tokens", "多端样式变量"],
+    summary: "把一份设计 token 编译成 CSS、SCSS、iOS、Android 等多端变量的构建工具，改一处全端同步。适合多端并行、UI 规范要落地的团队；代价是要维护 config 与 transform 链，4.0 有破坏性变更，老配置不能直接升。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["设计 token", "构建工具", "多端", "设计系统", "开源"],
+    body: "Style Dictionary 解决的问题很具体：同一个颜色或字号，在 Web、iOS、Android 上要写三遍，改一次要同步三处，总会漏。它的做法是把这些值写成 JSON（design token），由构建系统按平台配置输出成对应格式——SCSS 变量、Android 的 dimens.xml、iOS 的常量，甚至样式文档。\n核心概念只有三个：source（token 文件的 glob，多个文件会深合并）、platforms（每种目标端的 transform 与输出文件）、transformGroup（一组变换，比如 px 转 sp）。token 支持别名引用，{size.font.medium} 这种写法会在构建时解析成实际值，所以改基准字号能连带改掉所有引用它的地方。README 推荐按 Category / Type / Item 的层级组织，理由是这样命名一致，而且内置变换靠这个层级判断该不该作用——比如 color/hex 只对 color 类别的 token 生效。\n要提醒的是版本：README 顶部直接指向 4.0 迁移指南，说明这是不兼容升级。存量项目从 3.x 上来，配置结构、枚举导入方式都可能要改，别直接改版本号就发版。扩展性也有代价：自定义 transform 与 format 要用 Node API 写，团队得有人维护这段构建代码。",
+    officialUrl: "https://styledictionary.com",
+    officialLabel: "styledictionary.com",
+    links: {
+      official: "https://styledictionary.com",
+      github: "https://github.com/style-dictionary/style-dictionary",
+    },
+    whoFor: "同时维护 Web 与移动端、设计规范要强制执行的产品团队；以及需要把设计稿里的 token 变成可提交代码的人。",
+    whoNot: "只有单一平台、样式量很小的项目——多一层构建只增加心智负担；也不适合没人愿意维护构建脚本的团队。",
+    installTips: [
+      "CLI 用法装全局：npm install -g style-dictionary；当依赖用装成 devDependency：npm install -D style-dictionary。",
+      "空目录里跑 style-dictionary init basic 会拷出一份示例工程，改完再 style-dictionary build——比从零写 config 快得多。",
+      "默认读根目录的 config.json 或 config.js；换文件用 --config，只想构建某一个端用 --platform。",
+      "4.0 是不兼容升级，从 3.x 过来先读迁移指南，再动配置。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#6D28D9",
+    },
+    guide: {
+      intro: "从一份 token 到多端产物：config 怎么写、别名怎么用、以及升级 4.0 时会卡在哪。",
+      markdown: `## 三件东西就够跑起来
+\`\`\`bash
+npm i -g style-dictionary
+mkdir MyStyleDictionary && cd MyStyleDictionary
+style-dictionary init basic
+style-dictionary build
+\`\`\`
+
+\`init basic\` 会把仓库里的示例工程拷过来，包含 config.json 与 tokens/ 目录。先跑通，再改成自己的结构——比对着文档拼配置可靠。
+
+## config 的结构
+\`\`\`json
+{
+  "source": ["tokens/**/*.json"],
+  "platforms": {
+    "scss": {
+      "transformGroup": "scss",
+      "buildPath": "build/",
+      "files": [
+        { "destination": "scss/_variables.scss", "format": "scss/variables" }
+      ]
+    }
+  }
+}
+\`\`\`
+
+- \`source\`：token 文件的 glob，多个文件会深合并，所以你可以按类别拆文件；
+- \`transformGroup\`：一组变换的名字，决定单位、命名、颜色格式怎么转；
+- \`buildPath\` + \`destination\`：产物落点，注意 buildPath 要以斜杠结尾。
+
+## 别名是最值得用的功能
+\`\`\`json
+{
+  "size": {
+    "font": {
+      "medium": { "value": "16px" },
+      "base": { "value": "{size.font.medium}" }
+    }
+  }
+}
+\`\`\`
+
+构建时 base 会解析成 16px。意义在于改基准值，所有引用它的地方一起变——这是「token 体系」和「一堆常量」的分界线。
+
+## 升级 4.0 前
+README 第一行就挂了迁移指南链接。顺序建议：先读迁移文档 → 改配置结构与枚举导入 → 单独跑一次 build 对比产物 diff → 再合入。它的输出是别的项目直接引用的文件，出错的代价不是编译失败，而是线上颜色悄悄变了。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://styledictionary.com",
+          note: "token 结构、transform 与 format 的完整参考。自定义构建前必须过一遍 hooks 部分。",
+        },
+        {
+          kind: "html",
+          title: "4.0 迁移指南",
+          url: "https://styledictionary.com/versions/v4/migration/",
+          note: "从 3.x 升级的必读项。列出破坏性变更与替换写法，跳过它升级风险很高。",
+        },
+        {
+          kind: "link",
+          title: "npm 包页",
+          url: "https://www.npmjs.com/package/style-dictionary",
+          note: "查当前版本与发版节奏。锁版本前先确认大版本，避免 CI 自动升到破坏性版本。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "taro-ui",
+    linksCheckedAt: "2026-10-22",
+    name: "Taro UI",
+    nameZh: "Taro UI 多端组件库",
+    aliases: ["taro-ui", "Taro UI", "taro 组件库", "小程序组件库", "多端 UI"],
+    summary: "基于 Taro 的多端组件库，一套代码跑微信/支付宝/百度小程序、H5 与 React Native。适合存量的 Taro 小程序项目；代价是项目正处「恢复维护」阶段，Taro v4 兼容还在验证，新项目选它要留后路。",
+    scenes: ["code", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Taro", "小程序", "组件库", "多端", "开源"],
+    body: "Taro UI 是京东开源（现挂在 jd-opensource 下）的组件库，定位跟着 Taro 走：写一套代码，编译到微信小程序、支付宝小程序、百度小程序、H5 和 React Native。README 的「特性」只有三条，其中最关键的是多端适配——同一套组件在不同端上表现一致，这件事自己做成本很高。\n它对版本的要求是硬性的，也是新手最容易装错的地方：Taro 版本低于 3 用 2.x（npm install taro-ui@2.3.4），Taro 3 及以上用 latest。装错的表现通常是编译能过、运行时报组件内部 API 不存在。\n要说清的是项目状态。README 的路线图部分坦白了：「正在积极恢复维护中」，当前重点是 Monorepo 重构、CSS 预编译和 Taro v4 兼容性验证。这句话的含义是——它能用在存量项目上，但你要接受更新节奏慢、v4 兼容尚未完成。新项目如果重度依赖 Taro 的最新能力，选它之前先看 ROADMAP 的进度，并准备一个可替换的方案。\n它另外提供了一份 AI Native 的 skill，用 npx skills add 装上对应 SKILL.md 后，编码代理能按它的组件用法写页面。",
+    officialUrl: "https://jd-opensource.github.io/taro-ui",
+    officialLabel: "jd-opensource.github.io",
+    links: {
+      official: "https://jd-opensource.github.io/taro-ui",
+      github: "https://github.com/jd-opensource/taro-ui",
+    },
+    whoFor: "已经在用 Taro 做小程序/H5 多端、需要现成组件的团队；以及维护存量 Taro 项目、不想重写 UI 层的人。",
+    whoNot: "从零启动且要用 Taro v4 新特性的新项目——兼容性还在验证；也不适合需要活跃 issue 响应与长期版本承诺的产品。",
+    installTips: [
+      "先确认 Taro 大版本再装：Taro < 3 装 taro-ui@2.3.4，Taro ≥ 3 装 taro-ui@latest，装错会在运行时才炸。",
+      "按需引入组件，例如 import { AtButton } from 'taro-ui'，全量注册会明显拖慢小程序首包。",
+      "多端一致性要在真机上验：H5 上正常不代表小程序端正常，样式单位与端能力差异是主要来源。",
+      "想让 AI 按它的用法写页面：npx skills add https://raw.githubusercontent.com/jd-opensource/taro-ui/master/packages/taro-ui-guide/SKILL.md。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#2563EB",
+    },
+    guide: {
+      intro: "装之前先对版本、多端下最容易出问题的地方，以及「恢复维护中」这句该怎么读。",
+      markdown: `## 版本对不上，装了也白装
+README 把安装分成两段，这不是可选建议：
+
+\`\`\`bash
+# Taro 版本 < 3
+npm install taro-ui@2.3.4
+
+# Taro 版本 ≥ 3
+npm install taro-ui@latest
+\`\`\`
+
+判断依据是项目里 Taro 的版本，不是组件库的版本。装错的典型症状是构建通过、打开页面白屏或报内部依赖缺失——因为 2.x 与 3.x 是两套针对不同 Taro 运行时的实现。
+
+## 多端一致≠处处相同
+它宣称一套组件跑微信、支付宝、百度小程序、H5 和 RN。真实项目里差异主要出现在三处：
+
+1. **样式单位**：小程序用 rpx，H5 用 rem/px，换算规则由 Taro 配置决定；
+2. **端能力**：涉及原生 API 的组件（如某些弹层、选择器）在不同端行为不一致；
+3. **React Native**：样式支持是子集，flex 之外的能力要单独验。
+
+所以验收顺序应该是：先在小程序真机跑通主流程，再看 H5，最后才谈 RN。
+
+## 「恢复维护中」该怎么读
+README 的原话是项目正在积极恢复维护，当前重点是 Monorepo 重构、CSS 预编译与 Taro v4 兼容性验证。翻译成选型语言：
+
+- 存量项目继续用没问题，组件是现成的；
+- 新项目要评估「如果半年内没有新版本，我能不能接受」；
+- 依赖 v4 新能力的部分，先自己去 issue / ROADMAP 看进度，别按「已支持」规划排期。
+
+## 用 AI 辅助写页面
+仓库提供了一份 skill，装上之后代理会按 Taro UI 的组件 props 写代码，比让它凭记忆写小程序的组件名可靠：
+
+\`\`\`bash
+npx skills add https://raw.githubusercontent.com/jd-opensource/taro-ui/master/packages/taro-ui-guide/SKILL.md
+\`\`\``,
+      resources: [
+        {
+          kind: "html",
+          title: "组件文档",
+          url: "https://jd-opensource.github.io/taro-ui/#/",
+          note: "组件 props 与示例的唯一出处。写页面前对一遍，别照 React 端组件库的习惯套。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/jd-opensource/taro-ui",
+          note: "issue 与发版记录。判断维护是否真的恢复，看最近半年的提交与回复。",
+        },
+        {
+          kind: "html",
+          title: "ROADMAP",
+          url: "https://github.com/jd-opensource/taro-ui/blob/master/ROADMAP.md",
+          note: "列出 Monorepo 重构与 Taro v4 兼容的进度。排期前必看，别假设兼容已完成。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "baoyu-design",
+    linksCheckedAt: "2026-10-22",
+    name: "baoyu-design",
+    nameZh: "baoyu-design 本地设计 skill",
+    aliases: ["baoyu-design", "宝玉设计", "Claude Design 本地版", "design skill", "HTML 原型生成"],
+    summary: "把 Claude Design 那套设计流程打包成 Agent Skill，本地 agent 直接产出可版本管理的自包含 HTML 原型、落地页、幻灯片。适合想把设计稿留在仓库里的人；代价是效果吃模型，README 自己说最好配 Opus，换弱模型质量掉得明显。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Agent Skill", "原型设计", "HTML", "Claude Code", "开源"],
+    body: "baoyu-design 做的事很直接：把 claude.ai/design 背后的设计流程，打包成一个可移植的 Agent Skill，丢进 Cursor、Claude Code、Codex 或任何能读写文件的 agent 里，就能产出高保真 mockup、可交互原型、线框图、落地页、看板、移动端页面和幻灯片——交付物统一是自包含 HTML。\n它和「让 AI 画个网页」的区别在工程性：产物落在 designs/<项目>/ 下，是纯 HTML，可以 git 管理、可以 fork、可以导出。因为跑在本地，还能用 agent 的浏览器预览做第二轮修改——指着按钮说改什么，agent 去改源码，这个回路在纯网页工具上很难做到。\n能力面比想象中宽：内置 skill 覆盖 hi-fi 设计、交互原型、线框、deck 与讲者备注、移动端原型、动效视频、落地页、社媒图、HTML 邮件、三折页、数据可视化、3D、水彩插画，以及设计系统的创建与消费。导入侧支持 Figma .fig 离线解码、GitHub 仓库、已有 HTML/CSS；导出侧有独立 HTML、PDF、可编辑 PPTX、MP4、发到 Figma / Canva。\n代价写在 README 里：这是一份很长、要求很高的设计指令，模型越强结果越好，官方建议配 Opus。用弱模型跑，最容易出现的不是报错，而是「看起来完成度不错但经不起细看」。",
+    officialUrl: "https://github.com/JimLiu/baoyu-design",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/JimLiu/baoyu-design",
+      github: "https://github.com/JimLiu/baoyu-design",
+    },
+    whoFor: "想让设计稿直接进 git、和代码同仓库管理的前端与独立开发者；以及需要快速出多版原型做评审的人。",
+    whoNot: "指望弱模型也能出精修稿的人；也不适合需要真正多人协作、设计资产集中管理的大型设计团队。",
+    installTips: [
+      "npx skills add JimLiu/baoyu-design 装到当前项目（自动识别 agent），加 -g 装到全局，用 --agent claude-code / cursor / codex 显式指定。",
+      "多文件原型必须走 HTTP 预览，file:// 打不开：python3 -m http.server 4311 --directory designs，再访问 localhost:4311。",
+      "Claude Code 里可用 /baoyu-design 显式触发；Codex 在 skill 可用时用 $baoyu-design；其余情况直接描述设计任务，它会按描述自动激活。",
+      "更新用 npx skills update baoyu-design（或 upgrade 别名），之后重开会话才会加载新文件。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "B",
+      color: "#0EA5E9",
+    },
+    guide: {
+      intro: "装完之后怎么用才对：预览为什么要起服务器、怎么让它按你的设计系统出图、以及模型选择的现实影响。",
+      markdown: `## 装完先解决预览
+产物是 HTML，但多文件原型从 file:// 打不开——这是第一次用最常见的「怎么是白屏」。必须起本地服务器：
+
+\`\`\`bash
+python3 -m http.server 4311 --directory designs
+# 然后打开 http://localhost:4311/<项目>/<file>.html
+\`\`\`
+
+agent 通常会自己起，但你要知道这条命令，否则出问题时无从排查。
+
+## 一次好的调用长什么样
+别只说「做个设置页」。有效的描述包含三件事：页面类型、目标用户、约束条件。
+
+> Design 3 hi-fi variations of a settings screen for a meditation app.
+
+拿到第一版后，进入它真正的优势环节：**指着改**。在 agent 的浏览器预览里选中元素，说要改什么，它改源码。这比用文字描述「把那个按钮往右挪一点」精确得多，因为有元素标注做锚点。
+
+## 接设计系统，而不是每次从零
+如果项目已有设计系统，在开始时就点名：
+
+> Design a settings screen using the Fluent 2 design system.
+
+它会把系统同步成一份版本固定的副本放进 \`_ds/<slug>/\`，并把绑定写进 \`_d_meta.json\`。之后重开项目，agent 读这个文件就知道该按哪套规范做，不用每次重新选。README 强调这是「绑定契约」而非建议：屏幕必须用系统的 token、字体、间距和组件，agent 不该自己发明体系外的颜色。
+
+## 导入素材比描述更准
+三种导入都值得用：Figma .fig（离线解码，不需要账号或 API token）、GitHub 仓库（用 gh api 看树再稀疏检出）、已有 HTML/CSS（直接读真实样式表，取准确的颜色、字号、圆角、阴影）。有真材料时别用形容词描述。
+
+## 模型的现实影响
+README 明说这是一份长而苛刻的设计指令，模型越强越好，推荐 Opus。这不是客套：弱模型能跑完流程，但会在间距节奏、层级对比这些细节上塌方。如果你只有小模型，把它当「快速出结构」用，别当「出终稿」用。`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/JimLiu/baoyu-design",
+          note: "安装、更新、内置 skill 清单与设计系统导入的完整说明都在这份 README 里。",
+        },
+        {
+          kind: "html",
+          title: "SKILL.md 入口",
+          url: "https://github.com/JimLiu/baoyu-design/blob/main/skills/baoyu-design/SKILL.md",
+          note: "看它到底怎么编排流程、依赖哪些参考文件。想改造 skill 行为时从这里改。",
+        },
+        {
+          kind: "html",
+          title: "更新日志",
+          url: "https://github.com/JimLiu/baoyu-design/blob/main/CHANGELOG.md",
+          note: "内置 skill 与导出能力变动频繁，升级前扫一眼，避免沿用旧用法。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "taiga-ui",
+    linksCheckedAt: "2026-10-22",
+    name: "Taiga UI",
+    nameZh: "Taiga UI Angular 组件库",
+    aliases: ["taiga-ui", "Taiga UI", "Angular 组件库", "taiga ui angular", "可摇树 UI Kit"],
+    summary: "Angular 的完整 UI Kit，130+ 组件、100+ 指令，靠 Secondary Entry Points 做到逐个导入不拖冗余代码。适合要一套体系化 Angular 组件的团队；代价是版本与 Angular 大版本强绑定，中文资料少，Figma 库还停在 2.x/3.x。",
+    scenes: ["code", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Angular", "组件库", "可摇树", "设计系统", "开源"],
+    body: "Taiga UI 是 Angular 生态里少见的「大而全但仍然轻」的组件库。它的技术底子是 Secondary Entry Points——你可以只 import 一个实体，打包器能确认没有多余代码被带进来；这在 Angular 组件库里并不常见，多数方案要么全量引入，要么按模块粗粒度拆分。\n它在工程上的几个选择值得记：所有组件用 OnPush 变更检测，整个项目跑 strict TypeScript，样式全部走 CSS 自定义属性（所以深色主题开箱可用，改主题也不需要覆盖内部类名），复杂交互依赖 DI 与 ng-polymorpheus 的动态内容方案。README 给的规模是 130+ 组件、100+ 指令，外加若干 token 与工具。\n使用前必须对版本表，这是硬门槛：5.x 对应 Angular 19 及以上（当前支持），4.x 是 LTS 但 2027-01-01 结束，3.x 与 2.x 已停止支持。Angular 大版本升级往往要连带升 UI 库，反过来也成立——你想用新版 Taiga，就得先升 Angular。\n还有两个现实问题：社区以英文与俄文为主，中文资料很少；Figma 设计资源目前只覆盖 2.x 与 3.x，新版设计稿没有对应的 Figma 组件库，设计与实现的对齐要靠文档。",
+    officialUrl: "https://taiga-ui.dev",
+    officialLabel: "taiga-ui.dev",
+    links: {
+      official: "https://taiga-ui.dev",
+      github: "https://github.com/taiga-family/taiga-ui",
+    },
+    whoFor: "在用 Angular 19+、需要成套组件与深色主题的团队；以及在意产物体积、要求按实体摇树的项目。",
+    whoNot: "还停在 Angular 12–16 的项目（只能用 4.x LTS，2027 年初到期）；也不适合设计侧强依赖 Figma 组件库的团队。",
+    installTips: [
+      "先对版本表：5.x 支持 Angular 19 及以上，4.x 是 LTS（2027-01-01 结束），3.x 与 2.x 已不再支持。",
+      "从 taiga-ui.dev/getting-started 按步骤接入，或用官方 StackBlitz starter 先跑一个能运行的样例。",
+      "样式走 CSS 自定义属性，改主题改变量而不是覆盖组件内部类名，否则升级时会大面积失效。",
+      "Figma 库只到 2.x / 3.x，新版没有对应设计资源，设计交付前要提前说明。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#DD0031",
+    },
+    guide: {
+      intro: "Angular 项目接入前必做的版本对齐、摇树怎么用才有效，以及主题定制该改哪一层。",
+      markdown: `## 版本表决定你能不能用
+Taiga UI 的兼容表是硬性的，不是建议：
+
+| Taiga UI | Angular | 状态 |
+| --- | --- | --- |
+| 5.x | ^19.0.0 及以上 | 当前支持 |
+| 4.x | ^16.0.0 及以上 | LTS，2027-01-01 结束 |
+| 3.x / 2.x | 旧版本 | 已停止支持 |
+
+所以第一个动作不是装包，是看 \`ng version\`。你的 Angular 是 17/18，就只能落在 4.x 这条 LTS 线上，并且要在 2027 年前规划升级——UI 库和框架的升级必须同步做。
+
+## 摇树不是自动的
+「fully-treeshakable」靠的是 Secondary Entry Points。它的含义是：从具体入口导入实体，打包器才能裁掉没用的部分。
+
+实践中要避免的做法是从根 barrel 一次性导入一大堆组件或指令。你 import 什么，产物里就有什么——这句话在这里是真的成立，也因此「按需导入」不是优化技巧，而是使用前提。
+
+## 主题：改变量，不改类名
+所有样式基于 CSS 自定义属性，深色主题开箱可用。定制顺序建议：
+
+1. 先看官方提供的主题变量清单，改你要变的那些；
+2. 需要新增语义色时，加自定义属性并在组件层引用；
+3. 不要用 \`:ng-deep\` 或覆盖内部类名——它的 DOM 结构与类名属于实现细节，升级时会变。
+
+## 组件之外还要看什么
+它的抽象依赖 DI 与动态内容方案（ng-polymorpheus），写自定义弹层、动态组件时会碰到；浏览器 API 走 ng-web-apis。这两块不在「组件文档」里，但在真实项目里绕不开。
+
+## 支持渠道
+英文在 Angular 官方 Discord 的 #taiga-ui 频道，俄文在 Telegram 的 taiga_ui 群。中文资料基本没有，团队里要留一个愿意读源码的人。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://taiga-ui.dev",
+          note: "组件总览与设计语言。先看它的交互密度是否符合你的产品，再谈接入。",
+        },
+        {
+          kind: "html",
+          title: "快速上手",
+          url: "https://taiga-ui.dev/getting-started",
+          note: "按 Angular 版本给出接入步骤。照着走能避开版本错配这类最常见的问题。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/taiga-family/taiga-ui",
+          note: "各版本分支与兼容表原文。确认 LTS 截止时间时以这里的分支状态为准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "lint",
+    linksCheckedAt: "2026-10-22",
+    name: "@shadcn/lint",
+    nameZh: "@shadcn/lint 设计系统校验器",
+    aliases: ["@shadcn/lint", "shadcn lint", "design system linter", "Tailwind 规则校验", "no-restyle"],
+    summary: "面向 AI 编码代理的 Tailwind 设计系统 linter：你把「组件不许被改样式」写成规则，代理违规时错误信息会直接告诉它该用什么替代。适合让 AI 批量写 UI 又要守住规范的团队；代价是它只管 class 层面，设计对不对它不负责。",
+    scenes: ["code", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Lint", "Tailwind", "设计系统", "AI 代理", "开源"],
+    body: "来自一个具体观察：类型系统能拦住「Button 不许改 padding」，但错误只说不行、没说该怎么办，AI 代理于是换个错法再试一次。@shadcn/lint 把规则从类型层挪到 lint 层，错误里带设计系统上下文——可用尺寸、变体、主题色路径。\n它不要求用 shadcn/ui，只要是 Tailwind v4 项目；支持 ESLint 与 Oxlint，覆盖 React、Svelte、Vue。内置六条规则：no-restyle（禁 className 重设样式）、no-raw-colors（禁止 bg-pink-500 这类裸色）、no-arbitrary-values（禁止 p-[13px]）、no-inline-styles（禁止内联样式与 style 标签）、no-unknown-classes（拦 Tailwind 生成不出来的类名）、require-static-classes（拦模板字符串拼类名）。\n真正好用是 contracts：每个组件单独定允许与禁止的类别，比如 CardTitle 可改排版但禁改字体族，CardContent 可改间距但禁改排版。配合自定义消息，代理看到可执行指令，而不是一句「不允许」。\n局限：Oxlint 下 Vue 与 Svelte 只读 <script>、不读模板，模板里的 class 拦不住；它只管样式，组件用错、交互不合理管不了。",
+    officialUrl: "https://github.com/shadcn-ui/lint",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/shadcn-ui/lint",
+      github: "https://github.com/shadcn-ui/lint",
+    },
+    whoFor: "让 AI 代理批量产出前端页面的团队；以及维护组件库、需要把「组件该怎么被用」变成可执行约束的人。",
+    whoNot: "不用 Tailwind 的项目（要求 Tailwind v4）；也不适合期待它提升设计质量的场景——它保证一致性，不保证好看。",
+    installTips: [
+      "环境要求：Node.js 20.19+；ESLint 路线要 9.30+，Oxlint 路线要 1.80+。",
+      "React + ESLint：npm install -D @shadcn/lint eslint @typescript-eslint/parser，然后在 eslint.config.mjs 里注册 plugin 与规则。",
+      "Oxlint 路线用 .oxlintrc.json 的 jsPlugins 字段加载，再在 rules 里开规则，跑 npx oxlint。",
+      "配好之后把「改完跑 npm run lint 并修完错误」写进 AGENTS.md，否则代理不会主动自查。",
+      "Vue / Svelte 在 Oxlint 下只检查 <script>，模板里的 class 要改用 ESLint 路线才查得到。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#0F172A",
+    },
+    guide: {
+      intro: "从零配一条能真正拦住 AI 的规则：选对 linter、写对 contracts、再把 lint 接进代理的工作流。",
+      markdown: `## 先选一条技术路线
+两条路互斥：
+
+- **ESLint 9.30+**：React / Vue / Svelte 全覆盖，模板也能查；
+- **Oxlint 1.80+**：更快，但 Vue 与 Svelte 只读 \`<script>\` 块，模板里的 class 查不到。
+
+React 项目最小安装：
+
+\`\`\`bash
+npm install -D @shadcn/lint eslint @typescript-eslint/parser
+\`\`\`
+
+## 从一条规则开始，别一次全开
+先开 \`no-arbitrary-values\`，误报最低，能挡住 p-[13px] 这类随手值。跑通后再逐条加 no-raw-colors、no-inline-styles。
+
+\`no-restyle\` 要最后开，因为它最容易和现有代码冲突，需要先用 contracts 划清边界：
+
+\`\`\`js
+"shadcn/no-restyle": ["error", {
+  allow: ["layout"],
+  contracts: [
+    { pattern: "^Button$", allow: ["w-full", "mt-*", "mb-*"] },
+    { pattern: "^CardTitle$", allow: ["layout", "typography"], deny: ["font-*"] },
+  ],
+}]
+\`\`\`
+
+写 contracts：先列组件自己该管什么（Button 的 padding 与圆角），再列外面允许改什么（位置、通栏宽度）。已有 ESLint 配置时保留原 parser，只加 plugin 与 rule。
+
+## 最后一公里：接进代理流程
+规则不加到代理的检查清单里，等于没装。在 AGENTS.md 写一句：
+
+> After making changes, run \`npm run lint\` and fix all errors.
+
+并把 \`eslint .\` 或 \`oxlint\` 配成 lint 脚本。自定义消息（如 \`message: { spacing: "Use a {{component}} size: {{sizes}}." }\`）里，\`{{sizes}}\` 会替换成组件真实可用的尺寸，代理不用猜。`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/shadcn-ui/lint",
+          note: "安装步骤、contracts 写法与各框架配置的原文。排查「规则没生效」先看这里的配置示例。",
+        },
+        {
+          kind: "html",
+          title: "规则文档",
+          url: "https://github.com/shadcn-ui/lint/blob/main/docs/rules.md",
+          note: "六条规则的选项与消息占位符清单。写 contracts 时对着查，别凭印象填字段。",
+        },
+        {
+          kind: "link",
+          title: "npm 包页",
+          url: "https://www.npmjs.com/package/@shadcn/lint",
+          note: "核对版本与 peer 依赖要求。ESLint / Oxlint 的最低版本号以这里为准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pattern-craft",
+    linksCheckedAt: "2026-10-22",
+    name: "Pattern Craft",
+    nameZh: "Pattern Craft 背景纹理集",
+    aliases: ["pattern-craft", "Pattern Craft", "背景纹理", "CSS 背景图案", "background patterns"],
+    summary: "100+ 现代 CSS 背景图案与渐变片段，点开就能复制。适合快速给落地页、卡片区加纹理的前端；代价是它只给 JSX + Tailwind 代码，不提供原生 HTML/CSS，非 React 项目得自己翻译。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["CSS", "Tailwind", "背景纹理", "设计资源", "开源"],
+    body: "Pattern Craft 解决的是「页面太空」这个具体问题：首屏、卡片区、空状态页需要一层不抢内容的纹理或渐变，自己调 linear-gradient 与 background-size 很容易调出噪点或明显的拼接缝。它把这类配方收集成一个可浏览的站，点开预览、复制代码、粘进项目。\n每个片段本质就是一组 CSS：background 打底，backgroundImage 叠多层 gradient，backgroundSize 控制重复尺度。改成自己的配色只需改 gradient 里的色值，改密度就动 backgroundSize——README 的自定义说明就这两条。\n它有一个必须提前说明的限制，README 用引用块专门标了：项目不提供纯 HTML 或 vanilla CSS 片段，所有代码都按 JSX（React / Next.js）+ Tailwind 优化。所以 Vue、Angular、纯静态页用户拿到代码后要自己做一层改写——把 className 换成 class，把内联 style 对象摊成 CSS 规则，工作量不大但每次都要做。\n技术上站点本身是 Next.js 14 + TypeScript + Tailwind，跑在 Vercel 上。要不要克隆仓库取决于你是否要贡献图案：只是取用的话，线上站复制就够了，没必要本地起服务。",
+    officialUrl: "https://patterncraft.store",
+    officialLabel: "patterncraft.store",
+    links: {
+      official: "https://patterncraft.store",
+      github: "https://github.com/megh-bari/pattern-craft",
+    },
+    whoFor: "做落地页、活动页、个人站点、需要快速补背景层次的前端；以及不想自己调渐变的独立开发者。",
+    whoNot: "非 React 且不愿改写代码的项目；也不适合需要原创品牌纹理的场景——这些是通用配方，撞款概率不低。",
+    installTips: [
+      "直接开 patterncraft.store 浏览并复制，取用不需要克隆仓库、也不需要装依赖。",
+      "粘进项目前先确认技术栈：片段是 JSX + Tailwind，Vue / Angular / 原生 HTML 要自己转成 class 与 CSS 规则。",
+      "想本地跑或贡献图案：Node.js 18+，npm install 后 npm run dev，开 localhost:3000；新图案加在 src/data/patterns.ts。",
+      "改风格只动两个字段：backgroundImage 里的色值、backgroundSize 里的重复尺度，别改结构。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#7C3AED",
+    },
+    guide: {
+      intro: "取用、改造、落地三步：怎么把一段 JSX 片段变成你能用的代码，以及复用时的两个坑。",
+      markdown: `## 取用不需要装任何东西
+线上站就够：浏览 → 点开图案 → 复制。克隆只对想本地跑或要提新图案的人有意义。
+
+要本地跑：
+
+\`\`\`bash
+git clone https://github.com/megh-bari/pattern-craft.git
+cd pattern-craft
+npm install && npm run dev
+\`\`\`
+
+Node.js 18 以上，打开 http://localhost:3000。
+
+## 片段长什么样
+每个图案的数据结构是固定的四段：id、name、style（background / backgroundImage / backgroundSize）、code（可直接粘的 JSX）。
+
+改造时只碰 style：
+
+\`\`\`ts
+// 原始
+backgroundImage: \`linear-gradient(to right, #f0f0f0 1px, transparent 1px)\`
+
+// 换成品牌蓝、缩小网格
+backgroundImage: \`linear-gradient(to right, #3b82f6 1px, transparent 1px)\`,
+backgroundSize: "48px 32px"
+\`\`\`
+
+规律是：色值决定观感，backgroundSize 决定密度。多层渐变时两个值要一一对应，错位会叠加出意外效果。
+
+## 坑一：它只给 JSX + Tailwind
+README 用引用块写明：没有纯 HTML / vanilla CSS 版本，代码按 React / Next.js + Tailwind 优化。所以：
+
+- React 项目：直接粘，className 与内联 style 都能用；
+- Vue：className → class，style 对象拆成 CSS 规则；
+- 纯静态页：把 backgroundImage 与 backgroundSize 抄进 CSS，其余容器结构自己写。
+
+## 坑二：纹理要压住，不能抢内容
+背景图案的设计目标是「有层次但不干扰阅读」。实际落地时记得：
+
+1. 纹理层用 absolute inset-0 + z-0，内容层抬到 z-10；
+2. 文字区域加一层半透明遮罩或降低图案对比度；
+3. 暗色模式下单独验一遍——多数片段是为浅色底调的。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线站点",
+          url: "https://patterncraft.store",
+          note: "浏览与复制的入口。实时预览比看截图准，能直接判断纹理密度合不合适。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/megh-bari/pattern-craft",
+          note: "图案数据结构、贡献流程与本地运行方式。要改配色或加图案时看这里。",
+        },
+        {
+          kind: "link",
+          title: "关于只提供 JSX 的说明",
+          url: "https://github.com/megh-bari/pattern-craft/discussions/24",
+          note: "官方解释为何不出 vanilla CSS 版本。非 React 项目评估改造成本前值得读。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "appllama-skills",
+    linksCheckedAt: "2026-10-22",
+    name: "Appllama Skills",
+    nameZh: "Appllama 移动端设计技能包",
+    aliases: ["appllama", "appllama-skills", "Appllama 技能", "移动端设计技能", "Expo UI 技能"],
+    summary: "把「热销 App 的真实界面」变成编码代理的施工标准：一个技能负责查设计库，一个技能盯 Expo / React Native 的还原度。适合做移动端、又受不了 AI 产出「一眼模板」的人；代价是调研侧要接付费 MCP，每次调用扣一次额度。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Agent Skills", "移动端设计", "Expo", "React Native", "AI 编码"],
+    body: "Appllama 本身是「热销 App 的界面库」——真实截图、流程与 UI 模式，还带收入与下载量做上下文。这个仓库把它拆成两个装在编码代理里的技能：appllama-usage 是调研侧，规定怎么像设计总监一样用 Appllama MCP，附「从零做 App」「改一个现有界面」「查流程与元素」三套剧本；appllama-app-design-skill 是施工侧，盯的是 Expo / React Native 的原生质感：Apple HIG 保真、语义色、原生控件、导航该 push 还是 replace、返回单向门不能存在、动效必须带手指速度且不能跑在 JS 线程上，最后要在模拟器里整段录屏逐帧比对。\n两者的关系是「先决定学谁，再决定怎么建」，官方强调循环只有落到模拟器里、且屏幕挑不出毛病时才算结束。施工侧可以独立使用，不接 MCP 也成立；调研侧没有 MCP 就是空转。\n真正的门槛不在安装，在额度：MCP 接入是 Pro 权益，每次调用消耗 1 credit，只有 get_credits 免费，额度每月 1 号整月重置。想随手试的人容易第一天就把额度烧在「帮我看看这个 App 长什么样」上。",
+    officialUrl: "https://appllama.io/mcp",
+    officialLabel: "appllama.io",
+    links: {
+      official: "https://appllama.io/mcp",
+      github: "https://github.com/Appllama/appllama-skills",
+    },
+    whoFor: "用 Claude Code / Cursor / Codex 写 Expo 或 React Native，产出总被说「像模板、不像成品」的人；或者需要先研究同类头部 App 的界面与付费墙位置再动手的独立开发者。",
+    whoNot: "做 Web 后台、不做移动端的人——两个技能都在讲原生控件与模拟器验收；以及不想为 MCP 订阅付费的人，只装施工侧技能即可，别指望调研能力。",
+    installTips: [
+      "标准安装是一条命令，在项目根目录跑 `npx skills@latest add appllama/appllama-skills`，README 称兼容 Claude Code、Cursor、Codex 等 70 多个 agent。",
+      "只想装施工侧：加 `--skill appllama-app-design-skill`；只想要调研引擎就把参数换成 `--skill appllama-usage`。",
+      "静默安装用 `-a claude-code -a cursor -y` 指定 agent 并跳过提问；`-g` 是装到用户级，不加则是项目级。",
+      "接 MCP：端点 https://mcp.appllama.io/mcp，在客户端里作为自定义 connector 添加并用 Appllama 账号授权；Pro 才可用，每次调用 1 credit。",
+      "不想走 npx 就手动装：clone 仓库后把 `skills/*` 拷进 `~/.claude/skills/`（项目级放 `.claude/skills/`），技能本质就是普通目录。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#1F6F5C",
+    },
+    guide: {
+      intro: "按第一次上手会卡住的顺序讲：先分清两个技能各自要什么、什么时候能脱离 MCP、以及 credit 是怎么被烧掉的。",
+      markdown: `## 先搞清两个技能的分工
+
+装完会多出两个技能，它们不是一回事：
+
+- **appllama-usage**：调研。决定「要学哪几个 App、看哪些屏、付费墙放在哪」。**依赖 MCP**，没有 MCP 就是空壳。
+- **appllama-app-design-skill**：施工。决定这一屏怎么建才像原生。**可以单独用**。
+
+只做界面不想调研，就只装第二个：
+
+\`\`\`bash
+npx skills@latest add appllama/appllama-skills --skill appllama-app-design-skill
+\`\`\`
+
+## MCP 没连上是最常见的「技能不生效」
+
+在 Claude / Cursor / Codex 里把 \`https://mcp.appllama.io/mcp\` 加为自定义 connector，用你的 Appllama 账号授权。没授权时，agent 会一本正经地说「我去查一下头部 App」，然后什么都没查。
+
+授权分两种：管道式安装（\`npx\`）和手动拷目录。手动装记得目标目录要对——项目级是 \`.claude/skills/\`，用户级是 \`~/.claude/skills/\`，拷错层级技能列表里就看不到。
+
+## credit 要省着花
+
+MCP 访问属于 Pro，每次调用消耗 1 credit，\`get_credits\` 免费，额度每月 1 号整月重置。
+
+实操建议：**先用自然语言把范围问清楚，再让它逐屏查**。「帮我看看健身类 App 的 onboarding」会连开十几个调用；「只对比这三款的首屏和付费墙」通常三五次就够。不确定额度还剩多少，先让它调 \`get_credits\`。
+
+## 怎么判断它真的干活了
+
+施工侧技能的标准写在模拟器里：整条流程录屏、逐帧核对，而不是交几张截图。如果你只拿到静态截图和一句「已完成」，说明它没按技能里的动效与导航规则走，直接要求它重跑整段流程比对。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "Appllama MCP 接入说明",
+          url: "https://appllama.io/mcp",
+          note: "MCP 端点、Pro 权益与 credit 规则都在这页。决定要不要付费前先看这里。",
+        },
+        {
+          kind: "markdown",
+          title: "官方技能目录（SKILL.md）",
+          url: "https://github.com/Appllama/appllama-skills/tree/main/skills",
+          note: "两个技能的完整指令原文。想知道它到底给 agent 灌了什么规则，直接读这两个目录。",
+        },
+        {
+          kind: "html",
+          title: "定价与额度",
+          url: "https://appllama.io/pricing",
+          note: "查 Pro 档位与每月重置规则。按次调用前先估算一下自己的用量。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "7-css",
+    linksCheckedAt: "2026-10-22",
+    name: "7.css",
+    nameZh: "7.css Windows 7 风格 CSS 框架",
+    aliases: ["7.css", "7css", "Windows 7 CSS", "win7 css", "win7-ui"],
+    summary: "只用 CSS 把语义 HTML 画成 Windows 7 的窗口、标题栏和按钮，零 JavaScript，所以能塞进任何前端框架。适合做怀旧皮肤、彩蛋页或桌面隐喻界面；代价是它只覆盖 Win7 那套控件，复杂布局仍要自己补。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["CSS 框架", "复古 UI", "Windows 7", "前端", "开源"],
+    body: "7.css 的思路是「语义 HTML + 一套皮肤」，不是组件库：你写 .window、.title-bar、.window-body 这些结构，样式由它接管，于是同一段 HTML 既是可访问的内容，也长得像 2009 年的 Windows。\n它不带任何 JavaScript，这一点决定了适用范围——没有自己的拖拽、菜单展开、弹窗逻辑，也就不会和 Vue / React / Svelte 的状态管理打架。血统上它是 XP.css 的扩展，XP.css 又是 98.css 的扩展，所以三个项目共享同一套类名习惯，做过其中一个基本能直接上手。\n代价也很直白：它解决的是「像不像 Win7」，不解决「布局好不好写」。栅格、响应式、复杂表单校验这些都得自己来；组件表以 Win7 的控件为准，想要现代交互就得自己补 JS。社区有 Vue 的 win7-ui 与 Svelte 的 svelte-7.css 包装，后者 README 自己标了 WIP。\n适合的场景是彩蛋页、作品集、桌面隐喻的 demo、复古主题后台；不适合拿它当整站设计系统去撑一个业务系统。",
+    officialUrl: "https://khang-nd.github.io/7.css",
+    officialLabel: "khang-nd.github.io",
+    links: {
+      official: "https://khang-nd.github.io/7.css",
+      github: "https://github.com/khang-nd/7.css",
+    },
+    whoFor: "想给页面加一层 Win7 怀旧质感的前端：作品集、彩蛋页、桌面隐喻 demo，以及用 Vue / Svelte 想找现成皮肤的人。",
+    whoNot: "要一套现代组件库（表格、表单校验、无障碍交互全套）的业务项目——它只给外观不给行为；也不适合必须支持 IE 之外老浏览器、或要求严格设计规范对齐的团队。",
+    installTips: [
+      "最快验证只需一行 `<link rel=\"stylesheet\" href=\"https://unpkg.com/7.css\">`，不用构建工具。",
+      "走包管理：`npm install 7.css`，然后 `import \"7.css/dist/7.css\";`。",
+      "结构必须照它的语义类名写：`.window` 里放 `.title-bar`（内含 `.title-bar-text`）和 `.window-body`，类名换掉皮肤就没了。",
+      "想改样式或提 PR：clone 后 `npm install`，`npm start` 起带热重载的开发环境，`npm run build` 输出到 `dist/`，核心样式在 `gui/` 目录。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "7",
+      color: "#2F6FB2",
+    },
+    guide: {
+      intro: "第一次用最容易错在「结构」而不是「引入」：类名层级不对就完全没效果，这篇按这个顺序讲。",
+      markdown: `## 引入只是一行
+
+\`\`\`html
+<link rel="stylesheet" href="https://unpkg.com/7.css" />
+\`\`\`
+
+或者在构建里：
+
+\`\`\`bash
+npm install 7.css
+\`\`\`
+
+\`\`\`js
+import "7.css/dist/7.css";
+\`\`\`
+
+## 没效果，九成是层级写错了
+
+7.css 不是「加个 class 就变漂亮」，它认的是一套**固定的嵌套关系**：
+
+\`\`\`html
+<div class="window" style="width: 250px">
+  <div class="title-bar">
+    <div class="title-bar-text">My First Program</div>
+  </div>
+  <div class="window-body">
+    <p>Hello, world!</p>
+  </div>
+</div>
+\`\`\`
+
+\`.title-bar-text\` 必须嵌在 \`.title-bar\` 里，\`.window-body\` 必须是 \`.window\` 的直接子元素。自己加一层 wrapper 或换成 \`<header>\`，标题栏的渐变就消失——这不是 bug，是选择器写死了结构。
+
+## 里面有什么、没什么
+
+打开文档站逐个看组件，重点是窗口、按钮、输入框、菜单这些 Win7 原生控件。**它不提供**拖拽、窗口层级管理、右键菜单展开——这些要自己写 JS，或者找社区的 Vue（win7-ui）/ Svelte（svelte-7.css）包装。
+
+## 改皮肤先看 gui 目录
+
+核心样式集中在仓库的 \`gui/\` 目录，不在 \`dist/\`——\`dist/\` 是构建产物，改了下一次 \`npm run build\` 就被覆盖。改完跑 \`npm start\`，浏览器会自动刷新。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "组件文档与在线示例",
+          url: "https://khang-nd.github.io/7.css/",
+          note: "逐个组件的正确 HTML 结构，抄之前先对着看，能省掉大半「为什么没样式」。",
+        },
+        {
+          kind: "link",
+          title: "Vue 版包装 win7-ui",
+          url: "https://github.com/Visnalize/win7-ui",
+          note: "社区做的 Vue 组件封装，省去手写语义结构；注意它不是官方项目。",
+        },
+        {
+          kind: "html",
+          title: "版本更新记录",
+          url: "https://github.com/khang-nd/7.css/releases",
+          note: "查样式修正与破坏性改动。升级前扫一眼，避免类名被改后整页失真。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "realtaiizor",
+    linksCheckedAt: "2026-10-22",
+    name: "ReaLTaiizor",
+    nameZh: "ReaLTaiizor WinForms 控件库",
+    aliases: ["realtaiizor", "ReaLTaiizor", "WinForms 控件库", "C# 皮肤控件"],
+    summary: "给 .NET WinForms 换上一整套自制控件与主题（Air、Dungeon、Ribbon 等），让老式窗体程序看起来不像 2005 年的产物。适合维护存量 WinForms 项目的人；代价是只能跑 Windows，且文档薄，真正的用法得靠仓库里的示例工程。",
+    scenes: ["design", "code"],
+    platforms: ["windows"],
+    source: "opensource",
+    tags: ["WinForms", "C#", ".NET", "控件库", "桌面开发"],
+    body: "ReaLTaiizor 解决的是 WinForms 的原生丑：系统默认控件二十年没变，想做深色、圆角、扁平或仿大厂的界面，要么自己重画，要么换框架。它提供的是一整套重绘过的控件加多套主题（README 列了 Air、Dungeon、Dream、Ribbon、Space、Thunder、Moon、Forever、Fox、Hope、Lost、Royal、Night），换主题就是改控件属性。\n它只面向 Windows，跑在 WinForms 上，所以已有一套 WinForms 代码的人可以渐进替换；反过来，如果你在新项目里选型，直接上 WPF、WinUI 或 Avalonia 更省事，不必先跳进 WinForms 再找皮肤。\n要提前知道的是文档现状：README 的主体是贡献者与赞助者名单，安装只给了 NuGet 那一行，剩下的信息量全在仓库的 sample/ 与 ready/ 目录——Genshin Impact、Windows Defender、Kaspersky、XAMPP、Rufus、Store、Splash、MP3 Player、Payment、Login、Instagram 这些完整示例，以及 Stopwatch、Hashing、端口扫描之类的成品小程序。把它当「可运行的参考工程」用，比找文档快。",
+    officialUrl: "https://www.vegalya.com",
+    officialLabel: "www.vegalya.com",
+    links: {
+      official: "https://www.vegalya.com",
+      github: "https://github.com/Taiizor/ReaLTaiizor",
+    },
+    whoFor: "手上已有 WinForms 存量项目、想低成本做出深色/定制外观的 .NET 桌面开发者；以及需要现成登录页、支付页、启动画面模板的人。",
+    whoNot: "新项目选型者——WinForms 本身已是维护模式，为它挑皮肤不如直接上 WPF / WinUI / Avalonia；也不适合需要跨平台、或要求有完整官方文档与商业支持的团队。",
+    installTips: [
+      "NuGet 装：`Install-Package ReaLTaiizor`，或在 Visual Studio 的 NuGet 管理器里搜 ReaLTaiizor。",
+      "装完控件会进工具箱，主题通过控件自带属性切换，不需要额外的皮肤文件。",
+      "拿不准长什么样就直接跑 `sample/` 下的示例工程（Genshin Impact、Windows Defender、Rufus、Login 等），它们就是事实上的文档。",
+      "`ready/` 下有可直接参考的完整小程序（秒表、哈希、端口扫描等），比重头搭界面快得多。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#5B3E96",
+    },
+    guide: {
+      intro: "这篇不假装它有官方手册：按「装上—找不到文档—去示例里抄」这条真实路径讲，附几个一定会踩的坑。",
+      markdown: `## 装它只要一行
+
+\`\`\`powershell
+Install-Package ReaLTaiizor
+\`\`\`
+
+装完打开工具箱就能看到控件。如果没有，检查项目是不是 **WinForms**（不是 WPF、不是控制台），以及 NuGet 是否装到了当前项目而不是解决方案的别的项目。
+
+## 真正的文档在 sample 里
+
+你会在 README 里看到大量贡献者头像、主题名称列表，但几乎没有「这个控件怎么用」。别在这里找答案，直接打开仓库的 \`sample/\` 目录：
+
+- \`ReaLTaiizor.Login\` / \`ReaLTaiizor.Payment\`：现成的登录与支付页结构
+- \`ReaLTaiizor.Store\` / \`ReaLTaiizor.Rufus\`：仿应用商店与写盘工具的完整窗体
+- \`ReaLTaiizor.Splash\`：启动画面
+- \`ReaLTaiizor.Player\`：MP3 播放器
+
+用法就是**跑起来 → 打开设计器 → 看属性面板**。README 自己的建议也是「Step 2：Enjoy designing」，它默认你会从示例反推。
+
+## 两个必踩的坑
+
+**主题不是全局开关**。换主题改的是各个控件自己的属性，不是设一次全窗体生效。想统一风格，就在窗体基类里统一设，别一个个改，否则漏一个控件整页就破功。
+
+**设计器与运行时不总一致**。自绘控件在设计器里偶尔会画不出来或错位，这是宿主的问题不是你的代码——按 F5 跑起来看，别对着设计器调半天。
+
+## 先在 ready 里找现成的
+
+\`ready/\` 下是成品小程序，包含秒表、哈希计算、MAC 修改、端口扫描、翻译等。要做类似功能时，先抄它的界面与事件接线，再往里塞业务逻辑，比从空窗体开始快。
+`,
+      resources: [
+        {
+          kind: "link",
+          title: "示例工程目录",
+          url: "https://github.com/Taiizor/ReaLTaiizor/tree/develop/sample",
+          note: "登录、支付、商店、启动画面等完整窗体源码。缺文档时这就是文档。",
+        },
+        {
+          kind: "link",
+          title: "可参考的成品小程序",
+          url: "https://github.com/Taiizor/ReaLTaiizor/tree/develop/ready",
+          note: "秒表、哈希、端口扫描等已完成项目，适合直接改造成自己的工具。",
+        },
+        {
+          kind: "html",
+          title: "NuGet 包页面",
+          url: "https://www.nuget.org/packages/ReaLTaiizor",
+          note: "查最新版本号与目标框架。升级前在这里确认兼容性，别跟着 README 的截图走。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "typeui",
+    linksCheckedAt: "2026-10-22",
+    name: "TypeUI",
+    nameZh: "TypeUI AI 界面设计技能库",
+    aliases: ["typeui", "TypeUI", "AI UI 设计", "design.md", "UI 提示词"],
+    summary: "把设计规范写成 DESIGN.md / SKILL.md 喂给编码代理，让 Codex、Cursor、Claude 产出的界面有统一风格，而不是每次都随机一套。适合被 AI 生成的「紫色渐变卡片」恶心到的人；代价是它本质是设计系统与提示词，不是组件库，样式仍要自己写。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["AI UI", "设计系统", "MCP", "提示词", "Agent Skills"],
+    body: "TypeUI 押的判断是：AI 写界面难看，不是模型不会写 CSS，而是它没有设计约束。于是它把「某种风格该用什么字体、间距、圆角、配色」固化成 markdown，再通过 MCP 或直接贴进上下文的方式交给 agent。\n仓库本身更像一个接入索引：README 大半篇幅是二十多个客户端的连接指南（Codex、Claude、Cursor、Grok、Z.ai、OpenCode、VS Code、JetBrains、Zed、Windsurf、Cline、Qwen、Amp、Goose、Lovable、v0、Replit 等），入口各不相同，但终点都是「把托管 MCP 加进去，然后用自然语言要界面」。设计技能同时提供 DESIGN.md 与 SKILL.md 两种格式，前者给通用的 markdown 上下文，后者给支持 skills 的 agent。\n它的价值在一致性和可复用：一整套风格选定后，多个页面、多次生成不会漂。局限也在这：它给的是决策依据，不是可 import 的组件。你仍然要自己接 Tailwind 或组件库，agent 也可能「理解了风格但写歪了实现」，需要人验收。\n另外仓库的 GitHub 许可标注是 NOASSERTION，README 也没有授权声明，商用前值得先确认，别默认它和常见 MIT 项目一样宽松。",
+    officialUrl: "https://www.typeui.sh",
+    officialLabel: "www.typeui.sh",
+    links: {
+      official: "https://www.typeui.sh",
+      github: "https://github.com/bergside/typeui",
+    },
+    whoFor: "天天让 AI 写前端、但每次都要手动纠正「颜色太艳、间距太挤」的人；以及想把团队设计规范一次性固化成 agent 上下文的设计师。",
+    whoNot: "需要开箱即用组件库的人——它不提供按钮和表格；也不适合完全不愿接 MCP、只想要一份静态 prompt 的极简派（那就直接拷 DESIGN.md）。",
+    installTips: [
+      "先按你实际用的工具选接入方式：README 给每个客户端单开了指南，别拿 Claude 的步骤硬套到 Cursor 上。",
+      "主流路径是 MCP：把 TypeUI 的托管 MCP 服务器加到客户端，之后用自然语言提需求，它负责补设计系统与布局变体建议。",
+      "不想接 MCP 也能用：设计技能以 DESIGN.md / SKILL.md 两种纯 markdown 形式发布，任何吃 markdown 的模型都能直接读。",
+      "选风格时先看 design-skills 列表（Agentic、Bento、Brutalism、Editorial、Dashboard 等），一个项目锁定一套，混着用就失去一致性的意义。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#111827",
+    },
+    guide: {
+      intro: "第一次用最容易搞混「MCP 接好了」和「风格真的生效了」。这篇按接入、选风格、验收三步讲。",
+      markdown: `## 三种用法，先选一种
+
+1. **MCP 接入**（官方主推）：把托管 MCP 加到 Codex / Claude / Cursor / VS Code / JetBrains / Zed 等客户端，让 agent 自己取设计资料。
+2. **SKILL.md**：给支持 skills 的 agent（Claude Code、Codex 之类），当技能文件读。
+3. **DESIGN.md**：纯 markdown，贴进任何对话即可，兼容性最好，也最容易被上下文挤掉。
+
+工具不一样，步骤就不一样。README 里每个客户端都有独立链接，**别跨工具套步骤**——MCP 的配置文件位置在各家完全不同。
+
+## 选风格比接 MCP 更重要
+
+设计技能是按风格分的：Agentic、Bento、Brutalism、Editorial、Dashboard、Claymorphism……先定一套再开工。
+
+混用的典型症状：首页是 Bento 卡片、设置页变成 Brutalism 粗边框，agent 每次都「贴心」地换风格。一个项目只锁一套，把它写进项目规范里。
+
+## 怎么判断它生效了
+
+看三个地方：**字体是否统一**、**间距是否成体系**（而不是 13px/17px/21px 乱来）、**颜色是否来自同一组语义变量**。
+
+如果 agent 产出的还是默认蓝紫渐变 + 圆角卡片，说明设计上下文没进去——先确认 MCP 连接成功，或者 DESIGN.md 是否真的在上下文里（长对话里它会被挤到后面）。
+
+## 许可要先确认
+
+GitHub 上这个仓库标的是 NOASSERTION，README 未给授权说明。个人试验没问题，**要商用时先找官方确认**，别按 MIT 的预期直接用。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "设计技能总览",
+          url: "https://www.typeui.sh/design-skills",
+          note: "所有风格的清单与预览。先在这里挑一套，再去接 MCP，顺序反了会白折腾。",
+        },
+        {
+          kind: "html",
+          title: "Codex 接入指南",
+          url: "https://www.typeui.sh/docs/guides/codex",
+          note: "以 Codex 为例的完整接入步骤；其他客户端的差异主要就在配置文件位置。",
+        },
+        {
+          kind: "html",
+          title: "官网首页",
+          url: "https://www.typeui.sh",
+          note: "查最新的客户端支持范围与产品定位。仓库 README 只是索引，细节都在站点上。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "diaspora",
+    linksCheckedAt: "2026-10-22",
+    name: "diaspora*",
+    nameZh: "diaspora* 去中心化社交网络",
+    aliases: ["diaspora", "diaspora*", "Diaspora", "联邦社交", "pod"],
+    summary: "由一个个 pod 互联而成的去中心化社交网络，账号放在别人或自己的服务器上，数据不必交给一家公司。适合受不了平台封号与算法推荐的人；代价是选 pod、维护 Rails 服务、面对一个人口远小于主流平台的网络，都得自己承担。",
+    scenes: ["social"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["去中心化", "联邦社交", "Ruby on Rails", "隐私", "自建"],
+    body: "diaspora* 的组织方式是联邦：每个人在某个 pod（社区服务器）上注册，pod 之间互相转发内容，所以你不必和关注的人在同一台服务器上。README 第一句就说清了最关键的一点——**用这个网络不需要自己安装**，开放的 pod 名单在 fediverse observer 上，挑一个注册就能用；自己装只是「想把数据握在手里」时才有必要。\n这也决定了它真正的门槛不在技术，而在选择：pod 由谁维护、能活多久、管理员还管不管，直接影响你能不能用下去。README 没有藏着这一点，而是先让你去读 wiki 的选 pod 指南和 pod 管理员 FAQ。\n技术上它是一个 Ruby on Rails 应用，安装要照 wiki 的 Installation 走——试装、生产部署、开发环境是三条不同的路径，仓库本身不提供一键脚本。这也是自建的实际代价：服务器、升级、备份、被滥用后的处置，全落在你身上。\n适合把它当一个「小而可控的社交据点」：小圈子、自留地、想脱离算法推荐的信息流。不适合期待大 V 生态、短视频、直播这类主流平台能力的人。",
+    officialUrl: "https://diasporafoundation.org",
+    officialLabel: "diasporafoundation.org",
+    links: {
+      official: "https://diasporafoundation.org",
+      github: "https://github.com/diaspora/diaspora",
+    },
+    whoFor: "想脱离中心化平台、愿意接受一个规模更小但更自治的社交网络的个人；以及想自己开一台 pod 给亲友或小团队用、并且有能力维护 Rails 服务的运维。",
+    whoNot: "只想「换个 App 继续刷」的人——联邦网络的活跃度与内容密度和主流平台差得远；也不适合不愿碰服务器、把自建当成「装个软件」的人。",
+    installTips: [
+      "只想用的人不必安装：去开放的 pod 列表挑一台注册即可，README 明确说使用网络不需要自建。",
+      "挑 pod 前先读 wiki 的 Choosing a pod 与 pod 管理员 FAQ，服务器由谁维护比功能列表更影响长期体验。",
+      "要自建就照 wiki 的 Installation 指南走：试装、生产、开发三条路径各有文档，仓库里没有一键脚本。",
+      "pod 之间的可见性依赖联邦，关注了别的 pod 的人却看不到内容时，先查两端 pod 是否互相可达，而不是先怀疑账号。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#2E2E2E",
+    },
+    guide: {
+      intro: "第一次接触最容易卡在「pod 是什么、我要不要自己装」。这篇先把这两个决定讲清楚，再谈自建的实际步骤。",
+      markdown: `## 先决定：注册还是自建
+
+README 的第一条就是答案的一半：**使用 diaspora\\* 网络不需要安装**。注册只要找一台开放 pod。
+
+自建的唯一充分理由是数据主权——你想让内容存在自己机器上，或者要当 pod 管理员。除此以外，自建只会让你多一份运维工作。
+
+## pod 是什么
+
+pod 是一台跑着 diaspora* 的服务器。你注册在某台 pod 上，但可以关注其他 pod 上的人：内容和身份留在原 pod，靠联邦协议互相投递。
+
+所以「选 pod」等于选**谁替你保管账号**。README 让你先读两篇 wiki：Choosing a pod 与 FAQ for pod maintainers。重点看三件事——这台 pod 谁在维护、有没有公开的存活与备份说明、管理规则是否可接受。
+
+## 注册之后
+
+1. 补全个人资料，设好头像与简介（联邦里别人靠这些判断要不要关注你）。
+2. 用「按标签/按邮箱/按 ID」找人，跨 pod 关注一开始会显得冷清，这是网络规模问题，不是坏了。
+3. 发第一条公开帖，确认它在你自己的 pod 上可见，再去看别的 pod 的朋友能否看到。
+
+## 自建的真实步骤
+
+照 wiki 的 Installation 走，三条路径分开：试装（本地验证）、生产（对外提供服务）、开发（改代码）。
+
+会被卡住的地方通常不是 Rails 本身，而是：域名与 HTTPS、后台任务与发信、以及升级时的数据库迁移。**没有一键脚本**，这是这个项目一贯的风格——文档写得很细，但不替你决定。
+
+装完记得：单台 pod 的可用性完全取决于你，联邦里的其他 pod 不会替你兜底。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方网站",
+          url: "https://diasporafoundation.org",
+          note: "项目定位、pod 列表入口与常见问题，先判断这条路适不适合你再往下走。",
+        },
+        {
+          kind: "html",
+          title: "安装指南（wiki）",
+          url: "https://wiki.diasporafoundation.org/Installation",
+          note: "试装、生产、开发三条路径的完整步骤。自建前必读，别去仓库里找脚本。",
+        },
+        {
+          kind: "html",
+          title: "开放 pod 列表",
+          url: "https://diaspora.fediverse.observer",
+          note: "可以直接注册的服务器清单，含在线状态。这是 README 给出的注册入口。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "owncloud",
+    linksCheckedAt: "2026-10-22",
+    name: "ownCloud Core",
+    nameZh: "ownCloud 文件同步服务端",
+    aliases: ["owncloud", "ownCloud", "私有云盘", "ownCloud Classic", "自建网盘"],
+    summary: "自建网盘的老牌服务端：文件同步、WebDAV/CalDAV/CardDAV、外部存储与加密都在这个仓库里。适合要把文件放自己机房、还想顺带同步日历通讯录的团队；代价是它属于 Classic 分支，官方下一代是 oCIS，新项目得先决定押哪边。",
+    scenes: ["tools", "office"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["私有云盘", "文件同步", "WebDAV", "PHP", "自建服务"],
+    body: "ownCloud Core 是 ownCloud Classic 的服务端：文件存储与同步、分享、WebDAV / CalDAV / CardDAV 三套协议、应用插件机制、用户与组管理、加密、外部存储后端，还有一套 REST API。日历、通讯录、活动流这些是以插件形式挂在上面的独立仓库。\n它跑在 PHP 上，数据库可选 MySQL、MariaDB、PostgreSQL、SQLite——SQLite 只适合试装，别拿它撑团队。官方提供 `owncloud/server` 的 Docker 镜像，这是最省事的起点。\n最该先搞清楚的是分支：本仓库是 **Classic**，官方明确说下一代平台是 oCIS（ownCloud Infinite Scale），那是另一个仓库、另一套架构。两者不是简单升级，等于两个产品并行，选型时得先想清楚要哪一条线。\n许可也值得留意：当前是 AGPL-3.0，而接管它的 OSPO 正在推动整体迁到 Apache-2.0，README 说得很直白——每个仓库以 LICENSE 文件为准，且 AGPL 是强 copyleft，迁移需要全量重新授权，不是改个文件头。想把它嵌进商业产品的人，别按「以后会变 Apache」来规划。",
+    officialUrl: "https://owncloud.com",
+    officialLabel: "owncloud.com",
+    links: {
+      official: "https://owncloud.com",
+      github: "https://github.com/owncloud/core",
+    },
+    whoFor: "要在自己机房放文件、并且需要 WebDAV 加日历通讯录一起同步的组织；以及已经在用 Classic 插件生态、不打算短期迁移的运维。",
+    whoNot: "新部署且能自由选型的人——先去评估 oCIS，别默认从 Classic 起；也不适合只想「两台电脑同步一个文件夹」的个人，Syncthing 那类工具更省事。",
+    installTips: [
+      "生产部署别照 README 硬来：它只给了一句「看官方安装手册」，实际要按 doc.owncloud.com 的 admin manual 走。",
+      "想先试直接跑 Docker 镜像 `owncloud/server`，不要在宿主机上手动拼 PHP + 数据库 + Web 服务器。",
+      "从源码开发需要 Composer v2、Yarn 和 Node.js 14+，然后在仓库根目录执行 `make`。",
+      "部署前先确认你选的是 Classic（本仓库）还是 oCIS，两者是并行的两条产品线，不是版本号前后关系。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#1D8FC7",
+    },
+    guide: {
+      intro: "第一次部署会卡在「选哪个版本、装什么依赖、数据放哪」。这篇按选型、起服务、常见坑的顺序讲。",
+      markdown: `## 第一步不是装，是选代际
+
+ownCloud 现在有两条线：
+
+- **Classic**：本仓库，PHP 实现，插件生态成熟（日历、通讯录、活动流都是独立仓库）。
+- **oCIS**：官方说的下一代平台，另一个仓库、另一套架构。
+
+README 只给了一句提示，但这句最值钱。如果你的组织已经在用 Classic 的插件，继续；如果是全新部署且没有历史包袱，**先去评估 oCIS 再决定**，别照旧教程装完才发现站错了队。
+
+## 起一台能用的实例
+
+开发/试用直接上容器，省掉 PHP 栈的坑：
+
+\`\`\`bash
+docker run -d -p 8080:8080 owncloud/server
+\`\`\`
+
+生产环境请退回官方 admin manual，那里有数据库、HTTPS、数据目录、缓存与后台任务的完整要求。README 明确把安装交给文档，仓库里没有部署脚本。
+
+## 从源码开发才需要这些
+
+- Composer **v2**
+- Yarn
+- Node.js **14 或更高**
+
+然后在仓库根目录：
+
+\`\`\`bash
+make
+\`\`\`
+
+这条 \`make\` 只解决构建，不解决运行环境。别把它当成安装命令。
+
+## 三个会咬人的点
+
+**数据库别用 SQLite 上生产**。它只是「支持」，并发一上来就锁表。
+
+**外部存储与加密要想清楚再开**。加密一旦启用，密钥管理就成了你的责任，丢了等于数据没了。
+
+**许可不是永久 AGPL 但也别赌**。当前 AGPL-3.0，OSPO 在推动迁到 Apache-2.0，但 README 说得以各仓库的 LICENSE 为准。要嵌进商业产品，按现状评估。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方安装手册",
+          url: "https://doc.owncloud.com/server/latest/admin_manual/installation/",
+          note: "生产部署的唯一权威来源。README 把安装整个甩给了这一页，别跳过。",
+        },
+        {
+          kind: "html",
+          title: "Docker 镜像",
+          url: "https://hub.docker.com/r/owncloud/server",
+          note: "试用与快速起服务用这个，省去手装 PHP 栈；生产仍需按手册配数据库与备份。",
+        },
+        {
+          kind: "link",
+          title: "oCIS（下一代平台）",
+          url: "https://github.com/owncloud/ocis",
+          note: "决定用 Classic 之前先看一眼它，避免装完才发现官方主推的是另一条线。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "civitai",
+    linksCheckedAt: "2026-10-22",
+    name: "Civitai",
+    nameZh: "Civitai 模型分享平台",
+    aliases: ["civitai", "C站", "Civitai 源码", "SD 模型站", "模型分享平台"],
+    summary: "Stable Diffusion 模型（LoRA、VAE、textual inversion 等）的分享社区，开源的是整站而不是客户端。适合想自建小型模型站、或研究大型 Next.js + tRPC 应用怎么搭的人；代价是本地只能跑出浏览与上传，生成、训练、聊天通知这些官方明说不工作。",
+    scenes: ["social"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["模型分享", "Stable Diffusion", "Next.js", "自建", "社区"],
+    body: "Civitai 是让用户上传、浏览、评论 Stable Diffusion 衍生模型的平台——textual inversion、hypernetwork、aesthetic gradient、VAE 这些「给模型加料」的东西。仓库放的是整站源码：Next.js 前后端、tRPC 做 API、Prisma + Postgres 存数据、Mantine 做 UI、Cloudflare 存文件。\n对自建者，最关键的一句在 README 的 Known limitations 里：依赖外部输入的服务**本地跑不起来**，包括编排（生成与训练）、Signals（聊天、通知、其他实时更新）、Buzz。也就是说你搭出来的是一台能浏览和上传的站，不是一个能出图的站。冲着「白嫖一个自己的生成平台」来的人，会在这里失望。\n工程上它是个真正的大型 monorepo，环境要求写得很硬：Node 必须 `>=24.0.0 <25`（`.nvmrc` 钉在 24.19.0），包管理器只认 pnpm，`npm install` 会被 preinstall 的 only-allow 直接拦掉；还要先初始化 `event-engine-common` 子模块。数据库、Redis、MinIO、Meilisearch、ClickHouse、邮件捕获全在 docker compose 里。\n上手顺序错一步就会卡很久，尤其「空库没迁表」和「MinIO 里没建 S3 密钥」这两处。",
+    officialUrl: "https://civitai.com",
+    officialLabel: "civitai.com",
+    links: {
+      official: "https://civitai.com",
+      github: "https://github.com/civitai/civitai",
+    },
+    whoFor: "想研究大型 Next.js + tRPC monorepo 怎么组织的人；以及要搭一个只做模型浏览/上传的内部站、并且能接受「生成与实时功能缺席」的团队。",
+    whoNot: "想自建一个能出图的 AI 绘图站的人——本地明确不支持生成与训练；也不适合只想装个客户端的普通用户，直接用官网即可。",
+    installTips: [
+      "别用「Node 20 以上」糊弄：`engines.node` 是 `>=24.0.0 <25`，`.nvmrc` 钉在 24.19.0，先 `nvm use` 再往下走。",
+      "只认 pnpm：`npm install` 会被 `preinstall` 的 only-allow 拦下，先 `corepack enable` 让它读到 `packageManager` 字段。",
+      "顺序照抄 README：`git submodule update --init event-engine-common` → `cp .env-example .env.development` → `docker compose -f docker-compose.base.yml up -d` → `pnpm install` → `pnpm dev`。",
+      "起来后还要填 S3 密钥：MinIO 控制台在 9001 端口（账号密码都是 minioadmin），建 Access Key 后填进 `S3_UPLOAD_KEY` 与 `S3_IMAGE_UPLOAD_KEY`。",
+      "空库要自己灌：`make run-migrations` 再 `make reseed`，这两步慢且有破坏性，所以没有启动脚本替你跑。",
+      "Windows 上必须把仓库放在 WSL 卷里，或克隆进命名容器卷，否则文件 I/O 会慢到没法开发。",
+      "别用 devcontainer 模板当基准：它钉的仍是 Node 22 镜像，不在 `.nvmrc` 的支持区间里。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#1971C2",
+    },
+    guide: {
+      intro: "按第一次搭建会卡住的顺序讲：环境硬门槛、容器栈、空库迁移、以及 README 明说跑不起来的那些功能。",
+      markdown: `## 先过环境关，别急着 clone
+
+Node 必须 \`>=24.0.0 <25\`（\`.nvmrc\` 钉在 24.19.0），包管理器只认 pnpm。错任何一个，后面都会表现成「奇怪的测试失败」。
+
+\`\`\`bash
+nvm use            # 读 .nvmrc → 24.19.0
+corepack enable    # 让 pnpm 生效
+\`\`\`
+
+注意两者的差别：Node 版本错了**不报错**，\`pnpm install\` 只打一行警告就继续；\`npm install\` 则是硬拦，会被 \`preinstall\` 的 only-allow 直接退出。
+
+## 标准启动流程
+
+\`\`\`bash
+git clone https://github.com/civitai/civitai.git
+cd civitai
+git submodule update --init event-engine-common
+cp .env-example .env.development
+docker compose -f docker-compose.base.yml up -d
+pnpm install
+pnpm dev
+\`\`\`
+
+子模块别漏，漏了会在编译期报找不到包。容器栈含 Postgres、Redis、MinIO、Meilisearch、ClickHouse 与邮件捕获。
+
+## 起来之后还有三件事
+
+1. **填 S3 密钥**：MinIO 控制台在 9001 端口（9000 是 S3 API），账号密码都是 \`minioadmin\`，建 Access Key 后填进两个 \`S3_*\` 变量。
+2. **设 WEBHOOK_TOKEN**：任意随机串，用于 webhook 鉴权。
+3. **灌库**：\`make run-migrations\` → \`make reseed\`，只在空库上跑。
+
+之后访问 \`http://localhost:3000\`，注册邮件进 Mailpit（1080 端口）。
+
+## 别指望它有生成能力
+
+README 的 Known limitations 明说本地不支持：编排（Generation / Training）、Signals（Chat、Notifications）、Buzz——都依赖外部服务。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "项目 README",
+          url: "https://github.com/civitai/civitai#readme",
+          note: "环境门槛、启动顺序与 Known limitations 的原始出处。动手前通读一遍能少踩一半坑。",
+        },
+        {
+          kind: "link",
+          title: "数据库 schema 与迁移",
+          url: "https://github.com/civitai/civitai/tree/main/packages/civitai-db-schema",
+          note: "改表要改 schema.full.prisma，不是 schema.prisma；后者每次生成都会被覆盖。",
+        },
+        {
+          kind: "html",
+          title: "线上站点",
+          url: "https://civitai.com",
+          note: "先看线上长什么样再决定要不要自建；也能对照着判断自建版缺了哪些模块。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "module-federation-examples",
+    linksCheckedAt: "2026-10-22",
+    name: "Module Federation Examples",
+    nameZh: "模块联邦官方示例集",
+    aliases: ["module federation", "模块联邦", "mf examples", "微前端示例"],
+    summary: "Webpack 5 模块联邦的官方示例合集，几十套可直接跑的多应用组合，用来照抄 host / remote 的配法。适合第一次做微前端、卡在共享依赖上的人；代价它是示例仓库不是库，私有示例目录不删就装不上，版本还跟着 webpack 生态漂。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["微前端", "模块联邦", "Webpack", "示例", "前端架构"],
+    body: "模块联邦解决的是「两个独立构建的前端应用，运行时互相加载对方的代码」——微前端最核心的那块。这个仓库由模块联邦的作者维护，把各种组合摊开给你看：不同宿主、不同远程、不同框架、不同共享策略。\n它最大的价值不是让你依赖什么，而是**可以跑**。文档讲不清的 shared 版本协商、远程入口怎么写、跨框架怎么接，跑一遍示例比读十篇博客快。README 也强调联邦不限于 JS 或 React——图片、CSS、JSON、WASM 这类 Webpack 能处理的资源都能联邦。\n要提醒的是三点：第一，它是示例集合，不是 npm 包，没有版本语义；第二，仓库里混着 proprietary 目录，README 明确要求先删掉才能装依赖；第三，运行命令不统一，多数是 `pnpm start`，但有些是 `dev` 或 `serve`，照着 README 里那句「Some examples may use a different command」自己找。\n示例里还夹着书、咨询与 Zephyr Cloud 的推广，那是维护者的商业收入，看的时候跳过就行，不影响代码。",
+    officialUrl: "https://module-federation.io",
+    officialLabel: "module-federation.io",
+    links: {
+      official: "https://module-federation.io",
+      github: "https://github.com/module-federation/module-federation-examples",
+    },
+    whoFor: "第一次落地微前端、需要在真实可跑的工程里对照 host/remote 配置的前端；以及维护多团队共用组件、想验证 shared 依赖策略是否可行的人。",
+    whoNot: "想找一个能长期依赖的库的人——这里是示例不是包；以及单团队单应用的项目，微前端的复杂度纯属自找。",
+    installTips: [
+      "先在仓库根目录 `pnpm i`：示例用的是 pnpm workspace，单独进某个示例目录装会缺依赖。",
+      "装之前把仓库里那些 proprietary 示例目录删掉，README 明说否则装不上。",
+      "跑示例多数用 `pnpm start`，但有的示例命令是 `dev` 或 `serve`，别默认全都一样。",
+      "完整示例清单在仓库的 `output.md`，根 README 里没有逐个列表。",
+      "联邦对象不限于 JS：图片、CSS、JSON、WASM 只要 Webpack 能处理就能共享，选型时别把自己框在「只联邦组件」里。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#0B7285",
+    },
+    guide: {
+      intro: "第一次跑这个仓库会卡在「装不上、跑不起来、不知道看哪个」。这篇按这三个卡点讲。",
+      markdown: `## 装不上：先删私有示例
+
+README 原话是：从 git checkout 本地跑之前，**删掉所有 proprietary 示例目录**。那些目录依赖内部资源，留着会让 \`pnpm i\` 直接失败。
+
+然后在**仓库根目录**装：
+
+\`\`\`bash
+pnpm i
+\`\`\`
+
+这是 pnpm workspace，根目录装才会把各示例的依赖链起来。进到某个示例目录里单独装，通常会缺一堆 workspace 内包。
+
+## 跑不起来：命令不统一
+
+多数示例：
+
+\`\`\`bash
+pnpm start
+\`\`\`
+
+但 README 自己写了「Some examples may use a different command such as dev or serve」。所以跑之前先看该示例目录的 \`package.json\` 里 scripts 有什么，别硬套。
+
+## 不知道该看哪个
+
+根 README 只有一个总入口，完整清单在仓库的 \`output.md\`。按你的场景找：
+
+- 想看最小可跑的 host + remote：找最基础的那组
+- 想看跨框架（React 宿 Vue 之类）：搜框架名
+- 想看 shared 依赖冲突怎么解：找带版本协商的示例
+
+## 从示例到自己的项目
+
+示例里的 \`ModuleFederationPlugin\` 配置是可以直接搬的，但有两个前提：**构建工具版本要对上**（这里是 Webpack 5 的写法），**remote 的地址要换成你能访问的**。本地示例常用 localhost 端口硬编码，复制到自己项目时最容易漏改。
+
+## 注意商业内容
+
+README 里有书、按小时咨询和 Zephyr Cloud 的推广。它们是维护者的收入来源，不影响示例代码本身，看的时候跳过即可。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "完整示例清单",
+          url: "https://github.com/module-federation/module-federation-examples/blob/master/output.md",
+          note: "所有示例的目录索引。根 README 里没有逐条列表，找例子从这里进。",
+        },
+        {
+          kind: "html",
+          title: "模块联邦官方文档",
+          url: "https://module-federation.io/",
+          note: "配置项的权威说明。示例只展示「怎么写」，为什么这么写要看文档。",
+        },
+        {
+          kind: "link",
+          title: "Universe 生态仓库",
+          url: "https://github.com/module-federation/universe",
+          note: "官方维护的运行时与工具集合。示例跑通后要上生产，通常从这里挑依赖。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "koala",
+    linksCheckedAt: "2026-10-22",
+    name: "Koala",
+    nameZh: "Koala Facebook Ruby SDK",
+    aliases: ["koala", "koala gem", "facebook ruby", "Graph API Ruby"],
+    summary: "Ruby 里调 Facebook Graph / Marketing API 的老牌轻量封装，批量请求、分页、测试用户、OAuth 校验都有现成方法。适合维护存量 Rails 应用里 Facebook 登录与投放功能的人；代价是 README 的支持矩阵还停在 MRI 2.1–2.4 和 Travis，接之前得自己验一遍现在还能不能跑。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Ruby", "Facebook", "Graph API", "OAuth", "SDK"],
+    body: "Koala 的目标写得很克制：轻、快、灵活、有测试。它不封装业务概念，就是把 Graph API 的调用变成 Ruby 方法，返回 Ruby Hash；数组型结果包成 GraphCollection，能 `.next_page` 翻页，也能把翻页参数存下来跨请求用。\n几个真正省事的地方：批量请求（`@graph.batch` 里可以挂多个调用，还能给每个调用加后处理块，直接把结果塞进自己的字段）；测试用户 API（可以批量造测试账号甚至一整个网络）；RealtimeUpdates（订阅字段变更，并有 `meet_challenge` 处理回调校验）；以及 rate limit 的读取钩子。\nHTTP 层走 Faraday，意味着超时、代理、SSL 证书、日志中间件都能自己接管——这是它相对官方 SDK 的优势，也是需要读懂一点 Faraday 配置的代价。\n需要正视的是维护状态：README 写着「支持所有当前受支持的 Ruby 版本（MRI 2.1–2.4）」并链到 Travis CI，这两样都早已过时。这不代表代码坏了，但说明文档没跟上；另外它自己声明全局配置**不是线程安全的**。上生产前请用自己的 Ruby 版本跑一遍，别把 README 当兼容性承诺。",
+    officialUrl: "https://github.com/arsduo/koala",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/arsduo/koala",
+      github: "https://github.com/arsduo/koala",
+    },
+    whoFor: "维护存量 Rails 应用、需要接 Facebook 登录、主页发帖、广告投放或测试用户的 Ruby 开发者。",
+    whoNot: "新项目里能自由选型的人——先看官方 SDK 与当前维护状态；也不需要 Facebook 集成、或只想读公开数据的人，直接调 HTTP 更省事。",
+    installTips: [
+      "Bundler 里加 `gem \"koala\"`，或直接 `gem install koala`。",
+      "全局配置放 `config/initializers/koala.rb`，设 access_token / app_access_token / app_id / app_secret，省得每次调用都传。",
+      "README 明确说全局配置**不是线程安全的**：多线程服务里按请求传参，或用 per-API 配置，别共用全局。",
+      "拿 token 最快的方式是 Facebook Graph API Explorer，点 Get Access Token。",
+      "建议构造 API 时带上 app_secret（`Koala::Facebook::API.new(token, app_secret)`），并在应用设置里打开 Require proof on all calls。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "K",
+      color: "#3B5998",
+    },
+    guide: {
+      intro: "第一次接会卡在 token 类型、API 版本和分页上。这篇按调用链的顺序讲，最后说维护状态该怎么判断。",
+      markdown: `## 三种 token，别拿错
+
+- **user access token**：代表某个用户，读写他自己的数据。
+- **app access token**：代表应用本身，用于订阅与部分后台请求，不需要用户会话。
+- **page token**：代表主页，发主页帖要用它。
+
+README 里 \`get_app_access_token\` 拿的是第二种。拿错的表现是权限报错，后台却怎么查都对。
+
+## 最小可跑
+
+\`\`\`ruby
+require "koala"
+
+@graph = Koala::Facebook::API.new(access_token)
+profile = @graph.get_object("me")
+friends = @graph.get_connections("me", "friends")
+@graph.put_connections("me", "feed", message: "hello")
+\`\`\`
+
+返回值是普通 Hash；列表结果是 \`GraphCollection\`，可直接 \`each\`，翻页用 \`next_page\`。
+
+## 版本不写就用最老的
+
+Facebook 会给你一个默认 API 版本，通常是允许的最老那个：
+
+\`\`\`ruby
+Koala.config.api_version = "v2.0"
+\`\`\`
+
+也可单次请求传 \`api_version:\`。**两边版本不一致是「本地能跑、线上不行」的常见原因**。
+
+## 批量请求省的是延迟
+
+\`\`\`ruby
+@graph.batch do |batch_api|
+  batch_api.get_object("me") { |me| self.about_me = me }
+  batch_api.get_connections("me", "photos") { |photos| self.photos = photos }
+end
+\`\`\`
+
+后处理块让你直接消费结果，不必再拆数组，这是它比手写 HTTP 省事的地方。
+## 维护状态要自己判断
+
+Ruby 版本矩阵写着 MRI 2.1–2.4，CI 还指向 Travis——都过时了。**先在你的 Ruby 版本上跑一遍冒烟**，再决定是否依赖。多线程环境记得避开全局配置，它自己标了不线程安全。
+`,
+      resources: [
+        {
+          kind: "link",
+          title: "Koala Wiki",
+          url: "https://github.com/arsduo/koala/wiki",
+          note: "README 之外的完整用法与 HTTP 配置说明，分页、实时更新等细节都在这。",
+        },
+        {
+          kind: "html",
+          title: "Graph API Explorer",
+          url: "https://developers.facebook.com/tools/explorer/",
+          note: "拿临时 token、验证权限与字段最快的地方。排查「权限明明有却不返回」时用它对照。",
+        },
+        {
+          kind: "html",
+          title: "速率限制说明",
+          url: "https://developers.facebook.com/docs/graph-api/overview/rate-limiting/",
+          note: "Koala 的 rate_limit_hook 读的就是这里的三个响应头，先搞懂含义再决定怎么退避。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "deltachat-desktop",
+    linksCheckedAt: "2026-10-22",
+    name: "Delta Chat Desktop",
+    nameZh: "Delta Chat 桌面端",
+    aliases: ["delta chat", "deltachat", "DeltaChat", "去中心化聊天", "邮件聊天"],
+    summary: "把聊天跑在邮件协议上的去中心化通讯工具，桌面端默认 Electron 版，一个邮箱地址就是一个账号。适合想要端到端加密、又不想再注册一个中心化 IM 的人；代价是体验受邮件服务商牵制，浏览器版官方自己标注仅实验、别日常用。",
+    scenes: ["social"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["即时通讯", "去中心化", "端到端加密", "Electron", "邮件"],
+    body: "Delta Chat 的思路很反直觉：不新建协议，把聊天塞进邮件。对方不需要装任何东西——收件箱里就是一封普通邮件；两边都装了，才变成带引用、附件、加密的聊天界面。底层是 chatmail core（Rust），桌面端只是它的一个前端。\n这个仓库有三个版本，README 分得很清楚：**Electron 版是默认应用**，应用商店里发的就是它；**浏览器版高度实验性**，带一个 webserver 组件，官方说目前只给开发者和自动化测试用；**Tauri 版**还在 WIP，独立仓库，通过 submodule 复用这里的前端。选错版本是新手第一个坑。\n数据组织方式很朴素：配置与数据库存在 application-config 的默认路径下，**每个账号对应一个 SQLite 文件**，按邮箱地址区分。所以备份与迁移是「拷库」，不是「登录同步」——这也意味着换机器时只拷配置不拷库，历史就没了。\n安装渠道按平台分：Linux 首选 Flatpak，Arch 直接 pacman，macOS 走 Homebrew cask，Windows 官方建议 Microsoft Store（有自动更新）。从源码跑要 Node 22+ 和 pnpm。",
+    officialUrl: "https://github.com/deltachat/deltachat-desktop",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/deltachat/deltachat-desktop",
+      github: "https://github.com/deltachat/deltachat-desktop",
+    },
+    whoFor: "想要端到端加密聊天、又不愿把通讯录交给某家 IM 公司的人；以及需要「对方不装 App 也能收到消息」这种低门槛沟通的场景。",
+    whoNot: "要语音视频通话、大型群聊、丰富表情生态的人——它本质是邮件；也不适合想尝鲜浏览器版的人，官方明说那只是开发者与自动化测试用的。",
+    installTips: [
+      "Linux 首选 Flatpak（Flathub 的 chat.delta.desktop）；Arch 直接 `pacman -S deltachat-desktop`，AUR 的 -git 包编译 master，会比正式版新也更容易崩。",
+      "macOS 用 `brew install --cask deltachat`；Windows 官方建议装 Microsoft Store 版，因为那里才有自动更新。",
+      "从源码跑要 Node 22+ 和 pnpm：`pnpm install` → `pnpm -w build:electron` → `pnpm -w start:electron`；`-w` 指 workspace root，跑的时候不必站在仓库根目录。",
+      "每个账号的数据是一个 SQLite 文件，按邮箱地址区分；换机器时别只拷配置不拷库。",
+      "日志在菜单 View → Developer 里能直接打开目录，出问题先看它，比猜快。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#1B7A8C",
+    },
+    guide: {
+      intro: "第一次用会卡在「账号从哪来、为什么对方收不到、换电脑怎么搬历史」这三件事上。",
+      markdown: `## 账号就是一个邮箱
+
+Delta Chat 没有「注册」这一步，填一个邮箱地址和密码（或应用专用密码）就能用。桌面端每个账号对应一个 SQLite 库，存在 application-config 的默认目录下。
+
+这意味着两件事：
+
+1. **密码是邮箱的密码**，不是 Delta Chat 的密码。用 Gmail 之类要开应用专用密码，别直接填主密码。
+2. **备份 = 拷库**。换电脑只迁配置不迁库，聊天记录会空。
+
+## 三个版本别选错
+
+- **Electron**：默认版，应用商店里发的就是它，日常用这个。
+- **Browser**：高度实验，带 webserver，官方写明只给开发者与自动化测试。
+- **Tauri**：WIP，在独立仓库，通过 submodule 复用这里的前端。
+
+看到「浏览器版」教程就想试试的，先读上面那句：它不是给日常用的。
+
+## 第一次发消息
+
+1. 填邮箱 → 等它完成配置（会自己试 IMAP/SMTP 参数）。
+2. 新建聊天，输入对方的**邮箱地址**（不是用户名）。
+3. 对方没装 Delta Chat 也能收到——他看到的就是一封邮件。
+
+反过来说，如果对方抱怨「收到的像垃圾邮件」，那是邮件服务商在分类，不是消息没发出去。
+
+## 从源码跑
+
+\`\`\`bash
+git clone https://github.com/deltachat/deltachat-desktop.git
+cd deltachat-desktop
+npm i -g pnpm
+pnpm install
+pnpm -w build:electron
+pnpm -w start:electron
+\`\`\`
+
+Node 要 22 或更高。README 提醒：源码方式**不会**把应用装进系统，只是跑起来调试。
+
+## 排障顺序
+
+先看 View → Developer 里的日志目录，再看网络能否访问邮箱服务商的 IMAP 端口。公司网络封 993/465 时，症状就是「配置一直转圈」。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "排障文档",
+          url: "https://github.com/deltachat/deltachat-desktop/blob/main/docs/TROUBLESHOOTING.md",
+          note: "配置不上、收发异常时按这里的顺序查，比在 issue 里翻快。",
+        },
+        {
+          kind: "html",
+          title: "官方下载页",
+          url: "https://get.delta.chat",
+          note: "各平台安装包总入口。Windows 记得优先走 Microsoft Store 才有自动更新。",
+        },
+        {
+          kind: "markdown",
+          title: "核心库 chatmail core",
+          url: "https://github.com/chatmail/core",
+          note: "协议与加密逻辑都在这里。想搞清「为什么对方不装也能收」读这个仓库。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "freedomain",
+    linksCheckedAt: "2026-10-22",
+    name: "DigitalPlat FreeDomain",
+    nameZh: "DigitalPlat 免费域名",
+    aliases: ["FreeDomain", "DigitalPlat", "免费域名", "US.KG", "DPDNS"],
+    summary: "提供 .US.KG、.DPDNS.ORG 等后缀的免费域名注册，并把从注册到 DNS 部署的教程一起开源。适合练手项目、学生作品或临时站点；代价是后缀小众、命脉握在单一团队手上，README 还专门警告旧 Telegram 频道已失陷、别信任何「奖励」消息。",
+    scenes: ["education", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["免费域名", "DNS", "建站", "教程", "开源文档"],
+    body: "先说清楚这个仓库是什么：它**不是注册系统本身**，而是 DigitalPlat FreeDomain 的公开说明与学习资料，源码在另一个仓库 Domain-OSS。README 把它定位成两件事——告诉你有哪些免费后缀可申请，以及给一套从建域名到 DNS、邮箱、运维的教程。\n可申请的后缀目前是 .DPDNS.ORG、.US.KG、.QZZ.IO、.XX.KG、.QD.JE，注册在 dash.domain.digitalplat.org 上完成，DNS 通过自定义 nameserver 接到你自己的提供商。作者自述这项目起于 15 岁时的 DNS 实验，现在标称已注册超过 50 万个域名。\n它真正的附加值在文档：LEARN.md 是书式的学习路径，documents/ 下有教程与 FAQ。对没建过站的人来说，「域名解析为什么改了不生效」这类问题，比拿到一个免费后缀更值钱。\n风险也要提前说：免费后缀在部分邮件服务、企业网络、证书签发里会遇到兼容性与信誉问题；服务本身由一个小团队长期承担，政策与可用性不由你控制。README 里的安全提示尤其值得看——旧的 Telegram 账号与群已不在他们控制下，任何来自那儿的中奖、奖励、外链都应按钓鱼处理。",
+    officialUrl: "https://dashboard.digitalplat.org",
+    officialLabel: "dashboard.digitalplat.org",
+    links: {
+      official: "https://dashboard.digitalplat.org",
+      github: "https://github.com/DigitalPlatDev/FreeDomain",
+    },
+    whoFor: "想零成本给练手项目、课程作业或临时页面挂个域名的人；以及刚开始学 DNS、需要一条从注册到上线的完整路径的初学者。",
+    whoNot: "要长期运营的正式站点或商业项目——免费小众后缀在邮件送达、企业网络访问、证书与品牌信任上都有隐性成本；也不适合不愿公开 abuse 联系方式、需要 SLA 的团队。",
+    installTips: [
+      "注册不在这个仓库：去 dash.domain.digitalplat.org 申请，本仓库只放说明与教程。",
+      "先读不花钱：`LEARN.md` 是书式学习路径，从建域名一路讲到 DNS、网站、邮箱与运维。",
+      "接自己的 DNS 提供商时改的是**自定义 nameserver**，不是 A 记录；改完要等传播，别以为立刻生效。",
+      "源码在另一个仓库 DigitalPlatDev/Domain-OSS，想自建或审计代码去那边，别在本仓库找应用代码。",
+      "README 的 Telegram 账号与群已失陷，任何来自 Telegram 的公告、奖励、外链都不要信。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#0F9D58",
+    },
+    guide: {
+      intro: "第一次用会卡在「去哪注册、改了 nameserver 为什么没生效、免费到底能撑多久」。这篇按流程讲，并把风险说在前面。",
+      markdown: `## 分清两个仓库
+
+| 你要做的事 | 去哪 |
+| --- | --- |
+| 注册域名、改 DNS | dash.domain.digitalplat.org |
+| 学 DNS、看教程、看 FAQ | 本仓库（LEARN.md、documents/） |
+| 看注册系统的源码 | DigitalPlatDev/Domain-OSS |
+
+README 第一段就强调了这个分工，很多人跑到本仓库里找安装脚本，然后以为项目坏了。
+
+## 注册与接入自己的 DNS
+
+1. 在面板申请一个可用后缀的域名（目前是 .DPDNS.ORG / .US.KG / .QZZ.IO / .XX.KG / .QD.JE）。
+2. 到你自己的 DNS 提供商那里添加域名，拿到它给你的 **nameserver 地址**。
+3. 回面板把域名的 nameserver 改成那两条，**不是**加 A 记录。
+4. 等传播。这段时间站点打不开是正常的，用 \`dig NS 你的域名\` 看是否已经指向新 NS。
+
+第 3 步是最常见的误解：A 记录是「域名指向哪个 IP」，nameserver 是「谁来回答这个域名的解析」。托管到 Cloudflare 这类服务时，改的是后者。
+
+## 先学再注册，不吃亏
+
+\`LEARN.md\` 是成体系的路径，不是零散 FAQ。没建过站的人建议按顺序读：DNS 基础 → 把静态站挂上去 → 配邮箱 → 运维。这套东西换成付费域名一样适用。
+
+## 把风险当前提
+
+免费域名有两个现实约束：**小众后缀的信誉**（部分邮件服务与企业网络会拦）和**单一提供方**（政策、续期规则、可用性都由对方决定）。正式业务别押在这上面。
+
+README 还有一条安全公告：旧的 Telegram 账号与群已被攻陷，不再作为官方渠道。看到「领取奖励」「空投」「验证钱包」这类消息，直接当诈骗处理。滥用举报走 abusereport@digitalplat.org。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "LEARN.md 学习路径",
+          url: "https://github.com/DigitalPlatDev/FreeDomain/blob/main/LEARN.md",
+          note: "书式教程总目录，从域名到 DNS、网站、邮箱、运维。零基础从这里开始最省时间。",
+        },
+        {
+          kind: "markdown",
+          title: "注册教程",
+          url: "https://github.com/DigitalPlatDev/FreeDomain/blob/main/documents/tutorial/index.md",
+          note: "面板操作与 nameserver 配置的逐步说明，卡在「改了不生效」时对照它。",
+        },
+        {
+          kind: "html",
+          title: "注册面板",
+          url: "https://dash.domain.digitalplat.org/",
+          note: "真正申请域名、改 nameserver 的地方。仓库里没有注册功能，别找错。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "open-notebook",
+    linksCheckedAt: "2026-10-22",
+    name: "Open Notebook",
+    nameZh: "Open Notebook 自建研究笔记本",
+    aliases: ["open-notebook", "Open Notebook", "NotebookLM 开源替代", "自建知识库", "播客生成"],
+    summary: "NotebookLM 的自建替代：资料丢进去就能检索、对话、生成多说话人播客，模型可在 20 多家提供商之间换，也能全本地跑。适合资料敏感、不愿上传给 Google 的研究者；代价是默认没有密码、端口对外监听，启动前不改密钥和绑定地址等于把 API key 交出去。",
+    scenes: ["education", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["研究笔记", "RAG", "自建", "播客生成", "多模型"],
+    body: "Open Notebook 对标的很明确：NotebookLM。差别在于它自建、可换模型、数据留在自己机器上。内容形态是「笔记本 → 来源 → 笔记 → 对话」：PDF、视频、音频、网页、Office 文档都能作为来源，检索同时走全文与向量，回答带引用。\n它最实用的一点是模型自由：README 列了 20 多家提供商，OpenAI、Anthropic、Google、Mistral、DeepSeek、Ollama、LM Studio 都能接，也能全本地跑。一个坑随之而来——**必须同时配语言模型和 embedding 模型**，而 Anthropic、Groq 没有 embedding，只配一家会卡在索引阶段。\n播客生成是它的招牌差异点：支持 1 到 4 个说话人、可自定义 profile，而 NotebookLM 是固定两个。要真做成播客还得有 TTS 能力，部署前先确认你的提供商支持。\n部署只要一个 docker compose（SurrealDB + 应用），但安全默认值很糟：UI 的 8502 与 API 的 5055 监听所有网卡，**默认没有密码**。README 自己用黑体提示了这一点，这也是它最该被提前告知的地方。",
+    officialUrl: "https://www.open-notebook.ai",
+    officialLabel: "www.open-notebook.ai",
+    links: {
+      official: "https://www.open-notebook.ai",
+      github: "https://github.com/lfnovo/open-notebook",
+    },
+    whoFor: "手上有敏感资料（访谈、病历、内部文档）需要做检索与摘要的人；以及想用本地 Ollama 全离线跑、不愿为 NotebookLM 订阅付费的研究者。",
+    whoNot: "只想随手问两句文档的人——docker + 双模型配置的成本不划算；也不适合完全不管服务器安全、把服务直接暴露在公网的人。",
+    installTips: [
+      "起服务三步：下载官方 `docker-compose.yml`，改掉 `OPEN_NOTEBOOK_ENCRYPTION_KEY`，`docker compose up -d`，等约 30 秒开 http://localhost:8502。",
+      "密钥用 `openssl rand -hex 32` 生成并保存好，它加密你存进去的 API key，丢了就得全部重填。",
+      "机器可被同网段访问时，先把端口改成 `127.0.0.1:8502:8502` 与 `127.0.0.1:5055:5055`，或加 `OPEN_NOTEBOOK_PASSWORD`，再启动。",
+      "模型要配两类：至少一个 Language 和一个 Embedding，然后点 Auto-assign Defaults；Anthropic、Groq 没有 embedding，得配一家有的。",
+      "想零成本全本地，按 quick-start-local 用 Ollama 跑，模型别在配置文件里改，直接在 UI 的 Models 里加。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#B45309",
+    },
+    guide: {
+      intro: "第一次部署最容易在两处翻车：密钥与端口没改就上线，以及只配了语言模型没配 embedding。这篇按顺序讲。",
+      markdown: `## 先改两个默认值，再按启动
+
+\`\`\`bash
+mkdir open-notebook && cd open-notebook
+curl -o docker-compose.yml https://raw.githubusercontent.com/lfnovo/open-notebook/main/docker-compose.yml
+\`\`\`
+
+打开文件先改这一行：
+
+\`\`\`yaml
+- OPEN_NOTEBOOK_ENCRYPTION_KEY=change-me-to-a-secret-string
+\`\`\`
+
+生成：
+
+\`\`\`bash
+openssl rand -hex 32
+\`\`\`
+
+这个密钥加密你填的 API key，丢了不是「重置」，是**所有提供商的 key 都要重填**。
+
+第二件：8502 与 5055 默认监听所有网卡且**没有密码**。同网段有人可访问时，改成只绑本机：
+
+\`\`\`yaml
+ports:
+  - "127.0.0.1:8502:8502"
+  - "127.0.0.1:5055:5055"
+\`\`\`
+
+或者加 \`OPEN_NOTEBOOK_PASSWORD\`。然后 \`docker compose up -d\`，等 30 秒左右开 \`http://localhost:8502\`。
+
+## 模型要配「两类」，不是一类
+
+在 Manage → Models 里：
+
+1. 选提供商 → Add Configuration → 填名字和 API key（Ollama 这类本地服务填 Base URL）。
+2. 点 Test 验连通。
+3. 点 Models，勾选模型，**至少一个 Language + 一个 Embedding**。
+4. 回到 Default Model Assignments，点 Auto-assign Defaults。
+
+只配语言模型时，上传资料会卡在向量化，报错不直观。Anthropic 和 Groq 没有 embedding，必须再配一家（OpenAI、Google、Mistral、Ollama 都行）。
+
+## 播客要 TTS，升级要备份
+
+多说话人播客是差异点（1–4 人），但出音频需要 TTS；没配 ElevenLabs、OpenAI 这类只能出脚本。
+
+数据在 SurrealDB 容器里，升级前先备份卷。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "Docker 部署详解",
+          url: "https://github.com/lfnovo/open-notebook/blob/main/docs/1-INSTALLATION/docker-compose.md",
+          note: "密钥、端口、备份、更新与远程访问的完整说明。改 compose 文件前先看这页。",
+        },
+        {
+          kind: "markdown",
+          title: "完全本地运行（Ollama）",
+          url: "https://github.com/lfnovo/open-notebook/blob/main/docs/0-START-HERE/quick-start-local.md",
+          note: "不想付 API 费用、要数据不出机器，按这份配；注意本地模型也要有 embedding。",
+        },
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://www.open-notebook.ai",
+          note: "功能总览与版本动态。判断它是否已经覆盖你的资料类型，先看这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "wtfjs",
+    linksCheckedAt: "2026-10-22",
+    name: "WTFJS",
+    nameZh: "WTFJS JavaScript 怪例集",
+    aliases: ["wtfjs", "What the f*ck JavaScript", "JS 怪癖", "javascript 冷知识"],
+    summary: "一本收集 JavaScript 反直觉行为的读物，从 `[] == ![]` 到 0.1 + 0.2，每条给出结果和解释。适合已经会写 JS、想搞懂隐式转换与规范边角的人；代价它是读物不是工具，解决不了工程问题，中文译本还可能缺条目。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["JavaScript", "语言规范", "学习笔记", "面试", "开源书籍"],
+    body: "WTFJS 的定位是「好笑且棘手」，不是教程。它把一个又一个反直觉的例子摆出来：`[]` 等于 `![]` 却不等于 `true`、`NaN` 不等于自己、`parseInt` 在什么情况下会给你惊喜、数组相加变成字符串、`0.1 + 0.2` 的精度问题、`document.all` 既是对象又 undefined。每条都给出实际输出与背后原因。\n它的价值有两层：对新手，是把「JS 很怪」变成「JS 的规则我知道在哪」；对老手，是一份排查怪异 bug 时的对照表——线上出现 `[object Object]` 或莫名相等的比较时，翻一翻比搜快。\n形式很轻：整个 README 就是全书，也可以 `npm install -g wtfjs` 后在终端里用 `wtfjs` 打开，走你的 `$PAGER`。有中文、印地语、法语、葡语、波兰语、意大利语、韩语等译本。\n两个提醒：README 自己说译本由各译者维护，**可能缺条目或落后于英文版**；另外它是读物，读完不会让你的代码变好，得配合 lint 规则（比如禁用 `==`）才落地。",
+    officialUrl: "https://github.com/denysdovhan/wtfjs",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/denysdovhan/wtfjs",
+      github: "https://github.com/denysdovhan/wtfjs",
+    },
+    whoFor: "已经能写 JS、想补齐隐式转换与规范细节的人；以及准备前端面试、需要一批「为什么输出是这个」案例的人。",
+    whoNot: "刚学编程、连基础语法都没打牢的人——看这些会误以为 JS 不可理喻；也不能当规范参考书，真查语义要看 ECMAScript 标准与 MDN。",
+    installTips: [
+      "想离线当手册：`npm install -g wtfjs`，然后终端敲 `wtfjs`，会在你设置的 `$PAGER` 里打开。",
+      "不装也行，GitHub 上的 README 就是全书，带目录与逐条解释。",
+      "中文读者看 `README-zh-cn.md`，但 README 明说译本由译者各自维护，可能缺条目或没跟上英文版。",
+      "读之前先看 Notation 一节：它约定了示例写法（`// ->` 表示求值结果），不看清容易把输出当代码。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "W",
+      color: "#C9A227",
+    },
+    guide: {
+      intro: "这类读物最大的风险是读完只剩「JS 好怪」。这篇讲怎么读才有用：先懂记号、再抓住三条底层规则、最后落到项目里。",
+      markdown: `## 先读 Notation，再看例子
+
+书里所有示例都遵循同一套记号：表达式后面跟 \`// -> 结果\`，表示求值后的输出。不先看这一节，很容易把注释当代码、把输出当输入。
+
+## 别背结论，抓三条规则
+
+几十个怪例，真正支撑它们的其实就几条：
+
+1. **强制转换**（ToPrimitive / ToNumber / ToString）。\`[] == ![]\` 能成立，是因为两边都被转成了 \`""\` 与 \`false\`，再转数字都成 0。
+2. **IEEE 754 浮点**。\`0.1 + 0.2 !== 0.3\` 不是 JS 的错，是二进制浮点的通性；同理 \`Math.max() < Math.min()\` 这类空参数陷阱。
+3. **历史包袱**。\`typeof null === "object"\`、\`document.all\` 表现得像 undefined，都是为兼容旧页面留下的特例。
+
+看懂这三类，剩下的是查表而不是记忆。
+
+## 怎么读效率最高
+
+一次读 5 条，每条先猜输出再看答案。猜错的那些才是你的知识缺口——通常集中在 \`+\` 的重载、\`parseInt\` 的基数、以及对象转字符串。
+
+## 读完要做的一件事
+
+把结论落成规则，而不是留在脑子里。项目里打开 ESLint 的 \`eqeqeq\`（禁 \`==\`）、\`no-implicit-coercion\`，再配 \`prefer-const\`。书里那些坑，九成在 CI 就被拦住。
+
+## 译本注意
+
+中文版是独立文件 \`README-zh-cn.md\`，由译者维护。发现条目比英文版少，不是你打开方式错了——README 自己说明了这点。
+`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "中文版 README",
+          url: "https://github.com/denysdovhan/wtfjs/blob/master/README-zh-cn.md",
+          note: "中文全书入口。注意译本可能缺条目，对不上时回英文版核对。",
+        },
+        {
+          kind: "html",
+          title: "MDN 运算符与类型转换",
+          url: "https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators",
+          note: "书里解释跳过的规范细节，在这里查权威定义，比二手博客可靠。",
+        },
+        {
+          kind: "link",
+          title: "原始演讲 WTFJS（dotJS 2012）",
+          url: "https://www.youtube.com/watch?v=et8xNAc2ic8",
+          note: "这个项目的灵感来源。想理解作者的取舍，看这场 talk 比读目录快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "tinyrenderer",
+    linksCheckedAt: "2026-10-22",
+    name: "tinyrenderer",
+    nameZh: "tinyrenderer 软件渲染器教程",
+    aliases: ["tinyrenderer", "tiny renderer", "软渲染教程", "500 行渲染器"],
+    summary: "用约 500 行裸 C++ 从零写出软件渲染器的系列课，从画线、光栅化一路做到阴影与 SSAO。适合想搞懂 OpenGL / Vulkan 背后到底在干什么的图形学初学者；代价是作者明确说这是软件渲染、不是教你写 GPU 程序，还建议别直接抄他的代码。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["计算机图形学", "C++", "渲染器", "教程", "从零实现"],
+    body: "tinyrenderer 回答的是一个具体问题：为什么学 3D 图形 API 这么难上手。作者的判断是——因为大家不知道底下发生了什么。于是他把整条管线拆开，用不依赖任何第三方图形库的 C++ 重写一遍，最终代码约 500 行。\n课程是 14 篇连续的文章：Bresenham 画线、三角形光栅化、重心坐标、z-buffer 消隐、相机（先粗糙后改进）、着色、纹理、切线空间法线贴图、阴影贴图、环境光遮蔽，最后加一个卡通着色的彩蛋。起点极简：只给一个 TGA 读写类，除了存图就只有「设置单个像素颜色」，画线、填充三角形全靠自己写。\n它的取舍必须说清：这是**软件渲染器**，输出是一张 `framebuffer.tga`，没有窗口、没有 GPU。作者在 README 里明确写了「我不打算教你写 GPU 应用，我想让你知道它们怎么工作」。所以指望学完就会用 Vulkan 的人会失望；反过来，学完再去看 API，很多设计就有了理由。\n作者还特意说：完整的成品代码「没什么意思」，不建议直接拿来用，自己写才是关键。给学生准备的起始分支单独给了链接——别一上来对着结果抄。",
+    officialUrl: "https://haqr.eu/tinyrenderer",
+    officialLabel: "haqr.eu",
+    links: {
+      official: "https://haqr.eu/tinyrenderer",
+      github: "https://github.com/ssloy/tinyrenderer",
+    },
+    whoFor: "学过线性代数与 C++、想真正理解光栅化与着色原理的人；以及用着 OpenGL / Vulkan 却总觉得是在「背 API」的开发者。",
+    whoNot: "想找现成渲染引擎或要直接做产品的人——这里没有可用库；也不想花 10–20 小时动手写、只想看结论的人，读文章会很快失去耐心。",
+    installTips: [
+      "先读课再跑代码：README 第一句就是「代码本身没什么意思，去看课程笔记」，14 章从 Bresenham 讲到 SSAO。",
+      "编译三行：`cmake -Bbuild`、`cmake --build build -j`，产物是 `build/tinyrenderer`。",
+      "跑示例要带模型参数：`build/tinyrenderer obj/diablo3_pose/diablo3_pose.obj obj/floor.obj`，输出是 `framebuffer.tga` 而不是窗口。",
+      "想跟着写就用作者给学生的起始分支，别对着成品代码抄——README 明说不建议直接用他的实现。",
+      "TGA 读写的颜色是 BGRA 顺序（README 代码注释里专门标了 `attention, BGRA order`），颜色不对先查这里。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#4A5568",
+    },
+    guide: {
+      intro: "第一次上手最常见的错是「直接编译成品、看一张图就以为学会了」。这篇讲正确的用法：从起始分支开始，按章节推进。",
+      markdown: `## 这不是一个你要「运行」的项目
+
+README 的第一句话就把定位说清楚了：代码本身没什么意思，去看课程笔记。成品只是参考答案。
+
+## 正确的起手
+
+1. 打开课程第一篇：\`https://haqr.eu/tinyrenderer/\`
+2. 拿到作者发给学生的起始代码（README 里有那个 commit 的链接），里面只有一个 TGA 类和「设置像素」的能力。
+3. 每读完一章，自己实现一章，再对照成品。
+
+## 编译成品只为看对照
+
+\`\`\`bash
+git clone https://github.com/ssloy/tinyrenderer.git
+cd tinyrenderer
+cmake -Bbuild
+cmake --build build -j
+build/tinyrenderer obj/diablo3_pose/diablo3_pose.obj obj/floor.obj
+\`\`\`
+
+产物是当前目录下的 \`framebuffer.tga\`。**不会有窗口弹出来**，这是软件渲染器的正常表现。用能看 TGA 的看图工具打开，或者转成 PNG。
+
+## 第一个必然踩的坑：颜色是反的
+
+起始代码里写得很清楚：
+
+\`\`\`cpp
+constexpr TGAColor white = {255, 255, 255, 255}; // attention, BGRA order
+\`\`\`
+
+TGA 用 BGRA 顺序。你以为传的是红色，画出来是蓝色。这不是 bug，记住偏移就行。
+
+## 第二个坑：从 64×64 开始
+
+起始代码的 framebuffer 是 64×64，三个点。别急着改成 1920×1080——先在 64×64 上把线画直，把三角形填满，再放大。放大的常见症状是出现缝隙或锯齿，那正是后面几章要解决的问题。
+
+## 到哪算学完
+
+作者给的预期是 10–20 小时编程，做出能跑的渲染器。做到阴影贴图和 SSAO 那两章，你基本能把「管线里每一步为什么存在」讲清楚——这才是它的目的，不是产出一个能用的引擎。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "课程首页",
+          url: "https://haqr.eu/tinyrenderer/",
+          note: "14 章的完整目录与阅读顺序。所有正文都在这里，仓库只是配套代码。",
+        },
+        {
+          kind: "markdown",
+          title: "仓库 README",
+          url: "https://github.com/ssloy/tinyrenderer",
+          note: "定位声明、编译命令与起始代码链接。关于「别直接抄」的提醒也在这。",
+        },
+        {
+          kind: "html",
+          title: "三角形光栅化一章",
+          url: "https://haqr.eu/tinyrenderer/rasterization/",
+          note: "整门课的分水岭。这一章没吃透，后面 z-buffer 与纹理都会卡住。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "p5js",
+    linksCheckedAt: "2026-10-22",
+    name: "p5.js",
+    nameZh: "p5.js 创意编程库",
+    aliases: ["p5js", "p5.js", "processing js", "创意编程", "creative coding"],
+    summary: "把网页当画布的创意编程库：三行代码就能让一个圆跟着鼠标走，面向艺术家、设计学生与非科班初学者。代价是它服务表达而非工程，做常规 Web 应用会觉得底层全被包住；2.0 仍在 beta，别在生产里赌新 API。",
+    scenes: ["education", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["创意编程", "JavaScript", "生成艺术", "教学", "可视化"],
+    body: "p5.js 是 Processing 的 Web 版本，2013 年由 Lauren Lee McCarthy 创建。它的核心主张是「网页就是你的 sketch」：`setup()` 里建画布，`draw()` 里每帧重画，坐标系原点在左上角，画一个圆就是 `circle(x, y, d)`。\n它服务的人群写得很清楚：艺术家、设计师、教育者、初学者。围绕这个定位，它做了很多一般前端库不会做的事——文档每个函数都配可视化示例、有无障碍专项、社区有大量教学资源、还有浏览器里的 Web Editor（editor.p5js.org）让你零安装开写。\n代价也得说清：它把 canvas 与渲染循环包了起来，做产品级 Web 应用时，你会发现自己绕不开「DOM 怎么办、路由怎么办、性能怎么调」这些问题，而 p5.js 不打算回答。它也不是框架，没有组件、状态管理。\n版本上要留意：README 指向 beta.p5js.org 作为 2.0 的入口，说明 2.0 还在推进中。教程与示例混着 1.x 和 2.0 的写法，抄之前先确认版本。\n另外，这个项目的 AI 政策明确：**不接受完全由 AI 生成的贡献**，AI 只能辅助，贡献者要能为自己的改动负责。",
+    officialUrl: "https://p5js.org",
+    officialLabel: "p5js.org",
+    links: {
+      official: "https://p5js.org",
+      github: "https://github.com/processing/p5.js",
+    },
+    whoFor: "想用代码做视觉作品的设计师与艺术家；以及教编程入门的老师——它的示例与错误提示对新手相当友好。",
+    whoNot: "要做业务系统、后台或营销页的人——该用框架与组件库；也不适合需要精细控制渲染性能、或要长期维护大型前端工程的人。",
+    installTips: [
+      "最快的上手是不装任何东西：浏览器打开 editor.p5js.org 直接写 `setup()` / `draw()`。",
+      "本地用库：npm 包名是 `p5`，`npm install p5`，不是 `p5.js`。",
+      "结构就两个函数：`setup()` 里 `createCanvas(400, 400)` 只跑一次，`draw()` 每帧重画。",
+      "2.0 的文档在 beta.p5js.org，和稳定版不是同一套，抄示例前先看清版本。",
+      "想给项目提 PR 注意：官方 AI 政策不接受整段 AI 生成的贡献，AI 只能辅助。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#ED225D",
+      simpleIcon: "p5dotjs",
+    },
+    guide: {
+      intro: "新手最常问的是「代码写了怎么没反应」。这篇从生命周期讲起，把「画不出东西」的几种原因一次说清。",
+      markdown: `## 两个函数，一个循环
+
+\`\`\`js
+function setup() {
+  createCanvas(400, 400);
+  background(255);
+}
+
+function draw() {
+  circle(mouseX, mouseY, 80);
+}
+\`\`\`
+
+- \`setup()\` 只在启动时跑一次：建画布、加载资源、初始化变量。
+- \`draw()\` 默认每秒跑 60 次，每一帧都是一张新画。
+
+## 画不出东西？按这个顺序查
+
+1. **画在 draw 之前**：在 \`setup()\` 里画的图形，会被第一帧的 \`background()\` 覆盖。要么画在 \`draw()\` 里，要么别在每帧清屏。
+2. **没调 createCanvas**：没有画布，画什么都无处可落。
+3. **坐标在画布外**：原点在左上角，\`y\` 向下为正。写 \`circle(200, -50, 40)\` 就是画在视野上方。
+4. **颜色参数顺序**：\`fill(r, g, b)\` 与 \`fill(灰度)\` 是两套重载，\`fill(255, 0)\` 不是「白色透明」，而是灰阶 + alpha。
+
+## 想要拖尾？别清屏
+
+\`background()\` 每帧清空画布。想留下轨迹，把它换成半透明：
+
+\`\`\`js
+background(255, 25); // 每帧盖一层淡白，旧的慢慢褪去
+\`\`\`
+
+这是 p5 里最常用的一个小技巧，也是「为什么别人有拖尾我没有」的答案。
+
+## 版本别混着抄
+
+README 把 2.0 指向 \`beta.p5js.org\`。1.x 与 2.0 的部分 API 与示例写法不同，教程页面上要看清标的是哪个版本。不确定就用 editor.p5js.org 的默认版本起步。
+
+## 想贡献代码
+
+项目有明确的 AI 使用政策：不接受完全由 AI 生成的贡献，AI 只能辅助，提交者要能解释自己的改动。先读 \`AGENTS.md\` 与贡献指南再动手。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方入门教程",
+          url: "https://p5js.org/tutorials/get-started/",
+          note: "从零到第一个动画的官方路径，配可运行示例。比搜二手教程稳。",
+        },
+        {
+          kind: "html",
+          title: "函数参考（带可视化示例）",
+          url: "https://p5js.org/reference/",
+          note: "每个函数都有可点的示例。参数顺序记不清时查这里最快。",
+        },
+        {
+          kind: "html",
+          title: "网页编辑器",
+          url: "https://editor.p5js.org/",
+          note: "零安装开写，也能直接看社区作品源码。验证想法用它最省事。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "7days-golang",
+    linksCheckedAt: "2026-10-22",
+    name: "7 days golang",
+    nameZh: "7天用 Go 从零实现系列",
+    aliases: ["7days-golang", "7天用Go从零实现", "gee", "geecache", "geerpc"],
+    summary: "四个「7 天从零写一个」的 Go 项目：Web 框架 Gee、分布式缓存 GeeCache、ORM GeeORM、RPC GeeRPC，每章都有可运行代码目录。适合已会 Go 语法、想搞懂框架内部怎么长出来的人；代价是教学代码，别直接当生产框架依赖。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Go", "从零实现", "Web 框架", "分布式缓存", "ORM"],
+    body: "这个仓库是一套「拆解现成框架」的教程，不是框架本身。四个专题各七天，每天一篇长文加一个可运行的代码目录：Gee 仿 gin 写 Web 框架，GeeCache 仿 groupcache 写分布式缓存，GeeORM 参考 xorm 与 gorm 写 ORM，GeeRPC 基于标准库 net/rpc 写 RPC。\n它最有价值的地方是**顺序**。Gee 不是一上来给你完整框架，而是从 http.Handler 接口开始，第二天抽 Context，第三天写 Trie 树路由，第四天分组，第五天中间件，第六天模板，第七天 panic 恢复——每一步都对应一个真实框架里你会看到的概念，学完再看 gin 的源码就不再是天书。\nGeeCache 的路线也很扎实：LRU → 单机并发缓存 → HTTP 服务端 → 一致性哈希 → 多节点通信 → singleflight 防击穿 → Protobuf 通信。这条线基本就是「分布式缓存要解决哪些问题」的清单。\nGeeRPC 约 1k 行，在 net/rpc 之上加了协议交换、服务注册与发现、负载均衡。前提是你得先懂 net/rpc，否则第三天开始会跟丢。\n它明确是教学代码：没有生产级的错误处理、监控、配置体系。拿它当学习路径很好，拿它当依赖不合适。",
+    officialUrl: "https://geektutu.com/post/gee.html",
+    officialLabel: "geektutu.com",
+    links: {
+      official: "https://geektutu.com/post/gee.html",
+      github: "https://github.com/geektutu/7days-golang",
+    },
+    whoFor: "写过一些 Go、但看框架源码就晕的人；以及准备面试、想能讲清「路由树怎么匹配」「缓存击穿怎么防」的后端。",
+    whoNot: "刚学 Go 语法、还没写过并发程序的人——第一天就会卡在接口与反射；也不适合找现成框架上生产的人，这些代码缺工程化的那一半。",
+    installTips: [
+      "按专题目录走，别一上来 clone 就跑：`gee-web/`、`gee-cache/`、`gee-orm/`、`gee-rpc/` 下按 day1–day7 分成独立程序。",
+      "每章配一篇文章（geektutu.com/post/gee-dayN.html 这套地址），先看文章里的思路再读代码。",
+      "GeeRPC 基于标准库 `net/rpc` 扩展，读之前先把 `net/rpc` 的 client/server 过一遍，否则第三天开始会跟丢。",
+      "练 Go 与前端的交互，`demo-wasm/` 有四个 WebAssembly 示例：Hello World、注册函数、操作 DOM、回调。",
+      "每个 day 目录是独立可运行的最小版本，别指望根目录一个命令跑全部。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "7",
+      color: "#00ADD8",
+      simpleIcon: "go",
+    },
+    guide: {
+      intro: "第一次用容易犯「clone 下来就找 main 跑」的错。这篇讲目录怎么组织、每章怎么学、以及从教学代码到生产差在哪。",
+      markdown: `## 目录是「按天切片」的
+
+\`\`\`
+gee-web/day1-http-base ... day7-panic-recover
+gee-cache/day1-lru ... day7-proto-buf
+gee-orm/day1-database-sql ... day7-migrate
+gee-rpc/day1-codec ... day7-registry
+demo-wasm/hello-world ...
+\`\`\`
+
+每个 day 目录都是一个**独立可运行的最小程序**，复制了前一天的代码再加当天的新东西。所以不要问「主的 main 在哪」——你要跑哪一天的成果，就进哪个目录。
+
+## 为什么不能跳着看
+
+四套内容都是层层叠加的：
+
+- Gee：http.Handler → Context → Trie 路由 → Group → Middleware → 模板 → panic 恢复
+- GeeCache：LRU → 并发缓存 → HTTP 服务 → 一致性哈希 → 多节点 → singleflight → Protobuf
+
+第三天直接看，会看到一堆前一天埋的抽象（比如 \`Context\`、\`Peer\`），不知道它们为什么存在。**按天读，每天把当天的代码跑通再往下**。
+
+## 卡住时的两个办法
+
+1. 对照**上一天的目录**做 diff。新增的就是当天的知识点，这比读全文快。
+2. 回到文章看「为什么需要这一步」。仓库的代码注释不多，思路都在博文里。
+
+## GeeRPC 有前置
+
+它是在标准库 \`net/rpc\` 上做扩展。没读过 \`net/rpc\` 的 client/server 实现，第三天的服务注册会很难啃。先花一小时看标准库，能省后面三天的迷茫。
+
+## 教学代码与生产的分界线
+
+这些实现缺的是：错误处理、日志与可观测性、配置管理、超时与重试的统一策略、压测数据。**学它的设计，不要直接依赖它**。要上生产，用 gin、groupcache、gorm、kitex 这类成熟项目，但此时你已经能看懂它们为什么那样设计。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "Gee 系列总目录",
+          url: "https://geektutu.com/post/gee.html",
+          note: "七天 Web 框架的文章索引，也是整个仓库的主入口。",
+        },
+        {
+          kind: "html",
+          title: "GeeCache 专题",
+          url: "https://geektutu.com/post/geecache.html",
+          note: "分布式缓存七天的总览。想搞懂一致性哈希与缓存击穿，从这页进。",
+        },
+        {
+          kind: "markdown",
+          title: "中文 README",
+          url: "https://github.com/geektutu/7days-golang",
+          note: "仓库首页就有完整中文目录，含每章代码链接。对照着找当天目录最方便。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "digital-video-introduction",
+    linksCheckedAt: "2026-10-22",
+    name: "digital_video_introduction",
+    nameZh: "数字视频技术入门",
+    aliases: ["digital_video_introduction", "introduction_video_technology", "数字视频入门", "视频编解码教程", "视频技术导论"],
+    summary: "用图文加可跑的 Jupyter 实验，把图像、色彩、帧类型、编解码六步流水线讲到 DASH 与 DRM。适合想搞懂 H.264/AV1 为什么这样设计的人；代价是动手部分必须装 Docker，且正文以英文为主。",
+    scenes: ["education", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["视频编解码", "FFmpeg", "Docker", "教程", "开源"],
+    body: "这是一本写给工程师的视频技术导论，作者的目标是「用简单词汇、大量图示和实操例子」把数字视频讲通。它解决的具体问题是：调 ffmpeg 参数时你知道 -crf 该填几，却说不清 I 帧、B 帧、色度子采样为什么能省带宽。\n内容按一条清晰的线推进：先把图像当三维矩阵，讲清位深、分辨率、PAR/DAR 与码率（一小时 720p30 不压缩要 278GB，这个数字它自己算了一遍），再讲人眼对亮度更敏感这件事如何变成 YCbCr 与色度子采样，然后是帧类型、时域与空域预测，最后是编解码器的六步——分区、预测、变换、量化、熵编码、码流。后半段才是在线流媒体：渐进下载与自适应流、内容保护。\n它和普通科普的差别在于每节都有 Hands-on：用 ffmpeg 的直方图、运动矢量、分区可视化去验证刚讲的结论。这些命令跑在仓库封装的容器里（./s/ffmpeg），所以本机不需要先配好 FFmpeg。\n代价要提前知道：动手章节硬性要求 Docker，setup.sh 首次准备镜像时看起来像卡住；英文正文之外的翻译由社区维护，中文版章节齐全但术语与截图可能落后一点。",
+    officialUrl: "https://github.com/leandromoreira/introduction_video_technology",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/leandromoreira/introduction_video_technology",
+      github: "https://github.com/leandromoreira/digital_video_introduction",
+    },
+    whoFor: "刚转做音视频的后端、要给团队做一次「视频为什么能压这么小」分享的人、以及被 ffmpeg 参数搞晕想补原理的开发者。",
+    whoNot: "只想查某个 ffmpeg 参数怎么填的人——直接看官方文档更快；以及不愿意为一个教程装 Docker 的人，动手部分会全部跳过。",
+    installTips: [
+      "README 给出的起步只有三步：`git clone https://github.com/leandromoreira/digital_video_introduction.git`、`cd digital_video_introduction`、`./setup.sh`，之后所有命令都在这个目录里执行。",
+      "看到 `./s/ffmpeg`、`./s/mediainfo` 说明跑的是容器化版本，依赖都在镜像里，本机不必单独装 FFmpeg；去掉 `./s/` 直接调本机命令，输出会和正文截图对不上。",
+      "Jupyter 例子要先用 `./s/start_jupyter.sh` 起服务，再把终端打印的 URL 复制到浏览器，不能直接打开 .ipynb。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#1F6F8B",
+    },
+    guide: {
+      intro: "按第一次动手会卡在哪讲：Docker 与 setup.sh、为什么命令前面带 ./s/、Jupyter 服务怎么起，以及最省时间的阅读顺序。",
+      markdown: `## 先把实验环境跑起来
+
+README 第一段就是硬要求：动手部分需要装好 **Docker**，而且所有命令都要在 clone 出来的目录里执行。
+
+\`\`\`bash
+git clone https://github.com/leandromoreira/digital_video_introduction.git
+cd digital_video_introduction
+./setup.sh
+\`\`\`
+
+setup.sh 是第一个卡点。它要先把镜像准备好，网络差的时候屏幕上很久没有新输出，看起来像卡死，实际是在拉基础镜像。等它结束再往下读，别中途 Ctrl+C。
+
+## ./s/ 到底是什么
+
+正文里出现 \`./s/ffmpeg\`、\`./s/mediainfo\` 时，跑的**不是**你本机的 ffmpeg，而是仓库封装的容器版本——依赖全在镜像里，本机不需要配 FFmpeg。
+
+这一点很关键：如果你把 \`./s/\` 前缀去掉，用自己机器上的版本执行，参数可能还在，但输出格式、直方图的形态会和正文截图不一致，于是你以为自己理解错了。跟着正文就用正文的命令。
+
+## Jupyter 例子要单独起服务
+
+.ipynb 的环节不能双击打开，要先起服务：
+
+\`\`\`bash
+./s/start_jupyter.sh
+\`\`\`
+
+然后把终端打印出来的、带 token 的 URL 复制进浏览器。少了 token 会进不去，这是第二个常见卡点。
+
+## 别从头读到尾
+
+推荐顺序：先看 Basic terminology 建立位深、分辨率、DAR/PAR、码率这几个量纲；跳到 Frame types 理解 I / P / B 三种帧；再进 How does a video codec work 的六步流水线（分区 → 预测 → 变换 → 量化 → 熵编码 → 码流）。在线流媒体那章放到最后，它依赖前面所有概念。
+
+英文吃力可以切 README-cn.md，但动手章节里的命令与截图仍是英文的。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库与全文",
+          url: "https://github.com/leandromoreira/digital_video_introduction",
+          note: "正文、动手脚本与 Jupyter notebook 都在这里。先看 README 的 Index，按它跳章节比顺着滚快。",
+        },
+        {
+          kind: "html",
+          title: "简体中文版 README",
+          url: "https://github.com/leandromoreira/digital_video_introduction/blob/master/README-cn.md",
+          note: "术语对照用这一份；命令与截图仍以英文版为准，两者偶有版本差。",
+        },
+        {
+          kind: "html",
+          title: "版本记录与翻译进度",
+          url: "https://github.com/leandromoreira/digital_video_introduction#changelog",
+          note: "Changelog 在 README 开头，能看出新增了 DRM、FFmpeg 示波器滤镜等章节，判断你读到的是哪一版。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "learn-vim",
+    linksCheckedAt: "2026-10-22",
+    name: "Learn-Vim",
+    nameZh: "Learn Vim 教程（29 章）",
+    aliases: ["learn-vim", "learn vim the smart way", "学 Vim", "Vim 教程", "Vim 书"],
+    summary: "一本 29 章的书，定位在 vimtutor 太浅、:help 太深之间，只挑最有用的部分讲。适合练过 vimtutor 却仍靠方向键移动的人；代价是它讲 Vim 与 Vimscript，不覆盖 Neovim 的 Lua 配置。",
+    scenes: ["education", "docs"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Vim", "编辑器", "教程", "Vimscript", "开源"],
+    body: "作者写这本书的理由很具体：vimtutor 是个好起点，:help 手册什么都有，但普通用户需要的量恰好在两者之间。于是这本书只挑「最有用的一部分」，用尽量短的时间把你送到能干活的位置。\n结构分三部分：Part 1（1–21 章）是操作，从缓冲区/窗口/标签页、文件搜索、Vim Grammar，一路到寄存器、宏、Visual 模式、替换、global 命令、外部命令、折叠、Git 集成；Part 2（22–24 章）讲配置，vimrc、包管理、runtime；Part 3（25–29 章）才进 Vimscript，从数据类型、条件循环、变量作用域、函数，最后用一个 titlecase 插件收尾。\n它和速查表最大的区别是第 4 章讲 Grammar：operator + motion 的组合规则。这一章决定了后面十几章是「理解」还是「背诵」，跳过它，剩下的内容都会退化成记命令。\n代价说清楚：它讲的是 Vim 本身，Neovim 的 Lua 配置生态不在这里；许可是 CC BY-NC-SA 4.0，非商用，转载或做成课程要按条款来；书免费，作者靠 Leanpub 与打赏维持。",
+    officialUrl: "https://github.com/iggredible/Learn-Vim",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/iggredible/Learn-Vim",
+      github: "https://github.com/iggredible/Learn-Vim",
+    },
+    whoFor: "用过 vimtutor、能在 Vim 里活下来但移动仍靠方向键的人；以及想系统补 Vimscript、准备自己写插件的人。",
+    whoNot: "已经全套 Neovim + Lua 配置的人——书里的 vimrc 与 Vimscript 不是你的路径；以及只想找一张快捷键表的人，直接看 cheat sheet 更省时间。",
+    installTips: [
+      "本地读整本书：`docker compose -f book/docker-compose.yml up --build`，然后打开 http://localhost:8080 。首次会构建镜像，慢是正常的。",
+      "不装 Docker 也能读：仓库根目录每章一个 ch*.md（ch00_read_this_first.md 起），在 GitHub 上直接点开即可，章节顺序见 README 目录。",
+      "中文版在 wsdjeg.net/wiki/learn-vim/，西班牙语版在 victorhck/learn-Vim-es，章节与英文对齐，可对照读。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#2E7D32",
+    },
+    guide: {
+      intro: "按第一次读会卡在哪讲：用 Docker 起本地书架、8080 端口冲突怎么办、不想装 Docker 的替代读法，以及哪几章不能跳。",
+      markdown: `## 用 Docker 在本地读整本
+
+\`\`\`bash
+docker compose -f book/docker-compose.yml up --build
+\`\`\`
+
+然后浏览器打开 http://localhost:8080 。
+
+第一次要 build 镜像，比一般静态站点慢不少；如果 8080 已被别的服务占了，改 book/docker-compose.yml 里的端口映射即可，别怀疑书本身坏了。
+
+## 不想装 Docker 也行
+
+每一章就是仓库根目录的一个 Markdown 文件，从 ch00_read_this_first.md 开始，按 README 的 Table Of Contents 顺序点。这种方式少了侧边栏导航，但内容完全一样，适合在通勤时手机上翻。
+
+中文翻译在 wsdjeg.net/wiki/learn-vim/，术语与章节对齐；遇到译文别扭的地方，回英文原章对一眼就行。
+
+## 阅读路线：第 4 章不能跳
+
+作者自己的定位是：vimtutor 太浅，:help 太深，这本书补中间那段。所以它做了取舍——**只讲最有用的部分**。
+
+- Part 1（1–21 章）：操作。缓冲区/窗口/标签页、打开与搜索文件、Vim Grammar、移动、插入模式、点命令、寄存器、宏、撤销、Visual、查找替换、global、外部命令、命令行模式、tags、折叠、Git、编译、会话、多文件。
+- Part 2（22–24 章）：vimrc、包、runtime。
+- Part 3（25–29 章）：Vimscript，最后写一个 titlecase 插件。
+
+其中第 4 章 Vim Grammar 是分水岭：operator 与 motion 怎么组合，决定了后面十几章是理解还是死记。跳过它，第 5 到 13 章会变成背命令。
+
+只打算把编辑练熟的人，读到 Part 1 结束就可以停；要写插件再进 Part 3。
+
+## 两个预期要修正
+
+一是它讲 Vim，不是 Neovim 的 Lua 配置；书里的 vimrc 片段在老版本 Vim 上更稳。
+二是许可为 CC BY-NC-SA 4.0：非商业性使用、署名、相同方式共享。做内训课件前先看清这三条。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库与目录",
+          url: "https://github.com/iggredible/Learn-Vim",
+          note: "Table Of Contents 就在 README 里，29 章按 Part 1/2/3 分组，点章节名直接进正文。",
+        },
+        {
+          kind: "html",
+          title: "中文翻译（wsdjeg.net）",
+          url: "https://wsdjeg.net/wiki/learn-vim/",
+          note: "章节与英文对齐，适合对照读；译文更新会落后于原仓库，遇到术语歧义回英文版确认。",
+        },
+        {
+          kind: "html",
+          title: "本地书架构建文件",
+          url: "https://github.com/iggredible/Learn-Vim/blob/main/book/docker-compose.yml",
+          note: "端口映射与构建参数都在这一个文件里，8080 被占用时改这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ludwig",
+    linksCheckedAt: "2026-10-22",
+    name: "Ludwig",
+    nameZh: "Ludwig 声明式深度学习框架",
+    aliases: ["ludwig", "ludwig-ai", "声明式深度学习", "低代码训练框架", "YAML 训练模型"],
+    summary: "用一份 YAML 描述模型，ludwig train 一条命令跑完 LoRA 微调或表格分类，不写 PyTorch 样板。适合想快速试微调又不想搭训练脚本的人；代价是要 Python 3.12+，改模型细节仍得回到代码。",
+    scenes: ["data", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["深度学习", "LLM 微调", "LoRA", "低代码", "开源"],
+    body: "Ludwig 把自己定义成声明式深度学习框架：模型不是用代码堆出来的，而是写在一份 YAML 里，字段是 input_features、output_features、trainer、adapter、backend。同一份配置能覆盖 LLM 微调、多模态分类和表格预测，训练、预测、起 REST 服务都是一条命令。\n它真正省掉的是样板：微调 Llama-3.1 只要写 model_type: llm、base_model、adapter: lora、trainer: finetune，再 ludwig train --config model.yaml --dataset my_data.csv。对齐训练（DPO / KTO / ORPO / GRPO）、4-bit QLoRA、VLM（LLaVA、Qwen2-VL、InternVL）都是配置里换一个键。\n和手写训练脚本的差别在可复现与可搜索：整份配置（含嵌套参数）都能当超参搜索空间，executor 可选 Ray Tune 或原生 Optuna；分布式走 Accelerate 的 DDP/FSDP/DeepSpeed，不用改代码。\n代价要讲明：README 要求 Python 3.12+，技术栈是 PyTorch 2.7+、Transformers 5、Ray 2.54，装 ludwig[full] 会拖进几乎所有可选依赖，机器小的先只装 [llm]；配置驱动的另一面是细节藏在 YAML 背后，要做非常规的 loss 或训练循环，还是得回到 PyTorch。项目由 Linux Foundation AI & Data 托管，Apache-2.0。",
+    officialUrl: "https://ludwig.ai",
+    officialLabel: "ludwig.ai",
+    links: {
+      official: "https://ludwig.ai",
+      github: "https://github.com/ludwig-ai/ludwig",
+    },
+    whoFor: "想在一两天内跑通一次 LoRA 微调、或把一份 CSV 变成可用分类模型的人；以及要把训练流程固化成配置文件交给团队复现的人。",
+    whoNot: "需要自定义训练循环、特殊 loss 或底层算子改造的研究者——那还是直接写 PyTorch；以及只有 Python 3.10/3.11 环境又不打算升级的机器。",
+    installTips: [
+      "按用途装 extra：`pip install ludwig` 是核心，`pip install ludwig[llm]` 只带 LLM 微调依赖，`pip install ludwig[full]` 装全部可选依赖（很重）。",
+      "先 `python -V` 确认是 3.12 以上，否则依赖会在编译阶段连环报错。",
+      "微调要在环境里 `export HUGGING_FACE_HUB_TOKEN=\"<your_token>\"`，并且已在 HuggingFace 上接受该模型许可，否则卡在下载权重。",
+      "第一次跑通建议用自带数据集：`ludwig train --config model.yaml --dataset \"ludwig://alpaca\"`，链路通了再换自己的 CSV。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#6A3FA0",
+    },
+    guide: {
+      intro: "按第一次上手会卡在哪讲：Python 版本与 extra 怎么选、最小可跑的 YAML、token 与模型许可、以及跑通后的 predict 和 serve。",
+      markdown: `## 装之前先确认 Python
+
+\`\`\`bash
+python -V          # 需要 3.12 或更新
+pip install ludwig          # 核心
+pip install ludwig[llm]     # 只做 LLM 微调时装这个
+pip install ludwig[full]    # 全部可选依赖，体积最大
+\`\`\`
+
+技术栈是 Python 3.12 + PyTorch 2.7+ + Transformers 5 + Ray 2.54。版本不对时 pip 会给一串编译错误，看着像网络问题，其实是解释器版本。
+
+## 第一份配置
+
+新建 model.yaml。写的是「要做什么」，不是「怎么做」：
+
+\`\`\`yaml
+model_type: llm
+base_model: meta-llama/Llama-3.1-8B
+adapter:
+  type: lora
+trainer:
+  type: finetune
+  epochs: 3
+input_features:
+  - name: instruction
+    type: text
+output_features:
+  - name: response
+    type: text
+\`\`\`
+
+然后：
+
+\`\`\`bash
+export HUGGING_FACE_HUB_TOKEN="<your_token>"
+ludwig train --config model.yaml --dataset "ludwig://alpaca"
+\`\`\`
+
+\`ludwig://alpaca\` 是内置数据集，先用它跑通链路，再换自己的 CSV。
+
+最常见的是权重下载失败：没配 token，或没在 HuggingFace 页面上接受该模型的许可条款，都会停在拉取那一步。显存不够就在配置里加 \`quantization: { bits: 4 }\` 走 QLoRA，配合 \`trainer.batch_size: 1\` 与 \`gradient_accumulation_steps\`。
+
+## 跑通之后的三条命令
+
+\`ludwig predict\` 出预测，\`ludwig serve\` 起 REST（8000 端口），不想手写 YAML 就先用 \`ludwig generate_config "你的任务描述"\` 生成草稿再改。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档与 Getting Started",
+          url: "https://ludwig.ai/latest/getting_started/",
+          note: "安装矩阵与第一个例子都在这里；不确定该装哪个 extra 时先看这一页的依赖说明。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/ludwig-ai/ludwig",
+          note: "配置键的完整列表与 0.16 的新特性表（PEFT 适配器、VLM 微调、Optuna 执行器）以此为准。",
+        },
+        {
+          kind: "html",
+          title: "示例目录",
+          url: "https://ludwig.ai/latest/examples/",
+          note: "按场景分好：LLM 微调、对齐训练、表格分类、多模态、时序。照最接近你任务的那份改配置最快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "mdn-content",
+    linksCheckedAt: "2026-10-22",
+    name: "MDN Content",
+    nameZh: "MDN Web Docs 内容库",
+    aliases: ["mdn/content", "mdn content", "MDN 文档源", "MDN 离线", "MDN 中文翻译"],
+    summary: "MDN 全站四万五千多篇文档的 Markdown 源，npm start 就能在本地起一份可预览的 MDN。适合要离线查文档或参与翻译的人；代价是你拿到的是内容而不是站点，首次构建慢且不擅长当在线阅读器。",
+    scenes: ["docs", "education"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["MDN", "Web 文档", "前端", "本地预览", "开源"],
+    body: "这个仓库装的是 MDN Web Docs 的内容本体：CSS、HTML、JavaScript、Web API 的参考文档，加上给初学者用的学习材料。README 给的数字是 2005 年至今约 45,000 位贡献者、45,000 多篇文档；英文之外，中文、法文、日文、韩文、葡文、俄文、西班牙文各有一组志愿译者维护。\n用法上它和「下载一份文档」不一样：npm i 之后 npm start，会在 http://localhost:5042/ 起一个可实时预览的站点，渲染由 MDN 自家的 yari 工具链完成。所以你能在改完一页 Markdown 后立刻看到真实排版，而不是对着源码猜。\n适合谁：需要在一个没有外网的机房里查 Web 标准、或要给团队留一份可检索的离线副本；以及想给中文文档补翻译、改错别字的人——这是唯一能直接改到「线上那一页」的入口。\n代价要讲清楚：它只是内容，不含站点后端的搜索与统计；首次 npm i 与构建要拉整条工具链，四五万篇的索引不是几秒的事；日常查资料直接上 developer.mozilla.org 更快，本地起服务是为了写和校。参与贡献前必须读 CONTRIBUTING.md 并遵守行为准则。",
+    officialUrl: "https://developer.mozilla.org",
+    officialLabel: "developer.mozilla.org",
+    links: {
+      official: "https://developer.mozilla.org",
+      github: "https://github.com/mdn/content",
+    },
+    whoFor: "要给内网/离线环境留一份 Web 文档的人，以及想参与 MDN 中文翻译、修文档错误的贡献者。",
+    whoNot: "只是想把某个 API 查清楚的人——直接开 developer.mozilla.org 就行，本地跑一套不划算；以及机器内存吃紧的环境，全量构建会很吃力。",
+    installTips: [
+      "先确认 Node 与 npm：`node -v`、`npm -v`，两个都有输出再继续。",
+      "两步起本地站点：`npm i` 装依赖，`npm start` 起预览，成功后访问 http://localhost:5042/ 。",
+      "第一次 `npm i` 与首次构建耗时明显长于普通前端项目，别在进度条不动时就中断。",
+      "要提交改动先读仓库里的 CONTRIBUTING.md，并遵守 CODE_OF_CONDUCT.md（Mozilla 社区参与准则）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#1F2A44",
+    },
+    guide: {
+      intro: "按第一次拉起本地 MDN 会卡在哪讲：Node 前置、npm i 与 npm start、5042 端口、以及「改完看不到效果」和「该不该本地跑」的判断。",
+      markdown: `## 它是内容，不是站点
+
+这个仓库装的是 MDN 全站四万五千多篇文档的 Markdown 源，页面渲染靠 yari 工具链（随 npm 依赖一起装）。所以第一步不是读代码，是确认运行时：
+
+\`\`\`bash
+node -v
+npm -v
+\`\`\`
+
+README 的要求就这两条，缺一个就先装 Node（npm 随 Node 一起装好）。
+
+## 起本地预览
+
+\`\`\`bash
+npm i
+npm start
+\`\`\`
+
+成功后打开 http://localhost:5042/ 。
+
+三个常见卡点：
+
+1. **npm i 慢**。它拉的是整条构建链，不是三五个包，公司网络下尤其明显。
+2. **5042 被占用**。报错是端口冲突，关掉占用的进程再来，别改端口去试——脚本里写死了这个默认值。
+3. **改了看不见**。确认你看的是本地那个 5042，而不是浏览器里还开着的 developer.mozilla.org 标签页。这两个长得几乎一样。
+
+## 什么时候该本地跑，什么时候不该
+
+本地起服务的目的只有一个：**写和校**。你改一页 Markdown，需要看到真实排版、链接是否能跳、代码块是否高亮正确。
+
+如果只是查 API、看某个属性的兼容性，本地这套是负担——直接开官网更快，搜索与统计也不在这个仓库里。
+
+## 参与贡献的路径
+
+改之前先读 CONTRIBUTING.md，再读 CODE_OF_CONDUCT.md：后者指向 Mozilla 的社区参与准则，评论与 PR 的措辞都受它约束。
+
+翻译这块要有个预期：英文之外的 zh-CN、fr、ja、ko、pt-BR、ru、es 由 35 位以上志愿者维护，进度不齐。打开一页发现没有中文版是常态，不是 bug——这也正是可以补的地方。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "MDN Web Docs 线上站",
+          url: "https://developer.mozilla.org",
+          note: "判断要不要本地跑之前先开这一页：只是查资料的话，到这里就够了。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/mdn/content",
+          note: "本地构建的两条命令、贡献入口与沟通渠道都写在这页，先读它再动手。",
+        },
+        {
+          kind: "link",
+          title: "贡献指南 CONTRIBUTING.md",
+          url: "https://github.com/mdn/content/blob/main/CONTRIBUTING.md",
+          note: "提交 PR 前必读：文档结构约定、审阅流程与行为准则的入口都在这里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "flutterunit",
+    linksCheckedAt: "2026-10-22",
+    name: "FlutterUnit",
+    nameZh: "FlutterUnit 组件百科",
+    aliases: ["flutterunit", "flutter unit", "Flutter 组件大全", "Flutter 组件库", "组件样板间"],
+    summary: "收录 500+ Flutter 组件的跨平台样板间，每个都有可交互演示和可展开的真实源码。适合照着抄布局与绘制代码的人；代价是它教组件长什么样，不教你怎么组织一个真实 App。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Flutter", "Dart", "组件库", "学习", "开源"],
+    body: "FlutterUnit 是一个「全平台体验应用」：把 Flutter 生态里大大小小的组件收进来，500 多个组件、其中 213 个有详情页，每个至少配一个演示。README 特意强调了一点——所有演示都是真组件搭出来的，不是截图，所以能点、能拖、能改参数看变化。\n对学习者最实用的两块：详情页里可以展开当前效果的实现代码并直接分享，代码高亮样式也能换；组件之间用 link to 互相关联，顺着 Container→Padding→Align 这类关系走，比在搜索框里试关键词快。此外有 8 套主题、全局字体、收藏集（长按侧栏就能把组件收进去，支持多选与同步），搜索还能按星级过滤。\n和官方 docs 的差别在于「可跑」：文档告诉你某个参数存在，它让你把参数拖到极值看会坏成什么样。代价也要认：组件分类与星级是作者按个人感觉打的，README 自己写了没有统一标准，别当成重要性排序；它终究是组件样板间，状态管理、路由、网络层这些工程结构不在范围里；许可是 GPL-3.0，把代码搬进闭源产品前要先看清传染范围。",
+    officialUrl: "https://github.com/toly1994328/FlutterUnit",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/toly1994328/FlutterUnit",
+      github: "https://github.com/toly1994328/FlutterUnit",
+    },
+    whoFor: "正在学 Flutter、需要马上看到某个 Widget 长什么样的人；以及做 UI 时要快速抄一段布局或绘制代码的人。",
+    whoNot: "想学 App 工程结构（状态管理、路由、网络层）的人——它不覆盖这些；以及不能接受 GPL-3.0 的项目。",
+    installTips: [
+      "不想配环境就直接下安装包：Releases 里有 Windows exe、macOS dmg，另有 Android APK 与 Web 版。",
+      "要改源码就先对齐版本：README 记录的环境是 Flutter 3.38.3 stable / Dart 3.10.1，构建命令按平台分 `flutter build windows`、`flutter build linux`、`flutter build web`。",
+      "`flutter build` 之前先跑 `flutter doctor`；Windows 桌面缺 Visual Studio、Linux 缺 GTK 依赖时，报错出现在构建后半段，很容易误判成代码问题。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#0277BD",
+    },
+    guide: {
+      intro: "按第一次打开会卡在哪讲：先下载包还是先配环境、桌面端构建缺什么、以及怎么用它省时间而不是当图库刷。",
+      markdown: `## 先跑起来，再决定要不要读代码
+
+不想折腾 Flutter 环境，直接去 Releases 下安装包：Windows 是 exe，macOS 是 dmg，另有 Android APK 和一个 Web 版。装上先当「组件字典」用，确认它对你有用，再考虑改源码。
+
+要自己构建，版本必须对齐。README 记录的环境是：
+
+- Flutter 3.38.3（stable）
+- Dart 3.10.1
+
+\`\`\`bash
+git clone https://github.com/toly1994328/FlutterUnit.git
+cd FlutterUnit
+flutter build windows     # 或 linux / web
+\`\`\`
+
+\`flutter build\` 失败时先跑 \`flutter doctor\`。桌面端的坑集中在系统依赖：Windows 缺 Visual Studio 的 C++ 工作负载、Linux 缺 GTK 开发包，报错都发生在构建后半段，看着像代码错误，其实是环境没齐。
+
+## 怎么用它学，而不是刷
+
+**星级不是排名。** README 明说分类与评星是作者按个人感觉打的，没有统一标准。把它当「这个组件作者用得多」，别当官方推荐。
+
+真正省时间的是两个交互：
+
+1. **相关组件的 link to 跳转**。比如你在看 Container，侧边能直接跳到 Padding、Align、DecoratedBox。顺着关系走，比在搜索框里猜关键词有效得多。
+2. **收藏集**。做某一屏时，把用到的组件长按收进一个收藏集，改布局时不用反复搜。
+
+详情页右侧的图标能展开/收起当前效果的实现代码，代码可以单独分享；想看清某段高亮，代码面板风格也能换。
+
+## 预期要修正
+
+它是组件样板间，不是 App 架构课：状态管理、路由、网络层、测试都不在这里。学完你能熟练摆 Widget，但拼不出一个可维护的项目结构——那部分得另找材料。
+
+另外注意许可：GPL-3.0。直接抄一段布局代码进自己的项目通常没问题，但把它的实现整体搬进闭源产品前，先弄清传染范围。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库与 Releases",
+          url: "https://github.com/toly1994328/FlutterUnit",
+          note: "各平台安装包与源码在同一页；先看 README 的版本号，再决定是下载还是自己构建。",
+        },
+        {
+          kind: "html",
+          title: "安装包下载（Releases）",
+          url: "https://github.com/toly1994328/FlutterUnit/releases",
+          note: "Windows exe、macOS dmg、Android APK 都挂在这里，版本号与 README 头部标注的一致。",
+        },
+        {
+          kind: "link",
+          title: "Flutter 环境配置说明",
+          url: "https://github.com/toly1994328/FlutterUnit/issues/22",
+          note: "作者维护的环境配置 issue，桌面端构建失败时对照这里排查比翻 Flutter 官方文档快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "logisim-evolution",
+    linksCheckedAt: "2026-10-22",
+    name: "Logisim-evolution",
+    nameZh: "Logisim-evolution 数字电路仿真",
+    aliases: ["logisim-evolution", "logisim evolution", "Logisim", "数字电路仿真", "逻辑电路设计"],
+    summary: "数字逻辑课上的画图加仿真工具，在原版 Logisim 停更后接手，补了 VHDL 组件、时序图和 FPGA 板卡联调。适合数电与组成原理实验；代价是要 Java 21，macOS 包未签名。",
+    scenes: ["education", "engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["数字电路", "逻辑仿真", "VHDL", "教学", "开源"],
+    body: "Logisim-evolution 是给数字逻辑课用的设计加仿真软件：拖门电路、连线、看信号。原版 Logisim 在 2014 年停止开发后，几所瑞士院校接手维护了这一支，补进了原版没有的东西。\nREADME 列的能力里，超出「画个与门」的部分是：时序图（chronogram）看信号随时间的演化；单步仿真配合探针定位；组件行为可以直接用 VHDL 描述，并支持把电路导出成 VHDL/Verilog；对 BASYS3、TinyFPGA BX 这类开发板有直接支持，能把画好的电路放到真板子上跑；还有一个 TCL/TK 控制台用来在电路与用户之间做交互。组件库覆盖 LED、TTL、开关到 SoC，也支持启动时自动加载自定义库。\n和原版的差别集中在工程性：多语言界面、可扩展库、跨三平台的安装包（Deb 与 RPM 自带 JRE，另有 Snap 与 msiexec/dmg），以及一个通用 JAR。\n代价要提前知道：运行时是 Java 21 或更新，老机器上 JRE 8 跑不起来；macOS 的 app 没有 Apple 签名，首次启动得右键「打开」绕过 Gatekeeper；Linux 某些窗口管理器下窗口会全白，需要用 _JAVA_AWT_WM_NONREPARENTING=1 启动；包管理器里的版本（除 Snap）不是核心开发者维护的，报 bug 前先用官方包复现。",
+    officialUrl: "https://github.com/logisim-evolution/logisim-evolution",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/logisim-evolution/logisim-evolution",
+      github: "https://github.com/logisim-evolution/logisim-evolution",
+    },
+    whoFor: "上数字逻辑、计算机组成原理课的学生与助教；需要把课堂电路直接烧到 FPGA 开发板上验证的老师。",
+    whoNot: "要写 HDL 做正经综合与板级时序收敛的人——那该用厂商工具链；以及只有 JRE 8、又不想升级 Java 的机器。",
+    installTips: [
+      "优先用自带运行时的安装包，不必单独装 Java：Debian/Ubuntu 用 .deb，Fedora/SuSE 用 .rpm，Linux 通用可 `snap install logisim-evolution`，Windows 是 msi，macOS 是 dmg。",
+      "只有走通用 JAR 时才需要自备 Java 21+：`java -jar logisim-evolution-<version>-all.jar`。",
+      "Linux 上窗口全白但控件可点，用 `env _JAVA_AWT_WM_NONREPARENTING=1 java -jar logisim-evolution-<version>-all.jar` 启动，确认有效后写进启动器。",
+      "macOS 首次启动要右键（或按住 Ctrl 点击）选「打开」；系统询问是否允许接受网络连接时可以拒绝，它当前不需要联网。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#B3541E",
+    },
+    guide: {
+      intro: "按第一次装会卡在哪讲：该下哪种包、macOS 未签名的绕法、Linux 白窗口，以及第一张电路图的最小步骤。",
+      markdown: `## 装：优先选自带 JRE 的包
+
+各平台安装包都内嵌了运行时，不要求你另装 Java：
+
+\`\`\`bash
+snap install logisim-evolution                          # Linux 通用
+sudo dpkg -i logisim-evolution_<version>-1_amd64.deb    # Debian / Ubuntu
+brew install --cask logisim-evolution                   # macOS（Homebrew）
+winget install -e --id logisim-evolution.logisim-evolution
+\`\`\`
+
+用通用 JAR 才需要自备 **Java 21 或更新**：
+
+\`\`\`bash
+java -jar logisim-evolution-<version>-all.jar
+\`\`\`
+
+## 两个平台坑，先知道能省一小时
+
+**Linux 窗口全白**。控件还在响应，但画面不刷新——这是 Java AWT 与非重父窗口管理器的老问题。用环境变量绕过：
+
+\`\`\`bash
+env _JAVA_AWT_WM_NONREPARENTING=1 java -jar logisim-evolution-<version>-all.jar
+\`\`\`
+
+确认有效后，把同样的变量写进桌面启动项或会话配置，别每次都手敲。
+
+**macOS 打不开**。app 没有 Apple 签名，双击会提示移到废纸篓。正确做法是右键应用图标选「打开」（或按住 Ctrl 点击），在弹窗里确认。
+
+## 第一张图
+
+\`File → New\`，放两个 Input 和一个 AND 门，接一个 Probe 或 Lamp 当输出，用连线工具把 输入 → 门 → 输出 连起来，切输入看输出变化，保存。
+
+卡住时按这个顺序排查：点组件看右侧属性面板；用 \`Edit → Undo\` 退一步；再不行就看 docs 里的截图示例。
+
+## 报 bug 之前
+
+除 Snap 外，包管理器里的版本不是核心团队维护的。先用官方 Releases 的最新包、乃至 main 分支复现一遍，再去提 issue；否则多半会被转给打包者。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub Releases（各平台安装包）",
+          url: "https://github.com/logisim-evolution/logisim-evolution/releases",
+          note: "deb / rpm / snap / msi / dmg 与通用 JAR 都在这里，README 的选包对照表按 CPU 架构列好了。",
+        },
+        {
+          kind: "html",
+          title: "仓库 README 与故障排查",
+          url: "https://github.com/logisim-evolution/logisim-evolution",
+          note: "Linux 白窗口的环境变量、macOS 未签名的启动方式、包管理器免责声明都写在这页。",
+        },
+        {
+          kind: "link",
+          title: "白窗口问题 issue #1235",
+          url: "https://github.com/logisim-evolution/logisim-evolution/issues/1235",
+          note: "记录了该问题在不同窗口管理器下的表现与已确认的配置，改启动参数前先对一眼。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ctfd",
+    linksCheckedAt: "2026-10-22",
+    name: "CTFd",
+    nameZh: "CTFd 夺旗赛平台",
+    aliases: ["ctfd", "CTFd", "CTF 平台", "夺旗赛", "ctfd.io", "比赛平台"],
+    summary: "把一场 CTF 从零办起来的开源框架：后台出题、动态计分、队伍与榜单都现成，docker run 一条命令就能起。适合校内赛与社团赛自建；代价是反代、TLS、邮件这些运维活它不替你做。",
+    scenes: ["education", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["CTF", "安全竞赛", "自托管", "Flask", "开源"],
+    body: "CTFd 是一个 Capture The Flag 框架，定位是「开箱即用又可定制」：一场比赛需要的东西它基本都带了。题目、分类、提示、flag 都在后台建，支持静态 flag 与正则 flag、动态计分、可解锁题目与提示、题目插件；文件可以传本机也能用兼容 S3 的后端；题目限次、隐藏、自动防爆破是内建开关。\n比赛侧的能力同样齐全：个人赛与团队赛、自动处理并列的排行榜、对公众隐藏分数、在指定时间冻结榜单、Top 10 分数曲线、Markdown 内容管理、SMTP 与 Mailgun 邮件（含邮箱确认与找回密码）、比赛自动开始与结束、导入导出整场赛事做归档。插件与主题两套接口几乎能改掉所有界面。\n和「自己写个小站」的差别在细节：并列名次、冻结榜单、防爆破这些是真实办赛才会想到的需求，它已经做完了。\n代价要讲明：自托管意味着 Python 服务、数据库、反向代理与 TLS、备份升级全归你，README 只教怎么把服务跑起来；邮件不配就没人能找回密码；要更省事可以买官方托管（ctfd.io 定价页）或接 MajorLeagueCyber 做单点登录与赛事记录。许可是 Apache-2.0。",
+    officialUrl: "https://ctfd.io",
+    officialLabel: "ctfd.io",
+    links: {
+      official: "https://ctfd.io",
+      github: "https://github.com/CTFd/CTFd",
+    },
+    whoFor: "要办校内赛、社团赛或内部安全练兵的人：需要计分、榜单、队伍管理，但不想从零写一个比赛站。",
+    whoNot: "只想找题刷的人——这里是办赛的后台，不是题库；也没有运维能力、又不打算买托管版的团队，上线那一段会很难受。",
+    installTips: [
+      "最快起服务：`docker run -p 8000:8000 -it ctfd/ctfd`；在源码目录里也可以用 `docker compose up`。",
+      "本机改代码调试：先装 uv 并 `uv sync` 建虚拟环境，再 `uv run serve.py`（或 `uv run flask run`），配置改 CTFd/config.ini。",
+      "不想用 uv 可以 `pip install -r requirements.txt`，那个文件由 uv.lock 生成，别手工往里加包。",
+      "决定要不要用之前先开 https://demo.ctfd.io/ 点一遍，五分钟能看清后台与榜单长什么样。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#3E4A89",
+    },
+    guide: {
+      intro: "按第一次部署会卡在哪讲：三种起服务的方式、上线前必须自己补的四件事，以及接入 MajorLeagueCyber 的开关在哪。",
+      markdown: `## 三种起服务的方式
+
+**官方镜像，最省事：**
+
+\`\`\`bash
+docker run -p 8000:8000 -it ctfd/ctfd
+\`\`\`
+
+**源码 + compose：** 在仓库目录里 \`docker compose up\`。
+
+**本机改代码调试：**
+
+\`\`\`bash
+uv sync
+uv run serve.py      # 或 uv run flask run
+\`\`\`
+
+uv sync 会建好虚拟环境；不想用 uv，就 \`pip install -r requirements.txt\`——注意那个文件由 uv.lock 生成，往里手工加包会在下次同步时被覆盖。
+
+配置走 CTFd/config.ini。
+
+## 上线前必须自己补的四件事
+
+README 只负责把服务跑起来，下面这些它不管：
+
+1. **反向代理与 TLS**。8000 端口直接暴露到公网不是方案。
+2. **邮件**。注册确认、找回密码依赖 SMTP 或 Mailgun，不配这两项，选手改不了密码。
+3. **备份**。题库与成绩都在数据库里，赛前先验证一次导出与恢复。
+4. **登录口加固**。题目与提示带自动防爆破，但后台登录本身要按部署文档另外处理。
+
+## 要不要接 MajorLeagueCyber
+
+接上之后，选手能用 MLC 账号直接登录，个人与团队成绩自动跟踪，还能提交 writeup、收赛事通知。
+
+配置只有两个键，在 \`CTFd/config.py\` 或后台相应位置填：
+
+\`\`\`python
+OAUTH_CLIENT_ID = None
+OAUTH_CLIENT_SECRET = None
+\`\`\`
+
+流程是先注册 MLC 账号、建一个 event，再把拿到的 client id / secret 填进去。
+
+## 什么时候别自建
+
+只想办一次小比赛、又没人愿意长期运维，直接买官方托管版（ctfd.io 定价页）。省下的不是安装时间，是赛后那一堆升级与安全更新。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方演示站",
+          url: "https://demo.ctfd.io/",
+          note: "后台出题、计分板、队伍页都能点，决定要不要自建之前先在这里走一遍流程。",
+        },
+        {
+          kind: "html",
+          title: "部署文档",
+          url: "https://docs.ctfd.io/docs/deployment/installation",
+          note: "compose、单机、Kubernetes 等部署方式与升级说明都在这里，README 只给了摘要。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库",
+          url: "https://github.com/CTFd/CTFd",
+          note: "插件与主题两套接口的入口、以及导入导出比赛的用法以仓库为准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "server-survival",
+    linksCheckedAt: "2026-10-22",
+    name: "Server Survival",
+    nameZh: "Server Survival 云架构塔防",
+    aliases: ["server-survival", "server survival", "云架构游戏", "云原生塔防", "学云的游戏"],
+    summary: "用塔防讲云架构的浏览器 3D 游戏：拖节点、接流量、扛 DDoS，26 种服务和 25 关战役把自动扩缩容、熔断、冷启动变成可玩机制。适合给后端新人破冰；代价是它只讲逻辑层，不碰真实云。",
+    scenes: ["games", "education"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["云架构", "塔防", "教学游戏", "Three.js", "开源"],
+    body: "Server Survival 让你扮演云架构师：屏幕上是流量、预算与声誉三条命，你要用工具栏里的服务拼出一条链路，把请求接住、把攻击挡住，撑得越久越好。\n它把每个机制都做成了真实概念的缩影：不放 Monitoring 节点，指标面板就是黑的；Compute 在 70% 利用率扩容、30% 缩容，但新实例要预热，容器更慢；队列型负载按队列压力扩容而不是 CPU；下游错误率过阈值会触发熔断并带退避重试；GeoDNS 把流量分到多个区域，区域级故障事件告诉你为什么一个区域永远不够。到最后几关还会撞上电力墙——电网 8kW、每块 GPU 吃 6kW，算力上限先按瓦数买、再按美元买。\n模式分三种：Survival 是无尽高压，每 45 秒来一波 50% 的恶意流量；Campaign 是 25 关手工关卡，五章从基础走到 GPU 推理；Sandbox 可以随便调预算、RPS、流量配比，也不会 game over。失败时节点上会弹一个徽章说明「为什么丢了这个请求」——没路由、容量不足、只读副本、只能搜不能读。\n代价讲清楚：它是模拟器，教的是一阶直觉，真实的 IAM、计费、网络对等这些它一律不碰；把它当面试八股会学偏。做得好的是「预算与容量互相挤压」这种在真云上很贵才学得到的取舍。",
+    officialUrl: "https://pshenok.github.io/server-survival",
+    officialLabel: "pshenok.github.io",
+    links: {
+      official: "https://pshenok.github.io/server-survival",
+      github: "https://github.com/pshenok/server-survival",
+    },
+    whoFor: "刚入行的后端、要给学生讲云原生概念的老师、以及想在十分钟里把「为什么要队列和熔断」讲明白的人。",
+    whoNot: "想要真实云实操的人——它不产生任何云资源；以及只想刷分数、不愿读 debrief 的人，关卡设计的信息量全在结算那几句话里。",
+    installTips: [
+      "不用安装，浏览器直接打开 https://pshenok.github.io/server-survival/ 就能玩。",
+      "别一上来进 Survival：先进 Campaign 前三关，它会给你预置架构和结算提示。",
+      "卡住先放一个 Monitoring 节点，指标面板与告警才会解锁；第 15 关就是故意设计成没有它必瞎。",
+      "想跟同事讨论架构就用右上 share 面板：导出 PNG，或把整套搭建编码进 `?arch=` 链接，对方打开即载入。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#2B6E5C",
+    },
+    guide: {
+      intro: "按第一次玩会卡在哪讲：先玩哪个模式、为什么必须放 Monitoring、冷启动与队列的关系，以及怎么把架构分享给别人。",
+      markdown: `## 打开就能玩
+
+没有安装步骤，浏览器开 https://pshenok.github.io/server-survival/ 即可。
+
+**先别进 Survival。** 那个模式每 45 秒来一波恶意流量、每 40 秒换一次流量结构，新手撑不过两分钟就会因为声誉归零或破产（预算 -1000）结束。
+
+## 按 Campaign 走
+
+25 关分五章，每关只教一个概念，还带预置架构、主目标与 bonus 目标：
+
+- **Basics（1–3）**：第一台服务器、存储、用 CDN 做边缘缓存
+- **Optimization（4–10）**：缓存、队列、读扩展、搜索、NoSQL、限流、Serverless 与 Compute 的取舍
+- **Defense & Mastery（11–14）**：防御纵深、高可用、成本压缩、黑色星期五
+- **Production Readiness（15–20）**：观测、自动扩缩容、节点故障、死信队列、扇出、双区域容灾
+- **The AI Wave（21–25）**：GPU 推理的冷启动、批处理经济学、SLO 超时、电力墙
+
+## 三个必须记住的机制
+
+**先放 Monitoring。** 不放它，指标面板是黑的，你只能看着请求失败猜原因。
+
+**冷启动决定扩容能不能救急。** Compute 在 70% 利用率扩容，但新实例要预热，容器更慢。流量尖峰时扩容跟不上，所以前面挂一个 Message Queue 通常比多堆几台机器有效。
+
+**失败徽章会告诉你原因。** 每个被丢弃的请求都会在丢它的节点上弹一个徽章：没路由、容量不足、只读副本、只索引不能读……看不懂就照着改架构，比看分数有用。
+
+## 想跟人讨论你的架构
+
+右上 share 面板两种导出：PNG（一张干净的图）和可分享 URL（整套搭建编码进 \`?arch=\` 链接，别人打开就是你那一版）。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线玩（GitHub Pages）",
+          url: "https://pshenok.github.io/server-survival/",
+          note: "免安装入口，三个模式都在这里切；先跑 Campaign 前三关再考虑其他。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库 README",
+          url: "https://github.com/pshenok/server-survival",
+          note: "26 种服务的成本、容量、维护费与流量收益表都在这页，配预算时按表算比试错快。",
+        },
+        {
+          kind: "html",
+          title: "姊妹作 Datacenter Survival",
+          url: "https://pshenok.github.io/datacenter-survival/",
+          note: "同一套玩法讲物理层：供电链路、散热、PUE。逻辑层玩明白后再进这一部。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "digital",
+    linksCheckedAt: "2026-10-22",
+    name: "Digital",
+    nameZh: "Digital 数字电路仿真器",
+    aliases: ["digital", "hneemann digital", "Digital 仿真器", "数字逻辑设计", "logic simulator"],
+    summary: "解压即用的数字电路设计加仿真器，用「开机稳定时间」与单门模式解决了 Logisim 里振荡电路查不出原因的老毛病。适合数电实验；代价是要 JRE 8+，且仿真运行中不能改电路。",
+    scenes: ["education", "engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["数字电路", "逻辑仿真", "FSM", "FPGA", "开源"],
+    body: "Digital 是一个从零写的数字逻辑设计与仿真器，作者在 README 里花了大半篇幅解释「为什么不继续用 Logisim」——这段解释本身就是它最好的说明书。\n能力上它不缺什么：信号状态可视化配测量曲线；组合电路与时序电路的分析和综合；可以写测试用例验证设计；自带有限状态机编辑器，能把 FSM 转成状态转移表和实现它的电路；74xx 系列库；支持泛型电路（用的时候传位宽，比如任意位宽的桶形移位器）；示例从传输门 D 触发器一路到单周期 MIPS；性能上示例处理器能跑到 120kHz，Game of Life 例子有约 2400 个活动元件。还能导出 VHDL/Verilog、直接支持 BASYS3 与 TinyFPGA BX、导出 JEDEC 烧 GAL16v8/22v10、导出 SVG（含 LaTeX/Inkscape 兼容版）。\n与 Logisim 的两个真实差别：一是引入「开机」——开机时按随机门延迟迭代到稳定，再用一个 reset 门给出确定初态，解决了主从触发器建好能用、复位一次就废的问题；二是振荡排查——单门模式一次只让信号往前走一步，能追到振荡源头。\n代价随之而来：仿真运行中不能改电路，必须关掉、改、再开（作者认为这跟真实电路一致）。另外要 JRE 8 或更新；VHDL/Verilog 组件需要另装 ghdl / Icarus Verilog 才能仿真。",
+    officialUrl: "https://github.com/hneemann/Digital",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/hneemann/Digital",
+      github: "https://github.com/hneemann/Digital",
+    },
+    whoFor: "上数字逻辑课、要在仿真里把触发器与时序逻辑跑对的学生；以及需要把课堂电路导出成 VHDL 或烧到开发板的老师。",
+    whoNot: "习惯边跑边改电路的人——这里的「先关机再改」会改掉你的肌肉记忆；以及没有 Java 环境又不愿装 JRE 的机器。",
+    installTips: [
+      "不需要安装：下载 Digital.zip 解开即可，Linux 跑目录里的脚本，Windows / macOS 直接双击 JAR。",
+      "运行前提是 JRE 8 或更新；Windows 上装 Eclipse Temurin 的二进制包最省事。",
+      "启动异常时，在 Digital 目录里跑 `java -jar Digital.jar`，报错会显示在终端，双击是看不到的。",
+      "要仿真 VHDL / Verilog 描述的组件，得额外装 ghdl 或 Icarus Verilog；不装就只能画与仿真纯电路。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#4A4E69",
+    },
+    guide: {
+      intro: "按第一次开会卡在哪讲：解压后怎么启动、为什么「开着仿真不能改电路」、单门模式怎么用来抓振荡。",
+      markdown: `## 解压即用
+
+没有安装程序。下载 Digital.zip 解开，Linux 跑目录里的脚本，Windows / macOS 直接双击 JAR。
+
+前提是 **JRE 8 或更新**。Windows 上装 Eclipse Temurin 最省事。
+
+如果双击没反应，就在 Digital 目录里用命令行跑：
+
+\`\`\`bash
+java -jar Digital.jar
+\`\`\`
+
+这样报错会打在终端里；双击启动是看不到任何错误信息的，这是第一次使用最常见的「它坏了」。
+
+## 为什么它和 Logisim 不一样
+
+作者在 README 的 Motivation 里写得很直白。Logisim 的仿真在你还改电路的时候就一直在跑，没有「开机」这一步，于是没有稳定时间让电路落到确定状态——一个主从触发器可能建好能用，复位一次就废。
+
+Digital 的做法是引入 settling time：开机时按随机的门延迟反复迭代到稳定，再用一个 reset 门输出「稳定完成」信号，给电路一个确定的初态。
+
+**代价是：仿真运行中不能改电路。** 必须关掉、修改、再开。作者认为这恰好与真实电路一致，但你得先改掉在 Logisim 里边跑边拖线的习惯。
+
+## 抓振荡用单门模式
+
+另一个差别在排查。Logisim 检测到振荡只给一句提示；Digital 有单门模式，一次只让一个信号变化往前走一步，走完后高亮所有输入发生变化的门，你能一路追到振荡的源头。
+
+电路一跑就抖、或者输出一直是 X 的时候，先切到单门模式走两步，比盯着波形猜快得多。
+
+## 上手顺序
+
+先打开 examples 跑现成的例子（从 D 触发器到单周期 CPU 都有），再自己搭最小电路。想知道某个门为什么没输出，选中它看属性面板，或用单门模式单步。要验证设计就写内置 test case——它自带测试框架，不必外挂脚本。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "下载与 GitHub 仓库",
+          url: "https://github.com/hneemann/Digital",
+          note: "Digital.zip 的下载入口与全部特性说明都在这一页；Motivation 一节解释它与 Logisim 的分歧。",
+        },
+        {
+          kind: "html",
+          title: "官方文档（多语言）",
+          url: "https://github.com/hneemann/Digital/releases/latest",
+          note: "文档有简中版，含 First Steps 章节、74xx 芯片清单与快捷键表，遇到不认识的图标先查这里。",
+        },
+        {
+          kind: "link",
+          title: "自定义组件示例",
+          url: "https://github.com/hneemann/digitalCustomComponents",
+          note: "想用 Java 写自己的元件并打包成 jar 时照这个仓库做，主仓库只给了一句指路。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "opencat-quadruped-robot",
+    linksCheckedAt: "2026-10-22",
+    name: "OpenCat-Quadruped-Robot",
+    nameZh: "OpenCat 四足机器人框架",
+    aliases: ["opencat", "OpenCat", "四足机器人", "Bittle", "Nybble", "机器狗固件", "Petoi"],
+    summary: "Petoi 的四足机器人固件框架，把步态、舵机、IMU 这些硬骨头封装好，改几个宏就能让 Bittle / Nybble 走起来。适合 STEM 教学与 sim2real 实验；代价是必须先有硬件，且本仓库只服务停产的 NyBoard。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["四足机器人", "Arduino", "STEM", "舵机", "开源硬件"],
+    body: "OpenCat 是 Petoi 开源的 Arduino / 树莓派四足机器人框架，框架本身处理掉最难的部分——步态协调、舵机控制、IMU 融合——你只管在它上面搭东西。README 的定位是「让敏捷四足机器人便宜到研究者、教师和创客都买得起、改得动」。\n技术上它支持 C/C++、Python 和积木式编程，原生跑在 Arduino 与树莓派上，传感器（摄像头、触摸、IMU、超声）即插即用，能接 ROS 做 SLAM 与导航，也能当廉价的 sim2real 与强化学习实验平台。硬件侧本仓库针对 NyBoard（ATmega328P），最多协调 12 个舵机，完成走、跑、跳、后空翻。\n上手是这套东西最真实的部分：打开 OpenCat.ino 先选机型（BITTLE 9 自由度狗 / NYBBLE 11 自由度猫）和板型（NyBoard_V1_0 等），注释掉 MAIN_SKETCH 进配置模式，串口监视器设成「无行尾 + 115200」，然后按提示重置关节偏移、平放桌面做 IMU 校准，听到长鸣出现 Ready! 后再打开 MAIN_SKETCH 重新上传。\n代价要说清楚：**这个仓库服务的是已停产的 NyBoard**，当前世代的 Bittle X、Nybble Q 用 ESP32/BiBoard，代码在 OpenCatESP32 仓库；没有硬件就只能读代码，烧录还依赖串口驱动。项目累计出货 3 万多台、覆盖 60 多个国家，20 多篇论文引用它，生态不是问题。",
+    officialUrl: "https://www.petoi.com",
+    officialLabel: "www.petoi.com",
+    links: {
+      official: "https://www.petoi.com",
+      github: "https://github.com/PetoiCamp/OpenCat-Quadruped-Robot",
+    },
+    whoFor: "带 STEM / 机器人课的老师、买了 Bittle 或 Nybble 想改固件的玩家、以及要拿廉价四足平台做 sim2real 实验的研究生。",
+    whoNot: "手上是 Bittle X 或 Nybble Q 的人——那是 ESP32 平台，该去 OpenCatESP32；以及想纯软件仿真、不打算买硬件的人。",
+    installTips: [
+      "下载后先把目录名里的 `-main`（或分支名）后缀去掉，否则 Arduino IDE 打开可能报错。",
+      "在 OpenCat.ino 里选机型与板型：`#define BITTLE` 或 `#define NYBBLE`，配 `#define NyBoard_V1_0`（按你的板子版本改）。",
+      "首次烧录要注释掉 `#define MAIN_SKETCH` 进配置模式；串口监视器设成「无行尾」+ 115200，按提示重置关节偏移并完成 IMU 校准，看到 Ready! 后再打开 MAIN_SKETCH 重新上传。",
+      "反复烧录可加 `#define AUTO_INIT` 跳过提示并自动校准 IMU；想要图形化校准就插蓝牙模块配 Petoi app。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#C05621",
+    },
+    guide: {
+      intro: "按第一次烧录会卡在哪讲：先确认板子对不对、配置模式与主程序的切换、串口参数、以及校准做错会有什么后果。",
+      markdown: `## 第一步：确认你手上的板子
+
+README 打开第一句就是分流：**本仓库只服务 NyBoard（ATmega328P）**。Bittle X、Nybble Q 这些当前世代是 ESP32 / BiBoard，代码在 OpenCatESP32 仓库。
+
+拿错仓库的表现是编译期找不到对应板型宏，别在这里查半天——先确认硬件代际。
+
+## 烧录流程
+
+打开 OpenCat.ino，先选机型与板型：
+
+\`\`\`cpp
+#define BITTLE    // 9 DOF 机器狗
+//#define NYBBLE  // 11 DOF 机器猫
+
+#define NyBoard_V1_0
+\`\`\`
+
+然后**注释掉**主程序宏，进配置模式：
+
+\`\`\`cpp
+// #define MAIN_SKETCH
+\`\`\`
+
+上传后打开串口监视器，两个参数必须对：**行尾 None、波特率 115200**。接着按提示走：
+
+\`\`\`
+Reset joint offsets? (Y/n)  →  Y
+Calibrate the IMU? (Y/n)    →  Y
+\`\`\`
+
+IMU 校准时把机器人平放在桌面上，会先长鸣六声，再读传感器、存偏移，结束时再响。看到 \`Ready!\` 就可以关掉串口监视器。
+
+最后把 \`#define MAIN_SKETCH\` 打开，重新上传——这才是真正能跑的程序。
+
+## 三个最容易踩的坑
+
+1. **串口行尾没设 None**。校准提示会变成乱码，你会以为固件坏了。
+2. **夹具没拆就在桌上跑**。舵机会直接顶到限位，长期这样会烧舵机。
+3. **关节偏移没重置就调步态**。越调越歪，因为基准本来就是错的。
+
+## 没有硬件怎么办
+
+仓库是完整固件，读代码可以；要做 sim2real 或强化学习实验，官方给了在线仿真器，社区也有 NVIDIA Isaac 的示例可参考。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "GitHub 仓库与烧录步骤",
+          url: "https://github.com/PetoiCamp/OpenCat-Quadruped-Robot",
+          note: "Setup 一节把 12 步烧录流程与串口参数写全了，第一次上手照它走即可。",
+        },
+        {
+          kind: "html",
+          title: "Petoi 文档中心",
+          url: "https://docs.petoi.com",
+          note: "比 README 细得多的图文教程，含校准、扩展模块与故障排查，README 自己让人来这里看细节。",
+        },
+        {
+          kind: "html",
+          title: "当前世代固件 OpenCatESP32",
+          url: "https://github.com/PetoiCamp/OpenCatEsp32-Quadruped-Robot",
+          note: "用 Bittle X 或 Nybble Q 的人要的是这个仓库；拿错会卡在板型宏上。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pluto-jl",
+    linksCheckedAt: "2026-10-22",
+    name: "Pluto.jl",
+    nameZh: "Pluto.jl 响应式笔记本",
+    aliases: ["pluto", "pluto.jl", "Pluto", "Julia 笔记本", "响应式 notebook"],
+    summary: "Julia 的响应式笔记本：改一个变量，所有依赖它的单元格自动重跑，状态永远等于你看到的代码。适合教学与建模实验；代价是要先装 Julia，且和 Jupyter 的 ipynb 生态不通。",
+    scenes: ["education", "data"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Julia", "笔记本", "可复现", "教学", "开源"],
+    body: "Pluto 是 Julia 的笔记本环境，核心承诺只有一句：**任意时刻，程序状态完全由你看到的代码描述**。没有隐藏的工作区状态，也就没有「重启内核才恢复正常」这类问题。\n机制是响应式的：改一个变量，所有引用它的单元格自动重跑；单元格摆放顺序随意，它靠语法分析算出依赖关系再决定执行顺序。删掉一段代码，依赖它的单元格立刻报错而不是继续用着旧值——这正是 Jupyter 里最容易出隐蔽 bug 的地方。\n另外两个设计值得单独说。一是内置包管理：不用 Pkg.add，直接 import 任何注册包，Pluto 会分析依赖、自动建环境，并把环境信息写进 notebook 文件，别人打开时自动复现同一套版本。二是笔记本存成**纯 Julia 文件**，可以像普通代码一样被 import，也能导出带输出的 HTML / PDF；配合 @bind 与 PlutoUI，滑块、按钮直接绑到变量上。\n代价也要认：依赖链上的慢代码会拖住每一次编辑——一个跑两分钟的单元格，会让上游任何改动都变成两分钟等待；.ipynb 的生态（平台、扩展、协作工具）它不通用；上手前得先有 Julia 环境。它最初是为 MIT 的 Introduction to Computational Thinking 课程做的，教学场景是它最舒服的位置。",
+    officialUrl: "https://plutojl.org",
+    officialLabel: "plutojl.org",
+    links: {
+      official: "https://plutojl.org",
+      github: "https://github.com/JuliaPluto/Pluto.jl",
+    },
+    whoFor: "用 Julia 做数值实验、需要结果可复现的人；以及要给学生发一份「打开就能拖动参数」的课件的老师。",
+    whoNot: "团队已经在 Jupyter / Colab 上协作的人——ipynb 生态不通用；以及代码里有长耗时训练步骤的人，响应式重跑会很折磨。",
+    installTips: [
+      "先装 Julia，然后在 REPL 里 `import Pluto` 与 `Pluto.run()`，浏览器会自动打开。",
+      "不想装环境就先用官方 Binder 演示（binder.plutojl.org）试手感。",
+      "不用手动 Pkg.add：直接 import 任何注册包，Pluto 会自动建环境并把版本信息写进 notebook。",
+      "重活集中到少数单元格，参数用 `@bind` 接 PlutoUI 的滑块，避免每次改上游都重跑长任务。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#7E3A8F",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：安装两句、为什么没有「重启内核」、慢单元格怎么摆，以及和 Jupyter 的分界线。",
+      markdown: `## 装
+
+先有 Julia，然后两行：
+
+\`\`\`julia
+import Pluto
+Pluto.run()
+\`\`\`
+
+浏览器会自动打开。不想装环境，官方有 Binder 演示可先试。
+
+## 它会改掉你的习惯
+
+Jupyter 里删掉一个单元格，它的变量还留在内存里，于是「我明明改了为什么还是旧值」；Pluto 里没有这回事。
+
+Pluto 的保证是：任何时刻，程序状态完全等于你看到的代码。改一个变量，所有引用它的单元格自动重跑；删掉它，依赖它的单元格立刻报错。
+
+好处是没有隐藏状态，坏处是**依赖链上的慢代码会拖住每次编辑**。一个要跑两分钟的训练单元格，会让上游的任何改动都变成两分钟的等待。
+
+处理办法是把重活压到少数几个单元格，参数用 \`@bind\` 接成控件：
+
+\`\`\`julia
+using PlutoUI
+@bind α Slider(0.1:0.1:2.0)
+\`\`\`
+
+拖滑块只重跑真正依赖 α 的那几格，而不是整个笔记本。
+
+## 包管理是自动的
+
+不用 Pkg.add。直接 \`import DataFrames\` 就行，Pluto 会分析你用了哪些包、自动建环境，并把环境信息**写进 notebook 文件**。别人打开你的 notebook，会自动复现同一套包版本——这是它能被当成教学材料分发的前提。
+
+这也是它敢把笔记本存成**纯 .jl 文件**的底气：文件可以当普通 Julia 代码 import，也能导出带输出的 HTML 与 PDF 交作业或贴进论文。
+
+## 和 Jupyter 的分界线
+
+需要「可复现」的场合用它：教学作业、论文配图、给同事一份点开就能动的模型。
+
+已经在 ipynb 生态里协作的团队别硬换：平台、扩展、协作工具都不通用，换过来是净损失。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与安装指南",
+          url: "https://plutojl.org",
+          note: "Julia 与 Pluto 的安装步骤、包管理原理、教学用例都在这里，比 README 完整。",
+        },
+        {
+          kind: "html",
+          title: "在线演示（Binder）",
+          url: "https://binder.plutojl.org/",
+          note: "不装任何东西就能体验响应式重跑，判断它值不值得替换你现在的笔记本之前先点一下。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 仓库与 FAQ",
+          url: "https://github.com/JuliaPluto/Pluto.jl",
+          note: "FAQ、示例 notebook 与贡献说明都在仓库里；遇到疑问先查 wiki 再提问。",
+        },
+      ],
+    },
+  },
 ];
