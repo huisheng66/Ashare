@@ -480,21 +480,115 @@ const NAME_RANK =
  *  - 短于 2 字的词走 LIKE，无法用索引，是一次全表扫描；短查询本来就少，且 5 万条量级可接受。
  *    要根治得调小 ngram_token_size（索引膨胀）或上独立搜索引擎。
  */
-export async function searchCatalog(raw: string, limit: number, offset: number): Promise<SearchResult> {
+/** 搜索可叠加的筛选。与目录浏览（CatalogFilters）分开：搜索不做排序切换，也不支持仅看折扣。 */
+export type SearchFilters = { scenes?: SceneId[]; platforms?: Platform[] };
+
+/** 把查询串切成「能交给 ngram 的长词」与「只能 LIKE 兜底的短词」。 */
+function splitTerms(value: string) {
+  const long: string[] = [];
+  const short: string[] = [];
+  for (const term of [...new Set(value.split(" "))].filter(Boolean)) {
+    const sanitized = booleanTerm(term);
+    // 用净化后的长度判断能否交给 ngram：净化后只剩 1 个字符，MATCH 同样查不到。
+    if (sanitized.length >= NGRAM_TOKEN_SIZE) long.push(sanitized);
+    else short.push(term);
+  }
+  return { longTerms: long, shortTerms: short };
+}
+
+/**
+ * 搜索召回条件（不含排序、不含筛选）。
+ *
+ * 抽出来是为了让 searchFacets 与 searchCatalog 用**同一套**条件 —— 两处各写一份的话，
+ * 加一条召回通道（比如这次的拼音同义词）就会漏改一处，表现为「结果里有 34 条，
+ * 场景筛选却只统计出 13 条」，而且不报错。
+ */
+function searchRecallCondition(query: string, strict: boolean) {
+  const { longTerms, shortTerms } = splitTerms(query);
+  const text = textRecall(longTerms, shortTerms, query, strict, true);
+  const pinyin = pinyinRecall(longTerms, strict, true);
+  return {
+    where: "i.status = 'published' AND (" + text.where + " OR " + pinyin.where + ")",
+    params: [...text.params, ...pinyin.params] as unknown[],
+    longTerms,
+  };
+}
+
+/** 搜索之上的筛选条件（场景/平台）。刻意不含 status —— 那由 searchRecallCondition 负责。 */
+function searchFilterClause(filters: SearchFilters): { where: string[]; params: unknown[] } {
+  const where: string[] = [];
+  const params: unknown[] = [];
+  if (filters.scenes?.length) {
+    where.push("i.id IN (SELECT s.item_id FROM item_scenes s WHERE s.scene_id IN (?))");
+    params.push(filters.scenes);
+  }
+  if (filters.platforms?.length) {
+    where.push("i.id IN (SELECT p.item_id FROM item_platforms p WHERE p.platform IN (?))");
+    params.push(filters.platforms);
+  }
+  return { where, params };
+}
+
+/** 搜索结果的分布：每个场景/平台各命中多少条。 */
+export type SearchFacets = {
+  total: number;
+  scenes: { id: SceneId; count: number }[];
+  platforms: { id: Platform; count: number }[];
+};
+
+/**
+ * 统计搜索结果的场景/平台分布。
+ *
+ * **必须基于「筛选前」的全量**：如果先把结果按 scene=photo 筛过再统计，
+ * 其它场景的计数都会变成 0，筛选条上除当前项外全部消失，用户就再也切不回去了 ——
+ * 这是 facet 实现里最经典的错误。所以这里不带 filters 参数。
+ *
+ * 用两条 GROUP BY 而不是把全部条目拉进内存数：一个条目可能属于多个场景，
+ * 内存里还得自己展开去重，SQL 一次就能算准。
+ */
+export async function searchFacets(raw: string): Promise<SearchFacets> {
+  const query = normalizeQuery(raw);
+  if (!query) return { total: 0, scenes: [], platforms: [] };
+  const recall = searchRecallCondition(query, true);
+
+  return withConnection(async (conn) => {
+    const [countRows] = await conn.query<RowDataPacket[]>(
+      "SELECT COUNT(*) AS c FROM items i WHERE " + recall.where,
+      recall.params,
+    );
+    const total = Number(countRows[0].c);
+    if (!total) return { total: 0, scenes: [], platforms: [] };
+
+    const [sceneRows] = await conn.query<RowDataPacket[]>(
+      "SELECT s.scene_id AS id, COUNT(*) AS c FROM items i JOIN item_scenes s ON s.item_id = i.id WHERE " +
+        recall.where +
+        " GROUP BY s.scene_id ORDER BY c DESC, s.scene_id ASC",
+      recall.params,
+    );
+    const [platformRows] = await conn.query<RowDataPacket[]>(
+      "SELECT p.platform AS id, COUNT(*) AS c FROM items i JOIN item_platforms p ON p.item_id = i.id WHERE " +
+        recall.where +
+        " GROUP BY p.platform ORDER BY c DESC, p.platform ASC",
+      recall.params,
+    );
+    return {
+      total,
+      scenes: sceneRows.map((row) => ({ id: row.id as SceneId, count: Number(row.c) })),
+      platforms: platformRows.map((row) => ({ id: row.id as Platform, count: Number(row.c) })),
+    };
+  });
+}
+
+export async function searchCatalog(
+  raw: string,
+  limit: number,
+  offset: number,
+  filters: SearchFilters = {},
+): Promise<SearchResult> {
   const query = normalizeQuery(raw);
   if (!query) return { items: [], total: 0, fuzzy: false };
 
-  const termsOf = (value: string) => {
-    const long: string[] = [];
-    const short: string[] = [];
-    for (const term of [...new Set(value.split(" "))].filter(Boolean)) {
-      const sanitized = booleanTerm(term);
-      // 用净化后的长度判断能否交给 ngram：净化后只剩 1 个字符，MATCH 同样查不到。
-      if (sanitized.length >= NGRAM_TOKEN_SIZE) long.push(sanitized);
-      else short.push(term);
-    }
-    return { longTerms: long, shortTerms: short };
-  };
+  const termsOf = splitTerms;
 
   /** `q` 默认是清洗后的原查询；拼写纠正后会带着纠正词再跑一次。 */
   const run = (strict: boolean, q: string = query): Promise<SearchResult> => {
@@ -502,8 +596,15 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
     // 召回用扩展版（同义词也算命中），排序用原词版（原词优先）。
     const text = textRecall(longTerms, shortTerms, q, strict, true);
     const pinyin = pinyinRecall(longTerms, strict, true);
-    const condition = "i.status = 'published' AND (" + text.where + " OR " + pinyin.where + ")";
-    const whereParams = [...text.params, ...pinyin.params];
+    const extra = searchFilterClause(filters);
+    const condition =
+      "i.status = 'published' AND (" +
+      text.where +
+      " OR " +
+      pinyin.where +
+      ")" +
+      (extra.where.length ? " AND " + extra.where.join(" AND ") : "");
+    const whereParams = [...text.params, ...pinyin.params, ...extra.params];
     // 中文走 synonymsOf，拼音走拼音映射表 —— 两者任一有扩展就需要「原词优先」那一档。
     const pinyinMap = pinyinSynonymMapOf();
     const hasSynonyms =
@@ -516,7 +617,8 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
         whereParams,
       );
       const total = Number(countRows[0].c);
-      if (!total) return { items: [], total: 0, fuzzy: !strict };
+      // 带筛选时 total=0 多半是「筛太窄」，不是「没匹配到」—— 不该标记为放宽匹配。
+      if (!total) return { items: [], total: 0, fuzzy: !strict && extra.where.length === 0 };
 
       const like = escapeLike(q);
       const orderParams: unknown[] = [
@@ -573,6 +675,10 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
 
   const strict = await run(true);
   if (strict.total) return strict;
+
+  // 带筛选时空手，问题在筛选而不在查询：降级或纠正只会给出一批同样被筛掉的条目，
+  // 白白多打两次库。直接返回，由前台提示「试试取消筛选」（阶段 3 的零结果归因）。
+  if (searchFilterClause(filters).where.length) return strict;
 
   // 严格 AND 空手 → 先按 OR 语义给部分结果（多词查询常能救回来）。
   const relaxed = await run(false);

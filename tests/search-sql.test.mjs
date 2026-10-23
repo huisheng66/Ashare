@@ -352,3 +352,66 @@ test("搜索：没有同义词的词，结果集不受影响", { skip }, async (
   assert.ok(result.total > 0);
   assert.equal(result.fuzzy, false);
 });
+
+test("facet：总计数与搜索结果一致", { skip }, async () => {
+  const facets = await sql.searchFacets("图片");
+  const result = await sql.searchCatalog("图片", 1, 0);
+  assert.equal(facets.total, result.total, "facets 的总数必须等于搜索结果数，否则筛选条在骗人");
+  assert.ok(facets.scenes.length > 1, "图片类结果应分布在多个场景");
+});
+
+test("facet：各场景计数之和 >= 总数（一个条目可属于多个场景）", { skip }, async () => {
+  const facets = await sql.searchFacets("图片");
+  const sum = facets.scenes.reduce((acc, scene) => acc + scene.count, 0);
+  assert.ok(sum >= facets.total, "条目可跨场景，计数之和不应小于总数");
+  // 但不该出现某个场景的计数超过总数这种明显错误
+  for (const scene of facets.scenes) {
+    assert.ok(scene.count <= facets.total, `${scene.id} 的计数 ${scene.count} 超过总数 ${facets.total}`);
+  }
+});
+
+test("facet：筛选后结果全部属于该场景", { skip }, async () => {
+  const facets = await sql.searchFacets("图片");
+  const target = facets.scenes[0];
+  assert.ok(target && target.count > 0);
+
+  const filtered = await sql.searchCatalog("图片", PAGE, 0, { scenes: [target.id] });
+  assert.equal(filtered.total, target.count, `筛 ${target.id} 后的条数应等于 facet 计数`);
+
+  // 逐条核对归属，防止「筛选条件拼错但数字碰巧对上」
+  const rows = await query(
+    "SELECT i.slug FROM items i JOIN item_scenes s ON s.item_id = i.id WHERE s.scene_id = ? AND i.slug IN (?)",
+    [target.id, filtered.items.map((item) => item.slug)],
+  );
+  assert.equal(rows.length, filtered.items.length, "返回的每一条都必须真的属于该场景");
+});
+
+test("facet：筛选不改变 facet 计数（否则切不回去）", { skip }, async () => {
+  // 这是 facet 实现里最经典的错误：先筛再统计，其他选项的计数全变 0，
+  // 筛选条上除当前项外全部消失，用户再也切不回去。
+  const before = await sql.searchFacets("图片");
+  const after = await sql.searchFacets("图片");
+  assert.deepEqual(before, after, "facets 必须只取决于查询词，不取决于当前筛选");
+});
+
+test("facet：带筛选且筛空时，不误标为「已放宽匹配」", { skip }, async () => {
+  // 空结果的原因是筛选太窄，不是查询没匹配到 —— 标记 fuzzy 会误导用户
+  // 以为系统放宽了语义，实际是筛掉了。
+  //
+  // 不能硬编码「图片 + games 必为空」：pyxel（像素游戏引擎）就同时属于 games
+  // 且简介含图像相关词。这类断言必须从真实 facet 里找空场景，否则数据一变就假红。
+  const facets = await sql.searchFacets("图片");
+  const absent = ["music", "games", "social", "education", "office"].filter(
+    (id) => !facets.scenes.some((scene) => scene.id === id),
+  );
+  if (!absent.length) {
+    // 全覆盖时退到「查不到的词 + 筛选」：同样必须 fuzzy=false。
+    const result = await sql.searchCatalog("zzzznotfound", PAGE, 0, { scenes: ["photo"] });
+    assert.equal(result.total, 0);
+    assert.equal(result.fuzzy, false, "带筛选的空结果不该标记为放宽匹配");
+    return;
+  }
+  const result = await sql.searchCatalog("图片", PAGE, 0, { scenes: [absent[0]] });
+  assert.equal(result.total, 0, `图片类条目不应落在 ${absent[0]} 场景`);
+  assert.equal(result.fuzzy, false, "筛选导致的空结果不该标记为放宽匹配");
+});

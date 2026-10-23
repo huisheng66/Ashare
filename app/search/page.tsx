@@ -8,8 +8,10 @@ import { SearchPanel } from "@/components/SearchPanel";
 import { Eyebrow } from "@/components/SectionHeading";
 import { SoftwareCard } from "@/components/SoftwareCard";
 import { Button } from "@/components/ui/button";
-import { catalogCounts, searchCatalog } from "@/lib/catalog";
-import { parseCatalogPage, searchQueryParam, type PageSearchParams } from "@/lib/catalog-query";
+import { sceneById } from "@/data/scenes";
+import type { SceneId } from "@/data/types";
+import { catalogCounts, searchCatalog, searchFacets } from "@/lib/catalog";
+import { parseCatalogFilters, parseCatalogPage, searchQueryParam, type PageSearchParams } from "@/lib/catalog-query";
 import { highlightTermsOf } from "@/lib/highlight";
 import { nameSuggestions, taskSuggestions } from "@/lib/navigation";
 
@@ -42,17 +44,81 @@ function TermList({ label, terms }: { label: string; terms: string[] }) {
   );
 }
 
+/**
+ * 场景筛选条。只做场景，不做平台 ——
+ * 实测平台分布几乎没有区分度（图片：linux 33 / macos 27 / windows 27），
+ * 加一排「Windows 27」的按钮只会占地方。场景的差异才是真实的（photo 20 / code 7）。
+ *
+ * 计数来自筛选前的全量（searchFacets 不带 filters），所以切换场景时每个 chip 的数字不变，
+ * 用户能看见「其他场景还有多少」，也就能切回去。
+ */
+function SceneFilterBar({
+  query,
+  scenes,
+  active,
+  total,
+}: {
+  query: string;
+  scenes: { id: SceneId; count: number }[];
+  active: SceneId[];
+  total: number;
+}) {
+  const href = (sceneId?: SceneId) => {
+    const next = new URLSearchParams();
+    if (query) next.set("q", query);
+    if (sceneId) next.set("scene", sceneId);
+    const search = next.toString();
+    return search ? "/search?" + search : "/search";
+  };
+
+  const chip = (on: boolean) =>
+    "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] transition-colors pointer-coarse:h-10 " +
+    (on
+      ? "border-foreground bg-foreground text-background"
+      : "border-border bg-card text-muted-foreground hover:border-foreground/30 hover:text-foreground");
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-1.5" role="group" aria-label="按场景筛选">
+      <Link href={href()} className={chip(active.length === 0)} aria-current={active.length === 0 ? "true" : undefined}>
+        全部
+        <span className="tabular-nums opacity-70">{total}</span>
+      </Link>
+      {scenes.map((scene) => {
+        const on = active.includes(scene.id);
+        return (
+          <Link
+            key={scene.id}
+            href={href(scene.id)}
+            className={chip(on)}
+            aria-current={on ? "true" : undefined}
+          >
+            {sceneById[scene.id]?.name ?? scene.id}
+            <span className="tabular-nums opacity-70">{scene.count}</span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 export default async function SearchPage({ searchParams }: Props) {
   const params = await searchParams;
   const query = searchQueryParam(params.q);
-  // 搜索与分页都下推：不再把整份目录读进内存再打分。
-  const [results, counts] = await Promise.all([searchCatalog(query, parseCatalogPage(params)), catalogCounts()]);
+  // 只取场景：搜索页不做平台/类型筛选（那属于目录浏览的语义）。
+  const activeScenes = [...parseCatalogFilters(params).scenes];
+  // 三次查询并发：结果、筛选分布、目录总量。facets 刻意不带 filters（见 searchFacets 注释）。
+  const [results, facets, counts] = await Promise.all([
+    searchCatalog(query, parseCatalogPage(params), { scenes: activeScenes }),
+    searchFacets(query),
+    catalogCounts(),
+  ]);
   // 拼写纠正后，结果里出现的是纠正词本身，用原词高亮一个也标不中。
   const terms = highlightTermsOf(results.corrected ?? query);
 
   const pageHref = (target: number) => {
     const next = new URLSearchParams();
     if (query) next.set("q", query);
+    if (activeScenes.length === 1) next.set("scene", activeScenes[0]);
     if (target > 1) next.set("page", String(target));
     const search = next.toString();
     return search ? "/search?" + search : "/search";
@@ -95,6 +161,13 @@ export default async function SearchPage({ searchParams }: Props) {
               "没有找到匹配的工具"
             )}
           </p>
+          {/*
+            筛选条只在「有结果且确实能分流」时出现：facets.scenes.length > 1 意味着
+            结果至少落在两个场景里，只有一个场景时整条筛选没有意义，白白多一行。
+          */}
+          {facets.scenes.length > 1 ? (
+            <SceneFilterBar query={query} scenes={facets.scenes} active={activeScenes} total={facets.total} />
+          ) : null}
           {results.total ? (
             <>
               <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

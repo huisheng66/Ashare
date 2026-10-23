@@ -4,6 +4,7 @@ import { cache } from "react";
 
 import type { CatalogCounts, CatalogItem, SceneId, Software } from "@/data/types";
 import * as sql from "./catalog-sql.ts";
+import type { SearchFacets, SearchFilters } from "./catalog-sql.ts";
 import {
   kindIds,
   platformIds,
@@ -150,12 +151,12 @@ export type SearchPage = {
  * 两条路径的**结果集不完全相同**：SQL 的检索字段是 search_text（不含长正文），
  * 内存实现还扫正文。这条差异是刻意的，已写进计划文档。
  */
-export async function searchCatalog(query: string, page = 1): Promise<SearchPage> {
+export async function searchCatalog(query: string, page = 1, filters: SearchFilters = {}): Promise<SearchPage> {
   const safePage = Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1;
   const offset = (safePage - 1) * PAGE_SIZE;
 
   if (mysqlDriver()) {
-    const { items, total, fuzzy, corrected } = await sql.searchCatalog(query, PAGE_SIZE, offset);
+    const { items, total, fuzzy, corrected } = await sql.searchCatalog(query, PAGE_SIZE, offset, filters);
     return {
       items, total, page: safePage, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)), fuzzy, corrected,
     };
@@ -170,6 +171,18 @@ export async function searchCatalog(query: string, page = 1): Promise<SearchPage
     // JSON 回退路径没有容错降级（见 lib/items.ts 的说明），恒为 false。
     fuzzy: false,
   };
+}
+
+/**
+ * 搜索结果的场景/平台分布。
+ *
+ * JSON 回退路径返回空：它把整份目录读进内存，本来就没有「按条件聚合」的成本问题，
+ * 但也没实现（见 lib/items.ts 的说明 —— 回滚路径只保证能搜，不保证功能对等）。
+ * 前台拿不到 facets 就不渲染筛选条，属于优雅降级。
+ */
+export async function searchFacets(query: string): Promise<SearchFacets> {
+  if (mysqlDriver()) return sql.searchFacets(query);
+  return { total: 0, scenes: [], platforms: [] };
 }
 
 /** 首页编辑精选。 */
