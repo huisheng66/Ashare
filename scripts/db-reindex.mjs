@@ -22,12 +22,13 @@ import process from "node:process";
 
 import mysql from "mysql2/promise";
 
-import { searchPinyinOf } from "../lib/catalog-rows.ts";
+import { searchInitialsOf, searchPinyinOf } from "../lib/catalog-rows.ts";
 import { migrationConnectionOptions } from "../lib/db.ts";
 import { parseFlags } from "./_shared.mjs";
 
 const SEARCH_INDEX = "ft_items_search";
 const PINYIN_INDEX = "ft_items_pinyin";
+const INITIALS_INDEX = "ft_items_initials";
 
 async function indexExists(conn, name) {
   const [rows] = await conn.query(
@@ -38,10 +39,11 @@ async function indexExists(conn, name) {
 }
 
 /**
- * 回填 search_pinyin。基于数据库现有行计算，保证覆盖后台新建/编辑的条目。
- * 只传 searchPinyinOf 真正读取的三个字段，避免构造完整 Software。
+ * 回填两个派生检索列（search_pinyin 全拼 / search_initials 首字母）。
+ * 基于数据库现有行计算，保证覆盖后台新建/编辑的条目。
+ * 只传两个函数真正读取的三个字段，避免构造完整 Software。
  */
-async function backfillPinyin(conn) {
+async function backfillSearchColumns(conn) {
   const [rows] = await conn.query("SELECT slug, name, name_zh, aliases FROM items");
   let filled = 0;
   for (const row of rows) {
@@ -51,13 +53,18 @@ async function backfillPinyin(conn) {
     } catch {
       aliases = [];
     }
-    const value =
-      searchPinyinOf({
-        name: String(row.name ?? ""),
-        nameZh: row.name_zh == null ? "" : String(row.name_zh),
-        aliases: Array.isArray(aliases) ? aliases : [],
-      }) || null;
-    await conn.query("UPDATE items SET search_pinyin = ? WHERE slug = ?", [value, String(row.slug)]);
+    const source = {
+      name: String(row.name ?? ""),
+      nameZh: row.name_zh == null ? "" : String(row.name_zh),
+      aliases: Array.isArray(aliases) ? aliases : [],
+    };
+    const pinyin = searchPinyinOf(source) || null;
+    const initials = searchInitialsOf(source) || null;
+    await conn.query("UPDATE items SET search_pinyin = ?, search_initials = ? WHERE slug = ?", [
+      pinyin,
+      initials,
+      String(row.slug),
+    ]);
     filled += 1;
   }
   return filled;
@@ -95,20 +102,24 @@ async function main() {
 
     const hasSearch = await indexExists(conn, SEARCH_INDEX);
     const hasPinyin = await indexExists(conn, PINYIN_INDEX);
-    const [nullRows] = await conn.query("SELECT COUNT(*) AS c FROM items WHERE search_pinyin IS NULL OR search_pinyin = ''");
+    const hasInitials = await indexExists(conn, INITIALS_INDEX);
+    const [nullRows] = await conn.query(
+      "SELECT COUNT(*) AS c FROM items WHERE search_pinyin IS NULL OR search_pinyin = '' OR search_initials IS NULL OR search_initials = ''",
+    );
 
     if (args.check) {
       console.log(
         "[db:reindex] --check：配置可用；" +
           SEARCH_INDEX + (hasSearch ? " 存在" : " 缺失") +
           "；" + PINYIN_INDEX + (hasPinyin ? " 存在" : " 缺失") +
-          "；search_pinyin 为空的行数 " + Number(nullRows[0].c),
+          "；" + INITIALS_INDEX + (hasInitials ? " 存在" : " 缺失") +
+          "；检索列为空的行数 " + Number(nullRows[0].c),
       );
       return;
     }
 
-    console.log("[db:reindex] 回填 search_pinyin …");
-    const filled = await backfillPinyin(conn);
+    console.log("[db:reindex] 回填 search_pinyin / search_initials …");
+    const filled = await backfillSearchColumns(conn);
     console.log("[db:reindex] 已回填 " + filled + " 行");
 
     // 索引缺失才补建（正常由迁移负责）；存在与否都要走下面的 OPTIMIZE 重建 token。
@@ -117,6 +128,9 @@ async function main() {
     }
     if (!hasPinyin) {
       await conn.query("ALTER TABLE items ADD FULLTEXT KEY " + PINYIN_INDEX + " (search_pinyin) WITH PARSER ngram");
+    }
+    if (!hasInitials) {
+      await conn.query("ALTER TABLE items ADD FULLTEXT KEY " + INITIALS_INDEX + " (search_initials) WITH PARSER ngram");
     }
 
     /**
@@ -131,7 +145,7 @@ async function main() {
     console.log("[db:reindex] 重建索引 token（OPTIMIZE TABLE）…");
     await conn.query("OPTIMIZE TABLE items");
 
-    console.log("[db:reindex] 完成。索引 token 现在按空停用词表生成，search_pinyin 已回填。");
+    console.log("[db:reindex] 完成。索引 token 现在按空停用词表生成，search_pinyin / search_initials 已回填。");
   } finally {
     await conn.end();
   }

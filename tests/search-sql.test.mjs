@@ -7,7 +7,7 @@ import mysql from "mysql2/promise";
 import { samples } from "../data/samples.ts";
 import { software } from "../data/software.ts";
 import { persistCatalog } from "../lib/catalog-persist.ts";
-import { searchPinyinOf, searchTextOf } from "../lib/catalog-rows.ts";
+import { searchInitialsOf, searchPinyinOf, searchTextOf } from "../lib/catalog-rows.ts";
 import * as sql from "../lib/catalog-sql.ts";
 import { closePool, connectionOptions, query } from "../lib/db.ts";
 import { normalizeItems } from "../lib/normalize.ts";
@@ -126,7 +126,14 @@ function oracle(raw) {
     .filter((item) => {
       const text = searchTextOf(item).toLowerCase();
       const pinyin = searchPinyinOf(item).toLowerCase();
-      return terms.every((term) => text.includes(term)) || terms.every((term) => pinyin.includes(term));
+      // 首字母是第三条召回通道（独立列）。oracle 必须跟上，
+      // 否则 initials 命中的条目会被判成「多出来的」。
+      const initials = searchInitialsOf(item).toLowerCase();
+      return (
+        terms.every((term) => text.includes(term)) ||
+        terms.every((term) => pinyin.includes(term)) ||
+        terms.every((term) => initials.includes(term))
+      );
     })
     .map((item) => item.slug)
     .sort();
@@ -453,4 +460,34 @@ test("诊断：空查询归因为 empty-query，不跑任何 Count", { skip }, a
   const diagnosis = await sql.diagnoseSearch("   ");
   assert.equal(diagnosis.reason, "empty-query");
   assert.equal(diagnosis.perTerm, undefined);
+});
+
+test("搜索：首字母命中排在「名称里偶然含这对字母」之前", { skip }, async () => {
+  // 修复前：搜 tp 的第一名是 okhttp —— 它的名字字面上就含 tp（okht**tp**），
+  // 而真正的首字母命中（图片 / 图谱类，initials 列含 tp）被 NAME_RANK 压到后面。
+  // 这条断言的第一项必须来自 search_initials，而不是名称子串的巧合。
+  const result = await sql.searchCatalog("tp", PAGE, 0);
+  assert.ok(result.total > 0, "tp 应能命中首字母含 tp 的条目");
+
+  const first = result.items[0]?.slug;
+  const rows = await query(
+    "SELECT slug FROM items WHERE slug = ? AND MATCH(search_initials) AGAINST(? IN BOOLEAN MODE)",
+    [first, "+tp"],
+  );
+  assert.equal(rows.length, 1, `首位 ${first} 应是首字母命中，而不是名称里的偶然子串`);
+
+  // 反向确认：okhttp（名字含 tp、首字母是 khd）不该出现在最前面
+  const slugs = result.items.map((item) => item.slug);
+  const okhttpAt = slugs.indexOf("okhttp");
+  assert.ok(okhttpAt === -1 || okhttpAt > 0, `okhttp 排在第 ${okhttpAt + 1} 位，说明首字母档没生效`);
+});
+
+test("搜索：首字母列只收中文名，纯英文名不会因缩写被误召回", { skip }, async () => {
+  // 英文名的「首字母」就是它自己，放进 initials 列会让缩写查询命中一堆英文名。
+  // 用 ollama（纯 ASCII 名）验证：搜它的「首字母」不该有结果。
+  const rows = await query(
+    "SELECT slug FROM items WHERE slug = 'ollama' AND MATCH(search_initials) AGAINST(? IN BOOLEAN MODE)",
+    ["+ollm"],
+  );
+  assert.equal(rows.length, 0, "纯英文名不该进入首字母列");
 });

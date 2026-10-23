@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { searchPinyinOf } from "../lib/catalog-rows.ts";
+import { searchInitialsOf, searchPinyinOf } from "../lib/catalog-rows.ts";
 
 /**
  * 拼音派生列的纯函数测试。
@@ -15,18 +15,31 @@ import { searchPinyinOf } from "../lib/catalog-rows.ts";
 /** 只构造 searchPinyinOf 真正读取的字段，其余给空默认。 */
 const make = (over) => ({ slug: "x", name: "X", aliases: [], tags: [], summary: "", ...over });
 
-test("中文名产出三档拼音：分音节 / 连写 / 首字母", () => {
+test("中文名产出两档全拼：分音节 / 连写", () => {
+  // 首字母已拆到 searchInitialsOf / 独立的 search_initials 列 ——
+  // 混在同一列时无法区分「tp 是首字母」与「khttp 里恰好有 tp」，
+  // 实测搜 tp 会把 okhttp 排到第一。这里只断言全拼部分。
   const out = searchPinyinOf(make({ name: "PicTool", nameZh: "图片" }));
   assert.ok(out.includes("tu pian"), "分音节全拼应命中 tu pian");
   assert.ok(out.includes("tupian"), "连写全拼应命中 tupian");
-  assert.ok(out.includes("tp"), "首字母应命中 tp");
+  assert.ok(!/(^| )tp( |$)/.test(out), "首字母不该再出现在全拼列里");
 });
 
-test("longer 中文名逐字转换且三种形态都在", () => {
+test("longer 中文名逐字转换，全拼两档都在", () => {
   const out = searchPinyinOf(make({ name: "Zotero", nameZh: "文献管理" }));
   assert.ok(out.includes("wen xian guan li"));
   assert.ok(out.includes("wenxianguanli"));
-  assert.ok(out.includes("wxgl"));
+});
+
+test("首字母独立成列：图片 → tp，文献管理 → wxgl", () => {
+  assert.equal(searchInitialsOf(make({ name: "PicTool", nameZh: "图片" })), "tp");
+  assert.equal(searchInitialsOf(make({ name: "Zotero", nameZh: "文献管理" })), "wxgl");
+});
+
+test("首字母列只收中文：纯英文名不该产出任何内容", () => {
+  // 英文名的「首字母」是它自己，放进 initials 列只会让缩写查询命中一堆英文名。
+  assert.equal(searchInitialsOf(make({ name: "Ollama" })), "");
+  assert.equal(searchInitialsOf(make({ name: "RustDesk" })), "");
 });
 
 test("纯 ASCII 不会被逐字符拆成噪音", () => {
@@ -48,11 +61,13 @@ test("过短的英数名不折叠，避免无意义串", () => {
 });
 
 test("中英混排：只对汉字部分转拼音", () => {
-  const out = searchPinyinOf(make({ name: "RustDesk 远程桌面" }));
+  const item = make({ name: "RustDesk 远程桌面" });
+  const out = searchPinyinOf(item);
   assert.ok(out.includes("yuan cheng zhuo mian"), "汉字部分转拼音");
-  assert.ok(out.includes("yczm"), "汉字首字母");
   assert.ok(out.includes("rstdsk"), "英数部分去元音");
   assert.ok(!/r u s t/i.test(out), "英数部分不应被逐字符拆开");
+  // 首字母在独立列里：只取汉字部分，英文名不参与（否则初始化串会混入英文字母）。
+  assert.equal(searchInitialsOf(item), "yczm");
 });
 
 test("别名也参与拼音生成", () => {

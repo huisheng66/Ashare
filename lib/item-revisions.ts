@@ -1,4 +1,4 @@
-import { fromBundle, searchPinyinOf, searchTextOf, type ItemBundle, type ItemRow } from "./catalog-rows.ts";
+import { fromBundle, searchInitialsOf, searchPinyinOf, searchTextOf, type ItemBundle, type ItemRow } from "./catalog-rows.ts";
 
 /**
  * 内容级历史：基线快照 + 字段级差异，可重放还原任意版本。
@@ -31,6 +31,7 @@ import { fromBundle, searchPinyinOf, searchTextOf, type ItemBundle, type ItemRow
 export const DERIVED_COLUMNS: ReadonlySet<string> = new Set([
   "search_text",
   "search_pinyin",
+  "search_initials",
   "updated_at",
   "row_version",
 ]);
@@ -216,6 +217,7 @@ export function replay(revisions: Revision[], targetVersion?: number): ItemBundl
     current.item.updated_at = revision.at;
     current.item.search_text = searchTextOf(restored);
     current.item.search_pinyin = searchPinyinOf(restored) || null;
+    current.item.search_initials = searchInitialsOf(restored) || null;
   }
   return current;
 }

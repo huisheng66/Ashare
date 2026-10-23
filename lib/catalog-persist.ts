@@ -22,7 +22,8 @@ export const ITEM_COLUMNS: string[] = [
   "slug", "name", "name_zh", "aliases", "status", "kind", "source", "price", "summary", "body",
   "tutorial", "who_for", "who_not", "discount_note", "license", "version", "links_checked_at",
   "featured", "sort_index", "icon_letter", "icon_color", "icon_simple", "icon_image",
-  "guide_intro", "guide_markdown", "search_text", "search_pinyin", "created_at", "updated_at",
+  "guide_intro", "guide_markdown", "search_text", "search_pinyin", "search_initials",
+  "created_at", "updated_at",
 ];
 
 /** row_version 刻意不在 UPDATE 列表里：ETL / 批量保存不该覆盖编辑侧的并发计数。 */
@@ -42,7 +43,7 @@ function bindItem(row: ItemRow): unknown[] {
     row.summary, row.body, row.tutorial, row.who_for, row.who_not, row.discount_note,
     row.license, row.version, row.links_checked_at, row.featured, row.sort_index,
     row.icon_letter, row.icon_color, row.icon_simple, row.icon_image,
-    row.guide_intro, row.guide_markdown, row.search_text, row.search_pinyin,
+    row.guide_intro, row.guide_markdown, row.search_text, row.search_pinyin, row.search_initials,
     new Date(row.created_at), new Date(row.updated_at),
   ];
 }

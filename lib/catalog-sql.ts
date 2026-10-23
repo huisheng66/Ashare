@@ -452,6 +452,23 @@ function pinyinRecall(longTerms: string[], strict: boolean, expand = false) {
 }
 
 /**
+ * 首字母召回条件（search_initials，独立列）。
+ *
+ * 单独一列是为了把「tp 是首字母」和「khttp 里恰好有 tp」分开 —— 混在 search_pinyin 里时
+ * 实测搜 tp 返回 51 条、第一名是 okhttp。拆开后 `+tp` 只命中首字母含 tp 的条目。
+ *
+ * 不做同义词扩展：用户打 tp 指的是「图片」这个具体概念的首字母，
+ * 扩成「图像/照片」的首字母（tx/zp）只会引入他并没有输入的词。
+ */
+function initialsRecall(longTerms: string[], strict: boolean) {
+  if (!longTerms.length) return { where: "(1 = 0)", params: [] as unknown[] };
+  return {
+    where: "(MATCH(i.search_initials) AGAINST(? IN BOOLEAN MODE))",
+    params: [longTerms.map((term) => (strict ? "+" : "") + term).join(" ")],
+  };
+}
+
+/**
  * 名称命中分档，作 ORDER BY 第一优先级：精确 → 前缀 → 包含 → 别名 → 其他。
  *
  * 比只判 name 更细：中文名（name_zh）与别名的命中现在也能拔高，
@@ -507,9 +524,11 @@ function searchRecallCondition(query: string, strict: boolean) {
   const { longTerms, shortTerms } = splitTerms(query);
   const text = textRecall(longTerms, shortTerms, query, strict, true);
   const pinyin = pinyinRecall(longTerms, strict, true);
+  const initials = initialsRecall(longTerms, strict);
   return {
-    where: "i.status = 'published' AND (" + text.where + " OR " + pinyin.where + ")",
-    params: [...text.params, ...pinyin.params] as unknown[],
+    where:
+      "i.status = 'published' AND (" + text.where + " OR " + pinyin.where + " OR " + initials.where + ")",
+    params: [...text.params, ...pinyin.params, ...initials.params] as unknown[],
     longTerms,
   };
 }
@@ -653,15 +672,18 @@ export async function searchCatalog(
     // 召回用扩展版（同义词也算命中），排序用原词版（原词优先）。
     const text = textRecall(longTerms, shortTerms, q, strict, true);
     const pinyin = pinyinRecall(longTerms, strict, true);
+    const initials = initialsRecall(longTerms, strict);
     const extra = searchFilterClause(filters);
     const condition =
       "i.status = 'published' AND (" +
       text.where +
       " OR " +
       pinyin.where +
+      " OR " +
+      initials.where +
       ")" +
       (extra.where.length ? " AND " + extra.where.join(" AND ") : "");
-    const whereParams = [...text.params, ...pinyin.params, ...extra.params];
+    const whereParams = [...text.params, ...pinyin.params, ...initials.params, ...extra.params];
     // 中文走 synonymsOf，拼音走拼音映射表 —— 两者任一有扩展就需要「原词优先」那一档。
     const pinyinMap = pinyinSynonymMapOf();
     const hasSynonyms =
@@ -678,10 +700,23 @@ export async function searchCatalog(
       if (!total) return { items: [], total: 0, fuzzy: !strict && extra.where.length === 0 };
 
       const like = escapeLike(q);
-      const orderParams: unknown[] = [
-        q, q, like + "%", like + "%", "%" + like + "%", "%" + like + "%", "%" + like + "%",
-      ];
-      let order = NAME_RANK;
+      const orderParams: unknown[] = [];
+      let order = "";
+      if (longTerms.length) {
+        // 首字母命中排在最前，**在名称分档之前**。
+        //
+        // 为什么不能只把它放在全文相关度之前：NAME_RANK 的「名称包含」档会先命中。
+        // 实测搜 tp 时 okhttp 排第一，因为它的名字字面上就含 tp（okht**tp**）——
+        // 字面巧合压过了语义正确的首字母命中（图片类）。
+        // initials 列里只有首字母连写，命中它基本可以确定「用户打的就是这个缩写」。
+        //
+        // 长查询在这一档恒为 0（中文词、全拼、英文名都不在 initials 列里），
+        // 所以这个提前不会影响「搜 git 让 git 排第一」这类正常排序。
+        order += "CASE WHEN MATCH(i.search_initials) AGAINST(? IN BOOLEAN MODE) > 0 THEN 0 ELSE 1 END ASC, ";
+        orderParams.push(longTerms.map((term) => (strict ? "+" : "") + term).join(" "));
+      }
+      order += NAME_RANK;
+      orderParams.push(q, q, like + "%", like + "%", "%" + like + "%", "%" + like + "%", "%" + like + "%");
       // 标签命中：`tags` 是人工策展的类目（item_tags 子表），比「简介里顺带提了一句」可靠得多。
       //
       // 为什么需要这一档：全文相关度是**词频**驱动的，而词频在软件目录里是噪音而不是信号。
@@ -706,12 +741,30 @@ export async function searchCatalog(
         // 用原词条件（不扩展）重新算一遍 —— 参数重复一次，换来的是排序语义清晰。
         const original = textRecall(longTerms, shortTerms, q, strict, false);
         const originalPinyin = pinyinRecall(longTerms, strict, false);
-        order += ", CASE WHEN " + original.where + " OR " + originalPinyin.where + " THEN 0 ELSE 1 END ASC";
-        orderParams.push(...original.params, ...originalPinyin.params);
+        const originalInitials = initialsRecall(longTerms, strict);
+        order +=
+          ", CASE WHEN " +
+          original.where +
+          " OR " +
+          originalPinyin.where +
+          " OR " +
+          originalInitials.where +
+          " THEN 0 ELSE 1 END ASC";
+        orderParams.push(...original.params, ...originalPinyin.params, ...originalInitials.params);
       }
       if (longTerms.length) {
         // 原文相关度放在拼音相关度之前：原文命中的行得分必 > 0，纯拼音命中的恒为 0，
         // 于是「原文命中一律优先于纯拼音命中」这个意图靠排序本身就能表达，不必再套 CASE。
+        // 首字母档必须排在全文档**之前**。
+        //
+        // 实测教训：2~3 个字母的查询在 search_text 上必然充满偶然命中 —— 「tp」能命中
+        // okhttp，因为它的简介里写着 HTTP（ngram 切成 ht/tt/tp），text 得分 15.3，
+        // 把真正的首字母命中（图片类，initials 得分 1.9）全压下去了。
+        //
+        // 而 search_initials 里只有首字母连写：中文词、全拼、英文名都查不到它。
+        // 所以「无条件提前」是安全的 —— 长查询在这一档恒为 0，只有真正的缩写输入才受影响。
+        order += ", MATCH(i.search_initials) AGAINST(? IN BOOLEAN MODE) DESC";
+        orderParams.push(longTerms.map((term) => (strict ? "+" : "") + term).join(" "));
         order += ", MATCH(i.search_text) AGAINST(? IN BOOLEAN MODE) DESC";
         orderParams.push(longTerms.map((term) => "+" + term).join(" "));
         // 拼音相关度。不加这一档的话，拼音查询会退化成「只按目录顺序排」——

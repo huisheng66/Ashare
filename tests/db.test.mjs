@@ -63,7 +63,7 @@ test("迁移：0001 已应用且表齐全", { skip }, async () => {
   // 但表没建，运行时才发现。
   assert.deepEqual(applied.map((row) => row.version), [
     "0001_init", "0002_search-stopwords", "0003_audit-log", "0004_users",
-    "0005_list-indexes", "0006_item-revisions", "0007_search-pinyin",
+    "0005_list-indexes", "0006_item-revisions", "0007_search-pinyin", "0008_search-initials",
   ]);
 });
 
@@ -92,6 +92,16 @@ test("索引：items.search_pinyin 是 FULLTEXT（拼音召回通道，不参与
     "SELECT INDEX_NAME AS name, INDEX_TYPE AS type FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'items' AND INDEX_NAME = 'ft_items_pinyin'",
   );
   assert.equal(rows.length, 1, "缺少 ft_items_pinyin 索引（迁移 0007 未应用？）");
+  assert.equal(rows[0].type, "FULLTEXT");
+});
+
+test("索引：items.search_initials 是 FULLTEXT（首字母独立成列）", { skip }, async () => {
+  // 独立成列的理由见迁移 0008：混在 search_pinyin 里时，ngram 分不清
+  // 「tp 是首字母」与「khttp 里恰好有 tp」，实测搜 tp 的第一名会是 okhttp。
+  const rows = await query(
+    "SELECT INDEX_NAME AS name, INDEX_TYPE AS type FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'items' AND INDEX_NAME = 'ft_items_initials'",
+  );
+  assert.equal(rows.length, 1, "缺少 ft_items_initials 索引（迁移 0008 未应用？）");
   assert.equal(rows[0].type, "FULLTEXT");
 });
 
