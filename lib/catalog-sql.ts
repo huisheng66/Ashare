@@ -4,7 +4,12 @@ import type { CatalogCounts, CatalogItem, ItemKind, Platform, SceneId, Software 
 import { assembleSoftware, loadChildren, loadItem, loadItemsBySlugs } from "./catalog-persist.ts";
 import { getPool } from "./db.ts";
 import { kindIds, platformIds, sceneIds, type CatalogFilters } from "./catalog-query.ts";
+import { pinyin as toPinyin } from "pinyin-pro";
+
 import { pickCorrection } from "./spell-correct.ts";
+// 值导入必须用相对路径：`@/data/*` 在 tsc/Next 里能解析，但 `node --test` 直跑 .ts 时
+// 不认这个别名。项目里其余的 `@/data/types` 都是 import type（编译后擦除），所以之前没暴露。
+import { SYNONYM_GROUPS, synonymsOf } from "../data/synonyms.ts";
 
 /**
  * 目录的 SQL 读路径。
@@ -361,13 +366,29 @@ async function correctQuery(query: string): Promise<string | null> {
 /**
  * 原文召回条件（search_text）。strict=true 时每个词都必须命中（布尔模式的 + 前缀）；
  * strict=false 去掉 + 变成 OR 语义，用于零结果时的容错降级。
+ *
+ * `expand=true` 时把每个词换成同义词分组 `+(图片 图像 照片)`。这是 MySQL 布尔模式的
+ * **组语法**：组内任一命中即可，组之间仍是 AND —— 正好对应「这个概念的任一种说法」。
+ * 实测 `+图片` 13 条、`+(图片 图像 照片)` 34 条，新召回的全是图片工具。
  */
-function textRecall(longTerms: string[], shortTerms: string[], query: string, strict: boolean) {
+function textRecall(
+  longTerms: string[],
+  shortTerms: string[],
+  query: string,
+  strict: boolean,
+  expand = false,
+) {
   const conditions: string[] = [];
   const params: unknown[] = [];
   if (longTerms.length) {
+    const groups = longTerms.map((term) => {
+      if (!expand) return term;
+      const others = synonymsOf(term);
+      // 没有同义词时不加括号：`+(图片)` 与 `+图片` 等价，但前者让 SQL 更难读。
+      return others.length ? "(" + [term, ...others].join(" ") + ")" : term;
+    });
     conditions.push("MATCH(i.search_text) AGAINST(? IN BOOLEAN MODE)");
-    params.push(longTerms.map((term) => (strict ? "+" : "") + term).join(" "));
+    params.push(groups.map((term) => (strict ? "+" : "") + term).join(" "));
   }
   for (const term of shortTerms) {
     conditions.push("i.search_text LIKE ?");
@@ -381,17 +402,52 @@ function textRecall(longTerms: string[], shortTerms: string[], query: string, st
   return { where: "(" + conditions.join(" AND ") + ")", params };
 }
 
+const HAN = /[\u4e00-\u9fff]/;
+
+/**
+ * 拼音 → 同组其它词的拼音。
+ *
+ * 为什么需要：同义词扩展只作用在 search_text（中文/英文原文），而拼音列里是字母。
+ * 用户打 tupian 时走的是拼音通道，拿不到「图像/照片」的扩展 ——
+ * 实测扩展前 tupian 只有 4 条，而「图片」有 34 条，同一个意图两种结果，说不通。
+ *
+ * 只转换组内的中文词：cli / shell 这类英文词在拼音列里本来就以原文存在。
+ * 拼音转换有成本，所以算一次缓存住（组数是个位数量级，总共几十个词）。
+ */
+let pinyinSynonymMap: Map<string, string[]> | null = null;
+
+function pinyinSynonymMapOf(): Map<string, string[]> {
+  if (pinyinSynonymMap) return pinyinSynonymMap;
+  const map = new Map<string, string[]>();
+  for (const group of SYNONYM_GROUPS) {
+    const entries = group
+      .filter((word) => HAN.test(word))
+      .map((word) => ({ py: (toPinyin(word, { toneType: "none", type: "array" }) as string[]).join("") }));
+    for (const entry of entries) {
+      if (!entry.py) continue;
+      map.set(entry.py, entries.filter((other) => other.py !== entry.py).map((other) => other.py));
+    }
+  }
+  pinyinSynonymMap = map;
+  return map;
+}
+
 /**
  * 拼音召回条件（search_pinyin，独立列）。只处理长词 —— 拼音列里是字母，单字符没有意义。
  *
  * 命中即返回，但**不参与排序打分**：排序里没有它的相关度项。这是刻意的 ——
  * 拼音是为了「让 tupian 也能找到图片」，不是为了把拼音命中排到真名命中前面。
+ *
+ * `expand=true` 时把拼音也按同义词组展开（tupian → tupian / tuxiang / zhaopian / xiangpian）。
  */
-function pinyinRecall(longTerms: string[], strict: boolean) {
+function pinyinRecall(longTerms: string[], strict: boolean, expand = false) {
   if (!longTerms.length) return { where: "(1 = 0)", params: [] as unknown[] };
+  const terms = expand
+    ? longTerms.flatMap((term) => [term, ...(pinyinSynonymMapOf().get(term) ?? [])])
+    : longTerms;
   return {
     where: "(MATCH(i.search_pinyin) AGAINST(? IN BOOLEAN MODE))",
-    params: [longTerms.map((term) => (strict ? "+" : "") + term).join(" ")],
+    params: [terms.map((term) => (strict ? "+" : "") + term).join(" ")],
   };
 }
 
@@ -443,10 +499,16 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
   /** `q` 默认是清洗后的原查询；拼写纠正后会带着纠正词再跑一次。 */
   const run = (strict: boolean, q: string = query): Promise<SearchResult> => {
     const { longTerms, shortTerms } = termsOf(q);
-    const text = textRecall(longTerms, shortTerms, q, strict);
-    const pinyin = pinyinRecall(longTerms, strict);
+    // 召回用扩展版（同义词也算命中），排序用原词版（原词优先）。
+    const text = textRecall(longTerms, shortTerms, q, strict, true);
+    const pinyin = pinyinRecall(longTerms, strict, true);
     const condition = "i.status = 'published' AND (" + text.where + " OR " + pinyin.where + ")";
     const whereParams = [...text.params, ...pinyin.params];
+    // 中文走 synonymsOf，拼音走拼音映射表 —— 两者任一有扩展就需要「原词优先」那一档。
+    const pinyinMap = pinyinSynonymMapOf();
+    const hasSynonyms =
+      longTerms.some((term) => synonymsOf(term).length > 0) ||
+      longTerms.some((term) => (pinyinMap.get(term) ?? []).length > 0);
 
     return withConnection(async (conn) => {
       const [countRows] = await conn.query<RowDataPacket[]>(
@@ -477,6 +539,16 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
           conds +
           ")) THEN 0 ELSE 1 END ASC";
         for (const term of tagTerms) orderParams.push("%" + escapeLike(term) + "%");
+      }
+      if (hasSynonyms) {
+        // 原词命中优先于「仅靠同义词命中」。
+        // 不加这一档，搜「图片」时一个标签写「图像处理」但通篇没提「图片」的条目
+        // 会和真正写着「图片」的条目混在一起，用户会觉得结果跑偏。
+        // 用原词条件（不扩展）重新算一遍 —— 参数重复一次，换来的是排序语义清晰。
+        const original = textRecall(longTerms, shortTerms, q, strict, false);
+        const originalPinyin = pinyinRecall(longTerms, strict, false);
+        order += ", CASE WHEN " + original.where + " OR " + originalPinyin.where + " THEN 0 ELSE 1 END ASC";
+        orderParams.push(...original.params, ...originalPinyin.params);
       }
       if (longTerms.length) {
         // 原文相关度放在拼音相关度之前：原文命中的行得分必 > 0，纯拼音命中的恒为 0，

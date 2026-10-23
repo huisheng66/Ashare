@@ -31,21 +31,17 @@ const INSERT_ITEM = [
 ].join(" ");
 
 /**
- * 等 InnoDB 全文索引追上刚写入的行。
+ * 强制 InnoDB 全文索引与刚写入的行同步。
  *
- * 为什么要重试而不是直接断言：FULLTEXT 的索引写入是**异步合并**的，autocommit 插入
- * 之后立刻 MATCH 不保证能看到（实测在整库重建后尤其明显：同一份代码连跑两次，
- * 一次 59/0 一次 57/2）。这是 InnoDB 的最终一致性，不是业务逻辑错误，
- * 但这几个测试要验的是「ngram 配置对不对」，不该被索引合并的时机问题误伤。
+ * 为什么不能用「重试等待」：FTS 的索引写入走的是内存缓存（innodb_ft_cache_size），
+ * 新行要等缓存满或表被重建才进索引。实测在主库（491 条）插一行后**等 2 秒依然查不到**，
+ * 重试多少次都没用；`OPTIMIZE TABLE items` 之后立刻可见（耗时约 2.5 秒）。
  *
- * 重试 8 次共约 1.2 秒，正常情况第一次就返回。
+ * 这两个测试验的是「ngram 配置对不对」，不该被索引合并的时机问题误伤；
+ * 而「新行何时可见」本身是 InnoDB 的最终一致性，属于产品可接受的行为，不该在这里断言。
  */
-async function eventually(fn, tries = 8, delayMs = 150) {
-  for (let i = 0; i < tries; i += 1) {
-    if (await fn()) return true;
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
-  }
-  return false;
+async function syncFulltext() {
+  await query("OPTIMIZE TABLE items");
 }
 
 const insertItem = (conn, slug, searchText) =>
@@ -106,16 +102,11 @@ test("ngram：拼音列独立可搜（tupian 命中 search_pinyin）", { skip },
     ["__test_pinyin", "PicTool", "摘要", "正文", "适合", "不适合", "P", "PicTool 图片工具", "tu pian tupian tp"],
   );
   try {
-    const hit = await eventually(async () => {
-      const rows = await query("SELECT slug FROM items WHERE MATCH(search_pinyin) AGAINST(? IN BOOLEAN MODE)", ["tupian"]);
-      return rows.some((row) => row.slug === "__test_pinyin");
-    });
-    assert.ok(hit, "连写全拼 tupian 应命中");
-    const initials = await eventually(async () => {
-      const rows = await query("SELECT slug FROM items WHERE MATCH(search_pinyin) AGAINST(? IN BOOLEAN MODE)", ["tp"]);
-      return rows.some((row) => row.slug === "__test_pinyin");
-    });
-    assert.ok(initials, "首字母 tp 应命中");
+    await syncFulltext();
+    const hit = await query("SELECT slug FROM items WHERE MATCH(search_pinyin) AGAINST(? IN BOOLEAN MODE)", ["tupian"]);
+    assert.ok(hit.some((row) => row.slug === "__test_pinyin"), "连写全拼 tupian 应命中");
+    const initials = await query("SELECT slug FROM items WHERE MATCH(search_pinyin) AGAINST(? IN BOOLEAN MODE)", ["tp"]);
+    assert.ok(initials.some((row) => row.slug === "__test_pinyin"), "首字母 tp 应命中");
   } finally {
     await query("DELETE FROM items WHERE slug = '__test_pinyin'");
   }
@@ -125,12 +116,10 @@ test("ngram：多字命中，单字不命中（ngram_token_size=2 的已知约�
   // 必须先提交再查：InnoDB FULLTEXT 看不到本事务刚插入的行（实测），所以这里不走事务，用 finally 清理。
   await query(INSERT_ITEM, ["__test_ngram", "探针", "[]", "摘要", "正文", "适合", "不适合", "P", "探针软件 图像编辑 gimp"]);
   try {
-    const hit = await eventually(async () => {
-      const rows = await query("SELECT slug FROM items WHERE MATCH(search_text) AGAINST(? IN BOOLEAN MODE)", ["图像"]);
-      // 不断言「唯一命中」：真实目录里也有含「图像」的条目，这里只要求探针行被找到。
-      return rows.some((row) => row.slug === "__test_ngram");
-    });
-    assert.ok(hit, "两字中文应命中");
+    await syncFulltext();
+    const hit = await query("SELECT slug FROM items WHERE MATCH(search_text) AGAINST(? IN BOOLEAN MODE)", ["图像"]);
+    // 不断言「唯一命中」：真实目录里也有含「图像」的条目，这里只要求探针行被找到。
+    assert.ok(hit.some((row) => row.slug === "__test_ngram"), "两字中文应命中");
     // 等两字确认命中之后再验单字：否则「索引还没合并」同样会让单字查不到，
     // 那会把一个时序问题伪装成「约束成立」，测试就失去意义了。
     const miss = await query("SELECT slug FROM items WHERE MATCH(search_text) AGAINST(? IN BOOLEAN MODE)", ["图"]);

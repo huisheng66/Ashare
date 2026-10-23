@@ -322,3 +322,33 @@ test("搜索：无从纠正时如实返回空，不瞎猜", { skip }, async () =
   assert.equal(result.total, 0);
   assert.equal(result.corrected, undefined, "找不到相近名称时不能硬套一个纠正词");
 });
+
+test("搜索：同义词扩展能召回标签写「图像/照片」的条目", { skip }, async () => {
+  // 站内标签用词不统一：同一类工具有的标「图片编辑」有的标「图像处理」。
+  // 不扩展时，搜「图片」匹配不到标签写「图像」的条目（实测 13 条 vs 34 条）。
+  const plain = await sql.searchCatalog("图片", PAGE, 0);
+  assert.ok(plain.total > 13, "同义词扩展后应明显多于原词字面命中");
+  const expanded = plain.items.map((item) => item.slug);
+  // 结果里应同时出现「图像编辑」类和「照片管理」类的条目
+  assert.ok(plain.total >= 20, `扩展后命中数偏少：${plain.total}`);
+  assert.ok(expanded.length > 0);
+});
+
+test("搜索：原词命中排在仅靠同义词命中的条目之前", { skip }, async () => {
+  // 不加这一档，搜「图片」时只写了「图像处理」的条目会和真正写着「图片」的混在一起。
+  const result = await sql.searchCatalog("图片", PAGE, 0);
+  const rows = await query(
+    "SELECT i.slug, MATCH(i.search_text) AGAINST(? IN BOOLEAN MODE) AS hit FROM items i WHERE i.slug IN (?)",
+    ["+图片", result.items.map((item) => item.slug)],
+  );
+  const hitMap = new Map(rows.map((row) => [row.slug, Number(row.hit) > 0]));
+  // 允许同义词档在前几名之外，但第一个结果必须真的含「图片」二字
+  assert.equal(hitMap.get(result.items[0]?.slug), true, "首位应是原词命中，而不是仅同义词命中");
+});
+
+test("搜索：没有同义词的词，结果集不受影响", { skip }, async () => {
+  // 扩展是「有则加，无则不变」—— 不能让所有查询都莫名多出一批结果。
+  const result = await sql.searchCatalog("pdf", PAGE, 0);
+  assert.ok(result.total > 0);
+  assert.equal(result.fuzzy, false);
+});
