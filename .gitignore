@@ -46,7 +46,15 @@ next-env.d.ts
 data/store/
 public/media/
 # 上传的图片实际落点（早前是 public/media，那样会被 next start 静态直送、绕过防盗链）
-data/media/
+# 例外：条目预览图。它们由 data/software.ts 的 previews 字段引用，属于**构建期资产**
+# 而不是运行时上传 —— 不随种子进仓库的话，全新部署/换机器后这些路径全是死链。
+#
+# 这里刻意不写 `data/media/`（整目录忽略）：Git 不会进入被忽略的目录，
+# 里面的否定规则（!...webp）就永远不生效 —— 实测踩过。
+# 规则顺序也很重要（后面的覆盖前面的）：先忽略全部 → 放行目录 → 只放行 webp。
+data/media/**
+!data/media/**/
+!data/media/**/*.webp
 backups/
 
 # agent tool state

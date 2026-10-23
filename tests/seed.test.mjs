@@ -133,7 +133,7 @@ test("漂移检测的字段清单覆盖全部可透传字段", async () => {
   const { readFile } = await import("node:fs/promises");
   const script = await readFile(new URL("../scripts/seed-drift.mjs", import.meta.url), "utf8");
   assert.match(script, /const COMPARE = SEED_DRIFT_FIELDS/, "seed-drift 必须从登记表取比对字段");
-  for (const field of ["license", "version", "linksCheckedAt", "guide"]) {
+  for (const field of ["license", "version", "linksCheckedAt", "guide", "previews"]) {
     assert.ok(SEED_DRIFT_FIELDS.includes(field), `漂移比对漏了 ${field}，该字段的漂移将无法被发现`);
   }
 });

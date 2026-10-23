@@ -50,6 +50,7 @@ test("登记表与实际透传行为一致：每个字段都能从种子带进�
     license: "MIT", version: "1.0", linksCheckedAt: "2026-01-01",
     guide: { intro: "I", markdown: "M", resources: [] },
     links: { official: "https://e.invalid", github: "https://github.com/x/y" },
+    previews: ["/media/s2/0123456789abcdef.png"],
     kind: "script",
     icon: { letter: "B", color: "#111", simpleIcon: "x" },
   });

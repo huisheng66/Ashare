@@ -3526,6 +3526,7 @@ macOS 与 Windows 用 Homebrew / Chocolatey / Scoop 装的，配置文件位置�
       "第一次用先跑 tuios --show-keys，它会盖一层键位提示在界面上，照着按几遍比读文档快。",
     ],
     alternatives: ["vscode", "git"],
+    previews: ["/media/tuios/db382db36f39ea46.webp"],
     icon: {
       letter: "T",
       color: "#4A4A6A",
@@ -3663,6 +3664,7 @@ tuios list-options     # 所有可调项
       "第一次生成一定是最慢的（模型权重懒加载约 8 秒、CUDA 要编译内核），从第二次生成的耗时判断性能才有意义。",
     ],
     alternatives: ["audacity"],
+    previews: ["/media/voicestudio/ad3dfd3d47418a1f.webp", "/media/voicestudio/15db100347d031cb.webp"],
     icon: {
       letter: "V",
       color: "#5B4B8A",
@@ -3823,6 +3825,7 @@ https://github.com/debpalash/VoiceStudio/blob/main/docs/install/agent.md
       "源码构建、editable install、Docker、pip 提供的 CUDA 工具链、自定义 TVM checkout —— 这五种情况才需要看完整安装指南，装 PyPI 版的人不用看。",
     ],
     alternatives: ["python", "jupyter"],
+    previews: ["/media/tilelang/b15d4ff239b33283.webp", "/media/tilelang/4eabc715019c812f.webp"],
     icon: {
       letter: "T",
       color: "#1F6F6B",
@@ -4153,6 +4156,7 @@ Discord 是提问和交流的主场，官方核心团队在里面。Community Hu
       "首次启动会一次性下载约 140MB 的动作媒体，先知道这件事免得以为卡住了。",
     ],
     alternatives: ["immich", "esp32-c3-adblock"],
+    previews: ["/media/opengym/eec4bbccb0fd1019.webp", "/media/opengym/0e964a2c2348d39b.webp"],
     icon: {
       letter: "G",
       color: "#2E7D5B",
@@ -4702,6 +4706,7 @@ SDL 映射的游戏手柄都支持，**包括摇杆和扳机**。键鼠要在 \`
       "文件下到 ~/Downloads，完事会把路径打印到终端。",
     ],
     alternatives: ["yt-dlp", "stremio-web"],
+    previews: ["/media/yoinks/3b323226f38b38c1.webp", "/media/yoinks/6e92b657d4259b82.webp"],
     icon: {
       letter: "Y",
       color: "#7B3FA0",
@@ -5252,6 +5257,7 @@ README 开头就警告了：**MarkItDown 的 I/O 权限就是当前进程的权�
       "从模板起步比自己从零搭快得多——9000+ 工作流模板在 n8n.io/workflows。",
     ],
     alternatives: ["openclaw"],
+    previews: ["/media/n8n/79d05fe2588398ec.webp"],
     icon: {
       letter: "n",
       color: "#EA4B71",
@@ -5383,6 +5389,7 @@ n8n 是 "nodemation" 的缩写：Node-View + Node.js + automation。作者觉得
       "要提交新 API 的话看 CONTRIBUTING.md；清单是人工维护的，字段质量参差是正常的。",
     ],
     alternatives: ["python", "jupyter"],
+    previews: ["/media/public-apis/d35dc729f10852f8.webp"],
     icon: {
       letter: "P",
       color: "#2C6E49",
@@ -5835,6 +5842,7 @@ python -m doctest <文件路径> -v
       "想关掉默认的每日版本检查和匿名功能统计，在配置里设 update.checkOnStart: false。",
     ],
     alternatives: ["voicestudio", "firecrawl", "watermarksremover"],
+    previews: ["/media/openclaw/453a792e010f4682.webp"],
     icon: {
       letter: "O",
       color: "#C4562A",
@@ -6065,6 +6073,7 @@ README 给了一张按目标索引的表，摘几条常用的：
       "自托管前先读自托管指南：开源版是 AGPL-3.0 且不含云端那些额外功能，要准备 Redis、Playwright 和一组环境变量。",
     ],
     alternatives: ["anydoc", "markitdown"],
+    previews: ["/media/firecrawl/490635b23c238e51.webp"],
     icon: {
       letter: "F",
       color: "#D1442A",
@@ -6271,6 +6280,7 @@ README 里有一节专门讲这个，原文意思是：Firecrawl 以 AGPL-3.0 �
       "想自己构建：git clone 后跑 ./build.sh --dev（单独的 Developer变体），加 --install 可安装并启动。唯一依赖是 Xcode Command Line Tools。",
     ],
     alternatives: ["tuios", "localsend"],
+    previews: ["/media/vorssaint/0b56e38837f06d88.webp", "/media/vorssaint/cb810439a5fe3b07.webp"],
     icon: {
       letter: "V",
       color: "#4C8DFF",
@@ -7189,6 +7199,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       "机器学习降噪要联网下载官方模型，离线环境请关掉相关工具用传统降噪。"
     ],
     alternatives: ["darktable"],
+    previews: ["/media/rawtherapee/a2a5007f0d28dd86.webp"],
     icon: {
       letter: "R",
       color: "#3A6B7C"
@@ -7225,6 +7236,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       "批量处理走命令行：lossless-cut-cli 输入文件 -f 00:01:00 -t 00:02:00 -o 输出文件。",
     ],
     alternatives: ["kdenlive","obs-studio"],
+    previews: ["/media/lossless-cut/3200d5b9bebc4e61.webp"],
     icon: {
       letter: "L",
       color: "#2E7D6B",
@@ -7300,6 +7312,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       "对外分享前想清楚授权边界：AGPL-3.0 要求你对外提供服务时公开你改过的源码。",
     ],
     alternatives: ["darktable","rawtherapee","exiftool"],
+    previews: ["/media/immich/5ffc809b464a07a8.webp"],
     icon: {
       letter: "I",
       color: "#4250AF",
@@ -7550,6 +7563,7 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
       "只从 GitHub 仓库、`ecc-universal` / `ecc-agentshield` 两个 npm 包、GitHub App 和 ecc.tools 安装，第三方转载与镜像不受维护，可能带恶意代码。",
     ],
     alternatives: [],
+    previews: ["/media/ecc/cc0c6b85d21b9961.webp"],
     icon: {
       letter: "E",
       color: "#4B3F72",
@@ -7755,6 +7769,7 @@ Add-MpPreference -ExclusionPath "$env:LOCALAPPDATA\\hermes\\bin"
       "逆原生二进制要另配 Hopper / Ghidra / IDA 之一（setup 可在你同意后装 Hopper）；只做 JavaScript / Electron / .NET 静态分析不需要任何原生引擎。",
     ],
     alternatives: ["x64dbg"],
+    previews: ["/media/rea/7967e34d5cf0dc11.webp", "/media/rea/0d4f04630ae44615.webp"],
     icon: {
       letter: "R",
       color: "#1F3A5F",
@@ -7880,6 +7895,7 @@ REA 返回的每条边都标 \`EXTRACTED\`（源码里明写）或 \`INFERRED\`�
       "只想跑经典的单机 AutoGPT，看仓库里的 `classic/` 目录——它是 MIT 协议，和平台部分不是同一份许可。",
     ],
     alternatives: ["sim", "fastgpt"],
+    previews: ["/media/autogpt/ed084cdcd8ddbb27.webp"],
     icon: {
       letter: "A",
       color: "#2F5D62",
@@ -8252,6 +8268,7 @@ transformers chat Qwen/Qwen2.5-0.5B-Instruct
       "只从 `DietrichGebert/ponytail` 或 npm 的 `@dietrichgebert/ponytail` 装；项目从不发布 .exe / .dll，见到带这些文件的副本就是假的。",
     ],
     alternatives: [],
+    previews: ["/media/ponytail/0ec82a4ee9b25f69.webp", "/media/ponytail/765bddbac2736ba0.webp"],
     icon: {
       letter: "P",
       color: "#3D3B30",
@@ -8348,6 +8365,7 @@ transformers chat Qwen/Qwen2.5-0.5B-Instruct
       "想改代码或做二次开发，走官方的「从源码部署」指南，不要直接在 compose 起来的容器里改。",
     ],
     alternatives: ["fastgpt", "sim"],
+    previews: ["/media/dify/77a88c434c9372f3.webp"],
     icon: {
       letter: "D",
       color: "#155EEF",
@@ -8459,6 +8477,7 @@ Dify 不是「一个库」，是一整套服务：web、api、worker、数据库
       "不想用 Docker 可以 `pip install open-webui` 后 `open-webui serve`，但要用 Python 3.11，否则有兼容性问题；容器内端口是 8080。",
     ],
     alternatives: ["vane"],
+    previews: ["/media/open-webui/00e5d1878a70d21c.webp"],
     icon: {
       letter: "O",
       color: "#4A4A4A",
@@ -8700,6 +8719,7 @@ LangChain 演进很快，\`Chain\` 时代那批教程（\`LLMChain\`、\`Convers
       "画幅要在生成前定好：竖屏 9:16 是 1080×1920，横屏 16:9 是 1920×1080，方形 1:1 是 1080×1080，成片后再改很麻烦。",
     ],
     alternatives: ["hypit"],
+    previews: ["/media/moneyprinterturbo/739737da1a807587.webp", "/media/moneyprinterturbo/8fc4c23beb1e36e3.webp"],
     icon: {
       letter: "M",
       color: "#16A34A",
@@ -8813,6 +8833,7 @@ LangChain 演进很快，\`Chain\` 时代那批教程（\`LLMChain\`、\`Convers
       "需要 Python 3.10+；Windows 用 `winget install astral-sh.uv`，macOS 用 `brew install python@3.12 uv`，Ubuntu/Debian 可以 `sudo apt install python3.12 python3-pip pipx`。",
     ],
     alternatives: ["code-review-graph", "codebase-memory-mcp"],
+    previews: ["/media/graphify/34e9b702e44b79e1.webp"],
     icon: {
       letter: "G",
       color: "#0F766E",
@@ -8957,6 +8978,7 @@ graphify install --project --platform codex
       "Windows 上 Bash 工具要 WSL——它需要 Linux 或 macOS 主机上的 `/bin/bash`；Python 库本身没有这个限制。",
     ],
     alternatives: ["opencli"],
+    previews: ["/media/browser-use/44af178c22542a45.webp", "/media/browser-use/ccb963b4516245d9.webp"],
     icon: {
       letter: "B",
       color: "#E85C0D",
@@ -9103,6 +9125,7 @@ Python 库是 MIT、免费。但**模型推理和托管浏览器都要钱**—�
       "卸载：`npx -y github:JuliusBrussee/caveman -- --uninstall`（npm 12+ 要额外加 `--allow-git=root`）；只装了技能就 `npx skills remove JuliusBrussee/caveman -g`。",
     ],
     alternatives: ["rtk"],
+    previews: ["/media/caveman/1f1b680aa313f502.webp", "/media/caveman/c9a2734c41f4b33d.webp"],
     icon: {
       letter: "C",
       color: "#6B4423",
@@ -9235,6 +9258,7 @@ README 里有专门的 HONEST-NUMBERS 一节，值得先看。几个关键点：
       "至少要配一个模型 Key（OpenAI / Google / Anthropic / DeepSeek / Qwen / GLM 等）；`FRED_API_KEY` 是免费的宏观数据，可选；本地模型用 `llm_provider: ollama`。",
     ],
     alternatives: ["vibe-trading"],
+    previews: ["/media/tradingagents/13b1eeda1efa60cb.webp", "/media/tradingagents/a593b139c1623926.webp"],
     icon: {
       letter: "T",
       color: "#0B4F6C",
@@ -9390,6 +9414,7 @@ README 顶部有一句加粗：本框架为研究用途设计，交易表现取�
       "每个主章节都有 `exercise-solutions.ipynb`，答案汇总在附录 C；Manning 网站可免费下载含每章约 30 题的测验 PDF 自查。",
     ],
     alternatives: ["happy-llm", "ai-engineering-from-scratch"],
+    previews: ["/media/llms-from-scratch/605847ed4bb1670b.webp", "/media/llms-from-scratch/39a70603204ee75b.webp"],
     icon: {
       letter: "L",
       color: "#7C3AED",
@@ -9791,6 +9816,7 @@ README 把 CLI 参数一节标了 Unmaintained，但常用的还在：\`--mouth-
       "出图不出代码用 `imagegen-frontend-web` / `imagegen-frontend-mobile` / `brandkit`；要先审计再改老项目用 `redesign-existing-projects`；代理老输出半成品就加 `full-output-enforcement`。",
     ],
     alternatives: ["appllama-skills", "typeui"],
+    previews: ["/media/taste-skill/660a298c40bb75da.webp", "/media/taste-skill/7f1dadb7f0ca4708.webp"],
     icon: {
       letter: "T",
       color: "#DB2777",
@@ -10050,6 +10076,7 @@ vLLM 是生产组件，不是本地玩具。以下情况都不划算：
       "登录后第一件事是在模型供应商页添加 LLM、embedding 和 rerank（模型名、服务地址、API key）；从源码启动则要 Go 1.27、Clang 20、LLD 20、CMake ≥ 4.0 与 PCRE2 开发文件。",
     ],
     alternatives: ["onyx", "weknora", "fastgpt"],
+    previews: ["/media/ragflow/52d462e38fb2ef31.webp", "/media/ragflow/48a6b7a2b593cfb6.webp"],
     icon: {
       letter: "R",
       color: "#2B6CB0",
@@ -10157,6 +10184,7 @@ README 的 Docker 配置页明确标注 **macOS 目前不在支持列表**。别
       "选模型先定档位：PP-OCRv6 有 tiny(1.5M) / small(7.7M) / medium(34.5M) 三档，端侧、移动端、服务器各取所需，别一上来就上最大的。",
     ],
     alternatives: ["opendataloader-pdf"],
+    previews: ["/media/paddleocr/5f49ddaf4026b8bb.webp", "/media/paddleocr/0b5eb4a72167170f.webp"],
     icon: {
       letter: "P",
       color: "#1E6FD9",
@@ -10258,6 +10286,7 @@ PP-OCRv6 分三档，不是越大越好：
       "npm / 源码启动的入口是 http://localhost:8000，Docker 镜像是 http://localhost:8000/canvas，别找错；Windows 命令在仓库的 README.windows.md 里。",
     ],
     alternatives: [],
+    previews: ["/media/openhands/042abeb0812f09e5.webp"],
     icon: {
       letter: "O",
       color: "#0F5C5C",
@@ -10612,6 +10641,7 @@ InfoQuest 的 reader、网页搜索、图片搜索用的是 **30 秒 HTTP 连接
       "fork 之后只保留 upstream sync 这个 GitHub Action，其余全部禁用；用一键部署建的项目会一直提示更新，要按官方的 Auto Sync With Latest 重来一遍。",
     ],
     alternatives: ["autogpt"],
+    previews: ["/media/lobehub/42f4e717ecbb2212.webp", "/media/lobehub/f888163bed219857.webp"],
     icon: {
       letter: "L",
       color: "#4C6EF5",
@@ -10843,6 +10873,7 @@ rtk run <cmd>                   # 原样执行，不过滤
       "介意联网可设 `ARCHIFY_UPDATE_CHECK_DISABLED=1`：默认只会 GET 一个固定的稳定 manifest 用于提醒，不会自动下载或安装更新。",
     ],
     alternatives: ["next-ai-draw-io"],
+    previews: ["/media/archify/24e6e1c10e307ca6.webp", "/media/archify/2e77d86eb31dcc70.webp"],
     icon: {
       letter: "A",
       color: "#6B4E9B",
@@ -11049,6 +11080,7 @@ README 写得很明确：**会 Python，知道怎么通过 API 调一次 LLM**�
       "Docker：`docker run -d --name unsloth --gpus all --ipc=host -p 8000:8000 -p 8888:8888 -v \"$PWD\":/workspace/host -v \"$HOME/.cache/huggingface\":/workspace/.cache/huggingface -v unsloth-studio:/opt/unsloth-studio unsloth/unsloth`；AMD 用 unsloth/unsloth-rocm，只要 notebook 用 :core 标签。",
     ],
     alternatives: ["llamafactory", "ludwig"],
+    previews: ["/media/unsloth/cf83561cdce25053.webp", "/media/unsloth/a9a5fb8e6619bdc0.webp"],
     icon: {
       letter: "U",
       color: "#2C7A7B",
@@ -11162,6 +11194,7 @@ Linux / Mac 上先配一次 NVIDIA toolkit（官方脚本 \`install_nvidia_toolk
       "ASCEND NPU 与 AMD GPU 各有单独文档（readthedocs 的 multibackend/npu 与 ROCm 文档），别照通用 CUDA 教程装。",
     ],
     alternatives: ["unsloth", "ludwig"],
+    previews: ["/media/llamafactory/e3f3df29fee12bdb.webp"],
     icon: {
       letter: "L",
       color: "#975A16",
@@ -11476,6 +11509,7 @@ README 顶部有 Binder 徽章，点进去直接在浏览器里运行 notebook�
       "做行为研究时别只看主提示词：配套的 skills、slash commands、subagent 与注入提醒（如 `Anthropic/claude-code/skills`、`Anthropic/anthropic_reminders.md`）往往更能说明实际行为。",
     ],
     alternatives: [],
+    previews: ["/media/system-prompts-leaks/de11940b951e2c56.webp"],
     icon: {
       letter: "S",
       color: "#5F4B8B",
@@ -11577,6 +11611,7 @@ README 的 **Most recent additions/changes** 表是这个仓库的索引，每�
       "项目从仓库根目录跑：`python3 scripts/project_test.py retrieval-evaluation-lab --init learning-artifacts/retrieval-evaluation-lab`，再 `--stage 1 --path ... --strict`，最后 `--all --path ... --strict`。",
     ],
     alternatives: [],
+    previews: ["/media/ai-engineering-from-scratch/107dfd263f9839aa.webp"],
     icon: {
       letter: "A",
       color: "#805AD5",
@@ -11813,6 +11848,7 @@ strix view --host 0.0.0.0 --port 8080 --no-open   # 需要固定端口对外时
       "API key 全部可选、按需往 .env 加：`FAL_KEY`（FLUX 图 + Veo / Kling / MiniMax 视频）、`ATLASCLOUD_API_KEY`、`KLING_API_KEY`、`PEXELS_API_KEY`、`PIXABAY_API_KEY`（后两个是免费素材）。",
     ],
     alternatives: ["hypit"],
+    previews: ["/media/openmontage/10d3db9dae17b256.webp", "/media/openmontage/3bdc67b269198ce8.webp"],
     icon: {
       letter: "O",
       color: "#B7791F",
@@ -11919,6 +11955,7 @@ AGPL-3.0，改了要一并开源。它不是一个独立软件——**必须挂�
       "终端管记忆用 CLI：`npm install -g @mem0/cli`（或 `pip install mem0-cli`），`mem0 add \"Prefers dark mode and vim keybindings\" --user-id alice`、`mem0 search \"...\" --user-id alice`。",
     ],
     alternatives: ["mempalace"],
+    previews: ["/media/mem0/bd679a1f99cca847.webp", "/media/mem0/7d204cf5ea724ef3.webp"],
     icon: {
       letter: "M",
       color: "#2C5282",
@@ -12152,6 +12189,7 @@ yarn dev:collector
     whoNot: "只想偶尔连一次且不在乎商用检测的人，或没有公网服务器也不打算折腾——用默认公共服务器即可，不必强行自建。",
     installTips: ["直接官网下载对应系统的安装包即可，Windows / macOS / Linux 都有现成构建，不需要自己编译 Rust。", "客户端便携版双击就能跑，控制端与被控端是同一个程序，两侧都装它。", "要自建服务器请另行部署 rustdesk-server 的 hbbs 与 hbbr，客户端里填服务器地址与 key；只有windows/macOS/linux 官方二进制，别把它和客户端装在同一台机器上抢端口。"],
     alternatives: [],
+    previews: ["/media/rustdesk/222332daf6a698c9.webp"],
     icon: {
       letter: "R",
       color: "#2C5C8F",
@@ -13113,6 +13151,7 @@ yarn dev:collector
     whoFor: "想用一整套练习题自学 Python、能自己按天推进的人；想找中文版 Python 讲义的人。",
     whoNot: "想跟着视频或有人批改作业的人；需要明确许可证、准备把内容用于自己项目的人。",
     alternatives: ["free-programming-books", "thealgorithms", "freecodecamp"],
+    previews: ["/media/30-days-of-python/1f6bd93a9f61a251.webp", "/media/30-days-of-python/6afaa948b5dc39a0.webp"],
     featured: false,
     icon: { letter: "3", color: "#3776AB" },
   },
@@ -14043,6 +14082,7 @@ yarn dev:collector
       "某些数据源需要凭据，完整清单在仓库的 .env.example；想彻底不依赖外部模型就配 Ollama 走本地 AI。",
     ],
     alternatives: [],
+    previews: ["/media/worldmonitor/e41760bdc8aac4e3.webp", "/media/worldmonitor/296428bb2b1afb13.webp"],
     icon: {
       letter: "W",
       color: "#1B3A5C",
@@ -14141,6 +14181,7 @@ npm run dev:energy       # energy.worldmonitor.app
       "要 Web 工作台与策略问股用 python main.py --webui，访问 127.0.0.1:8000；Agent 问股需要已配置任意可用模型 key。",
     ],
     alternatives: ["tradingagents"],
+    previews: ["/media/daily-stock-analysis/e1f5a0852b5baf9c.webp", "/media/daily-stock-analysis/e271e4cc6eea32fd.webp"],
     icon: {
       letter: "D",
       color: "#A8322D",
@@ -14235,6 +14276,7 @@ README 末尾写着：本项目仅供学习和研究使用，不构成任何投�
       "想用 WebUI 必须先把模型文件夹复制到 ./scripts/ 下（如 cp -r minimind-3 ./scripts/minimind-3），再 cd scripts && streamlit run web_demo.py，否则扫描不到权重直接报错。",
     ],
     alternatives: ["happy-llm", "llms-from-scratch"],
+    previews: ["/media/minimind/3bb13d3de3ca0b38.webp"],
     icon: {
       letter: "M",
       color: "#2E6F5E",
@@ -14439,6 +14481,7 @@ How do I set up a Next.js 16 proxy? use context7
       "从 v6.0.0 以前升级要重做配置：config.yaml 已是 2.0.0，旧的 push_window / analysis_window 不兼容，必须照新版迁移。",
     ],
     alternatives: ["huginn"],
+    previews: ["/media/trendradar/19783108806df33f.webp", "/media/trendradar/86f78ca4cbce951d.webp"],
     icon: {
       letter: "T",
       color: "#C2410C",
@@ -14903,6 +14946,7 @@ Now humanize this text:
       "调用模型的实验要先配凭据：多数可在仓库根目录把 .env.example 复制成 .env 填一个厂商 key；只有实验明确列出 ollama 时才启用本地模型并加 --provider ollama。",
     ],
     alternatives: ["hello-agents"],
+    previews: ["/media/ai-agent-book/5d0dc8171c38793d.webp"],
     icon: {
       letter: "A",
       color: "#3B5B8C",
@@ -15112,6 +15156,7 @@ README 自己声明：它更新得没有文档站勤，最新教程请以 develo
       "第三方代理可以做成 gem，用环境变量 ADDITIONAL_GEMS 加载，不用改核心仓库。",
     ],
     alternatives: ["n8n"],
+    previews: ["/media/huginn/73b46eb82e009398.webp", "/media/huginn/653017d6ca6c51b0.webp"],
     icon: {
       letter: "H",
       color: "#B45309",
@@ -15212,6 +15257,7 @@ bundle exec foreman start
       "macOS 装 DMG 后必须执行 sudo xattr -d com.apple.quarantine /Applications/LocalAI.app，否则会被 Gatekeeper 拦下。",
     ],
     alternatives: [],
+    previews: ["/media/localai/53e3da3b922bad80.webp", "/media/localai/2023fafb2d54b70a.webp"],
     icon: {
       letter: "L",
       color: "#0F766E",
@@ -15328,6 +15374,7 @@ sudo xattr -d com.apple.quarantine /Applications/LocalAI.app
       "要求 Python 3.11 或更高，并且必须自备模型 provider 或本地模型服务——nanobot 本身不提供模型账号。",
     ],
     alternatives: ["hermes-agent"],
+    previews: ["/media/nanobot/c6a0b7e0836811e0.webp", "/media/nanobot/06d2999fc75225be.webp"],
     icon: {
       letter: "N",
       color: "#2563EB",
@@ -15439,6 +15486,7 @@ ssh -N -L 127.0.0.1:8765:127.0.0.1:8765 user@SERVER
       "想用一句话画流程、设计表单、生成报表，去装官方 Skills 仓库（github.com/jeecgboot/skills），配合 Claude Code 使用。",
     ],
     alternatives: [],
+    previews: ["/media/jeecgboot/9cfa2ceee925f379.webp", "/media/jeecgboot/f612e3608fc5cf6e.webp"],
     icon: {
       letter: "J",
       color: "#1D4ED8",
@@ -15536,6 +15584,7 @@ JeecgBoot 不是一个能一键跑起来的 demo，而是一整套企业级脚�
       "模型可以在控制台里一键切换；聊天、视觉、图像生成、ASR/TTS、嵌入可以分别路由到不同厂商。",
     ],
     alternatives: ["openclaw", "hermes-agent", "nanobot"],
+    previews: ["/media/cowagent/d8ad1b410bf98b76.webp", "/media/cowagent/f602ef6d36e7a909.webp"],
     icon: {
       letter: "C",
       color: "#4338CA",
@@ -15646,6 +15695,7 @@ Skill Hub 一键安装，也支持从 GitHub、ClawHub 装，或者直接用自�
       "接入 CI 或交给宿主 Agent：用 --format json --output result.json 输出结构化结果；不想给 OCR 配 key 就用 ocr delegate 委托模式。",
     ],
     alternatives: [],
+    previews: ["/media/open-code-review/0dedb83b0df0397c.webp", "/media/open-code-review/a71781f6ef74d47d.webp"],
     icon: {
       letter: "O",
       color: "#B91C1C",
@@ -16371,6 +16421,7 @@ LangGraph 里，流程是**图**，节点是步骤，边决定下一步去哪；
       "要接本地模型，先在机器上跑起 Ollama，再在 Chatbox 里选 Ollama provider，可直连 llama2、Mistral、codellama 等。",
     ],
     alternatives: [],
+    previews: ["/media/chatbox/5bcbbd13ef863dfc.webp", "/media/chatbox/814deb5e0ee9c36d.webp"],
     icon: {
       letter: "C",
       color: "#2E6BE6",
@@ -16470,6 +16521,7 @@ Windows 构建失败多半是脚本 shell 问题，README 给的解决办法是�
       "开发者用法是把它当 Rust 库引入（见 Rust quickstart），一个运行时可以承载上百个代理。",
     ],
     alternatives: [],
+    previews: ["/media/openhuman/fe13b2d5d61f18ee.webp"],
     icon: {
       letter: "O",
       color: "#2F5D62",
@@ -16668,6 +16720,7 @@ uv tool upgrade astrbot --python 3.12
       "需要本地编码代理协作时，可在 My Agents 里接入自己的 Claude Code / Codex，并在会话中途向它们提问。",
     ],
     alternatives: [],
+    previews: ["/media/deeptutor/5ecc0c299f9860f9.webp", "/media/deeptutor/91a4a8f8128df2a4.webp"],
     icon: {
       letter: "D",
       color: "#1F6F8B",
@@ -16764,6 +16817,7 @@ v1.5.17 起提供 \`deeptutor doctor\`，环境、连接、凭证这类问题先
       "进阶功能（向量搜索、changefeed、HTAP、容灾）都有独立文档，按需逐个接，别一次全开。",
     ],
     alternatives: [],
+    previews: ["/media/tidb/254572dbb5d459e2.webp", "/media/tidb/95bcdba037229fd9.webp"],
     icon: {
       letter: "T",
       color: "#D6293B",
@@ -16858,6 +16912,7 @@ README 提供了完整的 troubleshooting 文档。日常排查的顺序建议�
       "离线或隔离网络环境先看仓库里的 Offline Deployment Guide，提前把依赖和缓存装齐。",
     ],
     alternatives: ["graphrag"],
+    previews: ["/media/lightrag/3552a4f5dbbd8ad5.webp"],
     icon: {
       letter: "L",
       color: "#4C6EF5",
@@ -17056,6 +17111,7 @@ v0 的告警已经支持三种：关键字（\`"Acme" AND (grève OR strike) NOT
       "要扩展能力就挂 MCP Server，Agent TARS 的内核本身就建在 MCP 上。",
     ],
     alternatives: ["browser-use"],
+    previews: ["/media/ui-tars-desktop/65ab35b4fed4c23c.webp"],
     icon: {
       letter: "U",
       color: "#3B5BDB",
@@ -17160,6 +17216,7 @@ Agent TARS 的内核建在 MCP 上，额外能力通过挂载 MCP Server 接入�
       "想接到自己的代理里，官方提供工具适配 OpenAI Agents SDK 与 Claude Agent SDK，直接把 PageIndex 工具挂进去即可。",
     ],
     alternatives: [],
+    previews: ["/media/pageindex/0d1bc1d293e458bd.webp", "/media/pageindex/92e699f543e6ec23.webp"],
     icon: {
       letter: "P",
       color: "#5F6C5B",
@@ -17510,6 +17567,7 @@ MIT 协议，流程是 fork → 建分支 → 提 PR，细节看 CONTRIBUTING.md
       "跑特定新模型前先查 README 的版本要求：Kimi K3 要 compressed-tensors + flash-attn + CUDA 12 的 torch + transformers 4.56.x，Qwen3.8 系列要 transformers 5.8+ 或 git 版。",
     ],
     alternatives: [],
+    previews: ["/media/airllm/27cac6bb982edaf9.webp"],
     icon: {
       letter: "A",
       color: "#4A6FA5",
@@ -17867,6 +17925,7 @@ llmfit doctor     # 输出硬件探测报告，提 bug 时附上它
       "公开部署务必设 ACCESS_PASSWORD（可选 ACCESS_USERNAME，默认 admin），并且不要把 VITE_* 的 API key 写进环境变量——它们会被打进前端产物。",
     ],
     alternatives: [],
+    previews: ["/media/prompt-optimizer/243a5189008ccc48.webp", "/media/prompt-optimizer/9fa59a6189c3c359.webp"],
     icon: {
       letter: "P",
       color: "#E8590C",
@@ -18065,6 +18124,7 @@ README 用明确的语气警告过，**别跳过**：
       "诊断完记得退出会话或 `stop`，别把增强留在生产 JVM 上。",
     ],
     alternatives: [],
+    previews: ["/media/arthas/5a29c092b331831d.webp", "/media/arthas/4bda5486ff47d55a.webp"],
     icon: {
       letter: "A",
       color: "#C2410C",
@@ -18279,6 +18339,7 @@ Upcoming Features 里「Adding authentication」还画着未完成的勾。也�
       "公有云上打不开时按「本机 curl 通不通 → 云厂商安全组放行 → 系统防火墙」的顺序排查，面板端口默认不对外。",
     ],
     alternatives: [],
+    previews: ["/media/1panel/d2d434944443de96.webp"],
     icon: {
       letter: "1",
       color: "#1D8BF1",
@@ -18557,6 +18618,7 @@ README 明确说：这份代码是方法论的演示，不是受支持的 Micros
       "配置以 docs.continue.dev 为准，2.0.0 移除了遥测并拆出了鉴权，2.0 之前版本的教程字段对不上。",
     ],
     alternatives: [],
+    previews: ["/media/continue/86627767f60dd3cc.webp"],
     icon: {
       letter: "C",
       color: "#2D7FF9",
@@ -18641,6 +18703,7 @@ README 第一句就写着：\`continuedev/continue\` 仓库已不再活跃维护
       "VS Code 扩展不打包 CLI，它只是拉起你本地的 reasonix acp 后端，所以要先装 1.x CLI；扩展 ID 是 SivanLiu.reasonix-agent。",
     ],
     alternatives: ["oh-my-pi", "gemini-cli"],
+    previews: ["/media/deepseek-reasonix/69d9d2bd77c813ed.webp", "/media/deepseek-reasonix/d5ec3ffad87a777f.webp"],
     icon: {
       letter: "D",
       color: "#4D6BFE",
@@ -18824,6 +18887,7 @@ tracing 只是入口。看到一条坏结果，可以直接跳到 Playground 改
       "容器里要访问宿主机的 Ollama，加 `--add-host=host.docker.internal:host-gateway`，再到 Settings → Models 把 Base URL 改成 http://host.docker.internal:11434（LM Studio 是 :1234/v1）。",
     ],
     alternatives: [],
+    previews: ["/media/qwenpaw/8433c5369acdfeba.webp", "/media/qwenpaw/4ccc0a53ee3a9811.webp"],
     icon: {
       letter: "Q",
       color: "#6C4AB6",
@@ -18929,6 +18993,7 @@ Windows LTSC 或受严格策略管理的机器上，PowerShell 可能处于 Cons
       "用之前先读 CHANGELOG 的 scope 与 limits，数据口径与券商能力限制都写在那里（例如 mStock 不参与组合聚合、Robinhood 期权下单不可用）。",
     ],
     alternatives: ["tradingagents"],
+    previews: ["/media/vibe-trading/07185487ba676709.webp", "/media/vibe-trading/b8ad94ce4b7075bf.webp"],
     icon: {
       letter: "V",
       color: "#0E7C66",
@@ -19017,6 +19082,7 @@ README 明确列出限制：mStock 不参与组合聚合，Robinhood 期权下�
       "Alpine / musl 要先 `apk add libstdc++ libgcc`，否则预编译的 musl 二进制起不来。",
     ],
     alternatives: ["deepseek-reasonix"],
+    previews: ["/media/oh-my-pi/dcb6d9d619c7d060.webp", "/media/oh-my-pi/2b259d569c85286b.webp"],
     icon: {
       letter: "O",
       color: "#C2410C",
@@ -19125,6 +19191,7 @@ eval "$(omp completions zsh)"    # bash / fish 同理
       "扫描版 PDF 先自己做 OCR：`ocrmypdf input.pdf output.pdf`，否则提取器检查开头几页后会直接停下。",
     ],
     alternatives: [],
+    previews: ["/media/book-to-skill/9ba46dc40c698a65.webp", "/media/book-to-skill/86fa9bf6698ce58a.webp"],
     icon: {
       letter: "B",
       color: "#8A5A2B",
@@ -19230,6 +19297,7 @@ python3 scripts/extract.py --check
       "技能的 frontmatter 里带 ATT&CK / CSF / D3FEND / AI RMF / F3 / ATLAS 映射，做合规映射或写报告时直接读这一块，比手工查表快。",
     ],
     alternatives: [],
+    previews: ["/media/anthropic-cybersecurity-skills/007730a3b94c0846.webp"],
     icon: {
       letter: "A",
       color: "#B45309",
@@ -19320,6 +19388,7 @@ README 顶部写明：这是独立社区项目，与 Anthropic PBC 无关；库�
       "没有 GPU 也能对照第 5 章：作者把 215M 的 base 与 SFT 权重放到了 ModelScope，可以直接下载比对，不必从头预训练。",
     ],
     alternatives: ["llms-from-scratch", "minimind"],
+    previews: ["/media/happy-llm/8547f2f9852e7982.webp", "/media/happy-llm/1e7255ed347f2ec6.webp"],
     icon: {
       letter: "H",
       color: "#D97706",
@@ -19494,6 +19563,7 @@ spaCy 是「commercial open-source」，代码 MIT —— 商用没问题。但�
       "升级先在 .env 里把 WEKNORA_VERSION 设成目标版本再 pull + up -d，只跑 up -d 会复用缓存镜像导致 UI 版本与发布版不同步。",
     ],
     alternatives: ["ragflow", "onyx"],
+    previews: ["/media/weknora/6a12777793348908.webp", "/media/weknora/6f488626ad0a38e5.webp"],
     icon: {
       letter: "W",
       color: "#1A6FC4",
@@ -19596,6 +19666,7 @@ README 用了 WARNING：WeKnora 自带登录鉴权，但生产部署强烈建议
       "要产出可编辑的 PPT / Word / Excel，用内置的 Morph PPT、docx、xlsx 三类助手，它们由配套的 OfficeCLI 驱动。",
     ],
     alternatives: [],
+    previews: ["/media/aionui/ba1688d3767a2bdb.webp", "/media/aionui/d6f32a40fb01e556.webp"],
     icon: {
       letter: "A",
       color: "#32CD32",
@@ -19680,6 +19751,7 @@ README 用了 WARNING：WeKnora 自带登录鉴权，但生产部署强烈建议
       "Java 栈接入：Spring 用 nacos-spring-project，spring-cloud-alibaba 提供一站式方案，其它 SDK 与同步工具在 nacos-group。",
     ],
     alternatives: [],
+    previews: ["/media/nacos/818254c37ae0b1e5.webp", "/media/nacos/d16e2892d8ad7085.webp"],
     icon: {
       letter: "N",
       color: "#FF6A00",
@@ -19775,6 +19847,7 @@ Spring 用 nacos-spring-project；Spring Cloud Alibaba 是一站式方案，把 
       "只想要一个控制台 agent 的话，用 `launch_console(agent)`，流式输出、工具调用确认与 Ctrl+C 中断都已内置。",
     ],
     alternatives: [],
+    previews: ["/media/agentscope/dfc98f11418ea166.webp", "/media/agentscope/6500291326016233.webp"],
     icon: {
       letter: "A",
       color: "#2F6FED",
@@ -19892,6 +19965,7 @@ cd examples/web_ui && pnpm install && pnpm dev  # 前端
       "常驻运行用 `zeroclaw service install` 再 `zeroclaw service start`；先在 supervised 模式确认工具审批和工作区范围。",
     ],
     alternatives: ["openclaw", "nanobot"],
+    previews: ["/media/zeroclaw/64f7ffd62b2a9c4e.webp"],
     icon: {
       letter: "Z",
       color: "#B7410E",
@@ -19982,6 +20056,7 @@ zeroclaw auth status
       "完整 Standard 会增加向量/关键词索引、同步 worker、推理服务、Redis 与 MinIO，部署前先规划持久卷和备份。",
     ],
     alternatives: ["ragflow", "fastgpt"],
+    previews: ["/media/onyx/c0a008e728a9b6c5.webp", "/media/onyx/5277dfe9e8e54d83.webp"],
     icon: {
       letter: "O",
       color: "#2563EB",
@@ -20062,6 +20137,7 @@ Onyx 还支持 Docker、Kubernetes、Helm/Terraform 与主要云厂商。测试�
       "若输出为 `partial`，按摘要列出的解析失败文件处理；不要忽略 stderr 的 Warning，也不要把旧图行当成最新结果。",
     ],
     alternatives: ["graphify", "codebase-memory-mcp"],
+    previews: ["/media/code-review-graph/6cb082ebb5afe4e9.webp", "/media/code-review-graph/66e31270118171f8.webp"],
     icon: {
       letter: "C",
       color: "#0F766E",
@@ -20142,6 +20218,7 @@ GitHub Action 在 runner 本地建图并更新一条 PR 评论，内容包含风
       "不需要匿名遥测时设置 `SCRAPEGRAPHAI_TELEMETRY_ENABLED=false`；批量抓取前先评估模型 token、代理和浏览器资源。",
     ],
     alternatives: ["firecrawl"],
+    previews: ["/media/scrapegraph-ai/6d35849c219a079a.webp", "/media/scrapegraph-ai/4a6546fdeac743ce.webp"],
     icon: {
       letter: "S",
       color: "#7C3AED",
@@ -20327,6 +20404,7 @@ Docker Compose 可用 \`docker compose up\` 起 Neo4j 配套服务，FalkorDB pr
       "模型推理服务不是 Trainer 的职责，README 明确建议用 LitServe 构建 Python 推理服务器。",
     ],
     alternatives: [],
+    previews: ["/media/pytorch-lightning/0951b4cfcf3e1843.webp"],
     icon: {
       letter: "P",
       color: "#792EE5",
@@ -20408,6 +20486,7 @@ trainer.fit(model, train_loader, val_loader)
       "开发可用 Cursor 或 VS Code 的 ESP-IDF 插件；README 建议优先 Linux，以获得更快编译和更少驱动问题。",
     ],
     alternatives: [],
+    previews: ["/media/xiaozhi-esp32/1b3be36552b984a0.webp", "/media/xiaozhi-esp32/788e9baf4a30ff52.webp"],
     icon: {
       letter: "X",
       color: "#F59E0B",
@@ -20484,6 +20563,7 @@ README 建议 Linux 编译，原因是更快且驱动问题更少。Windows 也�
       "从源码运行需复制 `.env.example`，执行 `npm install`，再用 `PORT=20128 NEXT_PUBLIC_BASE_URL=http://localhost:20128 npm run dev`。",
     ],
     alternatives: [],
+    previews: ["/media/9router/73ff682e544b8c42.webp"],
     icon: {
       letter: "9",
       color: "#111827",
@@ -20569,6 +20649,7 @@ OAuth 与 API Key 会集中到本地路由器。只绑定本机或可信内网�
       "只启动一个 MCP Server，并保持插件端口在 localhost；建议设置 `BLENDER_MCP_SAFE_MODE=1` 检查 Agent 生成的脚本。",
     ],
     alternatives: [],
+    previews: ["/media/mcp-for-blender/18f0de48bd0d9a17.webp"],
     icon: {
       letter: "M",
       color: "#E87D0D",
@@ -20812,6 +20893,7 @@ python -m uvicorn main:app --reload
       "Windows 不支持示例中的 UnixLocalSandboxClient，应改用 DockerSandboxClient 加 `[docker]` extra 或托管沙箱。",
     ],
     alternatives: [],
+    previews: ["/media/openai-agents-python/2cf1588e021a20bc.webp"],
     icon: {
       letter: "O",
       color: "#10A37F",
@@ -21054,6 +21136,7 @@ Notebook 证明的是“技术在示例上可运行”。生产仍需权限、�
       "macOS 桌面端要求 macOS 12+；本地模型可接 Ollama 或 vLLM，但仍要按自托管文档配置。",
     ],
     alternatives: ["fastgpt", "autogpt", "n8n"],
+    previews: ["/media/sim/19f65be933c44046.webp", "/media/sim/8e37102e351a9158.webp"],
     icon: {
       letter: "S",
       color: "#6C5CE7",
@@ -21142,6 +21225,7 @@ Chat 是 Sim 管理服务。向导会打开浏览器登录并保存 Chat API Key
       "商用前阅读 FastGPT Open Source License：允许后台服务商用，但未经授权不允许提供 SaaS，且需保留版权信息。",
     ],
     alternatives: ["sim", "dify"],
+    previews: ["/media/fastgpt/374454e428b6429c.webp", "/media/fastgpt/7c73e5bbb59fa9bc.webp"],
     icon: {
       letter: "F",
       color: "#3370FF",
@@ -21219,6 +21303,7 @@ docker compose up -d
       "复杂 PDF 安装 `[hybrid]`，先起 `opendataloader-pdf-hybrid --port 5002`，再用客户端 `--hybrid docling-fast` 处理。",
     ],
     alternatives: ["paddleocr"],
+    previews: ["/media/opendataloader-pdf/91e3614ba4779a89.webp", "/media/opendataloader-pdf/559b9623d8830528.webp"],
     icon: {
       letter: "O",
       color: "#D97706",
@@ -21315,6 +21400,7 @@ Tagged PDF 使用 \`--format tagged-pdf\`，是开源自动标记能力；PDF/UA
       "Cua Spaces 当前要求 macOS 26+；Lume 只用于 Apple Silicon 上的本地 macOS/Linux VM，其他平台不要套用。",
     ],
     alternatives: [],
+    previews: ["/media/cua/0ff8988388b86ac2.webp", "/media/cua/75cbfd6f7f52012d.webp"],
     icon: {
       letter: "C",
       color: "#111827",
@@ -21494,6 +21580,7 @@ Python 3.14 free threading 通过测试也不等于线程安全。遇到竞态�
       "自带模型时不要把高权限长期 API Key 直接打进公开前端包，生产环境应使用受限凭证或后端代理。",
     ],
     alternatives: [],
+    previews: ["/media/page-agent/5d5eb074c5076df7.webp", "/media/page-agent/f5a4977728a2390b.webp"],
     icon: {
       letter: "P",
       color: "#FF6A00",
@@ -22108,6 +22195,7 @@ README 顶部明确写了：Gitleaks 已 feature complete，不再合并新功�
       "生成配置模板用 `repomix --init`；跑 Docker 用 `docker run -v .:/app -it --rm ghcr.io/yamadashy/repomix`。",
     ],
     alternatives: [],
+    previews: ["/media/repomix/c86462691dfdc5e6.webp", "/media/repomix/f8e2955dd251ad5b.webp"],
     icon: {
       letter: "R",
       color: "#D97706",
@@ -22229,6 +22317,7 @@ repomix --include-logs --include-diffs
       "先看效果可去 demo.kuma.pet/start-demo，10 分钟后数据清空。",
     ],
     alternatives: [],
+    previews: ["/media/uptime-kuma/e233f6d9673228a6.webp", "/media/uptime-kuma/59d4669323b89ff8.webp"],
     icon: {
       letter: "U",
       color: "#5CDD8B",
@@ -22342,6 +22431,7 @@ README 明确列出不支持：FreeBSD / OpenBSD / NetBSD，以及 Replit / Hero
       "升级与运维走官方文档；有任何异常先看部署与运行时日志，面板里可直接开容器终端排查。",
     ],
     alternatives: ["dokploy", "dokku"],
+    previews: ["/media/coolify/3632447c874bfdde.webp"],
     icon: {
       letter: "C",
       color: "#4F46E5",
@@ -22753,6 +22843,7 @@ Slack 与 Telegram 可以实时和其他用户聊；文档站提供深入内容�
       "v6 的 PDF 用 Forme 渲染，不需要 Browserless / Chromium，旧的 PRINTER_* 与 BROWSERLESS_* 环境变量可以删掉。",
     ],
     alternatives: [],
+    previews: ["/media/reactive-resume/e26d243ceab82d4e.webp", "/media/reactive-resume/3070ee47ea326d53.webp"],
     icon: {
       letter: "R",
       color: "#2563EB",
@@ -23067,6 +23158,7 @@ ShareX 能把图片、文本、文件、文件夹、剪贴板内容与 URL 上�
       "用 TriliumDroid 时要在服务端关掉自动更新，因为同步版本必须与客户端一致。",
     ],
     alternatives: ["obsidian"],
+    previews: ["/media/trilium/a80436435a03fd52.webp"],
     icon: {
       letter: "T",
       color: "#1F6FEB",
@@ -23256,6 +23348,7 @@ Dokploy 内置 Traefik 集成，负责路由与负载均衡。绑定域名与 HT
       "出问题先看 `docker compose logs`；装了 Dark Reader 记得给该域名关掉深色模式，否则布局会坏。",
     ],
     alternatives: [],
+    previews: ["/media/glance/5555c926e3f2a41d.webp", "/media/glance/6591b0117ba55f74.webp"],
     icon: {
       letter: "G",
       color: "#F59E0B",
@@ -23371,6 +23464,7 @@ pages:
       "卸载用 `casaos-uninstall`（v0.3.3 及以上）；更早版本用 `curl -fsSL https://get.icewhale.io/casaos-uninstall.sh | sudo bash`。",
     ],
     alternatives: ["1panel"],
+    previews: ["/media/casaos/2aa200f426a48e61.webp"],
     icon: {
       letter: "C",
       color: "#2563EB",
@@ -23692,6 +23786,7 @@ npm run dev                 # 打开 http://localhost:6002
       "需要 JS 渲染或可视化选区时启用 Chrome 抓取器（docker-compose.yml 里 sockpuppetbrowser 那几行取消注释），纯静态页面用内置 HTTP 抓取器就够，别无脑全开。",
     ],
     alternatives: [],
+    previews: ["/media/changedetection-io/6418aeda2282242a.webp"],
     icon: {
       letter: "c",
       color: "#C0392B",
@@ -23785,6 +23880,7 @@ json://someserver.com/custom-api
       "从源码跑：git clone 后 pnpm install && pnpm build，首次把 src/skeleton 拷成 config/ 得到示例配置，再用 HOMEPAGE_ALLOWED_HOSTS=域名:端口 pnpm start 启动。",
     ],
     alternatives: [],
+    previews: ["/media/homepage/7a39812ad4530ea9.webp"],
     icon: {
       letter: "H",
       color: "#2F6FB0",
@@ -23888,6 +23984,7 @@ README 的安全提示写得很重：widget 会访问你的家庭自动化等个
       "想让编码代理直接查遥测数据，用 SigNoz MCP server；README 注明 Noz（AI 队友）只在 SigNoz Cloud 上提供。",
     ],
     alternatives: [],
+    previews: ["/media/signoz/30284d9621ba3509.webp", "/media/signoz/70923542f4b65e59.webp"],
     icon: {
       letter: "S",
       color: "#E4694B",
@@ -24092,6 +24189,7 @@ dokku ssh-keys:add <name> ~/.ssh/id_rsa.pub
       "摘要模型可选：本地用 Ollama，或填 Claude / Groq / OpenRouter / 自建 OpenAI 兼容端点；不想接云端就先装好 Ollama 再开应用。",
     ],
     alternatives: [],
+    previews: ["/media/meetily/93ceba4c0e90ae64.webp", "/media/meetily/3c085eaa1788c224.webp"],
     icon: {
       letter: "M",
       color: "#5B4B8A",
@@ -24399,6 +24497,7 @@ Karakeep 自称 self-hosting first，但完整体验依赖的可不止一个进�
       "自托管遇到问题只有社区支持：官方在仓库 Discussions 里开了 self-hosted-support 版块，不要指望付费支持。",
     ],
     alternatives: [],
+    previews: ["/media/analytics/c9ca20836e47316c.webp"],
     icon: {
       letter: "P",
       color: "#5850EC",
@@ -24500,6 +24599,7 @@ Plausible 的产品哲学是「少即是多」，所以第一件事不是装，�
       "只想本地留存、不想默认上传到 archive.org，改配置里的 archivedotorg_enabled 关掉它。",
     ],
     alternatives: [],
+    previews: ["/media/archivebox/f177aeda330a2870.webp", "/media/archivebox/de379802ff3e677a.webp"],
     icon: {
       letter: "A",
       color: "#8B5A2B",
@@ -24823,6 +24923,7 @@ README 有一节 Current Capability Boundaries，值得逐条读完再设定预�
       "需要更多能力就去官方插件商店与主题商店（woxlauncher.com/store/plugins 与 /store/themes）看看有没有现成的，没有再用 Node.js 或 Python 写自己的插件。",
     ],
     alternatives: [],
+    previews: ["/media/wox/f7a5142b4bd50d3f.webp"],
     icon: {
       letter: "W",
       color: "#3C6E9F",
@@ -24921,6 +25022,7 @@ README 说明插件可以用 **Node.js、Python 或脚本**来写，也就是说
       "备份在 hub 侧配置，可存到磁盘或 S3 兼容存储；登录可以接 OAuth / OIDC 多家 provider，接好后把密码登录关掉。",
     ],
     alternatives: [],
+    previews: ["/media/beszel/22e8e6a18414bded.webp", "/media/beszel/7cf7eb0f4487d9fb.webp"],
     icon: {
       letter: "b",
       color: "#467A6B",
@@ -25019,6 +25121,7 @@ Beszel 是**指标**监控与告警，不做日志检索，也不做链路追踪
       "先不装也行：官方有在线演示 demo.nocobase.com/new，可以先验证是不是你要的东西。",
     ],
     alternatives: ["jeecgboot"],
+    previews: ["/media/nocobase/0d51f471dd71a58d.webp", "/media/nocobase/80faae6e5161bd6e.webp"],
     icon: {
       letter: "N",
       color: "#2E6F9E",
@@ -25242,6 +25345,7 @@ if __name__ == "__main__":
       "装完旧的 .zshrc 会被改名为 .zshrc.pre-oh-my-zsh，把要保留的配置手动搬进新的 .zshrc；自动化安装可加 --unattended，它不会改默认 shell 也不会在结束时启动 zsh。",
     ],
     alternatives: [],
+    previews: ["/media/ohmyzsh/cbb24ebc8ba82a32.webp", "/media/ohmyzsh/ef6177678d7d5a35.webp"],
     icon: {
       letter: "O",
       color: "#B4443C",
@@ -26000,6 +26104,7 @@ Sherlock 查的是公开可见的账号存在性，不登录任何平台，也�
       "手机端是配套的监控与追加指令入口：iOS 在 App Store 搜 Orca IDE，Android 从 onorca.dev/download/android 下 APK，需要和桌面端配对。",
     ],
     alternatives: [],
+    previews: ["/media/orca/88e07437eb1e5cd1.webp", "/media/orca/f86b13fb67b1946f.webp"],
     icon: {
       letter: "O",
       color: "#1F6F8B",
@@ -26232,6 +26337,7 @@ README 自己列了迁移建议，说明生态一直在动，别照着旧教程�
       "装完一定要配 shell 集成，否则键位与补全都不生效：bash 加 `eval \"$(fzf --bash)\"`，zsh 加 `source <(fzf --zsh)`，fish 加 `fzf --fish | source`。",
     ],
     alternatives: [],
+    previews: ["/media/fzf/8890456f870f285a.webp", "/media/fzf/601bd3a6f4a993c2.webp"],
     icon: {
       letter: "F",
       color: "#D9534F",
@@ -26399,6 +26505,7 @@ fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
       "装完直接在仓库目录里跑 `lazygit`；常用键位：改动区 `0` 聚焦 diff、`<space>` 暂存、`a` 逐行、`<tab>` 切面板、`c` 提交；提交区 `i` 进交互式 rebase、`shift+c`/`shift+v` 复制粘贴提交。",
     ],
     alternatives: [],
+    previews: ["/media/lazygit/c2cb7a9b2ab8f532.webp"],
     icon: {
       letter: "L",
       color: "#4B8BBE",
@@ -26627,6 +26734,7 @@ rg -i "your keyword" --glob '*.md'
       "要自托管看官方 docs.hoppscotch.io 的 self-host getting started，按 GitHub Flow 提 PR 参与贡献。",
     ],
     alternatives: ["bruno"],
+    previews: ["/media/hoppscotch/9234c39267fc12ef.webp"],
     icon: {
       letter: "H",
       color: "#4CBB7B",
@@ -26880,6 +26988,7 @@ README 直接说了：the first runs are rough, it does not know you yet. 把它
       "命令名是 `rg` 不是 ripgrep；装完跑 `rg --version` 确认，`rg -uuu` 才会关掉 gitignore / 隐藏文件 / 二进制的全部自动过滤。",
     ],
     alternatives: [],
+    previews: ["/media/ripgrep/9c69abc7d52e54e9.webp"],
     icon: {
       letter: "R",
       color: "#C0392B",
@@ -27026,6 +27135,7 @@ Andy Lester（ack 作者）维护了一份 ack / ag / git-grep / GNU grep / rg �
       "不想装任何东西：用网页版 https://tldr.inbrowser.app（支持 PWA 离线），或下载 PDF 版 https://github.com/tldr-pages/tldr/releases/latest/download/tldr-book.pdf。",
     ],
     alternatives: ["cheat-sh"],
+    previews: ["/media/tldr/4a942019b36a1792.webp"],
     icon: {
       letter: "T",
       color: "#2C9678",
@@ -27603,6 +27713,7 @@ README 的 Credits 说得很清楚：它 loosely based on《The Adult ADHD Tool 
       "想自己编译见 wiki 的 Compiling the whole project；插件去 plugins.x64dbg.com 找。",
     ],
     alternatives: [],
+    previews: ["/media/x64dbg/8ea6e5aca5742127.webp", "/media/x64dbg/619ff9ca8028a0bf.webp"],
     icon: {
       letter: "X",
       color: "#3B4E7A",
@@ -27846,6 +27957,7 @@ README 用加粗强调过：**不要只拷内层的 \`skills/\` 目录**，要 c
       "接 CI 用官方 GitHub Action `KeygraphHQ/shannon-action@v1` 或 GitLab CI 组件，需要私有仓库、带 Docker 与 Docker Compose v2 的 runner，以及存为 secret 的模型凭据。",
     ],
     alternatives: [],
+    previews: ["/media/shannon/1b64d2e8a7027dee.webp", "/media/shannon/0102523c5beada31.webp"],
     icon: {
       letter: "S",
       color: "#9B2C2C",
@@ -28324,6 +28436,7 @@ README 说得很清楚：**多数功能是免费开源的**，付费版本提供
       "装完记得看 `gh skill` 相关说明：官方提供了给编码代理用的 agent skill，可以用 `gh skill install cli/cli gh --scope user` 装上，之后用 `gh skill update gh` 升级。",
     ],
     alternatives: [],
+    previews: ["/media/cli/cc80aa76f9c39741.webp"],
     icon: {
       letter: "G",
       color: "#24292f",
@@ -28420,6 +28533,7 @@ GitHub 托管 runner 上 gh 已经预装，但版本是「每周更新」的，�
       "想看图谱可视化，跑 `codebase-memory-mcp --ui=true --port=9749`，浏览器打开 http://localhost:9749；界面由共享守护进程托管，多个代理会话不会起重复服务。",
     ],
     alternatives: ["graphify", "code-review-graph"],
+    previews: ["/media/codebase-memory-mcp/55079abf0e722c45.webp", "/media/codebase-memory-mcp/b841d7f4fdfb07ae.webp"],
     icon: {
       letter: "C",
       color: "#2f6f4f",
@@ -28510,6 +28624,7 @@ Windows 上 Defender 可能把发布二进制判成 \`Trojan:Script/Wacatac.B!ml
       "需要更多控件时看官方 API 文档的分类：widgets / data / charts / layout / multipage，别自己造轮子。",
     ],
     alternatives: ["dash"],
+    previews: ["/media/streamlit/9d56925f4bcd59d5.webp"],
     icon: {
       letter: "S",
       color: "#ff4b4b",
@@ -28711,6 +28826,7 @@ zx 在 Linux / macOS 上用 Bash，在 Windows 上用 PowerShell。这意味着�
       "接 CI 时注意锁版本：新版本可能引入新告警，导致原本通过的构建失败。",
     ],
     alternatives: [],
+    previews: ["/media/jest/9f4402a44145b660.webp"],
     icon: {
       letter: "J",
       color: "#c21325",
@@ -28902,6 +29018,7 @@ README 把适用人群写成「penetration testers and software developers」，
       "调试要用 `dlv debug --headless --api-version=2 --listen=127.0.0.1:43000 .` 再从另一个终端 `dlv connect`，因为程序占用了 stdin/stdout。",
     ],
     alternatives: [],
+    previews: ["/media/bubbletea/33443082f4666a4f.webp"],
     icon: {
       letter: "B",
       color: "#ff5f87",
@@ -29311,6 +29428,7 @@ agent-platform, cd in, read the README, and follow the get started guide.
       "想要干净可粘贴的输出，加 `?Q` 去掉注释、`?T` 去掉语法高亮，可叠加为 `?QT`。",
     ],
     alternatives: ["tldr"],
+    previews: ["/media/cheat-sh/180b58586d3f55f1.webp", "/media/cheat-sh/fa0b77a8efb2b1bc.webp"],
     icon: {
       letter: "C",
       color: "#2d7ff9",
@@ -29423,6 +29541,7 @@ chmod +x "$PATH_DIR/cht.sh"
       "要排查「有没有连可疑地址」，用导入自定义 IP 黑名单的功能高亮可疑连接。",
     ],
     alternatives: [],
+    previews: ["/media/sniffnet/924a44280b4f8c0f.webp", "/media/sniffnet/d5f615cf95e7a92f.webp"],
     icon: {
       letter: "S",
       color: "#3aa675",
@@ -29519,6 +29638,7 @@ ICED_BACKEND=tiny-skia
       "接模型用 `/provider`（或按 F3）添加 hosted key 或选本地 runtime；如果 Ollama 已经在跑聊天模型，它会自动切过去。",
     ],
     alternatives: [],
+    previews: ["/media/codewhale/7f282e95fb25e5b7.webp", "/media/codewhale/359620b00fa561ed.webp"],
     icon: {
       letter: "C",
       color: "#1f6feb",
@@ -30019,6 +30139,7 @@ README 开头就说明了：当前文档描述的是**即将发布的版本**，
       "从 z / autojump / fasd / z.lua / zsh-z / atuin 迁移：跑 `zoxide import <插件名>`，数据文件会自动识别。",
     ],
     alternatives: [],
+    previews: ["/media/zoxide/f8c82ea689e6204b.webp"],
     icon: {
       letter: "Z",
       color: "#6f42c1",
@@ -30324,6 +30445,7 @@ Lapce **自带 LSP 客户端**，不需要装插件就能获得：
       "PDF 报告是可选依赖：`pip install 'maigret[pdf]'`，还依赖系统级图形库，Linux/macOS 上要按文档另装。",
     ],
     alternatives: [],
+    previews: ["/media/maigret/8dbc77b6476c7fe1.webp"],
     icon: {
       letter: "M",
       color: "#2F5D62",
@@ -30417,6 +30539,7 @@ maigret --web 5000
       "扫描范围要显式写清楚：`trivy fs --scanners vuln,secret,misconfig myproject/`。",
     ],
     alternatives: [],
+    previews: ["/media/trivy/f465e3a7d1973a01.webp"],
     icon: {
       letter: "T",
       color: "#1C4ED8",
@@ -30613,6 +30736,7 @@ textual serve "python -m textual"
       "每条命令都能自查：`npm run check` 等于 lint + typecheck + build，克隆完先让它过一遍再改样式。",
     ],
     alternatives: [],
+    previews: ["/media/ai-website-cloner-template/a9830731cb63e062.webp"],
     icon: {
       letter: "A",
       color: "#111827",
@@ -30706,6 +30830,7 @@ Node 需要 24 以上。版本低了会在构建阶段报语法错，而不是�
       "首次配置用 `/provider` 存档 profile；想用环境变量就 `openclaude --provider-env-file .env`，它不会自动读项目 .env。",
     ],
     alternatives: [],
+    previews: ["/media/openclaude/7ef323fe9319fb07.webp", "/media/openclaude/52fb479836be8381.webp"],
     icon: {
       letter: "O",
       color: "#B45309",
@@ -30804,6 +30929,7 @@ openclaude kill auth-refactor
       "客户端要装对应 SDK（Rust/JS/Python/Go/.NET/PHP/Java 都有），连的时候要指定 namespace 与 database 两层。",
     ],
     alternatives: [],
+    previews: ["/media/surrealdb/3bfa2acc048e6b68.webp"],
     icon: {
       letter: "S",
       color: "#E6007E",
@@ -31373,6 +31499,7 @@ with 会自动收尾。如果不用 with，忘记 close() 的后果是最后一�
       "CI 里用 `--output=json --output-path=./report.json` 落盘，再自己解析；多格式同时输出时扩展名会被统一改写。",
     ],
     alternatives: [],
+    previews: ["/media/lighthouse/908a7bfa0d2c4ffd.webp"],
     icon: {
       letter: "L",
       color: "#E8590C",
@@ -31882,6 +32009,7 @@ npx nx run <target>    # 第二次应命中缓存
       "多实例部署必须外接数据库与 Redis：session 存在 Redis 里，否则每个实例各认各的登录态。",
     ],
     alternatives: [],
+    previews: ["/media/authelia/6037458e8bca8cae.webp", "/media/authelia/2325be677e3b0cae.webp"],
     icon: {
       letter: "A",
       color: "#0B5FA5",
@@ -31981,6 +32109,7 @@ session 存在 Redis，多副本部署时它是共享登录态的唯一途径。
       "给大表建 physical dataset 再建 chart，别用原始 SQL 每次全表扫；同时把缓存和查询超时配上。",
     ],
     alternatives: ["dataease"],
+    previews: ["/media/superset/ae622e2395504711.webp", "/media/superset/2e81c8fb19466978.webp"],
     icon: {
       letter: "S",
       color: "#20A7C9",
@@ -32266,6 +32395,7 @@ README 直说：Remotion 有专门的许可证，某些情况下需要购买公�
       "只装技能用 npx skills add heygen-com/hyperframes，但别选 --all，那会装全部 21 个；非交互环境直接用 npx hyperframes skills update 只装核心集。",
     ],
     alternatives: ["remotion"],
+    previews: ["/media/hyperframes/f65977bd408bfc59.webp", "/media/hyperframes/1f1a4b02f2e9efb9.webp"],
     icon: {
       letter: "H",
       color: "#1F6FEB",
@@ -32531,6 +32661,7 @@ print(a + b)   # x 是 NaN，不是报错
       "自己编译先执行 ./other/download_libs.sh 拉预编译依赖，可用 --arch arm64 或 --arch x86_64 只下单一架构，然后用最新版 Xcode 打开 iina.xcodeproj。",
     ],
     alternatives: ["mpv"],
+    previews: ["/media/iina/159a1b911302ddbd.webp"],
     icon: {
       letter: "I",
       color: "#1E6F9F",
@@ -32711,6 +32842,7 @@ demo.launch()
       "源码跑需要 Python 3.9+ 与 PostgreSQL（也支持 MySQL），先建库再改 config.py，缺库会在启动阶段直接失败。",
     ],
     alternatives: ["gpt-researcher"],
+    previews: ["/media/bettafish/831a60cbdc7da1d4.webp", "/media/bettafish/62c2fd9e7eb261d8.webp"],
     icon: {
       letter: "B",
       color: "#C2410C",
@@ -32883,6 +33015,7 @@ npx @videojs/cli agents init
       "要本地跑 notebook 按 INSTALLATION.md 配 Python 环境；只是阅读的话 GitHub 网页和 Codespaces 就够，不必装任何东西。",
     ],
     alternatives: ["ai-for-beginners"],
+    previews: ["/media/data-science-for-beginners/d715582a628724d6.webp"],
     icon: {
       letter: "D",
       color: "#0F6CBD",
@@ -33237,6 +33370,7 @@ JaaS（8x8 Jitsi as a Service）保留品牌定制与嵌入能力，把监控、
       "用 OBS 更省事：Service 选 Custom，Server 填 rtmp://localhost/live，Stream Key 填 livestream。",
     ],
     alternatives: [],
+    previews: ["/media/srs/c523030921f91bf1.webp"],
     icon: {
       letter: "S",
       color: "#0E7490",
@@ -33341,6 +33475,7 @@ ffmpeg -re -i ./doc/source.flv -c copy -f flv -y rtmp://localhost/live/livestrea
       "首次 reflex init 会生成项目骨架并准备前端运行环境，网络不好时这一步最容易卡住，别当成代码写错了。",
     ],
     alternatives: [],
+    previews: ["/media/reflex/b8edc9a8ae9a7b74.webp"],
     icon: {
       letter: "R",
       color: "#6E56CF",
@@ -33546,6 +33681,7 @@ app.add_page(index)
       "配合 Privacy Redirect 或 LibRedirect 扩展，可以把 YouTube 链接和网页里的嵌入视频自动转到你的实例，省掉手动改域名。",
     ],
     alternatives: ["freetube"],
+    previews: ["/media/invidious/463ba3d62f9c79aa.webp", "/media/invidious/bd66c5fdf34e72f1.webp"],
     icon: {
       letter: "I",
       color: "#CC0000",
@@ -34012,6 +34148,7 @@ README 自己写了两条：数据仅供学术研究、部分接口可能因不�
       "换机前先在设置里导出订阅：订阅与历史存在本地，不跟着账号走，删了应用就没了。",
     ],
     alternatives: ["invidious"],
+    previews: ["/media/freetube/5cb1d3e1d1ded30a.webp"],
     icon: {
       letter: "F",
       color: "#E11D48",
@@ -34104,6 +34241,7 @@ README 自己写了两条：数据仅供学术研究、部分接口可能因不�
       "模型服务可选：HypiHub 是官方推荐的托管服务，也可以自带 API 或本地模型，把服务名和接口文档告诉 agent 让它接。",
     ],
     alternatives: ["openmontage"],
+    previews: ["/media/hypit/06ab7218d5e66b90.webp"],
     icon: {
       letter: "H",
       color: "#E4572E",
@@ -34551,6 +34689,7 @@ vhs record > cassette.tape
       "配 GeoIP 需要编译时开 `--enable-geoip=mmdb` 并装 libmaxminddb，发行版包通常没带。",
     ],
     alternatives: [],
+    previews: ["/media/goaccess/5d7472e58693a33e.webp"],
     icon: {
       letter: "G",
       color: "#3B7DD8",
@@ -34674,6 +34813,7 @@ cat access.log | docker run --rm -i -v ./report.html:/report.html \\
       "BT 源会边下边播并持续做种，流量敏感的网络（公司、校园网）建议改用在线源或自建源。",
     ],
     alternatives: [],
+    previews: ["/media/animeko/a36de2650aa5121c.webp", "/media/animeko/54c9b278353af3e6.webp"],
     icon: {
       letter: "A",
       color: "#F06EAA",
@@ -34868,6 +35008,7 @@ Node.js ≥ 14，改完 \`npm run build\` 重新加载。授权是 GPLv3（3.0.0
       "要调原生代码优先看 FFI 与 platform channels 两套方案，再决定用社区包还是自己写。",
     ],
     alternatives: ["react-native", "expo"],
+    previews: ["/media/flutter/2b592348ffd7e425.webp"],
     icon: {
       letter: "F",
       color: "#02569B",
@@ -34965,6 +35106,7 @@ Dart 可以编到 JavaScript 与 WebAssembly，也能编 x64/ARM 桌面程序。
       "只控制不投屏用 `scrcpy --otg`，这个模式不需要 USB 调试。",
     ],
     alternatives: [],
+    previews: ["/media/scrcpy/d99e8f202757b870.webp"],
     icon: {
       letter: "S",
       color: "#3DDC84",
@@ -35181,6 +35323,7 @@ Expo Go 是一个装好的壳，扫码就能跑你的 JS，适合验证界面与
       "接自建模型时在设置里填兼容 OpenAI 协议的 base url，RWKV-Runner 与 LocalAI 都有对应端点。",
     ],
     alternatives: [],
+    previews: ["/media/nextchat/5575aed9f7c1c4f8.webp", "/media/nextchat/467cdfb9e0a83363.webp"],
     icon: {
       letter: "N",
       color: "#1F7A5C",
@@ -35696,6 +35839,7 @@ README 的 WARNING 写得很清楚：多数情况下 jadx 无法反编译 100% �
       "AppImage 已因稳定性问题暂时移除，别在旧教程里找 AppImage 链接。",
     ],
     alternatives: ["musicfreedesktop"],
+    previews: ["/media/spotube/5473548a3d0386ac.webp", "/media/spotube/ab83736279399516.webp"],
     icon: {
       letter: "S",
       color: "#1DB954",
@@ -35915,6 +36059,7 @@ OkHttp 会跟着 TLS 生态调整行为以保持连通性。长期不升级的�
       "Hilt 的注入关系从这里学比看文档快：顺着 ViewModel 的构造函数往回找模块即可。",
     ],
     alternatives: [],
+    previews: ["/media/architecture-samples/3dac96fc5e78b532.webp"],
     icon: {
       letter: "A",
       color: "#3DDC84",
@@ -36206,6 +36351,7 @@ README 承诺所有工具都跑在你自己的电脑或服务器上，凭证不�
       "README 里的性能倍数来自 benchmark 目录的三份平台报告（Android / iOS / 鸿蒙），属于官方自测，换项目要自己复测。",
     ],
     alternatives: ["flutter", "react-native"],
+    previews: ["/media/uni-app/72ec79ed0ca81a0e.webp", "/media/uni-app/195f379df878580e.webp"],
     icon: {
       letter: "U",
       color: "#2B9939",
@@ -36382,6 +36528,7 @@ README 的建议是用包管理器装完整版；Windows 用 vim-win32-installer
       "Rust 代码实时热补丁用 `dx serve --hotpatch`，README 标注为实验特性，别在关键演示前才第一次试。",
     ],
     alternatives: [],
+    previews: ["/media/dioxus/729317342e8ee9b7.webp"],
     icon: {
       letter: "D",
       color: "#5B4BC4",
@@ -36481,6 +36628,7 @@ Web 端可以只编 wasm，但记得先关默认的桌面特性，否则会把�
       "nightly 跟随 main、可能改 schema 且没有迁移，指过去的库务必备份；想固定更新通道用 `sd config set update.channel nightly`。",
     ],
     alternatives: [],
+    previews: ["/media/spacedrive/cf9686b2d7f52fef.webp"],
     icon: {
       letter: "S",
       color: "#2F6FEB",
@@ -36572,6 +36720,7 @@ Rust 1.95+（仓库 pin 了 1.97.1）、Bun 1.3.4、Node 20，外加 \`just\`。
       "最低要求 minSdk 23、Java 17、Kotlin 2.0+；从 Java 3.x 上来先看仓库的 MIGRATION.md。",
     ],
     alternatives: [],
+    previews: ["/media/mpandroidchart/e59f01e4ac1d8d56.webp"],
     icon: {
       letter: "M",
       color: "#D05C2D",
@@ -36756,6 +36905,7 @@ legacy solutions 2023 年 3 月已停支，仓库里那些老示例的 API 可�
       "Linux 的 tar.gz 只是方便二次打包，缺图标与托盘，要完整功能请装 .deb。",
     ],
     alternatives: [],
+    previews: ["/media/kazumi/d1fff4540bb4f44e.webp", "/media/kazumi/6b4394c9564c093e.webp"],
     icon: {
       letter: "K",
       color: "#E56A9B",
@@ -37128,6 +37278,7 @@ README 开头就是它。含义：改动来自社区补丁，只做 bug 修复�
       "首次启动要授予麦克风与辅助功能权限，并且把快捷键设在 Settings 里——默认键位可能和你的输入法冲突。",
     ],
     alternatives: [],
+    previews: ["/media/handy/e0fa82355d641b93.webp"],
     icon: {
       letter: "H",
       color: "#6C5CE7",
@@ -37330,6 +37481,7 @@ README 单独提了这一条：必须 \`git config --global core.symlinks true\`
       "自定义键位脚本放进 `keymap` 目录，点「刷新脚本」后选中，连上手机启动服务再点应用，按 `~` 切换映射模式。",
     ],
     alternatives: ["scrcpy"],
+    previews: ["/media/qtscrcpy/fa02b199a18b09cd.webp"],
     icon: {
       letter: "Q",
       color: "#2E8B57",
@@ -37720,6 +37872,7 @@ LeakCanary 不会主动扫描全应用，它在生命周期回调里等待对象
       "卸载很干净：删掉二进制，再删配置目录 `~/.config/micro` 即可。",
     ],
     alternatives: [],
+    previews: ["/media/micro/3538236d425c8c96.webp"],
     icon: {
       letter: "m",
       color: "#4B5563",
@@ -37823,6 +37976,7 @@ ip a | micro
       "要自托管就 clone 本仓库部署 server，再把客户端指向自建实例；README 只给到「可以自托管」这一步，具体部署步骤以仓库文档为准，别按云服务的体验预估工作量。",
     ],
     alternatives: ["lychee"],
+    previews: ["/media/ente/a9dea430de3ffa28.webp", "/media/ente/a1578289ed8dfeed.webp"],
     icon: {
       letter: "E",
       color: "#12A150",
@@ -38379,6 +38533,7 @@ scoop install extras/yesplaymusic
       "Linux 用 venv 隔离：apt 装 ffmpeg python3-pip python3-tk，python3 -m venv venv 后 pip install -r requirements.txt，最后 python UVR.py；不要删 EXTERNALLY-MANAGED。",
     ],
     alternatives: [],
+    previews: ["/media/ultimatevocalremovergui/c9797f2eddee6a0e.webp"],
     icon: {
       letter: "U",
       color: "#B45309",
@@ -38584,6 +38739,7 @@ docker run --rm -v $(pwd):/music spotdl download <trackUrl>
       "想要手机遥控电脑播放，用内置的远程控制功能，两端需要处在同一个局域网内。",
     ],
     alternatives: ["yesplaymusic", "lx-music-desktop", "pear-desktop"],
+    previews: ["/media/algermusicplayer/6ff2e8d0483361d0.webp", "/media/algermusicplayer/ac5178c64745c190.webp"],
     icon: {
       letter: "A",
       color: "#C2410C",
@@ -39128,6 +39284,7 @@ musicbox download --playlist 3778678 --path ./music --json
       "主题里引用包内文件用 @/ 前缀，例如 iframes 填 @/bg.html，它会被替换成主题包路径。",
     ],
     alternatives: ["lx-music-desktop", "pear-desktop", "yesplaymusic"],
+    previews: ["/media/musicfreedesktop/1f62b07a07728ad6.webp", "/media/musicfreedesktop/c68bd9229e395d43.webp"],
     icon: {
       letter: "M",
       color: "#0D9488",
@@ -39243,6 +39400,7 @@ npm start
       "本地音乐在设置里指定文件夹即可，按你在歌单里列出的本地文件播放，支持任意采样率。",
     ],
     alternatives: ["lx-music-desktop", "pear-desktop", "yesplaymusic"],
+    previews: ["/media/spotifast/c080fb41f7723e08.webp"],
     icon: {
       letter: "S",
       color: "#15803D",
@@ -39338,6 +39496,7 @@ Windows 与其他 Linux 发行版去官网下载页，按平台取构建。
       "模组系统默认关闭，要先在 设置 → 模组 → 模组系统 打开；每个模组首次启用都要在原生窗口确认，文件改动后需再确认一次。",
     ],
     alternatives: ["lx-music-desktop", "pear-desktop", "yesplaymusic"],
+    previews: ["/media/folia-major/5a4756b239dad58e.webp", "/media/folia-major/99ae931d26358746.webp"],
     icon: {
       letter: "F",
       color: "#7E22CE",
@@ -39623,6 +39782,7 @@ README 直接把人指向安装文档，因为不同系统的依赖差异不小�
       "客户端用 --player 指定后端（Linux alsa / pulse、Windows wasapi、macOS coreaudio），-l 列出可用声卡，-s 选设备。",
     ],
     alternatives: [],
+    previews: ["/media/snapcast/de0ba5e7fd32eeec.webp"],
     icon: {
       letter: "S",
       color: "#1F6F6B",
@@ -39902,6 +40062,7 @@ TS 5 由 pixi.js 自带 @webgpu/types，无需配置。TS 6/7 把 WebGPU 类型�
       "API 查询用 javadoc.io 上的 gdx 文档，版本与依赖里的一致。",
     ],
     alternatives: ["raylib", "pixijs"],
+    previews: ["/media/libgdx/9e133e878ea7a766.webp"],
     icon: {
       letter: "L",
       color: "#C8452F",
@@ -40008,6 +40169,7 @@ public class MyGame extends ApplicationAdapter {
       "用 IDE 打开时选 .slnf（如 osu.Desktop.slnf）而不是主 .sln，能少加载一堆用不到的平台依赖。",
     ],
     alternatives: [],
+    previews: ["/media/osu/a6813fe00bae24bc.webp"],
     icon: {
       letter: "O",
       color: "#FF66AA",
@@ -40093,6 +40255,7 @@ dotnet run --project osu.Desktop
       "只想拿数据或做对局工具，直接用 lichess.org/api 的 HTTP 接口，不用部署服务端。",
     ],
     alternatives: [],
+    previews: ["/media/lila/8647573d711f4292.webp"],
     icon: {
       letter: "L",
       color: "#3D6B52",
@@ -40177,6 +40340,7 @@ curl https://lichess.org/api/user/thibault
       "官网 showcase 里的示例可以直接在浏览器试玩，先挑一个接近你想做的类型改。",
     ],
     alternatives: ["raylib"],
+    previews: ["/media/pyxel/841e8deb4b6a901a.webp", "/media/pyxel/9cac0f3ce442198d.webp"],
     icon: {
       letter: "P",
       color: "#D94F70",
@@ -41394,6 +41558,7 @@ CompactGUI 不打包、不移动文件，只是给文件夹打上 NTFS 的透明
       "用前先核对格式支持：JPEG XL 不支持、AVIF 只能写、HEIC 与 Affinity 文档只读。",
     ],
     alternatives: ["pinta", "photodemon"],
+    previews: ["/media/photocraft/37fc78e0b9198bb4.webp", "/media/photocraft/21598d4f6c2f71c8.webp"],
     icon: {
       letter: "P",
       color: "#7C3AED",
@@ -41564,6 +41729,7 @@ README 写得很清楚：开源版本只含前端代码。完整前后端、管�
       "协作会话不私密、可能丢稿，别拿它传敏感图片或当正式协作工具。",
     ],
     alternatives: [],
+    previews: ["/media/jspaint/ec97de04fc161581.webp"],
     icon: {
       letter: "J",
       color: "#F59E0B",
@@ -41654,6 +41820,7 @@ README 写得很清楚：开源版本只含前端代码。完整前后端、管�
       "Windows 安装后可能提示补截屏依赖库，按提示去微软官网装完再重启；Gnome 要先装 appindicator 扩展。",
     ],
     alternatives: ["sharex"],
+    previews: ["/media/esearch/630eb33f9b0cc0d1.webp", "/media/esearch/00f69886154f73c2.webp"],
     icon: {
       letter: "E",
       color: "#0EA5E9",
@@ -41914,6 +42081,7 @@ Apple Silicon 上不设 \`DYLD_LIBRARY_PATH=/opt/homebrew/lib\`，程序启动�
       "数据库默认在用户目录，要用就把它和照片一起备份；设置 → Storage 里能改位置并做备份。",
     ],
     alternatives: ["immich"],
+    previews: ["/media/lap/cdbf335868a5ae31.webp", "/media/lap/970286046244ce2e.webp"],
     icon: {
       letter: "L",
       color: "#0F766E",
@@ -42206,6 +42374,7 @@ compileOptions {
       "AI 加速只走 NVIDIA CUDA；Intel/AMD 核显不在支持范围，会退到 CPU 跑。",
     ],
     alternatives: [],
+    previews: ["/media/snapotter/558746911a49a5a5.webp"],
     icon: {
       letter: "S",
       color: "#EA580C",
@@ -42475,6 +42644,7 @@ pnpm dev
       "从 V3 或 V2 升级要按对应版本的升级指南走，跨大版本不能直接覆盖。",
     ],
     alternatives: ["lychee"],
+    previews: ["/media/chevereto/e2d3512b0d0537ff.webp", "/media/chevereto/b09fddae66c97586.webp"],
     icon: {
       letter: "C",
       color: "#DC2626",
@@ -42564,6 +42734,7 @@ pnpm dev
       "把它当设计决策参考，不是代码生成器；最终的组件与交互仍要自己实现。",
     ],
     alternatives: [],
+    previews: ["/media/ui-ux-pro-max-skill/d34360168d565a2c.webp"],
     icon: {
       letter: "U",
       color: "#6D28D9",
@@ -42951,6 +43122,7 @@ npm run mutations
       "从源码开发需要 Node.js 22+、pnpm 9+、Rust stable 和对应平台的 Tauri 依赖，然后 pnpm install 再 pnpm dev；pnpm dev:remote 会把 Vite 绑到 0.0.0.0，方便局域网内用手机远程控制。",
     ],
     alternatives: ["lx-music-desktop", "yesplaymusic"],
+    previews: ["/media/nuclear/891d66781d3a979c.webp", "/media/nuclear/526e479c04964c0f.webp"],
     icon: {
       letter: "N",
       color: "#2F3E9E",
@@ -43286,6 +43458,7 @@ yarn install && yarn start
       "发布链路要提前定：webhook 触发重建、ISR，还是运行时从 CDN 取，三种的缓存行为不同，别上线后再改。",
     ],
     alternatives: [],
+    previews: ["/media/plasmic/ddde2174b9df605d.webp"],
     icon: {
       letter: "P",
       color: "#8B5CF6",
@@ -43384,6 +43557,7 @@ import { PlasmicComponent, PlasmicRootProvider } from "@plasmicapp/loader-nextjs
       "它不会自动更新，升级要手动 npx antislop-ai --update，之后重开会话才生效。",
     ],
     alternatives: ["lint"],
+    previews: ["/media/anti-slop/6ff16474d997f1f5.webp", "/media/anti-slop/b438047d26d48503.webp"],
     icon: {
       letter: "A",
       color: "#111827",
@@ -43925,6 +44099,7 @@ README 第一行就挂了迁移指南链接。顺序建议：先读迁移文档 
       "想让 AI 按它的用法写页面：npx skills add https://raw.githubusercontent.com/jd-opensource/taro-ui/master/packages/taro-ui-guide/SKILL.md。",
     ],
     alternatives: [],
+    previews: ["/media/taro-ui/80fae18e1580222b.webp"],
     icon: {
       letter: "T",
       color: "#2563EB",
@@ -44016,6 +44191,7 @@ npx skills add https://raw.githubusercontent.com/jd-opensource/taro-ui/master/pa
       "更新用 npx skills update baoyu-design（或 upgrade 别名），之后重开会话才会加载新文件。",
     ],
     alternatives: [],
+    previews: ["/media/baoyu-design/d3c5c2e2e9f82914.webp", "/media/baoyu-design/b2d1289115e047bd.webp"],
     icon: {
       letter: "B",
       color: "#0EA5E9",
@@ -44186,6 +44362,7 @@ Taiga UI 的兼容表是硬性的，不是建议：
       "Vue / Svelte 在 Oxlint 下只检查 <script>，模板里的 class 要改用 ESLint 路线才查得到。",
     ],
     alternatives: [],
+    previews: ["/media/lint/35227796ad55b5be.webp"],
     icon: {
       letter: "L",
       color: "#0F172A",
@@ -44277,6 +44454,7 @@ npm install -D @shadcn/lint eslint @typescript-eslint/parser
       "改风格只动两个字段：backgroundImage 里的色值、backgroundSize 里的重复尺度，别改结构。",
     ],
     alternatives: [],
+    previews: ["/media/pattern-craft/06e7264149b9f5f3.webp", "/media/pattern-craft/a9ceaee8569524a4.webp"],
     icon: {
       letter: "P",
       color: "#7C3AED",
@@ -44558,6 +44736,7 @@ import "7.css/dist/7.css";
       "`ready/` 下有可直接参考的完整小程序（秒表、哈希、端口扫描等），比重头搭界面快得多。",
     ],
     alternatives: [],
+    previews: ["/media/realtaiizor/3e58ec445e0007d9.webp", "/media/realtaiizor/deb809da9ceed3c9.webp"],
     icon: {
       letter: "R",
       color: "#5B3E96",
@@ -44643,6 +44822,7 @@ Install-Package ReaLTaiizor
       "选风格时先看 design-skills 列表（Agentic、Bento、Brutalism、Editorial、Dashboard 等），一个项目锁定一套，混着用就失去一致性的意义。",
     ],
     alternatives: ["taste-skill", "ui-ux-pro-max-skill"],
+    previews: ["/media/typeui/d82136df188d0536.webp", "/media/typeui/337d759c42e28ddb.webp"],
     icon: {
       letter: "T",
       color: "#111827",
@@ -44999,6 +45179,7 @@ README 的 Known limitations 明说本地不支持：编排（Generation / Train
       "联邦对象不限于 JS：图片、CSS、JSON、WASM 只要 Webpack 能处理就能共享，选型时别把自己框在「只联邦组件」里。",
     ],
     alternatives: [],
+    previews: ["/media/module-federation-examples/b7e1ba8f5eb82576.webp"],
     icon: {
       letter: "M",
       color: "#0B7285",
@@ -45196,6 +45377,7 @@ Ruby 版本矩阵写着 MRI 2.1–2.4，CI 还指向 Travis——都过时了。
       "日志在菜单 View → Developer 里能直接打开目录，出问题先看它，比猜快。",
     ],
     alternatives: [],
+    previews: ["/media/deltachat-desktop/2d05cb9d53537740.webp"],
     icon: {
       letter: "D",
       color: "#1B7A8C",
@@ -45381,6 +45563,7 @@ README 还有一条安全公告：旧的 Telegram 账号与群已被攻陷，不
       "想零成本全本地，按 quick-start-local 用 Ollama 跑，模型别在配置文件里改，直接在 UI 的 Models 里加。",
     ],
     alternatives: [],
+    previews: ["/media/open-notebook/1d0d6e57eda0bcc8.webp"],
     icon: {
       letter: "O",
       color: "#B45309",
@@ -45568,6 +45751,7 @@ ports:
       "TGA 读写的颜色是 BGRA 顺序（README 代码注释里专门标了 `attention, BGRA order`），颜色不对先查这里。",
     ],
     alternatives: [],
+    previews: ["/media/tinyrenderer/022cd9abb4d7e926.webp", "/media/tinyrenderer/43b1017404d39a36.webp"],
     icon: {
       letter: "T",
       color: "#4A5568",
@@ -45664,6 +45848,7 @@ TGA 用 BGRA 顺序。你以为传的是红色，画出来是蓝色。这不是 
       "想给项目提 PR 注意：官方 AI 政策不接受整段 AI 生成的贡献，AI 只能辅助。",
     ],
     alternatives: ["pts"],
+    previews: ["/media/p5js/bf83c1d39d33e4cf.webp", "/media/p5js/36bd4514c982aef2.webp"],
     icon: {
       letter: "P",
       color: "#ED225D",
@@ -45941,6 +46126,7 @@ setup.sh 是第一个卡点。它要先把镜像准备好，网络差的时候�
       "中文版在 wsdjeg.net/wiki/learn-vim/，西班牙语版在 victorhck/learn-Vim-es，章节与英文对齐，可对照读。",
     ],
     alternatives: [],
+    previews: ["/media/learn-vim/1fa75e0d323ffa1f.webp"],
     icon: {
       letter: "L",
       color: "#2E7D32",
@@ -46224,6 +46410,7 @@ npm start
       "`flutter build` 之前先跑 `flutter doctor`；Windows 桌面缺 Visual Studio、Linux 缺 GTK 依赖时，报错出现在构建后半段，很容易误判成代码问题。",
     ],
     alternatives: [],
+    previews: ["/media/flutterunit/477d9cbe02bfc7ee.webp", "/media/flutterunit/2027d1414445134c.webp"],
     icon: {
       letter: "F",
       color: "#0277BD",
@@ -46596,6 +46783,7 @@ OAUTH_CLIENT_SECRET = None
       "要仿真 VHDL / Verilog 描述的组件，得额外装 ghdl 或 Icarus Verilog；不装就只能画与仿真纯电路。",
     ],
     alternatives: ["logisim-evolution"],
+    previews: ["/media/digital/2d81df6b04b50182.webp", "/media/digital/7800846d4a5dff4d.webp"],
     icon: {
       letter: "D",
       color: "#4A4E69",

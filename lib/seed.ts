@@ -23,7 +23,7 @@ export function seedToItem(s: SeedSoftware): Software {
     body: s.body ?? "",
     tutorial: installTips,
     links,
-    previews: [],
+    previews: s.previews ?? [],
     createdAt: now,
     updatedAt: now,
   };
@@ -53,6 +53,7 @@ export const SEED_CARRIED_FIELDS = [
   "scenes", "platforms", "source", "price", "discountNote",
   "whoFor", "whoNot", "alternatives", "guide", "featured", "icon",
   "license", "version", "linksCheckedAt", "links", "tutorial", "kind",
+  "previews",
 ] as const;
 
 /** 刻意不比对的字段，必须写明理由。 */
@@ -72,4 +73,5 @@ export const SEED_DRIFT_FIELDS: string[] = SEED_CARRIED_FIELDS.filter(
 export const SEED_SYNC_FIELDS: string[] = [
   "summary", "body", "tags", "aliases", "links", "source",
   "scenes", "platforms", "license", "kind", "version", "linksCheckedAt", "guide",
+  "previews",
 ];

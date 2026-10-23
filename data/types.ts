@@ -179,6 +179,14 @@ export type SeedSoftware = {
   /** 可选：详细教程。缺省即前台不渲染该区块。 */
   guide?: Guide;
   featured?: boolean;
+  /**
+   * 可选：预览图路径（站内 /media/... 形式）。
+   *
+   * 为什么种子要能带它：预览图是从各项目 README 里抓的真实截图，
+   * 只存在运行库的话，全新部署（或从种子重建）就会全丢，
+   * 而重抓一遍要逐个项目访问 GitHub —— 成本高且不可复现。
+   */
+  previews?: string[];
   icon: {
     letter: string;
     color: string;
