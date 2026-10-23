@@ -415,3 +415,42 @@ test("facet：带筛选且筛空时，不误标为「已放宽匹配」", { skip
   assert.equal(result.total, 0, `图片类条目不应落在 ${absent[0]} 场景`);
   assert.equal(result.fuzzy, false, "筛选导致的空结果不该标记为放宽匹配");
 });
+
+test("诊断：筛选过窄时报 filtered-out，并给出取消筛选后的条数", { skip }, async () => {
+  const facets = await sql.searchFacets("音乐");
+  // 找一个「音乐」结果里完全没覆盖的场景，用它筛出空结果
+  const absent = ["games", "photo", "office", "education", "social"].find(
+    (id) => !facets.scenes.some((scene) => scene.id === id),
+  );
+  if (!absent) return; // 全覆盖时这条无从构造，跳过
+
+  const filtered = await sql.searchCatalog("音乐", PAGE, 0, { scenes: [absent] });
+  assert.equal(filtered.total, 0);
+
+  const diagnosis = await sql.diagnoseSearch("音乐", { scenes: [absent] });
+  assert.equal(diagnosis.reason, "filtered-out", "应归因为筛选过窄，而不是词不存在");
+  assert.equal(diagnosis.withoutFilters, facets.total, "应报出取消筛选后的真实条数");
+});
+
+test("诊断：真的没有匹配时报 no-match，并逐词指出谁拖了后腿", { skip }, async () => {
+  const diagnosis = await sql.diagnoseSearch("python zzzznotfound");
+  assert.equal(diagnosis.reason, "no-match");
+  const byTerm = new Map((diagnosis.perTerm ?? []).map((item) => [item.term, item.hits]));
+  assert.ok((byTerm.get("python") ?? 0) > 0, "python 单独应有命中");
+  assert.equal(byTerm.get("zzzznotfound"), 0, "不存在的词应报 0 命中");
+});
+
+test("诊断：拼写错误的词能给出可点的替代词", { skip }, async () => {
+  const diagnosis = await sql.diagnoseSearch("obisidan");
+  assert.equal(diagnosis.reason, "no-match");
+  assert.ok(
+    (diagnosis.suggestions ?? []).some((word) => word.toLowerCase() === "obsidian"),
+    `应建议 Obsidian，实际：${JSON.stringify(diagnosis.suggestions)}`,
+  );
+});
+
+test("诊断：空查询归因为 empty-query，不跑任何 Count", { skip }, async () => {
+  const diagnosis = await sql.diagnoseSearch("   ");
+  assert.equal(diagnosis.reason, "empty-query");
+  assert.equal(diagnosis.perTerm, undefined);
+});

@@ -4,7 +4,7 @@ import { cache } from "react";
 
 import type { CatalogCounts, CatalogItem, SceneId, Software } from "@/data/types";
 import * as sql from "./catalog-sql.ts";
-import type { SearchFacets, SearchFilters } from "./catalog-sql.ts";
+import type { SearchDiagnosis, SearchFacets, SearchFilters } from "./catalog-sql.ts";
 import {
   kindIds,
   platformIds,
@@ -183,6 +183,17 @@ export async function searchCatalog(query: string, page = 1, filters: SearchFilt
 export async function searchFacets(query: string): Promise<SearchFacets> {
   if (mysqlDriver()) return sql.searchFacets(query);
   return { total: 0, scenes: [], platforms: [] };
+}
+
+/**
+ * 零结果归因。只在 total=0 时调用 —— 它要多跑几次 COUNT。
+ *
+ * JSON 回退路径返回 no-match：它没有 facets/筛选能力，也就谈不上「被筛掉」，
+ * 只说「没匹配到」是准确的。
+ */
+export async function diagnoseSearch(query: string, filters: SearchFilters = {}): Promise<SearchDiagnosis> {
+  if (mysqlDriver()) return sql.diagnoseSearch(query, filters);
+  return { reason: query ? "no-match" : "empty-query" };
 }
 
 /** 首页编辑精选。 */

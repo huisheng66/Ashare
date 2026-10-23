@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SearchX } from "lucide-react";
+import { Filter, SearchX } from "lucide-react";
 
 import { EmptyState } from "@/components/EmptyState";
 import { SceneChips } from "@/components/SceneGrid";
@@ -10,7 +10,7 @@ import { SoftwareCard } from "@/components/SoftwareCard";
 import { Button } from "@/components/ui/button";
 import { sceneById } from "@/data/scenes";
 import type { SceneId } from "@/data/types";
-import { catalogCounts, searchCatalog, searchFacets } from "@/lib/catalog";
+import { catalogCounts, diagnoseSearch, searchCatalog, searchFacets } from "@/lib/catalog";
 import { parseCatalogFilters, parseCatalogPage, searchQueryParam, type PageSearchParams } from "@/lib/catalog-query";
 import { highlightTermsOf } from "@/lib/highlight";
 import { nameSuggestions, taskSuggestions } from "@/lib/navigation";
@@ -77,13 +77,21 @@ function SceneFilterBar({
       ? "border-foreground bg-foreground text-background"
       : "border-border bg-card text-muted-foreground hover:border-foreground/30 hover:text-foreground");
 
+  // 用户可能带着一个「这批结果里根本没有」的场景参数进来（比如手动改 URL、或收藏了旧链接）。
+  // 那时 facets 里没有它，筛选条上就没有任何一项是高亮的 —— 用户看不出自己筛了什么。
+  // 补一个计数为 0 的 chip，保证「当前筛选」永远可见、也永远能点掉。
+  const shown = [...scenes];
+  for (const id of active) {
+    if (!shown.some((scene) => scene.id === id)) shown.push({ id, count: 0 });
+  }
+
   return (
     <div className="mt-3 flex flex-wrap items-center gap-1.5" role="group" aria-label="按场景筛选">
       <Link href={href()} className={chip(active.length === 0)} aria-current={active.length === 0 ? "true" : undefined}>
         全部
         <span className="tabular-nums opacity-70">{total}</span>
       </Link>
-      {scenes.map((scene) => {
+      {shown.map((scene) => {
         const on = active.includes(scene.id);
         return (
           <Link
@@ -114,6 +122,10 @@ export default async function SearchPage({ searchParams }: Props) {
   ]);
   // 拼写纠正后，结果里出现的是纠正词本身，用原词高亮一个也标不中。
   const terms = highlightTermsOf(results.corrected ?? query);
+  // 零结果才诊断：它要多跑几次 COUNT，不该进正常路径。
+  const diagnosis = query && !results.total ? await diagnoseSearch(query, { scenes: activeScenes }) : null;
+  const zeroTerms = (diagnosis?.perTerm ?? []).filter((term) => term.hits === 0).map((term) => term.term);
+  const clearFilterHref = `/search?q=${encodeURIComponent(query)}`;
 
   const pageHref = (target: number) => {
     const next = new URLSearchParams();
@@ -201,24 +213,60 @@ export default async function SearchPage({ searchParams }: Props) {
             </>
           ) : (
             <div className="mt-6 space-y-10">
-              <EmptyState
-                icon={SearchX}
-                title="换个说法试试"
-                actions={
-                  <>
-                    <Button asChild variant="outline">
-                      <Link href="/#catalog">浏览全部工具</Link>
-                    </Button>
-                    <Button asChild variant="ghost">
-                      <Link href="/submit">推荐一款工具</Link>
-                    </Button>
-                  </>
-                }
-              >
-                用更短的名称或常用别名，或者直接写要做的事。也支持拼音和首字母——比如输入{" "}
-                <span className="font-medium text-foreground">tupian</span> 或{" "}
-                <span className="font-medium text-foreground">tp</span> 找「图片」类工具。没收录的工具，也欢迎推荐给我们。
-              </EmptyState>
+              {diagnosis?.reason === "filtered-out" ? (
+                // 查询本身能命中，只是被场景筛选排除了 —— 这时候让用户改查询是误导，
+                // 该做的是把筛选摘掉。
+                <EmptyState
+                  icon={Filter}
+                  title="当前筛选下没有结果"
+                  actions={
+                    <>
+                      <Button asChild>
+                        <Link href={clearFilterHref}>查看全部 {diagnosis.withoutFilters} 条</Link>
+                      </Button>
+                      <Button asChild variant="ghost">
+                        <Link href="/#catalog">浏览全部工具</Link>
+                      </Button>
+                    </>
+                  }
+                >
+                  「{query}」本身能命中{" "}
+                  <span className="font-medium text-foreground tabular-nums">{diagnosis.withoutFilters}</span>{" "}
+                  条，但都不在你选中的场景里。
+                </EmptyState>
+              ) : (
+                <EmptyState
+                  icon={SearchX}
+                  title={zeroTerms.length && zeroTerms.length < (diagnosis?.perTerm?.length ?? 0) ? "有一个词拖累了结果" : "换个说法试试"}
+                  actions={
+                    <>
+                      <Button asChild variant="outline">
+                        <Link href="/#catalog">浏览全部工具</Link>
+                      </Button>
+                      <Button asChild variant="ghost">
+                        <Link href="/submit">推荐一款工具</Link>
+                      </Button>
+                    </>
+                  }
+                >
+                  {zeroTerms.length && (diagnosis?.perTerm?.length ?? 0) > 1 ? (
+                    <>
+                      查询里的「
+                      <span className="font-medium text-foreground">{zeroTerms.join("」「")}</span>
+                      」在全站没有任何匹配，去掉它再试一次也许就够了。
+                    </>
+                  ) : (
+                    <>
+                      用更短的名称或常用别名，或者直接写要做的事。也支持拼音和首字母——比如输入{" "}
+                      <span className="font-medium text-foreground">tupian</span> 或{" "}
+                      <span className="font-medium text-foreground">tp</span> 找「图片」类工具。没收录的工具，也欢迎推荐给我们。
+                    </>
+                  )}
+                </EmptyState>
+              )}
+              {diagnosis?.suggestions?.length ? (
+                <TermList label="你是不是想搜" terms={diagnosis.suggestions} />
+              ) : null}
               <TermList label="大家常搜" terms={taskSuggestions} />
             </div>
           )}

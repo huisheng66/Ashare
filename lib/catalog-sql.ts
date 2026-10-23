@@ -579,6 +579,63 @@ export async function searchFacets(raw: string): Promise<SearchFacets> {
   });
 }
 
+/** 零结果时归因：「被筛选掉」与「真的没匹配」是两件事，处置完全不同。 */
+export type SearchDiagnosis = {
+  /** empty-query：没输入；filtered-out：查询能命中，但被筛选条件筛光了；no-match：查询本身没命中。 */
+  reason: "empty-query" | "filtered-out" | "no-match";
+  /** filtered-out 时：取消筛选能得到的条数。 */
+  withoutFilters?: number;
+  /** no-match 时：逐词的命中数，用来指出是哪个词拖累了整个查询。 */
+  perTerm?: { term: string; hits: number }[];
+  /** no-match 时：可点的替代词（拼写纠正的候选）。 */
+  suggestions?: string[];
+};
+
+/**
+ * 诊断零结果的原因。
+ *
+ * 只在前台拿到 total=0 时调用 —— 它要多跑几次 COUNT，没必要放进正常搜索路径。
+ *
+ * 为什么值得单独做：没有归因的空页面只会说「换个说法试试」，用户不知道是
+ * 「这个词站里没有」还是「筛选太窄」还是「打错字了」。三种情况的下一步动作完全不同。
+ */
+export async function diagnoseSearch(raw: string, filters: SearchFilters = {}): Promise<SearchDiagnosis> {
+  const query = normalizeQuery(raw);
+  if (!query) return { reason: "empty-query" };
+
+  // 有筛选时先摘下筛选试一次：查询能命中就说明是筛选太窄，而不是词不存在。
+  if (searchFilterClause(filters).where.length) {
+    const plain = await searchCatalog(query, 1, 0);
+    if (plain.total > 0) return { reason: "filtered-out", withoutFilters: plain.total };
+  }
+
+  const terms = [...new Set(query.split(" "))].filter(Boolean);
+  const perTerm = await withConnection(async (conn) => {
+    const rows: { term: string; hits: number }[] = [];
+    for (const term of terms) {
+      const one = searchRecallCondition(term, true);
+      const [countRows] = await conn.query<RowDataPacket[]>(
+        "SELECT COUNT(*) AS c FROM items i WHERE " + one.where,
+        one.params,
+      );
+      rows.push({ term, hits: Number(countRows[0].c) });
+    }
+    return rows;
+  });
+
+  // 只对「单看也 0 命中」的词给建议：有命中的词不需要替换，
+  // 给它们建议反而会让用户以为整个查询错在哪。
+  const vocabulary = await nameVocabulary();
+  const suggestions: string[] = [];
+  for (const { term, hits } of perTerm) {
+    if (hits > 0) continue;
+    const fixed = pickCorrection(term, vocabulary);
+    if (fixed && !suggestions.includes(fixed)) suggestions.push(fixed);
+  }
+
+  return { reason: "no-match", perTerm, suggestions };
+}
+
 export async function searchCatalog(
   raw: string,
   limit: number,
