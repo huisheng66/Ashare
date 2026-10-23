@@ -38,7 +38,7 @@ type SuggestionResponse = { items: SuggestionItem[]; total: number; fuzzy: boole
 type FetchState =
   | { status: "idle" }
   | { status: "loading"; query: string }
-  | { status: "done"; query: string; items: SuggestionItem[]; corrected?: string };
+  | { status: "done"; query: string; items: SuggestionItem[]; total: number; corrected?: string };
 
 const DEBOUNCE_MS = 200;
 const SUGGEST_LIMIT = 6;
@@ -185,6 +185,7 @@ export function SearchCommand({
             status: "done",
             query: trimmed,
             items: Array.isArray(data.items) ? data.items : [],
+            total: Number.isFinite(data.total) ? data.total : 0,
             corrected: typeof data.corrected === "string" ? data.corrected : undefined,
           });
         })
@@ -192,7 +193,7 @@ export function SearchCommand({
           if (error instanceof DOMException && error.name === "AbortError") return;
           if (controller.signal.aborted) return;
           // 请求失败按「无结果」处理：不弹错、不空白，用户仍可回车走完整搜索页。
-          setSuggest({ status: "done", query: trimmed, items: [] });
+          setSuggest({ status: "done", query: trimmed, items: [], total: 0 });
         });
     }, DEBOUNCE_MS);
     return () => {
@@ -229,6 +230,8 @@ export function SearchCommand({
   const fresh = suggest.status !== "idle" && suggest.query === trimmed ? suggest : null;
   const results = fresh?.status === "done" ? fresh.items : [];
   const corrected = fresh?.status === "done" ? fresh.corrected : undefined;
+  // 只在「还有更多」时展示总数：6 条以内全都列出来了，再写「共 4 条」是废话。
+  const totalCount = fresh?.status === "done" ? fresh.total : 0;
   // 尚未取到当前词的结果（无 state / 正在加载）都算挂起，显示加载态而不是「无结果」。
   const pending = searching && (fresh === null || fresh.status === "loading");
 
@@ -265,6 +268,9 @@ export function SearchCommand({
                   <Search className="size-4" aria-hidden="true" />
                   <span className="min-w-0 flex-1 truncate">
                     在站内搜索「<span className="font-medium text-foreground">{trimmed}</span>」
+                    {totalCount > results.length ? (
+                      <span className="ml-1.5 text-xs text-muted-foreground tabular-nums">共 {totalCount} 条</span>
+                    ) : null}
                   </span>
                   <CornerDownLeft className="size-3.5 opacity-60" aria-hidden="true" />
                 </CommandItem>
