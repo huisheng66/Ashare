@@ -52,6 +52,11 @@ type SuggestionResponse = {
   total: number;
   /** true 表示严格匹配无结果、已放宽为 OR 语义（透传底层容错标记，前台可据此提示）。 */
   fuzzy: boolean;
+  /**
+   * 拼写纠正后的查询词。面板据此在结果上方标一行「已按 X 搜索」——
+   * 悄悄把用户的输入换掉是不诚实的，尤其面板里一按回车就跳转，更容易让人以为搜的是原词。
+   */
+  corrected?: string;
 };
 
 function json(body: unknown, status = 200): Response {
@@ -88,10 +93,11 @@ export async function GET(request: NextRequest): Promise<Response> {
   // 空查询不是错误：面板在输入框为空时会请求一次，这里如实回空数组即可。
   if (!query) return json({ items: [], total: 0, fuzzy: false } satisfies SuggestionResponse);
 
-  const { items, total, fuzzy } = await searchCatalog(query, limit, 0);
+  const { items, total, fuzzy, corrected } = await searchCatalog(query, limit, 0);
   return json({
     items: items.map(({ slug, name, nameZh, icon }) => ({ slug, name, nameZh, icon })),
     total,
     fuzzy,
+    ...(corrected ? { corrected } : {}),
   } satisfies SuggestionResponse);
 }

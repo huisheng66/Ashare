@@ -47,7 +47,8 @@ export default async function SearchPage({ searchParams }: Props) {
   const query = searchQueryParam(params.q);
   // 搜索与分页都下推：不再把整份目录读进内存再打分。
   const [results, counts] = await Promise.all([searchCatalog(query, parseCatalogPage(params)), catalogCounts()]);
-  const terms = highlightTermsOf(query);
+  // 拼写纠正后，结果里出现的是纠正词本身，用原词高亮一个也标不中。
+  const terms = highlightTermsOf(results.corrected ?? query);
 
   const pageHref = (target: number) => {
     const next = new URLSearchParams();
@@ -78,7 +79,17 @@ export default async function SearchPage({ searchParams }: Props) {
             {results.total ? (
               <>
                 找到 <span className="font-semibold text-foreground tabular-nums">{results.total}</span> 款，按相关度排列
-                {results.fuzzy ? <span className="ml-1">（严格匹配没有结果，以下是放宽后的相近项）</span> : null}
+                {results.corrected ? (
+                  <span className="ml-1">
+                    （没有「{query}」的结果，已按「{results.corrected}」搜索 ——{" "}
+                    <Link href={`/search?q=${encodeURIComponent(query)}`} className="underline underline-offset-2">
+                      仍搜原词
+                    </Link>
+                    ）
+                  </span>
+                ) : results.fuzzy ? (
+                  <span className="ml-1">（严格匹配没有结果，以下是放宽后的相近项）</span>
+                ) : null}
               </>
             ) : (
               "没有找到匹配的工具"

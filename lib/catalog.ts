@@ -135,7 +135,15 @@ export async function queryCatalog(filters: CatalogFilters, page = 1): Promise<C
   };
 }
 
-export type SearchPage = { items: CatalogItem[]; total: number; page: number; pageCount: number; fuzzy: boolean };
+export type SearchPage = {
+  items: CatalogItem[];
+  total: number;
+  page: number;
+  pageCount: number;
+  fuzzy: boolean;
+  /** 拼写纠正后的查询词；有值时前台要显示「已按 X 搜索」。 */
+  corrected?: string;
+};
 
 /**
  * 搜索：SQL 路径走 FULLTEXT + ngram（短词 LIKE 兜底），JSON 路径用内存打分。
@@ -147,8 +155,10 @@ export async function searchCatalog(query: string, page = 1): Promise<SearchPage
   const offset = (safePage - 1) * PAGE_SIZE;
 
   if (mysqlDriver()) {
-    const { items, total, fuzzy } = await sql.searchCatalog(query, PAGE_SIZE, offset);
-    return { items, total, page: safePage, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)), fuzzy };
+    const { items, total, fuzzy, corrected } = await sql.searchCatalog(query, PAGE_SIZE, offset);
+    return {
+      items, total, page: safePage, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)), fuzzy, corrected,
+    };
   }
 
   const results = query ? searchSoftware(query, await allPublished()) : [];

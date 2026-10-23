@@ -1,5 +1,50 @@
 # 变更记录
 
+## 2026-10-23 · 搜索三处真实缺陷：拼音排序失效、拼写容错缺失、标签信号未用
+
+这一轮不是加功能，是修「一直存在但没人测出来」的问题。三个都靠实测数据发现，不是猜的。
+
+### 1. 拼音查询根本没有排序（最严重）
+
+拼音命中只影响「能否召回」，不进 ORDER BY。而纯拼音查询时 `MATCH(search_text)` 恒为 0、
+`NAME_RANK` 也全打平，于是整批结果**只剩 sort_index 在排**。实测：
+
+```
+yinyue → mineradio(92), musicbrainz-picard(94), navidrome(110), beets(111), spotube(370)
+```
+
+mineradio 的拼音得分 3.7，lx-music-desktop 是 10.5 却排第五 —— 用户会直接判定「搜得不准」。
+修法：ORDER BY 里 MATCH(search_text) 之后补一档 MATCH(search_pinyin)。原文命中的得分必 > 0，
+纯拼音命中的恒为 0，所以「原文优先于拼音」这个意图靠排序本身就能表达，不必再套 CASE。
+
+修后：`yinyue → lx-music-desktop, spotube, mopidy, mineradio, nuclear`（播放器在前，电台在后）。
+
+### 2. 单词拼错必然 0 结果，且 SQL 层无解
+
+`obisidan`、`joplinn` 这类拼写错误：布尔模式 0 条，**去掉 `+` 的 OR 模式同样 0 条**。
+根因是 ngram parser 把「单个词的 ngram」当**短语**处理，要求所有 bigram 连续出现 ——
+拼错一个字母就断链，降级到 OR 也救不回来（OR 作用在多词之间，不是单词内部的片段）。
+
+只能在应用层补：新增 `lib/spell-correct.ts`，严格与放宽都空手时，拿查询词和
+名称/中文名/别名做编辑距离比对（≥7 字母容 2 处、5~6 容 1 处、更短不纠；中文不参与）。
+命中则带着纠正词重查一次，并把 `corrected` 透传到页面与建议接口 ——
+搜索结果页显示「没有『obisidan』的结果，已按『Obsidian』搜索」，并给「仍搜原词」的链接。
+悄悄换掉用户的输入是不诚实的。
+
+### 3. 标签是策展信号，但排序没用它
+
+全文相关度是词频驱动的，词频在软件目录里是噪音。实测搜「图片」，yazi（终端文件管理器）
+仅因简介提到「图片预览」就挤进前六。`item_tags` 里的标签是人工标注的类目，比简介可靠得多。
+ORDER BY 在名称分档之后补一档 EXISTS(item_tags 命中)，再下面才是词频。
+
+### 4. 顺手修掉测试的一个假红
+
+`db.test.mjs` 的两个 FTS 探针测试会随机失败（同一份代码连跑两次：59/0 与 57/2）。
+根因是新数据的索引可见性延迟（见坑位第 54 条），加带重试的 `eventually()` 断言即可稳定。
+
+**验证**：`npm run check` 306 项 0 失败 · `npm run test:db` 67 项 64 通过 0 失败（3 项跳过）·
+`/search?q=obisidan` HTTP 200 且显示纠正提示 · `/api/suggest?q=obisidan` 返回 `corrected: "Obsidian"`。
+
 ## 2026-10-15 · GitHub 热门实用项目净增 50 条（110 → 160）
 
 上一批说完「按场景最薄选」，这批直接把库存拉到均线：先写 `data/inbox/plan-50/manifest.json`

@@ -266,3 +266,59 @@ test("搜索：分页越界返回空数组，total 仍是全量", { skip }, asyn
   assert.equal(beyond.total, first.total);
   assert.deepEqual(beyond.items, []);
 });
+
+test("搜索：拼音查询按相关度排序，不退化为目录顺序", { skip }, async () => {
+  // 曾经的缺陷：拼音命中只影响「能否召回」，不进排序。而纯拼音查询时
+  // MATCH(search_text) 恒为 0、NAME_RANK 也全打平，整批结果就只剩 sort_index 在起作用。
+  // 实测搜 yinyue 时 mineradio（sort_index 92）压过 lx-music-desktop（395），
+  // 尽管后者的拼音得分是前者的近三倍 —— 用户会觉得「搜得不准」。
+  const result = await sql.searchCatalog("yinyue", PAGE, 0);
+  assert.ok(result.total > 3, "yinyue 应有多个结果");
+
+  const catalogOrder = await query(
+    "SELECT i.slug FROM items i WHERE i.status = 'published' AND MATCH(i.search_pinyin) AGAINST(? IN BOOLEAN MODE) ORDER BY i.sort_index ASC, i.id ASC LIMIT ?",
+    ["+yinyue", PAGE],
+  );
+  assert.notDeepEqual(
+    result.items.map((item) => item.slug),
+    catalogOrder.map((row) => row.slug),
+    "拼音查询应按拼音相关度排序，而不是退回目录顺序",
+  );
+});
+
+test("搜索：标签命中排在「仅在简介里提及」之前", { skip }, async () => {
+  // tags 是人工策展的类目，比简介里顺带提一句可靠得多。
+  // 搜「知识管理」时只有 obsidian / joplin 打了这个标签，它们应占据结果最前。
+  const tagged = await query(
+    "SELECT i.slug FROM items i JOIN item_tags t ON t.item_id = i.id WHERE t.tag = ? AND i.status = 'published' ORDER BY i.slug",
+    ["知识管理"],
+  );
+  assert.ok(tagged.length > 0, "种子数据里应有打了「知识管理」标签的条目");
+
+  const result = await sql.searchCatalog("知识管理", PAGE, 0);
+  assert.ok(result.total >= tagged.length, "打了标签的条目必须都能被召回");
+  const top = result.items.slice(0, tagged.length).map((item) => item.slug).sort();
+  assert.deepEqual(top, tagged.map((row) => row.slug), "打了该标签的条目应占据结果最前");
+});
+
+test("搜索：单词拼错能纠正到原名，并把纠正词透传出去", { skip }, async () => {
+  // SQL 层救不回来：ngram parser 把单个词的 ngram 当短语，拼错一个字母就要求
+  // 所有 bigram 连续命中，布尔与非布尔模式都返回 0（实测 obisidan / joplinn 均如此）。
+  // 所以这是应用层拼写纠正的存在理由，不是「锦上添花」。
+  const result = await sql.searchCatalog("obisidan", PAGE, 0);
+  assert.ok(result.total > 0, "拼错一个字母不该 0 结果");
+  assert.equal(result.corrected?.toLowerCase(), "obsidian", "应纠正为原名");
+  assert.equal(result.items[0]?.slug, "obsidian", "纠正后原名应排第一");
+});
+
+test("搜索：纠正不改变正确输入的语义", { skip }, async () => {
+  const exact = await sql.searchCatalog("joplin", PAGE, 0);
+  assert.equal(exact.corrected, undefined, "输入本来就是对的，不该标记纠正");
+  assert.equal(exact.items[0]?.slug, "joplin");
+});
+
+test("搜索：无从纠正时如实返回空，不瞎猜", { skip }, async () => {
+  const result = await sql.searchCatalog("zzzznotfound", PAGE, 0);
+  assert.equal(result.total, 0);
+  assert.equal(result.corrected, undefined, "找不到相近名称时不能硬套一个纠正词");
+});

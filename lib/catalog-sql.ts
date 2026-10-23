@@ -4,6 +4,7 @@ import type { CatalogCounts, CatalogItem, ItemKind, Platform, SceneId, Software 
 import { assembleSoftware, loadChildren, loadItem, loadItemsBySlugs } from "./catalog-persist.ts";
 import { getPool } from "./db.ts";
 import { kindIds, platformIds, sceneIds, type CatalogFilters } from "./catalog-query.ts";
+import { pickCorrection } from "./spell-correct.ts";
 
 /**
  * 目录的 SQL 读路径。
@@ -288,7 +289,74 @@ export type SearchResult = {
   total: number;
   /** true 表示严格匹配无结果、已放宽为 OR 语义（容错降级）。调用方据此提示读者。 */
   fuzzy: boolean;
+  /**
+   * 拼写纠正后的查询词（仅当原查询 0 结果、且纠正后才命中时才有值）。
+   * 前台据此显示「已按 X 搜索」—— 悄悄换掉用户的输入是不诚实的。
+   */
+  corrected?: string;
 };
+
+/**
+ * 名称词表，供拼写纠正比对。
+ *
+ * 只收名称/中文名/别名：简介里的词不是「用户想找的东西的名字」，
+ * 拿它做编辑距离纠正会把 git 纠成 get 之类的噪音。
+ *
+ * 带 5 分钟缓存：纠正只在 0 结果时触发（罕见路径），但一次 415 行的全表扫
+ * 也不该在用户连打错几个词时反复执行。
+ */
+let vocabularyCache: { at: number; words: string[] } | null = null;
+const VOCABULARY_TTL_MS = 5 * 60_000;
+
+async function nameVocabulary(): Promise<string[]> {
+  if (vocabularyCache && Date.now() - vocabularyCache.at < VOCABULARY_TTL_MS) {
+    return vocabularyCache.words;
+  }
+  const words = await withConnection(async (conn) => {
+    const [rows] = await conn.query<RowDataPacket[]>(
+      "SELECT name, name_zh, aliases FROM items WHERE status = 'published'",
+    );
+    const set = new Set<string>();
+    for (const row of rows) {
+      if (typeof row.name === "string" && row.name.trim()) set.add(row.name.trim());
+      if (typeof row.name_zh === "string" && row.name_zh.trim()) set.add(row.name_zh.trim());
+      // aliases 是 JSON 列：驱动可能返回已解析的数组，也可能返回字符串。
+      let aliases: unknown = row.aliases;
+      if (typeof aliases === "string") {
+        try {
+          aliases = JSON.parse(aliases);
+        } catch {
+          aliases = [];
+        }
+      }
+      if (Array.isArray(aliases)) {
+        for (const alias of aliases) {
+          if (typeof alias === "string" && alias.trim()) set.add(alias.trim());
+        }
+      }
+    }
+    return [...set];
+  });
+  vocabularyCache = { at: Date.now(), words };
+  return words;
+}
+
+/** 逐词尝试纠正；没有任何词被改动时返回 null（调用方据此跳过二次查询）。 */
+async function correctQuery(query: string): Promise<string | null> {
+  const terms = query.split(" ").filter(Boolean);
+  if (!terms.length) return null;
+  const vocabulary = await nameVocabulary();
+  let changed = false;
+  const fixed = terms.map((term) => {
+    const hit = pickCorrection(term, vocabulary);
+    if (hit && hit.toLowerCase() !== term.toLowerCase()) {
+      changed = true;
+      return hit;
+    }
+    return term;
+  });
+  return changed ? fixed.join(" ") : null;
+}
 
 /**
  * 原文召回条件（search_text）。strict=true 时每个词都必须命中（布尔模式的 + 前缀）；
@@ -360,17 +428,22 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
   const query = normalizeQuery(raw);
   if (!query) return { items: [], total: 0, fuzzy: false };
 
-  const longTerms: string[] = [];
-  const shortTerms: string[] = [];
-  for (const term of [...new Set(query.split(" "))].filter(Boolean)) {
-    const sanitized = booleanTerm(term);
-    // 用净化后的长度判断能否交给 ngram：净化后只剩 1 个字符，MATCH 同样查不到。
-    if (sanitized.length >= NGRAM_TOKEN_SIZE) longTerms.push(sanitized);
-    else shortTerms.push(term);
-  }
+  const termsOf = (value: string) => {
+    const long: string[] = [];
+    const short: string[] = [];
+    for (const term of [...new Set(value.split(" "))].filter(Boolean)) {
+      const sanitized = booleanTerm(term);
+      // 用净化后的长度判断能否交给 ngram：净化后只剩 1 个字符，MATCH 同样查不到。
+      if (sanitized.length >= NGRAM_TOKEN_SIZE) long.push(sanitized);
+      else short.push(term);
+    }
+    return { longTerms: long, shortTerms: short };
+  };
 
-  const run = (strict: boolean): Promise<SearchResult> => {
-    const text = textRecall(longTerms, shortTerms, query, strict);
+  /** `q` 默认是清洗后的原查询；拼写纠正后会带着纠正词再跑一次。 */
+  const run = (strict: boolean, q: string = query): Promise<SearchResult> => {
+    const { longTerms, shortTerms } = termsOf(q);
+    const text = textRecall(longTerms, shortTerms, q, strict);
     const pinyin = pinyinRecall(longTerms, strict);
     const condition = "i.status = 'published' AND (" + text.where + " OR " + pinyin.where + ")";
     const whereParams = [...text.params, ...pinyin.params];
@@ -383,14 +456,38 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
       const total = Number(countRows[0].c);
       if (!total) return { items: [], total: 0, fuzzy: !strict };
 
-      const like = escapeLike(query);
+      const like = escapeLike(q);
       const orderParams: unknown[] = [
-        query, query, like + "%", like + "%", "%" + like + "%", "%" + like + "%", "%" + like + "%",
+        q, q, like + "%", like + "%", "%" + like + "%", "%" + like + "%", "%" + like + "%",
       ];
       let order = NAME_RANK;
+      // 标签命中：`tags` 是人工策展的类目（item_tags 子表），比「简介里顺带提了一句」可靠得多。
+      //
+      // 为什么需要这一档：全文相关度是**词频**驱动的，而词频在软件目录里是噪音而不是信号。
+      // 实测搜「图片」时，yazi（终端文件管理器）仅因简介提到「图片预览」就挤进前六，
+      // 真正的图片工具反而被压下去。标签精确覆盖了这个语义：「图片」是 photocraft 的类目，
+      // 只是 yazi 的一句描述。
+      //
+      // 放在名称分档之后、全文相关度之前：名称命中最强，标签命中次之，词频再次之。
+      const tagTerms = [...new Set(q.split(" "))].filter(Boolean);
+      if (tagTerms.length) {
+        const conds = tagTerms.map(() => "it.tag LIKE ?").join(" OR ");
+        order +=
+          ", CASE WHEN EXISTS (SELECT 1 FROM item_tags it WHERE it.item_id = i.id AND (" +
+          conds +
+          ")) THEN 0 ELSE 1 END ASC";
+        for (const term of tagTerms) orderParams.push("%" + escapeLike(term) + "%");
+      }
       if (longTerms.length) {
+        // 原文相关度放在拼音相关度之前：原文命中的行得分必 > 0，纯拼音命中的恒为 0，
+        // 于是「原文命中一律优先于纯拼音命中」这个意图靠排序本身就能表达，不必再套 CASE。
         order += ", MATCH(i.search_text) AGAINST(? IN BOOLEAN MODE) DESC";
         orderParams.push(longTerms.map((term) => "+" + term).join(" "));
+        // 拼音相关度。不加这一档的话，拼音查询会退化成「只按目录顺序排」——
+        // 实测搜 yinyue 时 mineradio（sort_index 92）压过 lx-music-desktop（395），
+        // 尽管后者的拼音得分是前者的近三倍。这是个真实缺陷，不是调优。
+        order += ", MATCH(i.search_pinyin) AGAINST(? IN BOOLEAN MODE) DESC";
+        orderParams.push(longTerms.map((term) => (strict ? "+" : "") + term).join(" "));
       }
       order += ", i.sort_index ASC, i.id ASC";
 
@@ -404,5 +501,21 @@ export async function searchCatalog(raw: string, limit: number, offset: number):
 
   const strict = await run(true);
   if (strict.total) return strict;
-  return run(false);
+
+  // 严格 AND 空手 → 先按 OR 语义给部分结果（多词查询常能救回来）。
+  const relaxed = await run(false);
+  if (relaxed.total) return relaxed;
+
+  // 连 OR 都空手，说明是**单词拼错**。这一步不能省给 SQL：
+  // ngram parser 把单个词的 ngram 当短语，拼错一个字就要求所有 bigram 连续命中，
+  // 布尔模式与非布尔模式都会返回 0（实测 obisidan / joplinn 均如此）。
+  // 只能在应用层比对名称的编辑距离。
+  const corrected = await correctQuery(query);
+  if (corrected && corrected !== query) {
+    for (const strictRetry of [true, false]) {
+      const retried = await run(strictRetry, corrected);
+      if (retried.total) return { ...retried, fuzzy: true, corrected };
+    }
+  }
+  return relaxed;
 }

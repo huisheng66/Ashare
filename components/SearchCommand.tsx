@@ -26,7 +26,7 @@ import { taskSuggestions } from "@/lib/navigation";
 
 /** 与 /api/suggest 的窄投影同形状。用 Pick 绑定 CatalogItem，接口一改这里同时报错。 */
 type SuggestionItem = Pick<CatalogItem, "slug" | "name" | "nameZh" | "icon">;
-type SuggestionResponse = { items: SuggestionItem[]; total: number; fuzzy: boolean };
+type SuggestionResponse = { items: SuggestionItem[]; total: number; fuzzy: boolean; corrected?: string };
 
 /**
  * 取数状态带上「它是为哪个查询词取的」。
@@ -38,7 +38,7 @@ type SuggestionResponse = { items: SuggestionItem[]; total: number; fuzzy: boole
 type FetchState =
   | { status: "idle" }
   | { status: "loading"; query: string }
-  | { status: "done"; query: string; items: SuggestionItem[] };
+  | { status: "done"; query: string; items: SuggestionItem[]; corrected?: string };
 
 const DEBOUNCE_MS = 200;
 const SUGGEST_LIMIT = 6;
@@ -185,6 +185,7 @@ export function SearchCommand({
             status: "done",
             query: trimmed,
             items: Array.isArray(data.items) ? data.items : [],
+            corrected: typeof data.corrected === "string" ? data.corrected : undefined,
           });
         })
         .catch((error: unknown) => {
@@ -227,6 +228,7 @@ export function SearchCommand({
   // 只采用「为当前查询词」取回的结果，避免防抖窗口里拿旧结果冒充新结果。
   const fresh = suggest.status !== "idle" && suggest.query === trimmed ? suggest : null;
   const results = fresh?.status === "done" ? fresh.items : [];
+  const corrected = fresh?.status === "done" ? fresh.corrected : undefined;
   // 尚未取到当前词的结果（无 state / 正在加载）都算挂起，显示加载态而不是「无结果」。
   const pending = searching && (fresh === null || fresh.status === "loading");
 
@@ -267,6 +269,13 @@ export function SearchCommand({
                   <CornerDownLeft className="size-3.5 opacity-60" aria-hidden="true" />
                 </CommandItem>
               </CommandGroup>
+
+              {corrected && results.length > 0 ? (
+                // 纠正提示必须显式：面板里一按回车就跳转，用户会以为自己搜的是原词。
+                <div className="px-3 pb-1.5 text-xs text-muted-foreground" role="status">
+                  没有「{trimmed}」的结果，已按「<span className="font-medium text-foreground">{corrected}</span>」搜索
+                </div>
+              ) : null}
 
               {results.length > 0 ? (
                 <CommandGroup heading="软件">

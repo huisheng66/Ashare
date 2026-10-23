@@ -229,6 +229,9 @@ clicks                       出站点击
 52. **`ALTER TABLE ... DROP INDEX` / `ADD FULLTEXT INDEX` 重建不了 ngram token —— 必须 `OPTIMIZE TABLE`。** MySQL 8.0.46 实测：把停用词表换成空表后，用 DROP+ADD 重建 `ft_items_search`，**含 a/i 的 token 依然缺失**（`MATCH(search_pinyin) AGAINST('af')` 恒为 0，`INNODB_FT_INDEX_TABLE` 里连一个 a 开头的 word 都没有）；同一张表改用 `OPTIMIZE TABLE items`（内部 recreate + analyze）后立刻恢复（a 开头的 token 重新出现、`af` 命中 darktable）。**对照组**：新建一张空表 + 新建 ngram 全文索引 + 插入同样文本，token 完全正常 —— 说明问题只在「在既有索引上换配置」，不在配置本身。这解释了「停用词变量查着是空的，却还是搜不到」这个最难查的状态；`scripts/db-reindex.mjs` 已改为 OPTIMIZE。
 53. **测试里只重放部分迁移 = 顺序耦合。** `tests/catalog-sql.test.mjs` 原先只执行 `0001_init.sql` 再 DELETE 数据，于是它的 schema 依赖「上一个测试文件跑完留下的产物」。加迁移 0007 后立刻炸 `Unknown column 'search_pinyin'`，而且换一个执行顺序可能是绿的 —— 属于最难复现的一类。改为与 `search-sql.test.mjs` 一致：先按子表→主表 DROP，再按文件名排序重放**全部**迁移。
 54. **InnoDB 全文索引对新事务提交的行有可见性延迟。** 批量 `persistCatalog` 在一个事务里插完 107 条并 commit 后立即查询，会漏行（`search-sql.test.mjs` 的「不漏也不多」因此随机报缺，如「电路」漏 kicad）；而单条 autocommit 插入立即可见。测试 setup 里加一次 `OPTIMIZE TABLE` 强制同步即可稳定。**注意这与 52 是两件事**：52 是重建 token 的方式不对，这条是新数据的可见性时机。
+55. **ngram parser 把「单个词的 ngram」当短语，所以单词拼错必然 0 结果。** 实测 `obisidan`（想搜 Obsidian）：布尔模式 `+obisidan` 返回 0，**去掉 `+` 的非布尔模式同样是 0**。原因是 ngram 会把查询词切成 `ob/bi/is/si/id/da/an` 并要求它们连续出现（短语语义），拼错一个字母就断链。**降级到 OR 只作用于多词之间，救不了单词内部的片段断裂** —— 这一条容易被误认为「容错已经做了」，实际对最常见的错误类型（打错一个字母）完全无效。只能在应用层用编辑距离补，见 `lib/spell-correct.ts`。顺带记录边界：3~4 字母不纠正（编辑距离 1 的覆盖面太大，`git` 会被纠成 `get`），中文不纠正（中文只有打错字，没有拼错）。
+56. **词频相关度在软件目录里是噪音，不是信号。** `MATCH ... AGAINST` 的分数由词频驱动，于是「简介里把某个词重复最多的条目」排最前。实测搜「图片」时 yazi（终端文件管理器）因简介写了「图片预览」挤进前六；搜「笔记」时 Trilium（7.69 分）压过 Obsidian（5.49 分），仅仅因为它的别名和简介里「笔记」出现得更频繁。对目录站来说，可靠的排序信号依次是：名称/别名命中 → 人工策展的标签命中 → 词频 → 目录顺序。词频不能删（多词查询要靠它区分命中完整度），但必须排在策展信号之后。
+
 
 ## 八、本地开发环境
 
