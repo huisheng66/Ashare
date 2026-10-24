@@ -63,6 +63,23 @@
 - 没有订阅（`listChanged: false`）：目录更新频率是每天几条，不值得为它维护推送。
 - 没有鉴权与配额分级：公开只读，靠 IP 限流挡住脚本。
 
+### 本机实测记录（2026-10-24）
+
+在开发机上真的连过一遍，不是只看文档：
+
+| 客户端 | 怎么验的 | 结果 |
+| --- | --- | --- |
+| Claude Code 2.x | `claude mcp add -s local -t http` → `claude mcp list` 健康检查 → `claude -p` 真实提问 | `√ Connected`；模型调用 `search_tools("视频剪辑")` 返回 `autoclip / lossless-cut / kdenlive` |
+| Codex CLI | `codex mcp add --url` → `codex exec` 让它真的调工具 | 日志 `mcp: ashare/search_tools started → completed`，同样返回三条 slug |
+| stdio 桥（Claude Desktop 那一类） | 用 `npx -y mcp-remote <URL> --transport http-only` 手工喂 initialize / tools/list / tools/call | 握手、列工具、调用全部成功；日志 `Connected to remote server using StreamableHTTPClientTransport`（即官方 SDK 的客户端） |
+| Qoder IDE | 只确认到 `~/.qoder/mcp.json` 存在且当前为空 | 无法在无 GUI 下验证；未能在现有配置里看出它认 `url` 还是 `serverUrl` |
+| WorkBuddy | `~/.workbuddy/mcp.json` 已有 stdio 服务在跑（本会话的工具列表里能看到它的工具） | 加载机制已证明可用；新增本条需重启应用 + 在界面上「信任」 |
+
+两点经验：
+
+- **配置键不要猜**。同一个概念有 `servers` / `mcpServers`、`url` / `serverUrl` 三种写法，写错了客户端通常只是静默不加载。
+- **Codex 会重写自己的 config.toml**（补 `type = "stdio"`、键排序、浮点格式化）。临时加一条测试服务再删掉，文件不会字节还原 —— 要验就先把 config.toml 备份出来，验完覆盖回去。
+
 ## 客户端接入：目标是「谁都能接」
 
 MCP 客户端在传输与配置键上并不统一，这一节按「怎么连上」分类，而不是按产品列表。
