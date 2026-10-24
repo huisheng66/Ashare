@@ -13,6 +13,7 @@
 | 公开页面、搜索筛选、SEO | [前台](./frontend.md) |
 | 后台管理、账号权限、审核流 | [后台管理](./admin.md) |
 | CSP、防盗链、限速、封禁 | [安全机制](./security.md) |
+| 给 agent 用的 MCP 端点 | [给 agent 用](./agent-access.md) |
 | 19 个运维脚本、备份、CI、部署 | [脚本与运维](./operations.md) |
 | 测试怎么跑、都测什么 | [测试与验证](./testing.md) |
 

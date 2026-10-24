@@ -46,6 +46,38 @@ npm run dev                  # 或 npm run build && npm run start
 
 误报因环境而异：2026-10-04 实测在本机是 3 个（inkscape 与 jasp 的 Cloudflare 403、texstudio 的代理超时），**在 GitHub runner 上全部 200**。它们是本机网络环境的产物，不是站点问题。`--flaky-ok` 仍保留，作为将来 runner 换 IP 时的防护。
 
+## 给 agent 用（MCP）
+
+站内数据通过 MCP 暴露成只读工具，用户可以在自己的 agent（Claude Code、Cursor、WorkBuddy 等）里直接问「我要一个能批量压缩图片的工具」，不用打开网页。
+
+端点：`POST https://<站点>/api/mcp`（Streamable HTTP，不提供 SSE 流；`GET` 返回 405）。
+
+| 工具 | 用途 |
+|---|---|
+| `search_tools` | 按需求/名称/拼音搜（`query` 必填，可选 `scene` / `platform` / `limit`） |
+| `get_tool` | 按 slug 读详情：适合谁、不适合谁、安装步骤、渠道、许可证、同类替代 |
+| `list_scenes` | 12 个使用场景及条目数，用于确定 `scene` 取值 |
+
+接入方式（以 Claude Code 为例）：
+
+```bash
+claude mcp add --transport http ashare https://<站点>/api/mcp
+```
+
+其它客户端在配置里写 URL 即可（WorkBuddy / Cursor 这类 `mcp.json` 形态）：
+
+```json
+{ "mcpServers": { "ashare": { "url": "https://<站点>/api/mcp" } } }
+```
+
+冒烟一条：
+
+```bash
+curl -s https://<站点>/api/mcp -H 'content-type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search_tools","arguments":{"query":"压缩图片"}}}'
+```
+
+边界：无鉴权、只读、按 IP 60 次/分钟限流；不暴露草稿、后台字段与点击数据。工具输出是给人读的 Markdown，正文照实返回，详细教程只给链接（几千字塞进上下文没有意义）。实现见 `lib/mcp-protocol.ts`（协议层，无数据库依赖）与 `lib/mcp-tools.ts`（工具实现）。
 ## 安全机制
 
 - 口令只存 scrypt 哈希；session 为 HMAC 签名 cookie（HttpOnly / Secure / SameSite=Strict / Path=/admin）。

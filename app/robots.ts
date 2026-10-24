@@ -9,7 +9,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/search"],
+      // /api/mcp 是给 agent 的公开只读端点，不是网页；爬虫抓它没意义，还占限流额度。
+      disallow: ["/admin", "/search", "/api/"],
     },
     sitemap: absoluteSiteUrl("/sitemap.xml"),
   };
