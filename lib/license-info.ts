@@ -31,6 +31,7 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   "PSF-2.0": { summary: "允许商用闭源分发", tier: "permissive", allowsClosedSource: true },
   Unlicense: { summary: "公有领域，可闭源分发", tier: "permissive", allowsClosedSource: true },
   "CC0-1.0": { summary: "公有领域，可闭源分发", tier: "permissive", allowsClosedSource: true },
+  // Zlib：宽松许可，与 MIT 近似，额外要求「修改版不得声称是原版」。
   Zlib: { summary: "允许商用闭源分发", tier: "permissive", allowsClosedSource: true },
   "BSL-1.0": { summary: "允许商用闭源分发", tier: "permissive", allowsClosedSource: true },
   "0BSD": { summary: "公有领域等价", tier: "permissive", allowsClosedSource: true },
@@ -79,6 +80,17 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   // CC-BY-SA-4.0：允许商用，但要求署名且衍生作品同方式共享，属内容型强 copyleft。
   "CC-BY-SA-4.0": { summary: "允许商用，需署名且衍生作品同方式共享", tier: "strong-copyleft", allowsClosedSource: false },
   // ELv2：源码可见但**不是**开源许可，核心限制是「不得作为托管服务转售」。Airbyte 用它。
+  // OFL-1.1：字体专用。**字体本身**是 copyleft（改后需同名开源），但把它嵌进文档/软件不受限。
+  // 这一条对「能不能商用」的判断容易出错，所以文案要写清边界。
+  "OFL-1.1": {
+    summary: "字体专用：可自由嵌入与商用，但修改字体本身需沿用同许可",
+    tier: "weak-copyleft",
+    allowsClosedSource: true,
+  },
+  // EPL-2.0：弱 copyleft，只约束「被修改的文件」，链接调用不受影响。
+  "EPL-2.0": { summary: "修改的文件需开源，链接调用不受限", tier: "weak-copyleft", allowsClosedSource: true },
+  // MulanPSL-2.0：木兰宽松许可证（国内主导），条款接近 Apache-2.0 但无专利报复条款。
+  "MulanPSL-2.0": { summary: "宽松许可（木兰），保留声明即可商用与闭源", tier: "permissive", allowsClosedSource: true },
   "ELv2": { summary: "源码可见，禁止作为托管服务转售", tier: "strong-copyleft", allowsClosedSource: false },
   // FIT2CLOUD：DataEase 的厂商自定义许可，基于 GPL-3.0 附加品牌限制（不得改 Logo/名称）。
   // 自定义许可无法归入 SPDX，按原文如实描述，不拔高也不贬低。
