@@ -1,5 +1,41 @@
 # 变更记录
 
+## 2026-10-24 · 治理「制图」场景：43 条误归条目回到真实主场景（55 → 12）
+
+`engineering` 这个 id 的字面意思是「工程」，场景名与描述却是**制图**（画零件、布电路、做三维或地图）。
+早期批量收录按英文 id 理解，把网关、数据库、PaaS、监控、漏洞扫描、投屏、反编译一路塞了进来——
+点开「制图」看到 nginx 和 TiDB，这个场景就没法用了。
+
+### 判定口径
+
+只保留「能产出工程图或几何模型」的工具：二维/三维 CAD、参数化建模、EDA、电路仿真、GIS、工程图表。
+基础设施、服务器运维、软件开发框架一律不算——它们归 code / tools / data。
+
+### 处置
+
+| 去向 | 条数 | 例子 |
+| --- | --- | --- |
+| 保留制图 | 12 | FreeCAD、KiCad、QGIS、OpenSCAD、LibreCAD、Blender、Logisim-evolution、Digital、Mermaid、D2、PlantUML、draw.io |
+| 归 code | 25 | vLLM、SGLang、Kong、Nacos、Arthas、Gogs、Wails、Trivy、Nuclei、Caddy、Fastlane |
+| 归 tools | 10 | nginx、1Panel、Uptime Kuma、Beszel、Authelia、SRS、scrcpy、Etcher、Algo VPN、n8n |
+| 归 data | 6 | TiDB、ClickHouse、Airbyte、GoAccess、GNU Octave、nautilus_trader |
+| 归 education | 2 | OpenBot、xiaozhi-esp32 |
+
+移出时同步调整 `scenes[0]`：主场景按约定取首项，原先以 `engineering` 打头的条目
+（如 1Panel、Beszel、Nacos）会跟着落到真正的主场景，`/scenes/xxx` 的归属不再错位。
+
+### 验证
+
+- `npm run seed:sync` 同步 43 处、**只有 scenes 一个字段**，运行库 674 条不变
+- `/scenes/engineering` 从 55 条降到 12 条，页面渲染 12 条且无基础设施条目混入
+- `npm run check` 330 项 0 失败（Node 24；本地 Node 22 缺 `module.registerHooks` 会有 2 个环境性失败）
+- `npm run content:audit` 制图场景 12 条，高于 3 条的薄场景阈值
+
+### 留待后续
+
+制图场景现在缺 **3D 打印切片**（Cura / OrcaSlicer / Bambu Studio）这一环——
+它属于「做三维」的最后一公里，是当前 12 条里唯一明显缺失的高频工序。
+
 ## 2026-10-24 · 首字母独立成列：修掉「tp → okhttp」这个一直没人发现的错
 
 搜 `tp`（想找「图片」）长期返回 51 条、**第一名是 okhttp**。这一轮查清了原因并根治。
