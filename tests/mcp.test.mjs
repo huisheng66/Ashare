@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { handleRpcMessage, MCP_PROTOCOL_VERSION, SERVER_INFO, TOOLS } from "../lib/mcp-protocol.ts";
+import {
+  handleRpcMessage,
+  handleRpcPayload,
+  MCP_PROTOCOL_VERSION,
+  SERVER_INFO,
+  TOOLS,
+  wantsEventStream,
+} from "../lib/mcp-protocol.ts";
 
 /**
  * MCP 协议层的闸门：报文怎么进、怎么出。
@@ -125,15 +132,18 @@ test("工具抛错时返回 isError 结果而不是 JSON-RPC error", async () =>
   assert.match(outcome.body.result.content[0].text, /数据库连接失败/);
 });
 
-test("未知方法 -32601；非法报文 400 且带 -32600 / -32700 之外的解析错误", async () => {
+test("未知方法 -32601；非法报文 400", async () => {
   const unknown = await handleRpcMessage({ jsonrpc: "2.0", id: 7, method: "resources/list" }, fakeInvoker());
   assert.equal(unknown.body.error.code, -32601);
 
-  for (const bad of [null, [], "字符串", 42]) {
-    const outcome = await handleRpcMessage(bad, fakeInvoker());
+  // 数组走批量分支，其余走单条分支 —— 两条入口都要拒绝畸形输入。
+  for (const bad of [null, "字符串", 42, true]) {
+    const outcome = await handleRpcPayload(bad, fakeInvoker());
     assert.equal(outcome.status, 400);
     assert.equal(outcome.body.error.code, -32600);
   }
+  const nested = await handleRpcMessage([{ jsonrpc: "2.0", id: 1, method: "ping" }], fakeInvoker());
+  assert.equal(nested.status, 400);
 
   const wrongVersion = await handleRpcMessage({ id: 8, method: "ping" }, fakeInvoker());
   assert.equal(wrongVersion.status, 400);
@@ -146,4 +156,60 @@ test("未知方法 -32601；非法报文 400 且带 -32600 / -32700 之外的解
 test("ping 回空对象", async () => {
   const outcome = await handleRpcMessage({ jsonrpc: "2.0", id: 10, method: "ping" }, fakeInvoker());
   assert.deepEqual(outcome.body.result, {});
+});
+
+test("批量请求：2025-03-26 及更早的客户端会发，必须逐条处理并回数组", async () => {
+  const invoke = fakeInvoker();
+  const outcome = await handleRpcPayload(
+    [
+      { jsonrpc: "2.0", id: 20, method: "ping" },
+      call(21, "search_tools", { query: "笔记" }),
+      // 通知没有响应体，批量结果里不该出现它（否则客户端会以为多了个请求）
+      { jsonrpc: "2.0", method: "notifications/initialized" },
+    ],
+    invoke,
+  );
+  assert.equal(outcome.status, 200);
+  assert.ok(Array.isArray(outcome.body));
+  assert.deepEqual(outcome.body.map((entry) => entry.id), [20, 21]);
+  assert.equal(invoke.calls.length, 1);
+});
+
+test("批量请求：空数组 400，全是通知回 202", async () => {
+  const empty = await handleRpcPayload([], fakeInvoker());
+  assert.equal(empty.status, 400);
+  assert.equal(empty.body.error.code, -32600);
+
+  const onlyNotifications = await handleRpcPayload(
+    [
+      { jsonrpc: "2.0", method: "notifications/initialized" },
+      { jsonrpc: "2.0", method: "notifications/cancelled", params: { requestId: 1 } },
+    ],
+    fakeInvoker(),
+  );
+  assert.equal(onlyNotifications.status, 202);
+  assert.equal(onlyNotifications.body, null);
+});
+
+test("批量里单条出错不影响其它条", async () => {
+  const outcome = await handleRpcPayload(
+    [
+      call(30, "search_tools", {}), // 缺 query
+      { jsonrpc: "2.0", id: 31, method: "ping" },
+    ],
+    fakeInvoker(),
+  );
+  assert.equal(outcome.status, 200);
+  assert.equal(outcome.body[0].error.code, -32602);
+  assert.deepEqual(outcome.body[1].result, {});
+});
+
+test("SSE 协商：只接受 text/event-stream 才走流，两个都接受时优先 JSON", () => {
+  assert.equal(wantsEventStream("text/event-stream"), true);
+  assert.equal(wantsEventStream("text/event-stream;q=1.0"), true);
+  // 规范要求客户端同时声明两者，此时一次性 JSON 更省事（有明确结尾）
+  assert.equal(wantsEventStream("application/json, text/event-stream"), false);
+  assert.equal(wantsEventStream("*/*"), false);
+  assert.equal(wantsEventStream("application/json"), false);
+  assert.equal(wantsEventStream(null), false);
 });

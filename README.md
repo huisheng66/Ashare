@@ -48,36 +48,61 @@ npm run dev                  # 或 npm run build && npm run start
 
 ## 给 agent 用（MCP）
 
-站内数据通过 MCP 暴露成只读工具，用户可以在自己的 agent（Claude Code、Cursor、WorkBuddy 等）里直接问「我要一个能批量压缩图片的工具」，不用打开网页。
+站内数据通过 MCP 暴露成只读工具，用户可以在**自己的 agent** 里直接问「有没有能批量压缩图片的免费工具」，不用打开网页。
 
-端点：`POST https://<站点>/api/mcp`（Streamable HTTP，不提供 SSE 流；`GET` 返回 405）。
+端点：`POST https://<站点>/api/mcp`（Streamable HTTP）。
 
 | 工具 | 用途 |
 |---|---|
-| `search_tools` | 按需求/名称/拼音搜（`query` 必填，可选 `scene` / `platform` / `limit`） |
+| `search_tools` | 按需求/名称/拼音搜（`query` 必填，可选 `scene` / `platform` / `limit` 1–12） |
 | `get_tool` | 按 slug 读详情：适合谁、不适合谁、安装步骤、渠道、许可证、同类替代 |
 | `list_scenes` | 12 个使用场景及条目数，用于确定 `scene` 取值 |
 
-接入方式（以 Claude Code 为例）：
+### 各家客户端怎么接
 
-```bash
-claude mcp add --transport http ashare https://<站点>/api/mcp
-```
+| 客户端 | 做法 |
+|---|---|
+| **Claude Code** | `claude mcp add --transport http ashare https://<站点>/api/mcp` |
+| **Cursor** | `~/.cursor/mcp.json`（或项目内 `.cursor/mcp.json`）：`{"mcpServers":{"ashare":{"url":"https://<站点>/api/mcp"}}}` |
+| **VS Code / Copilot** | `.vscode/mcp.json`：`{"servers":{"ashare":{"type":"http","url":"https://<站点>/api/mcp"}}}`；或用可移植的 `.mcp.json`（顶层键是 `mcpServers`） |
+| **Codex CLI** | `codex mcp add ashare --url https://<站点>/api/mcp`（配置落在 `~/.codex/config.toml`） |
+| **Gemini CLI** | `gemini mcp add -s user --transport http ashare https://<站点>/api/mcp` |
+| **Antigravity** | `~/.gemini/config/mcp_config.json`：`{"mcpServers":{"ashare":{"serverUrl":"https://<站点>/api/mcp"}}}` |
+| **Zed** | 设置里的 `context_servers` 加一项，填 `url` |
+| **WorkBuddy** | `~/.workbuddy/mcp.json`：`{"mcpServers":{"ashare":{"url":"https://<站点>/api/mcp"}}}` |
+| **只支持 stdio 的客户端**（如 Claude Desktop） | 用社区桥 `mcp-remote`，把远程地址当本地命令拉起（见下） |
 
-其它客户端在配置里写 URL 即可（WorkBuddy / Cursor 这类 `mcp.json` 形态）：
+各家的键名与文件位置随版本变过（`servers` vs `mcpServers`、`url` vs `serverUrl`），以对应客户端文档为准。
+
+只支持 stdio 的客户端这样接：
 
 ```json
-{ "mcpServers": { "ashare": { "url": "https://<站点>/api/mcp" } } }
+{
+  "mcpServers": {
+    "ashare": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://<站点>/api/mcp", "--transport", "http-only"]
+    }
+  }
+}
 ```
 
-冒烟一条：
+`--transport http-only` 是因为本端点不提供服务端推送的 SSE 流（`GET` 返 405）：不锁死的话，桥每次启动会先试 SSE 再回退，多等几秒。
+
+冒烟一条（不需要任何客户端）：
 
 ```bash
 curl -s https://<站点>/api/mcp -H 'content-type: application/json' \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search_tools","arguments":{"query":"压缩图片"}}}'
 ```
 
-边界：无鉴权、只读、按 IP 60 次/分钟限流；不暴露草稿、后台字段与点击数据。工具输出是给人读的 Markdown，正文照实返回，详细教程只给链接（几千字塞进上下文没有意义）。实现见 `lib/mcp-protocol.ts`（协议层，无数据库依赖）与 `lib/mcp-tools.ts`（工具实现）。
+### 兼容性是怎么做到的
+
+- 响应默认 `application/json`；客户端**只**接受 `text/event-stream` 时改回单条 SSE 消息。
+- 支持 2025-03-26 及更早客户端会发的**批量请求**（2025-06-18 才取消），批量里的通知不产生响应体。
+- 无状态，不下发 `Mcp-Session-Id`；客户端带着它来就忽略。CORS 放开了各家会用的请求头（含 `Authorization`）。
+
+边界：无鉴权、只读、按 IP 60 次/分钟限流；不暴露草稿、后台字段与点击数据。工具输出是给人读的 Markdown，正文照实返回，详细教程只给链接（几千字塞进上下文没有意义）。实现见 `lib/mcp-protocol.ts`（协议层，无数据库依赖）、`lib/mcp-tools.ts`（工具实现）与 `app/api/mcp/route.ts`（传输与限流）。
 ## 安全机制
 
 - 口令只存 scrypt 哈希；session 为 HMAC 签名 cookie（HttpOnly / Secure / SameSite=Strict / Path=/admin）。

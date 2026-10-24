@@ -10,8 +10,11 @@ import { scenes } from "../data/scenes.ts";
  * 但协议本身是纯函数 —— 握手、能力声明、参数校验、错误码都不需要数据库。
  * 拆开之后 `tests/mcp.test.mjs` 能用假实现跑完整报文流程，不必连 MySQL。
  *
- * 传输选 Streamable HTTP 的**最简单子集**：客户端 POST 一条 JSON-RPC 报文，
- * 服务端直接回 `application/json`（不提供 SSE 长连接）。理由：
+ * 传输按 Streamable HTTP 实现，目标是**各家客户端都能接**而不是只伺候一家：
+ *  - 响应默认 `application/json`；客户端只接受 SSE 时回单条 `event: message`；
+ *  - 支持 2025-03-26 及更早客户端会发的**批量请求**（2025-06-18 才取消）；
+ *  - 无状态，不下发 `Mcp-Session-Id`；协议版本以 initialize 协商结果为准。
+ * 不做服务端推送的 SSE 长连接，理由：
  *  - 这里的工具都是一问一答的只读查询，没有服务端主动推送的需求；
  *  - 站点是自托管 Node + 反向代理，长连接会被代理超时与缓冲折腾；
  *  - 官方 SDK 支持这个子集，客户端不需要额外配置。
@@ -147,10 +150,45 @@ export type RpcOutcome = {
  * 返回 HTTP 状态码而不是直接抛错：解析失败要 400，业务错误要 200 + JSON-RPC error，
  * 这个区分由传输层决定，协议层只如实给出。
  */
+export async function handleRpcPayload(raw: unknown, call: ToolInvoker): Promise<RpcOutcome> {
+  // 批量请求：2025-06-18 取消了它，但 2025-03-26 及更早的客户端会发。
+  // 我们对这两种版本都声称支持（KNOWN_VERSIONS），就得真的处理，否则老客户端
+  // 一发批量就拿到 400 —— 而它们会把 400 当成服务端坏了。
+  if (Array.isArray(raw)) {
+    if (!raw.length) return { status: 400, body: fail(null, -32600, "空数组不是合法的批量请求") };
+    const responses: unknown[] = [];
+    let status = 200;
+    for (const message of raw) {
+      const outcome = await handleRpcMessage(message, call);
+      // 通知与客户端回执没有响应体，批量里直接略过（规范如此，不是丢数据）。
+      if (outcome.body !== null) responses.push(outcome.body);
+      if (outcome.status >= 400) status = 400;
+    }
+    // 整批都是通知：按规范回 202 且不带响应体。
+    if (!responses.length) return { status: 202, body: null };
+    return { status, body: responses };
+  }
+  return handleRpcMessage(raw, call);
+}
+
+/**
+ * 该不该用 SSE 回这条响应。
+ *
+ * 规范要求客户端在 Accept 里同时声明 `application/json` 与 `text/event-stream`，
+ * 服务端二选一即可。只有当客户端**只**接受 SSE 时才走流 —— 两个都接受时优先 JSON：
+ * 一次性返回、有明确结尾，客户端不用为「一条消息的流」写收尾逻辑。
+ */
+export function wantsEventStream(accept: string | null): boolean {
+  if (!accept) return false;
+  const acceptsSse = accept.includes("text/event-stream");
+  const acceptsJson = accept.includes("application/json") || accept.includes("*/*");
+  return acceptsSse && !acceptsJson;
+}
+
 export async function handleRpcMessage(raw: unknown, call: ToolInvoker): Promise<RpcOutcome> {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-    // 2025-06-18 取消了批量请求；数组直接拒绝，比静默接受一部分更诚实。
-    return { status: 400, body: fail(null, -32600, "请求必须是单个 JSON-RPC 对象（不支持批量）") };
+    // 批量在 handleRpcPayload 里已经拆开；走到这里的数组只可能是嵌套的畸形报文。
+    return { status: 400, body: fail(null, -32600, "请求必须是 JSON-RPC 对象") };
   }
 
   const message = raw as { jsonrpc?: unknown; id?: unknown; method?: unknown; params?: unknown };

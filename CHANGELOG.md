@@ -1,5 +1,48 @@
 # 变更记录
 
+## 2026-10-24 · MCP 兼容面扩到各家 agent：批量请求、按需 SSE、CORS 头补全
+
+上一版只保证「POST + JSON 响应 + 无会话」，实际只验证过 Claude Code 那一类客户端。
+但 MCP 客户端在四件事上并不统一，任何一项不兼容都会表现为「连不上」或「工具不出现」：
+
+| 差异点 | 各家做法 | 原来的行为 | 现在 |
+| --- | --- | --- | --- |
+| 响应格式 | 有的只吃 `text/event-stream` | 恒回 JSON | `Accept` 里**只有** SSE 时才改回单条 `event: message`；两者都接受时仍回 JSON（有明确结尾，客户端不必为一条消息的流写收尾） |
+| 批量请求 | 2025-03-26 及更早会发数组 | 400 | 逐条处理并回数组；通知不产生响应体；空数组 400、全通知 202 |
+| 会话 | 有的会带 `Mcp-Session-Id` | 忽略 | 忽略（本来就无状态），但预检里放行这个头 |
+| 预检 | 浏览器型客户端会发 OPTIONS | 只放行 3 个头 | 补上 `Accept` / `Authorization` / `Last-Event-ID`，并 expose `Mcp-Session-Id` |
+
+### 代码
+
+- `lib/mcp-protocol.ts`：新增 `handleRpcPayload`（批量入口，逐条复用单条实现）与 `wantsEventStream`（协商规则）。
+  批量只在**协议版本支持它**的客户端上出现，但我们既然在 `KNOWN_VERSIONS` 里声称支持 2025-03-26 及更早，
+  就必须真的处理 —— 否则老客户端一发批量就拿到 400，而它会把 400 当成服务端坏了。
+- `app/api/mcp/route.ts`：SSE 响应分支、CORS 头补全、错误响应也带上同样的头。
+
+### 文档
+
+README 与 `docs/wiki/agent-access.md` 都换成按「怎么连」分类的接入表：
+
+- **直接填地址**：Claude Code（`claude mcp add`）、Cursor（`.cursor/mcp.json` + `url`）、
+  VS Code / Copilot（`.vscode/mcp.json` + `type: http`，或可移植 `.mcp.json`）、Codex CLI（`codex mcp add --url`）、
+  Gemini CLI（`gemini mcp add --transport http`）、Antigravity（键是 `serverUrl`）、Zed（`context_servers`）、WorkBuddy。
+- **只支持 stdio**（Claude Desktop 等）：用 `mcp-remote` 桥，并且**必须加 `--transport http-only`** ——
+  桥默认先试 SSE 再回退，而本端点不提供服务端推送流（`GET` 返 405），不锁死每次启动都要白等一轮。
+- **云端托管型**（Anthropic 的 Connectors）：连的是云端不是本机，域名必须公网可达、TLS 有效，`localhost` 一定不行。
+
+键名与文件位置随客户端版本变过（`servers` vs `mcpServers`、`url` vs `serverUrl`），表里的写法按各家文档整理，
+**没有逐个装机验证**，文档里也写明了以对应客户端文档为准。
+
+### 验证
+
+- `npm run check`：358 项，281 通过、0 失败（新增 4 项：批量三条 + SSE 协商一条）
+- 生产构建后逐条 curl：批量回数组且两条都对、只发 SSE 的请求拿到 `text/event-stream` + `event: message`、
+  两个都接受时仍是 JSON、`OPTIONS` 预检 204 且 CORS 头齐全、`GET` 405、通知 202
+
+### 仍未做
+
+服务端推送的 SSE 长连接（`GET` 405）。理由不变：三个工具都是一问一答的只读查询，没有推送需求，
+而站点是自托管 Node + 反向代理，长连接会被代理缓冲与超时折腾。真需要时再补，客户端那边已经用 `http-only` 兜住。
 ## 2026-10-24 · 开放 MCP 端点：用户能在自己的 agent 里搜这个目录
 
 到这一步目录只有网页一个入口 —— 想找工具的人得先打开浏览器。用户越来越多地在自己的 agent
