@@ -56867,4 +56867,5390 @@ README 的设计原则一节很有参考价值，**别指望它有这些能力**
       ],
     },
   },
+  {
+    slug: "libzmq",
+    linksCheckedAt: "2026-10-24",
+    name: "ZeroMQ",
+    nameZh: "libzmq 消息内核",
+    aliases: ["libzmq", "zeromq", "zmq", "零消息队列", "消息内核"],
+    summary: "ZeroMQ 的 C++ 内核，把 socket 扩展成带队列与多种消息模式的消息总线。适合进程间、机器间传消息又不想上 Kafka 的后端；代价是它只管传输，持久化、重放、监控都得自己补。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["消息队列", "网络库", "C++", "ZeroMQ", "分布式"],
+    body: "libzmq 是 ZeroMQ 的 C++ 实现，负责 ZMTP/3.1 协议本身。README 对它的定位很直接：扩展标准 socket 接口，补上过去只有专用消息中间件才有的能力——异步消息队列、多种消息模式、按订阅过滤消息、跨多种传输协议。\n最要紧的认知是它**不是服务**。没有 broker 进程，消息在端点之间直接流动，你链接的是一个库。好处是不用运维中间件、延迟低；代价是持久化、重放、消费位点这些都不存在，要可靠投递得自己在应用层做。\n两个工程坑写在 README 里：一是 API 分 STABLE 与 DRAFT 两档，DRAFT 随时可能改且不提前通知，官方明确建议发行版打包选 STABLE——顺手加了 draft 源，升级后编译失败往往就是这么来的。二是主体仍按 C++98 写（少量 C++11 片段），构建系统 autotools 与 CMake 二选一；README 的平台表按 primary CI、secondary CI 分档，不少组合标着 DRAFT，意味着能编过但不保证稳。",
+    officialUrl: "https://www.zeromq.org",
+    officialLabel: "www.zeromq.org",
+    links: {
+      official: "https://www.zeromq.org",
+      github: "https://github.com/zeromq/libzmq",
+    },
+    whoFor: "写 C++ 或通过语言绑定用 ZeroMQ 的人：需要 pub/sub、push/pull 这类模式，又不想为这点需求部署一整套消息中间件。",
+    whoNot: "需要消息落盘、重放、消费组、管理界面的场景，那是带 broker 的中间件的活；只想调个 HTTP 接口的人也不必碰它——它编译出来是库，不是服务。",
+    installTips: [
+      "Linux 用发行版包最快：Debian 系包名 `libzmq3-dev`；要新版按 README 加 OBS 源，认准 release-stable，别加 release-draft。",
+      "macOS 一条 `brew install zeromq`；Windows 推荐 vcpkg，先在仓库根目录跑 bootstrap-vcpkg.bat（bash 用 .sh），再 `vcpkg install zeromq`。",
+      "源码构建看发行包里的 INSTALL 文件，autotools 与 CMake 二选一，别两套混着用。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "Z",
+      color: "#C6303E",
+      simpleIcon: "zeromq",
+    },
+    guide: {
+      intro: "先讲清「装完为什么找不到可执行文件」，再给三条安装路径和 STABLE/DRAFT 的选择，最后是编译期的排查顺序。",
+      markdown: `## 它不是一个服务
+
+装完 libzmq，命令行里找不到叫 zeromq 的命令——它是 C++ 库，产物是动态库与头文件。所谓「消息队列」来自它的 socket 抽象：异步队列、多种消息模式、订阅过滤，这些都在你自己的进程里跑。
+
+这决定了排错方向：连不上不是「服务没起」，而是两端 endpoint、传输方式或 socket 类型对不上。
+
+## 三条安装路径
+
+Linux 用发行版包最省事，Debian 系包名 \`libzmq3-dev\`。README 给的 OBS 源写法：
+
+    echo "deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/Debian_9.0/ ./" >> /etc/apt/sources.list
+    wget https://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/Debian_9.0/Release.key -O- | sudo apt-key add
+    apt-get install libzmq3-dev
+
+macOS 直接 \`brew install zeromq\`。Windows 用 vcpkg：先 bootstrap（PowerShell 跑 .bat，bash 跑 .sh），再 \`vcpkg install zeromq\`。
+
+## STABLE 与 DRAFT 是两套东西
+
+README 说 DRAFT API 随时可能变、且不提前通知，发行版打包建议选 STABLE。判断方法很朴素：包装自 draft 源就是 DRAFT。
+
+这条最容易在小团队踩：有人图新加了 draft 源，当时编译通过，几周后上游一改签名构建就红。
+
+## 编译不过时按顺序查
+
+1. 头文件找不到：只装了运行库，没装 -dev 开发包。
+2. 链接报未定义符号：编译时的头文件与链接的库版本不一致，清缓存重编。
+3. 平台本身没被覆盖：README 把组合分成 primary CI、secondary CI、已知活跃用户三档，标 DRAFT 意味着能编过但不保证。`,
+      resources: [
+        {
+          kind: "html",
+          title: "ZeroMQ 官网",
+          url: "https://zeromq.org/",
+          note: "项目门户，从这里进文档与各语言绑定的入口。先分清「库」与「broker 型中间件」再决定用不用。",
+        },
+        {
+          kind: "link",
+          title: "受支持平台清单",
+          url: "https://github.com/zeromq/libzmq/blob/master/SupportedPlatforms.md",
+          note: "README 里那张平台表的完整版，标注了哪些组合只是「能编过」。交叉编译前值得先扫一眼。",
+        },
+        {
+          kind: "html",
+          title: "发布包与更新记录",
+          url: "https://github.com/zeromq/libzmq/releases",
+          note: "查稳定版本的源码包与变更。选 STABLE 时以这里的 tag 为准，别跟着分支走。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "centrifugo",
+    linksCheckedAt: "2026-10-24",
+    name: "Centrifugo",
+    nameZh: "Centrifugo 实时消息服务",
+    aliases: ["centrifugo", "实时消息服务器", "pubsub 服务", "pusher 替代"],
+    summary: "自建的实时消息服务器，WebSocket/SSE/gRPC 共用一套订阅模型，替代 Pusher、Ably 这类按连接计费的云服务。代价是鉴权和扩展要自己配——多节点必须挂 Redis 或 Postgres。",
+    scenes: ["code"],
+    platforms: ["linux", "macos"],
+    source: "opensource",
+    tags: ["实时通信", "WebSocket", "自建服务", "Go", "发布订阅"],
+    body: "Centrifugo 是 Go 写的实时消息服务器，核心是一个面向终端用户的 PUB/SUB：你的后端通过 HTTP 或 gRPC API 往 channel 发消息，客户端用官方 SDK 订阅 channel。传输层支持 WebSocket、HTTP-streaming、SSE、gRPC，WebTransport 还标着实验状态。\n它真正的卖点是「与语言无关」。业务逻辑留在你自己的后端，长连接这层单独拆出去，不必为每种语言重写一套连接管理——这是它跟 socket.io 那类库的根本区别。同时它把难做的部分做完了：断线重连后的消息恢复、频道历史、presence、delta 压缩、多路复用。\n代价同样明确，而且集中在两处。一是鉴权：连接用 JWT 或代理模式（Centrifugo 回调你的后端），channel 权限还要按 namespace 配策略，模型不熟就会卡在「连上了但订阅被拒」。二是扩展：README 说多节点要靠 Redis/Redis Cluster、PostgreSQL 或 NATS 做广播，单机跑得起来，但一旦要横向扩就得提前规划。\n还有个容易忽略的点：README 的快速体验命令带两个 insecure 参数，那是给本地试用的，生产环境必须去掉，它们会关掉鉴权。",
+    officialUrl: "https://centrifugal.dev",
+    officialLabel: "centrifugal.dev",
+    links: {
+      official: "https://centrifugal.dev",
+      github: "https://github.com/centrifugal/centrifugo",
+    },
+    whoFor: "给现有应用加聊天、实时通知、协同编辑的后端团队；尤其是已经用 Pusher/Ably、账单随并发连接数一路涨的项目。",
+    whoNot: "只是页面偶尔刷个状态、几十个连接的项目，轮询更省事；没有运维余力维护长连接集群、也不打算配 Redis 的团队，自建成本会比订阅高。",
+    installTips: [
+      "本地先跑通再谈上线：`docker run -it --rm -p 8000:8000 centrifugo/centrifugo:latest centrifugo --client.insecure --admin.enabled --admin.insecure`，然后开 http://localhost:8000 看内置管理界面。",
+      "上面两个 insecure 参数关掉了鉴权，README 明说仅限本地试用，生产环境不要带。",
+      "多节点部署要配 Redis（或 PostgreSQL/NATS）做跨节点广播，单机不需要。",
+      "客户端别自己手写协议，官方提供 JS、Dart、Swift、Java、Python、Go 的 SDK；很简单的场景也可以用无 SDK 的单向流。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#1E7BC4",
+    },
+    guide: {
+      intro: "按上线顺序走：先用 Docker 看一眼它在干什么，理解 channel 这套模型，再把鉴权从 insecure 换成 JWT，最后才是多节点。",
+      markdown: `## 先跑起来看一眼
+
+README 给的体验命令是完整的，直接复制：
+
+    docker run -it --rm -p 8000:8000 centrifugo/centrifugo:latest centrifugo \\
+      --client.insecure --admin.enabled --admin.insecure
+
+打开 http://localhost:8000 是内置管理界面，能看到在线连接，也能手动往 channel 里发消息。这一步会让人误以为它是个聊天室，其实它只是把消息按 channel 分发出去。
+
+## 三个词要先分清
+
+- **connection**：一条长连接，通常对应一个登录用户
+- **channel**：消息通道，客户端 subscribe 的是它
+- **namespace**：一组 channel 的配置模板，权限、历史长度、是否开启 presence 都挂在它上面
+
+后端发消息走 HTTP 或 gRPC API，指定 channel 名即可。客户端收到的是它订阅过的 channel 的消息——服务端不做用户之间的路由，路由靠 channel 命名自己做。
+
+## 第一个坎是鉴权
+
+insecure 参数把鉴权整个关掉了，所以本地怎么连都通。上线时会突然全部 401，这不是 bug。
+
+两条路：JWT（后端签发，Centrifugo 只验签）或代理模式（Centrifugo 反向请求你的后端做校验）。前者省一次往返，后者能把权限逻辑留在熟悉的地方。选完还要配 channel 权限——默认并不是「连上就能订阅任意 channel」。
+
+## 第二个坎是扩展
+
+单机版所有连接都在一个进程里，广播很直接。多节点就必须有外部广播通道，README 列的是 Redis（含 Cluster 与兼容实现）、PostgreSQL、NATS。
+
+这决定了部署形态：要么一开始就挂 Redis，要么接受「以后扩容要停机改造」。
+
+## 不要自己实现重连
+
+断线重连、订阅状态恢复、消息补发这些，SDK 已经处理了。自己写 WebSocket 再接 Centrifugo，等于把它最有价值的部分绕开，还容易在弱网下丢消息。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://centrifugal.dev",
+          note: "安装、快速上手、设计说明都在这里。判断能不能替代现有推送服务，看 design 那一节的模型说明最省时间。",
+        },
+        {
+          kind: "link",
+          title: "客户端 SDK 汇总",
+          url: "https://github.com/centrifugal/centrifuge-js",
+          note: "JS SDK 仓库，README 里有各语言 SDK 的完整列表。先确认你的端上有官方实现再动手。",
+        },
+        {
+          kind: "link",
+          title: "官方示例集合",
+          url: "https://github.com/centrifugal/examples",
+          note: "聊天、通知这类场景的完整可跑示例，比照着自己接第一个客户端快得多。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "fluentui-system-icons",
+    linksCheckedAt: "2026-10-24",
+    name: "Fluent UI System Icons",
+    nameZh: "Fluent 系统图标集",
+    aliases: ["fluent icons", "fluentui icons", "微软图标", "fluent 图标"],
+    summary: "微软自家的 Fluent 图标集，regular/filled 两套，按 Android、iOS、Flutter、SVG 分别发包。适合做 Windows 风格或跨端一致的产品；代价是风格偏圆润现代，混进 Material 或旧线条图标会很跳。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图标", "设计资源", "Fluent", "跨平台", "MIT"],
+    body: "Fluent UI System Icons 是微软设计体系里的图标库，分 regular 与 filled 两种字重，覆盖常见的界面语义。它的价值不在「图好看」，而在**同一套图标能落到四个端上**：Android 走 Maven、iOS/macOS 走 CocoaPods 或 Carthage、Flutter 走 pub、其余场景直接取 SVG。对要做跨端一致性的产品，这省掉了「iOS 用 SF Symbols、安卓用 Material Icons、桌面再找一套」的拼凑。\n风格取向要先想清楚。Fluent 的线条偏圆润、端点收得软，和 Material 的几何感、以及很多老项目的细线图标放一起会明显不搭。半路换图标往往不是换几个文件，而是整套视觉都要跟着调。\n工程上有两件事值得提前知道。一是方向性：README 说明元数据里有 directionType，`unique` 表示这套图有独立的 RTL/LTR 版本，`mirror` 表示可以直接镜像——做阿拉伯语、希伯来语界面时，不能一律翻转。二是版本：README 里的依赖写法带着完整版本号（1.1.344），跟着升要同步改四个端的锁文件，否则同一个界面在不同端会拿到不同图标。",
+    officialUrl: "https://aka.ms/fluentui-system-icons",
+    officialLabel: "aka.ms",
+    links: {
+      official: "https://aka.ms/fluentui-system-icons",
+      github: "https://github.com/microsoft/fluentui-system-icons",
+    },
+    whoFor: "做 Windows 桌面应用、或需要 iOS/Android/Flutter 三端图标保持一致的团队；也适合想给后台管理界面换一套统一图标的独立开发者。",
+    whoNot: "视觉上已经定死 Material 或自绘图标体系的项目；只缺三五个特殊图标的人也不必引入整套依赖，直接取 SVG 更划算。",
+    installTips: [
+      "找图标先翻仓库根目录的 icons_regular.md 与 icons_filled.md 两份清单，文件名就是调用名，比在代码里猜快得多。",
+      "Flutter 在 pubspec.yaml 加 `fluentui_system_icons: ^1.1.344`，版本号跟 README 对齐。",
+      "Android 用 Maven：`implementation 'com.microsoft.design:fluent-system-icons:1.1.344@aar'`，别忘在根 build.gradle 里加 mavenCentral()。",
+      "iOS/macOS 走 CocoaPods：`pod \"FluentIcons\", \"1.1.344\"`；只要原始文件的话取 packages/svg-icons，不用引整个库。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#0078D4",
+    },
+    guide: {
+      intro: "从「先想清楚风格合不合」讲到四个端的接入方式，再补上 RTL 方向与版本同步这两个真会出问题的地方。",
+      markdown: `## 先确认风格对不对
+
+Fluent 图标的线条偏圆、端点软，视觉上更接近 Windows 11 的原生界面。它和 Material 的几何风格、以及很多老项目里的细线图标放在一起会有明显割裂感。
+
+所以第一件事不是安装，是拿三五个常用图标（设置、搜索、返回、删除）和你现有界面拼一下看看。图标换整套的成本，远高于换一个库的成本。
+
+## 四个端怎么接
+
+**Android**：README 给的是 Maven 依赖，前提是根 build.gradle 里已经有 mavenCentral()：
+
+    implementation 'com.microsoft.design:fluent-system-icons:1.1.344@aar'
+
+**iOS / macOS**：CocoaPods 一行，或者 Carthage 指到仓库的 tag：
+
+    pod "FluentIcons", "1.1.344"
+
+**Flutter**：pubspec 里的依赖名是带下划线的 fluentui_system_icons，版本号是 1.1.344，两者别写混。
+
+**纯 Web 或其它场景**：直接用 SVG，见 packages/svg-icons 的说明，不必为了几个图标引一整个平台的包。
+
+## RTL 语言不能一律镜像
+
+图标元数据里有 directionType：
+
+- \`unique\`：这枚图标有独立的 RTL 与 LTR 版本，必须按语言取对应文件
+- \`mirror\`：可以直接水平翻转折用
+
+还有 singleton 表示默认方向。做阿拉伯语、希伯来语界面时，一律翻转会把「播放键」「音量」这类不该翻的图标翻错——这是最常见的翻车点。
+
+## 版本要四个端一起动
+
+README 里的依赖示例都带完整版本号（写作时的 1.1.344）。Android、iOS、Flutter 三边的锁文件如果不同步，同一个界面在不同端会拿到不同版本的图标，表现为某个图标在 iOS 上是新版、在安卓上还是旧版。
+
+升级时按「先升 Flutter、再看 Android 编译是否过、最后同步 iOS 的 Podfile.lock」这个顺序推，比三端同时改好排查。`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "regular 图标清单",
+          url: "https://github.com/microsoft/fluentui-system-icons/blob/main/icons_regular.md",
+          note: "线框版全部图标的名称列表，写代码时按名字查。先在这里确认有没有你要的语义。",
+        },
+        {
+          kind: "markdown",
+          title: "filled 图标清单",
+          url: "https://github.com/microsoft/fluentui-system-icons/blob/main/icons_filled.md",
+          note: "实心版清单。选中态、强调态通常用 filled，和 regular 配对使用。",
+        },
+        {
+          kind: "html",
+          title: "官方站点入口",
+          url: "https://aka.ms/fluentui-system-icons",
+          note: "微软给这个项目的短链入口，通向设计规范与各端接入说明。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "caire",
+    linksCheckedAt: "2026-10-24",
+    name: "Caire",
+    nameZh: "Caire 内容感知缩放",
+    aliases: ["caire", "seam carving", "内容感知缩放", "智能缩图"],
+    summary: "用 seam carving 做内容感知缩放的命令行工具，缩图时优先删掉低能量的空白区域，主体基本不变形。适合批量改图尺寸；代价是遇到密集纹理、文字或规则线条会明显拉扯。",
+    scenes: ["photo", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图片处理", "缩放", "命令行", "Go", "seam carving"],
+    body: "Caire 实现的是 2007 年那篇 seam carving 论文：先对图片做边缘检测生成能量图，再用动态规划找出一条条能量最低的接缝，把它删掉（或复制）来改变尺寸。直觉上就是——先扔掉画面里最「没信息」的那几列像素，而不是等比压缩全部。\n这使得它在「宽高比要变、主体不能变形」的场景里明显好过普通缩放：把一张横图改成方形、把配图从 16:9 裁成 4:5，人像和建筑主体能保住。README 里给了对比图，也明确支持放大、双向缩放、百分比缩放和 `-square`。\n代价要说清楚。第一，算法找「低能量」不等于找「该删的东西」：密集纹理、文字、规则建筑线条的能量都很高，删不掉就只好在别处重复采样，结果就是局部被拉伸涂抹。第二，双轴同时缩放时，它其实是先等比缩到接近目标、再用 seam carving 处理剩下的差额——所以大幅双轴缩放的收益没想象中大。\n两个实用设置：`-face=1` 用人脸检测保护面部（分类器已编进二进制，不用另下模型），`-mask` / `-rmask` 用同尺寸二值图指定保护和必删区域。这两条是把它从玩具变成能交付的关键。",
+    officialUrl: "https://github.com/esimov/caire",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/esimov/caire",
+      github: "https://github.com/esimov/caire",
+    },
+    whoFor: "要批量把配图改成不同比例、又不希望主体变形的人：电商图、文章头图、社交媒体多尺寸一套图。",
+    whoNot: "图里有大量文字、表格、规则线条的人（缩放后字会歪）；只需要等比缩放或裁切的场景，普通工具更快且不会出意外。",
+    installTips: [
+      "装 Go 后 `go install github.com/esimov/caire/cmd/caire@latest`，并确认 $GOPATH/bin 在 PATH 里；macOS 也可以直接 `brew install caire`。",
+      "最小用法：`caire -in input.jpg -out output.jpg`，输出格式由扩展名决定，jpg/png/bmp 都行。",
+      "默认会弹 GUI 预览窗口，批处理整个目录时会自动关掉；无桌面环境记得显式加 `-preview=false`。",
+      "保护人脸加 `-face=1`；遮罩文件必须是二值图且与原图同尺寸，白色代表「不要动」或「要删掉」。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#2F6F4E",
+    },
+    guide: {
+      intro: "从一条命令跑通开始，讲清几个真正影响效果的参数（face、mask、sobel、blur），以及批量处理时的预览与输入输出约定。",
+      markdown: `## 最小可用的一条命令
+
+    caire -in input.jpg -out output.jpg
+
+不给 width/height 时它按原尺寸走一遍算法，通常用来先看看默认效果。真正改尺寸要指定一边或两边。
+
+## 参数里只有四个值得先调
+
+- \`-width\` / \`-height\`：目标像素。只给一边时另一边按比例走。
+- \`-face=1\`：开人脸检测，避免五官被接缝切到。分类器已内嵌，不需要额外文件。
+- \`-sobel\`（默认 2）：边缘检测阈值，调低会把更多细节算成「重要」，图更保守；调高更激进。
+- \`-blur\`（默认 4）：先做高斯模糊再算能量，能压掉噪点带来的伪边缘。
+
+人像图建议直接：\`caire -in a.jpg -out b.jpg -face=1 -perc=1 -width=20\`，意思是横向缩 20%，不是缩到 20px。
+
+## 遮罩才是稳定出图的抓手
+
+自动判断在复杂图上并不可靠，README 给了两种遮罩，都是**二值图、必须与原图同尺寸**：
+
+- \`-mask\`：白色区域禁止被接缝穿过（保护主体）
+- \`-rmask\`：白色区域优先被删除（去掉广告条、水印区、空白边）
+
+配合 \`-debug=true\` 能看到接缝分布，判断是不是在乱删。调好一次之后，同类图片可以复用同一张遮罩。
+
+## 批量处理的两条约定
+
+    caire -in ./input_dir -out ./output_dir
+
+给目录就会并发处理里面的图，此时预览自动关闭。两个坑：
+
+1. 输出目录要先存在，别指望它替你建。
+2. 大批量时每个进程都在算能量图，CPU 会打满——这是算法本身的开销，不是卡死。
+
+## 什么时候该停手
+
+如果预览里看到文字变形、建筑直线弯曲、纹理区出现重复块，说明这张图不适合 seam carving——换裁切或等比缩放，比继续调参划算。`,
+      resources: [
+        {
+          kind: "pdf",
+          title: "seam carving 原始论文",
+          url: "https://inst.eecs.berkeley.edu/~cs194-26/fa16/hw/proj4-seamcarving/imret.pdf",
+          note: "README 引用的那篇论文。想理解为什么文字和高频纹理会失败，看能量图那一节就够了。",
+        },
+        {
+          kind: "html",
+          title: "维基百科：Seam carving",
+          url: "https://en.wikipedia.org/wiki/Seam_carving",
+          note: "算法脉络与已知缺陷的概览，比读论文快，适合先建立直觉。",
+        },
+        {
+          kind: "html",
+          title: "发布包与更新",
+          url: "https://github.com/esimov/caire/releases",
+          note: "各平台二进制与变更记录。不想装 Go 的话从这里取现成构建。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pixelorama",
+    linksCheckedAt: "2026-10-24",
+    name: "Pixelorama",
+    nameZh: "Pixelorama 像素画工具",
+    aliases: ["pixelorama", "像素画", "pixel art", "精灵图工具"],
+    summary: "Godot 写的像素画工具，动画时间轴、平铺图层、索引色都齐，桌面三平台加网页版都能跑。适合做游戏 sprite 和 tileset；代价是它只服务像素画，画插画或修照片完全不是它的场景。",
+    scenes: ["design", "games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["像素画", "游戏美术", "动画", "Godot", "MIT"],
+    body: "Pixelorama 是给像素画专门做的编辑器，不是「缩小了的 Photoshop」。它把像素画的几个刚需做成了核心功能：像素级完美的直线、索引色模式、以及专为像素设计的旋转缩放算法（cleanEdge、OmniScale、rotxel）——这些在通用绘图软件里要么没有，要么会把像素糊掉。\n对做游戏的人，两个功能决定它值不值得换：一是 tilemap 图层，能直接画矩形、等距、六边形三种平铺，不用自己在画布上数格子；二是动画时间轴，洋葱皮、帧标签、音频同步，甚至允许在播放中继续画。导出覆盖 PNG、APNG、精灵表、GIF，做 sprite 基本不用再开第二个工具。\n代价也很清楚。它面向像素画，画矢量、做印刷排版、修照片都不是它的领域；3D 图层和扩展生态是加分项，但别指望替代完整的 2D 绘画软件。\n安装上有两件事别搞错：一是认准稳定版，README 明说 GitHub Actions 里的 early access 构建有 bug、不稳定；二是想从源码跑必须用 Godot 4.7.1，低版本打不开项目。",
+    officialUrl: "https://www.pixelorama.org",
+    officialLabel: "www.pixelorama.org",
+    links: {
+      official: "https://www.pixelorama.org",
+      github: "https://github.com/Orama-Interactive/Pixelorama",
+    },
+    whoFor: "做独立游戏、需要画 sprite / 图块 / 帧动画的人；也适合想入门像素画、不想先买 Aseprite 的新手。",
+    whoNot: "画插画、做印刷品、修图的人——它的工具链全是为像素网格设计的；只偶尔切一张图的人，用现成在线工具更快。",
+    installTips: [
+      "Windows 可以 `winget install pixelorama`；其他平台从 GitHub Releases 或 itch.io 取稳定版，Linux 还有 Flathub 的 com.orama_interactive.Pixelorama。",
+      "别拿 GitHub Actions 里的 early access 构建干活，README 明确说那些版本有 bug、不稳定，只适合测试主分支。",
+      "想从源码运行需要 Godot 4.7.1，旧版本打不开项目；主体是 GDScript，不需要 Mono 版 Godot。",
+      "导出按用途选格式：单帧 PNG、序列帧或精灵表给引擎用，动画用 GIF/APNG，需要视频也行。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#E4572E",
+    },
+    guide: {
+      intro: "第一次打开会卡在三件事：画布与像素网格的关系、图层和帧的二维结构、以及导出时该选精灵表还是序列帧。按顺序讲。",
+      markdown: `## 装哪个版本
+
+先看版本来源。稳定版在 GitHub Releases、itch.io、Flathub 和 Steam 上都有；GitHub Actions 里的构建是主分支自动打包的 early access，README 自己写着「会有 bug、不稳定」，只适合想帮忙测试的人。
+
+网页版能直接开，但浏览器里没法用本地文件系统，工程保存和导入导出会受限——临时改两笔可以，正经做项目还是装桌面版。
+
+## 画布先定像素密度
+
+新建时最容易犯的错是把画布开得太大。像素画的细节是「一个像素」，1080p 画布上画出来的东西缩到游戏里全是糊的。
+
+常见做法是从目标尺寸反推：游戏里这个 sprite 显示 64×64，画布就开 64×64；需要更高精度时开 2 倍再整体缩小，但缩放算法要选 rotxel 或 OmniScale，别用默认的双线性。
+
+## 图层和帧是两个维度
+
+时间轴是二维的：横向是帧，纵向是图层。第一次用会觉得别扭，理解成「每一格是一个 cel」就顺了——cel 是某个图层在某一帧上的画面。
+
+动画常用流程：底部一层画背景（固定不动），上面几层画角色，再给角色层逐帧画动作。洋葱皮打开能看到前后帧的残影，对齐关键位置。
+
+## 图块用 tilemap 图层
+
+做 tileset 不要在一块大画布上手动画格子。新建 tilemap 图层，选矩形 / 等距 / 六边形，编辑器会给你网格和吸附，切图时也不会因为差一像素出现接缝。
+
+导出精灵表时按引擎要求设行列数，注意图块之间有没有 padding——很多引擎默认不留间隙，接了会串色。
+
+## 导出格式怎么选
+
+    PNG        单帧、带透明通道，最通用
+    精灵表      给 Unity/Godot 这类引擎按帧切
+    GIF/APNG   直接分享或预览动画
+    视频         给宣传素材用
+
+PNG 序列是兼容性最好的中间产物：任何引擎都能读，出错也容易定位是哪一帧的问题。
+
+## 崩溃与备份
+
+它自带自动备份，但别把它当版本管理。工程文件建议直接放进 Git 仓库——像素画是二进制，不过文件小，diff 不了也能回滚。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方在线文档",
+          url: "https://orama-interactive.github.io/Pixelorama-Docs",
+          note: "工具、图层、动画各章节的说明。文档仍在补，缺页时以软件内提示为准。",
+        },
+        {
+          kind: "html",
+          title: "发布包下载",
+          url: "https://github.com/Orama-Interactive/Pixelorama/releases",
+          note: "三平台稳定版安装包。认准这里或 Flathub，别下 Actions 里的构建。",
+        },
+        {
+          kind: "html",
+          title: "官方站点",
+          url: "https://www.pixelorama.org",
+          note: "入口页，汇总了各分发渠道与社区链接。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ytdlnis",
+    linksCheckedAt: "2026-10-24",
+    name: "YTDLnis",
+    nameZh: "YTDLnis 安卓下载器",
+    aliases: ["ytdlnis", "安卓下载器", "yt-dlp 安卓", "视频下载"],
+    summary: "安卓上的 yt-dlp 图形前端，1000+ 站点、播放列表、定时队列、字幕与章节切割都有。适合在手机上批量存音视频；代价是站点一改版就得跟着更新内置组件，而且只有安卓版。",
+    scenes: ["tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["Android", "下载工具", "yt-dlp", "音视频", "开源"],
+    body: "YTDLnis 本质是把 yt-dlp 装进安卓，再配一层 Material You 界面。README 说明它支持 yt-dlp 支持的上千个站点，真正的能力边界由此决定——yt-dlp 能解析的它都能下，解析不了的它也下不了。\n比「贴个链接就下」多出来的东西，是它在手机上把批量流程做顺了：播放列表可以逐条改参数、队列能按时间排程、多个任务并行、断掉的任务能重下。还有几个桌面端才常见的功能被搬了过来：按时间戳或章节切割、去掉 SponsorBlock 片段、把字幕与元数据嵌进文件、用 cookie 登录后下私享内容。\n代价集中在维护上。解析规则跟着站点改版走，组件不更新就会突然全部失败，所以第一件事是去应用内的更新页把 yt-dlp、FFmpeg 这些拉新；要合并音视频或转码，得单独在插件里装 FFmpeg，本体不含。\n另外两条现实约束：只有安卓版（Android 7.0+），且 GPLv3 之外还附加了名称限制——衍生版不允许继续叫 YTDLnis，找第三方构建时要留意来源。",
+    officialUrl: "https://ytdlnis.org",
+    officialLabel: "ytdlnis.org",
+    links: {
+      official: "https://ytdlnis.org",
+      github: "https://github.com/deniscerri/ytdlnis",
+    },
+    whoFor: "用安卓手机批量保存课程、播客、歌单的人；愿意偶尔点一下「更新组件」、能接受配置项偏多的人。",
+    whoNot: "用 iPhone 或电脑的人（它只有安卓版）；只想偶尔存一条、不想理解格式与容器选择的人，用在线转换站更省事。",
+    installTips: [
+      "从 GitHub Releases、F-Droid 或 IzzyOnDroid 安装；不同渠道的 APK 签名可能不同，换源前先卸载旧版。",
+      "装完先去「更新」页把 yt-dlp、Python、FFmpeg 这些组件拉到最新，否则新站点会解析失败。",
+      "要合并音视频或转码，必须在插件里单独装 FFmpeg，本体不带。",
+      "任务支持队列与定时；只想快速存一条就开快速下载模式，跳过参数确认直接开始。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "Y",
+      color: "#1F6FEB",
+    },
+    guide: {
+      intro: "第一次用最容易卡在「解析失败」和「下下来的文件没声音」这两件事上，先讲组件更新，再讲格式与批量任务。",
+      markdown: `## 装完先更新组件
+
+它不是一个自包含的下载器，而是把 yt-dlp、Python、FFmpeg 当成可独立升级的插件来管（README 的 Plugin Support 一节）。这意味着：
+
+- 刚装好的版本，内置组件可能已经落后几周
+- 站点一改版，旧组件立刻解析失败
+
+所以第一件事是进更新页把组件刷到最新。这一步能解决掉大部分「昨天还能下今天不行」的问题。
+
+## 没有声音是缺 FFmpeg
+
+YouTube 一类站点的高清视频是音视频分离的两条流，下载后需要合并。没装 FFmpeg 时，只能拿到其中一条——常见表现就是只有画面没声音，或者只有音频。
+
+在插件里把 FFmpeg 装上，再选「视频」类型，它才会走合并流程。
+
+## 格式选择别贪最高
+
+分辨率越高，容器和编码越挑播放器。手机上存着看，选 1080p 的 mp4/h264 兼容性最好；要归档才考虑更高规格。音频单独下时注意是转码还是原样抽取——转码会损失质量但体积小。
+
+## 批量与播放列表
+
+播放列表的处理方式是它的强项：每个条目都能单独改参数，也能一次性统一格式和输出目录。
+
+    - 队列里的任务可以按日期时间排程
+    - 多条任务并行下载，数量可在设置里限
+    - 失败或取消的任务能直接重下，左滑重下、右滑删除
+
+想更省事就用「分享」菜单里的底部卡片：在别的 App 里复制链接直接分享过来，不用先打开 YTDLnis。
+
+## 私享内容与 cookie
+
+需要登录才能看的视频，要在设置里导入 cookie。这一步等于把你的账号会话交给 App，用完记得清掉——尤其是共用设备。
+
+## 合法性边界
+
+工具本身中立，但下载内容受版权与站点条款约束。自己存档、离线看是一回事，二次分发是另一回事，这条线要自己守住。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方站点",
+          url: "https://ytdlnis.org",
+          note: "README 声明的少数可信来源之一。第三方站点改名打包的版本不要装。",
+        },
+        {
+          kind: "html",
+          title: "发布包下载",
+          url: "https://github.com/deniscerri/ytdlnis/releases",
+          note: "最新 APK 与变更记录。升级前看一眼 release note，能知道这次修了哪些站点。",
+        },
+        {
+          kind: "link",
+          title: "yt-dlp 支持站点列表",
+          url: "https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md",
+          note: "判断某个站能不能下的唯一依据。README 说的「1000+ 站点」就是这张表。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "rapidraw",
+    linksCheckedAt: "2026-10-24",
+    name: "RapidRAW",
+    nameZh: "RapidRAW 轻量 RAW 修图",
+    aliases: ["rapidraw", "raw 修图", "lightroom 替代", "raw 编辑器"],
+    summary: "Tauri + Rust 写的 RAW 修图软件，安装包不到 20MB，GPU 加速、非破坏性编辑，定位是 Lightroom 的轻量替代。代价是 README 自己承认还不如 darktable / RawTherapee 成熟，会碰到 bug。",
+    scenes: ["photo"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["RAW", "修图", "摄影", "Rust", "GPU 加速"],
+    body: "RapidRAW 是一个把「打开快、调得快」放在第一位的 RAW 编辑器。技术栈是 Rust + wgpu + React + Tauri，README 强调安装包不到 20MB，全部调整走 GPU 渲染，编辑是非破坏性的——原图不动，改动记在旁边。\n功能面已经相当宽：曲线、HSL、蒙版、镜头校正（用 Lensfun 数据库）、降噪、AI 蒙版与去噪、HDR 合成、焦点堆叠、相机联机拍摄（限 macOS 与 Linux），还有一条 headless CLI 用来按 JSON 参数批量导出。对需要出片效率的摄影师，这些是实打实的日常工序。\n但它对自己的定位很诚实。README 明写「仍在积极开发，还没有 darktable、RawTherapee 或 Lightroom 那么打磨」，欢迎你报 bug。这句话应当被当真：把它当唯一的生产工具之前，先用几个真实项目验证色彩和导出是否符合预期。\n另外注意两件事：一是编辑信息存在 sidecar 文件里，换机器或重装前要连 sidecar 一起带走；二是 AI 相关功能依赖模型，首次使用需要联网下载。",
+    officialUrl: "https://getrapidraw.com",
+    officialLabel: "getrapidraw.com",
+    links: {
+      official: "https://getrapidraw.com",
+      github: "https://github.com/CyberTimon/RapidRAW",
+    },
+    whoFor: "想从 Lightroom 的订阅里出来、又不愿意接受 darktable 那套复杂度的摄影师；机器一般、希望修图软件别拖慢系统的人。",
+    whoNot: "要靠修图软件吃饭、需要极其稳定的色彩管理与批量交付的商用流程；还有已经在 darktable 建好整套工作流的人，迁移成本不划算。",
+    installTips: [
+      "Windows / macOS / Linux / Android 都从 GitHub Releases 取现成包，不需要自己编 Rust 工具链。",
+      "编辑不写回原图，改动记在 sidecar 里；换机器、重装系统前先确认 sidecar 跟着走。",
+      "批量导出走 headless CLI，配 JSON 调整参数即可跑脚本，不必开界面。",
+      "AI 降噪、AI 蒙版这类功能依赖模型文件，首次使用要联网下载。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#E8A33D",
+    },
+    guide: {
+      intro: "从「能不能当主力」这个问题出发：先装、先导入、先确认色彩，再决定是否迁移工作流，最后是批量与备份这两个长期问题。",
+      markdown: `## 先验证色彩，再谈迁移
+
+修图软件换掉的前提是导出结果能对上。建议第一批测试就做三件事：
+
+1. 拿一张你熟悉的 RAW，分别在旧软件和 RapidRAW 里只调曝光与白平衡，导出对比
+2. 检查导出是否嵌入 sRGB ICC 配置（README 的更新记录里提到过这项）
+3. 看直方图在高光处有没有异常截断
+
+颜色对不上时，先别怀疑软件，先确认显示器配置文件在系统层面是一致的。
+
+## 导入与库
+
+它按文件夹建库，不是导入到某个私有数据库里——这点和 Lightroom 的目录模式不同，文件仍在原来的位置。
+
+第一次打开大目录会花时间生成缩略图，机械硬盘上尤其慢。README 的更新记录里多次提到缩略图与缓存优化，说明这是被反复处理的痛点；建议一次只加一个根目录，别一口气把整个硬盘挂进去。
+
+## 非破坏性意味着什么
+
+调整不写进原图，而是存在 sidecar 文件里。好处是随时能回到原始状态；代价是：
+
+- sidecar 丢了，调整就没了
+- 换电脑时要把 sidecar 和图片一起拷
+- 用别的软件打开，看不到你的调整
+
+养成把照片目录整体（含隐藏文件）备份的习惯，比备份单张图靠谱。
+
+## 蒙版与 AI 功能
+
+蒙版是这类软件的分水岭。它的 AI 蒙版和去噪要下模型，第一次用会等一会儿。没有网络或不想用 AI 时，README 提到有 AI-free 模式，可以纯手动做。
+
+手动蒙版配合边缘感知的调整滤镜，效果未必比 AI 差，尤其在背景干净的人像上。
+
+## 批量导出
+
+拍了几百张要统一出片时，别在界面里一张张导。它提供 headless CLI，把调整参数写成 JSON 喂进去批量跑——适合固定机位、统一光线的场景（活动、棚拍）。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档与教程",
+          url: "https://www.getrapidraw.com/docs/",
+          note: "从基础调整到蒙版的逐步教程。先看蒙版那一节，能少走很多弯路。",
+        },
+        {
+          kind: "html",
+          title: "发布包下载",
+          url: "https://github.com/CyberTimon/RapidRAW/releases",
+          note: "各平台安装包。更新很频繁，遇到 bug 先看是不是已经在最新版修掉。",
+        },
+        {
+          kind: "html",
+          title: "项目主页",
+          url: "https://getrapidraw.com",
+          note: "功能介绍与下载入口，判断它当前覆盖了你的哪几道工序。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "optimizerduck",
+    linksCheckedAt: "2026-10-24",
+    name: "optimizerDuck",
+    nameZh: "optimizerDuck 系统优化",
+    aliases: ["optimizerduck", "windows 优化", "系统优化", "去臃肿"],
+    summary: "Windows 优化的图形外壳：42 项调整、44 个开关，外加启动项、计划任务、磁盘清理等五个小工具，单文件免安装。适合重装系统后一次收拾干净；代价是它改的是注册表和服务，出问题只能靠还原点。",
+    scenes: ["tools"],
+    platforms: ["windows"],
+    source: "opensource",
+    tags: ["Windows", "系统优化", "隐私", "去臃肿", "C#"],
+    body: "optimizerDuck 把散落在注册表、组策略、PowerShell 里的 Windows 调整项收进一个界面。README 列的账很具体：42 项优化分 7 类（性能、隐私、GPU、电源、臃肿组件与服务、使用体验、AI），44 个开关分 4 类（桌面、偏好、游戏、系统），再加五个自带工具——系统面板、启动项管理、计划任务、磁盘清理、AppX 卸载。\n它比同类脚本克制的地方在于**每一项都带说明和风险等级**，勾之前能看到这项到底动什么。README 还强调这些调整是从用户量大的成熟工具里整理来的，不是 AI 生成或随手加的。\n该泼的冷水也在 README 里：作者自己写「不会magically 让帧数翻倍」，它的作用是减少后台活动、降低延迟、让硬件表现更稳定；真正提升性能最有效的仍然是换 CPU、显卡、内存、SSD。\n风险要说透：这些都是系统级改动，改服务启动类型、删 AppX 包、动 GPU 注册表，个别组合会让某些功能（更新、商店、Copilot）失效。所以 README 把「先建系统还原点」写成了提示条，不是客套。",
+    officialUrl: "https://optimizerduck.vercel.app",
+    officialLabel: "optimizerduck.vercel.app",
+    links: {
+      official: "https://optimizerduck.vercel.app",
+      github: "https://github.com/itsfatduck/optimizerDuck",
+    },
+    whoFor: "刚重装完 Windows、想一次性关掉遥测和预装软件的人；游戏本用户想压一压后台占用、又不想自己翻注册表。",
+    whoNot: "公司配的电脑（改策略可能违反 IT 规定）；不想承担系统异常排查成本的人——这类工具出问题时，回滚比重装更费时间。",
+    installTips: [
+      "从 GitHub Releases 下 exe 直接双击运行，README 明确是 portable，不需要安装。",
+      "动手前先建系统还原点，README 把它写成 TIP 而不是可选步骤。",
+      "每项都标了风险等级，第一遍只勾 Safe 档，Caution 的逐条读完说明再决定。",
+      "只支持 Windows 10 及以上的 x64 / ARM64，老系统不要尝试。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#F2C14E",
+    },
+    guide: {
+      intro: "按「先保命再动刀」的顺序：还原点、逐类勾选、重启验证、出问题怎么退。附上哪些项容易连带出副作用。",
+      markdown: `## 第一步不是勾选，是还原点
+
+    Win + R → sysdm.cpl → 系统保护 → 创建
+
+给它一个能认出来的名字（比如 before-optimizerduck）。这一步花两分钟，能省掉后面几小时的重装。
+
+如果系统保护是关闭状态，先打开再操作——很多人卡在这里，以为建好了其实没建。
+
+## 七类调整怎么挑
+
+README 把 42 项分成性能、隐私、GPU、电源、臃肿组件与服务、使用体验、AI。建议按需求而不是按分类全勾：
+
+- **隐私**：关遥测、错误报告、广告 ID、位置跟踪，副作用最小，可以优先
+- **性能**：服务宿主按内存调优、进程优先级、键盘延迟、多媒体调度，收益取决于机器
+- **GPU**：按厂商（AMD / NVIDIA / Intel）改注册表，涉及电源状态与时钟门控，风险中等
+- **电源**：关休眠与快速启动、关 USB 选择性挂起、装高性能电源计划——笔记本上会明显影响续航
+- **服务与臃肿组件**：200+ 服务的启动类型，这一类的连带影响最大
+
+## 服务别一次关太多
+
+把 200 多个服务的启动类型批量改掉是最容易出事的操作。典型症状：打印机装不上、某些外设不认、系统更新失败。
+
+做法是分批。先关一眼能认出来的（Xbox 相关、旧版组件），重启用一天，确认没问题再动下一批。
+
+## 自带工具里最实用的是两个
+
+- **启动项管理**：比任务管理器更全，还能直接跳到文件位置，判断这个自启项是谁装的
+- **磁盘清理**：除了常规临时文件，还能清 Windows 更新残留和旧版安装，这块钱省得最多
+
+计划任务那一页慎用删除，有些任务看着没用，实际是驱动或商店的依赖。
+
+## 出问题怎么退
+
+它支持恢复改动，但恢复的前提是软件还在、记录还在。稳妥的顺序是：
+
+1. 勾完先重启，观察一天
+2. 有异常先用软件内的恢复功能逐项退
+3. 退不掉再走系统还原点
+
+别在出问题后立刻重装系统——那会把可排查的现场一起清掉。`,
+      resources: [
+        {
+          kind: "html",
+          title: "上手说明",
+          url: "https://optimizerduck.vercel.app/docs/guides/getting-started",
+          note: "官方 Getting Started，讲了第一次打开该按什么顺序操作。比 README 更细。",
+        },
+        {
+          kind: "html",
+          title: "工作原理",
+          url: "https://optimizerduck.vercel.app/docs/guides/how-it-works",
+          note: "说明每类调整实际改动了什么。勾选前对着看，能判断哪些项在你的机器上有意义。",
+        },
+        {
+          kind: "html",
+          title: "发布包下载",
+          url: "https://github.com/itsfatduck/optimizerDuck/releases",
+          note: "取最新便携版 exe。旧版本对新的 Windows 构建可能不适配。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "manga-image-translator",
+    linksCheckedAt: "2026-10-24",
+    name: "Manga Image Translator",
+    nameZh: "漫画图片翻译",
+    aliases: ["manga image translator", "漫画翻译", "图片翻译", "嵌字"],
+    summary: "把漫画或图片里的文字检测、擦除、翻译、重新排版一条龙做完，主要面向日文。适合看生肉同人和群聊图；代价是依赖重（PyTorch、模型、约 15GB 镜像），嵌字结果还要人工校对。",
+    scenes: ["photo"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图片翻译", "OCR", "漫画", "深度学习", "Python"],
+    body: "这个项目解决的是「图里的字没法复制粘贴」这件事。流程是四步串起来的：先用检测模型找出文字框，用 OCR 认字，把原文从画面里擦掉（inpainting），再把译文按原来的排版画回去。日语是主场景，README 说也支持简繁中文、英文等二十来种语言。\n它对自己的定位很务实：面向「不会被正式翻译」的图——群聊里的截图、同人图、图站上的短漫。这类内容不值得走人工流程，机器翻个大概就能看懂。\n代价要提前接受。一是依赖重：Python 3.12+、PyTorch、模型首次运行自动下到本地，Docker 镜像约 15GB；Windows 上还得装 C++ Build Tools 才能编译某些依赖。二是质量上限由翻译后端决定，接 GPT 类服务要先准备 API key；即便接了好模型，OCR 认错字、擦除留下色块、译文撑破气泡框都是常态，重要内容必须人工过一遍。\n三种用法各有取舍：本地批处理适合一次性扫一本，Web 服务适合反复试参数，API 模式适合接进自己的工具链。",
+    officialUrl: "https://cotrans.touhou.ai",
+    officialLabel: "cotrans.touhou.ai",
+    links: {
+      official: "https://cotrans.touhou.ai",
+      github: "https://github.com/zyddnys/manga-image-translator",
+    },
+    whoFor: "看日文同人、生肉短漫，想知道大概在讲什么的人；也适合想把「图片转译」这一步接进自己工具链的开发者（有 API 模式）。",
+    whoNot: "需要出版级译文的场景；机器配置吃紧、又不愿意为一次翻译装十几 GB 依赖的人，用网页版服务试试更划算。",
+    installTips: [
+      "本地跑要 Python 3.12+，克隆后 `pip install -r requirements.txt`，模型首次运行会自动下到 ./models。",
+      "不想配环境就直接用 Docker 镜像 `zyddnys/manga-image-translator:main`，但要有心理准备它约 15GB。",
+      "翻译后端必须选：接 GPT 类服务要先准备 OPENAI_API_KEY 这类环境变量，什么都不配就只能检测、不翻译。",
+      "有 N 卡可加 `--use-gpu`，但要按本机 CUDA 版本单独装对应的 PyTorch。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#6B4FBB",
+    },
+    guide: {
+      intro: "第一次用基本都卡在环境上。按「先跑通 Docker、再换成本地、最后调效果」的顺序讲，附上几个真影响可读性的参数。",
+      markdown: `## 先用 Docker 确认结果值不值得
+
+本地装依赖是最容易劝退的一步。建议先跑官方镜像看效果，确认能用再折腾环境：
+
+    docker run --name manga_image_translator_cpu \\
+      -p 5003:5003 --ipc=host --entrypoint python --rm \\
+      -v $PWD/result:/app/result \\
+      -e OPENAI_API_KEY='' -e OPENAI_API_BASE='' \\
+      zyddnys/manga-image-translator:main \\
+      server/main.py --verbose --start-instance --host=0.0.0.0 --port=5003
+
+镜像很大，拉取要等；起来后开对应端口传图。
+
+## 本地安装的两个前提
+
+Python 3.12 起步；Windows 上必须先装 Microsoft C++ Build Tools，某些依赖要从源码编译。
+
+    python -m venv venv && source venv/bin/activate
+    pip install -r requirements.txt
+
+模型不随仓库分发，首次运行自动下载到 ./models，这一步很慢且需要稳定网络。
+
+## 翻译后端不配等于白跑
+
+检测、擦除、嵌字都在本地模型里，唯独「翻译」这一步要外部服务。不配任何 key 时，它只能做文字检测（\`--translator none\`），输出的是框和掩码，不是译文。
+
+所以先决定用哪个后端，再准备对应的环境变量；用 GPT 类服务注意 API base 与代理，漏配代理会一直超时。
+
+## 影响可读性的几个参数
+
+- \`--detector ctd\`：换检测器，对密集排版的小字更敏感
+- 擦除质量：擦不干净会把原文残影带进译文，宁可放大原图再处理
+- 字号与换行：译文比原文长时容易溢出气泡，只能人工后修
+
+一次扫一整本用本地模式，传目录即可：
+
+    python -m manga_translator local -i ./chapters/01 --use-gpu
+
+先拿三页试参数再跑整本，参数不对时整本重跑很费时间。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线演示",
+          url: "https://cotrans.touhou.ai",
+          note: "官方维护的演示站。README 提示它可能因为服务重启而暂时不可用，重试或改用本地部署。",
+        },
+        {
+          kind: "markdown",
+          title: "中文说明文档",
+          url: "https://github.com/zyddnys/manga-image-translator/blob/main/README_CN.md",
+          note: "参数与配置项的中文说明，比英文 README 更容易对照着改命令行。",
+        },
+        {
+          kind: "html",
+          title: "发布与更新记录",
+          url: "https://github.com/zyddnys/manga-image-translator/releases",
+          note: "查版本与已知问题。项目更新频繁，遇到奇怪输出先确认是不是已修。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "openframeworks",
+    linksCheckedAt: "2026-10-24",
+    name: "openFrameworks",
+    nameZh: "openFrameworks 创意编程",
+    aliases: ["openframeworks", "of", "创意编程", "c++ 艺术"],
+    summary: "C++ 创意编程框架，把 OpenGL、音频、视频、OpenCV 打包成自包含目录，配 projectGenerator 生成工程。适合做装置与互动影像；代价是工程必须待在 OF 目录树里，挪动位置就会链接失败。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["创意编程", "C++", "OpenGL", "音频", "互动装置"],
+    body: "openFrameworks 是给做视觉与声音作品的人准备的 C++ 工具箱。它不发明新语言，而是把 OpenGL、音频、视频、计算机视觉这些底层库缝成一套统一 API，让你能专心写「画面怎么动」而不是「窗口怎么建」。\n它和 Processing 的差别在语言与掌控力：Processing 上手快，OF 是 C++，性能上限更高，也能直接接硬件、相机、传感器。代价是编译型语言的反馈循环更慢，环境配错的成本也更高。\n它的目录结构是理解一切的前提。README 说得很直白：每个发行版都是**自包含**的，addons、apps、examples、libs、export、scripts、projectGenerator 各司其职；工程里到处是 `../../../libs` 这样的相对路径，把项目往上或往下挪一层，链接就会断。这条几乎每个新手都会踩一次。\n另一件要分清的是「仓库」和「发行包」：GitHub 仓库里没有外部依赖，也没有各平台的示例工程文件，得另跑 download_libs.sh、再用 projectGenerator 生成。想直接开工就下发行包。",
+    officialUrl: "https://openframeworks.cc",
+    officialLabel: "openframeworks.cc",
+    links: {
+      official: "https://openframeworks.cc",
+      github: "https://github.com/openframeworks/openFrameworks",
+    },
+    whoFor: "做互动装置、演出视觉、生成艺术，愿意写 C++ 换性能与底层控制的人；也需要接相机、传感器、音频设备的项目。",
+    whoNot: "只想快速出个原型、不熟悉 C++ 编译链的人——Processing 或 p5.js 的学习曲线平缓得多；做普通桌面应用更不该选它。",
+    installTips: [
+      "从 openframeworks.cc/download 下对应平台的发行包，别直接 clone 仓库：仓库里没有外部依赖，还要另跑 download_libs.sh。",
+      "新工程用 projectGenerator 生成，手写工程文件很容易漏链接项；仓库版的 projectGenerator 要先 `git submodule init` 再 `git submodule update`。",
+      "每个发行版要单独放一个目录，不同版本不能混用；升级时新建一份，别覆盖旧的。",
+      "工程位置不能随便改：OF 内部大量使用 ../../../libs 这类相对路径，挪一层就断。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#3C6E9F",
+    },
+    guide: {
+      intro: "从「下哪个包」开始，讲清目录结构与相对路径这条硬约束，再走一遍用 projectGenerator 建工程、跑示例的流程。",
+      markdown: `## 下载包，而不是 clone
+
+官网下载页给的是按平台打好的包，里面已经包含外部依赖和 projectGenerator。GitHub 仓库是另一回事：README 明确说仓库里没有外部依赖、也没有各平台的示例工程文件。
+
+如果你确实要用仓库版：
+
+    git submodule init
+    git submodule update
+    scripts/<platform>/download_libs.sh
+
+顺序不能反——先拿 submodule，再下依赖。
+
+## 目录结构决定一切
+
+发行包里是这样分的：
+
+- **apps**：你自己的项目放这里
+- **examples**：官方示例，学 API 的主要途径
+- **addons**：核心之外的功能扩展
+- **libs**：OF 本体与第三方库
+- **export**：编译后要跟着走的 dll / dylib
+- **scripts**：各平台的自动化脚本与模板
+- **projectGenerator**：建新工程的图形工具
+
+## 相对路径是最大的坑
+
+OF 内部大量使用 \`../../../libs\` 这种路径。这意味着：
+
+- 项目必须待在 apps 下面，深度不能变
+- 把项目拷到桌面单独打开，一定链接失败
+- 两个不同版本的 OF 不能混着用
+
+想和别人共享项目，共享整个 OF 目录（或至少保持相对位置一致），而不是只发 apps 里那个文件夹。
+
+## 建第一个工程
+
+用 projectGenerator 选目标平台、填项目名、勾需要的 addons，点 Generate。生成后直接用 IDE 打开——macOS 是 Xcode 工程，Windows 是 Visual Studio 解决方案，Linux 走 Makefile 或 CMake。
+
+第一次编译会比较久，属于正常现象。
+
+## 从示例改起比从零写快
+
+examples 目录按主题分（graphics、sound、video、computer vision 等）。做法是复制一个最接近的示例到 apps 下改名，再改代码——比新建空工程再一个个加 addon 省事得多。
+
+注意示例的工程文件是用 projectGenerator 批量生成的，仓库版里没有，这也是要用发行包的原因之一。`,
+      resources: [
+        {
+          kind: "html",
+          title: "下载与平台安装指南",
+          url: "https://openframeworks.cc/download/",
+          note: "各平台发行包与安装步骤。先在这里确认你的 IDE 版本是否被支持，能省掉大量编译错误。",
+        },
+        {
+          kind: "html",
+          title: "官方文档目录",
+          url: "https://github.com/openframeworks/openFrameworks/blob/master/docs/table_of_contents.md",
+          note: "仓库内文档的索引，按平台分开讲注意事项。macOS 用户至少要读 osx.md。",
+        },
+        {
+          kind: "html",
+          title: "发布包与 nightly 构建",
+          url: "https://github.com/openframeworks/openFrameworks/releases",
+          note: "不想处理 submodule 时下 nightly 包最省事，但 nightly 不等于稳定版。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "omni-tools",
+    linksCheckedAt: "2026-10-24",
+    name: "OmniTools",
+    nameZh: "OmniTools 自建工具箱",
+    aliases: ["omni-tools", "omnitools", "在线工具箱", "自建工具站"],
+    summary: "自托管的网页工具箱，图片、PDF、文本、JSON、日期计算上百个小工具都在浏览器里跑，文件不上传服务器。适合不想为转个格式装一堆软件；代价是单项功能都不深，复杂排版和批量处理会不够用。",
+    scenes: ["tools", "office"],
+    platforms: ["linux", "macos", "windows"],
+    source: "opensource",
+    tags: ["工具箱", "自建服务", "PDF", "图片转换", "Docker"],
+    body: "OmniTools 是一堆小工具的集合页，形态是自托管的 Web 应用。README 强调两件事：所有文件**在浏览器里处理**，不上传服务器；Docker 镜像只有 28MB 左右，随便找台机器就能跑。\n工具覆盖面是它的价值所在：图片缩放/转换/编辑、视频裁剪与倒放、PDF 拆分合并编辑、文本大小写与列表洗牌、日期与时区换算、JSON/CSV/XML 处理，还有电压电流电阻这类小计算。日常那些「为了转一次格式去装个软件」的场景，基本都能在这里点两下解决。\n「在浏览器里跑」是优点也是限制。优点是没有上传等待、断网也能用（页面加载完之后）、隐私上更放心；限制是大文件直接吃浏览器内存，几百 MB 的 PDF 或视频容易把标签页卡死。\n另一个必须提醒的是深度：它是工具箱，不是专业软件。改 PDF 的精细排版、批量重命名几百张图、带预设的图像处理，这些还是要用专门工具。中文界面也没翻全，README 的覆盖率表里中文约七成。",
+    officialUrl: "https://omnitools.app",
+    officialLabel: "omnitools.app",
+    links: {
+      official: "https://omnitools.app",
+      github: "https://github.com/iib0011/omni-tools",
+    },
+    whoFor: "经常处理零散小任务的人：转格式、拆 PDF、理 JSON；也适合在家里 NAS 或小服务器上搭一个，全家共用。",
+    whoNot: "需要专业级图像处理、精密 PDF 排版、或大批量文件流水线的场景；不能自建服务、只能访问公网的场景，直接用公共站更省事。",
+    installTips: [
+      "一条命令起服务：`docker run -d --name omni-tools --restart unless-stopped -p 8080:80 iib0011/omni-tools:latest`。",
+      "镜像很小（约 28MB），树莓派或低配 NAS 都能跑；不需要数据库。",
+      "处理全在浏览器端完成，不必给每台电脑装东西，发个内网地址就行。",
+      "中文没翻全，README 的覆盖率表显示中文约七成，介意的话切英文。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#4A90D9",
+    },
+    guide: {
+      intro: "从部署讲起：一条命令起服务、局域网内怎么访问，再说浏览器端处理带来的能力边界与几个实际使用细节。",
+      markdown: `## 部署只要一条命令
+
+    docker run -d --name omni-tools --restart unless-stopped -p 8080:80 iib0011/omni-tools:latest
+
+起来后访问 http://localhost:8080。想给局域网里其他设备用，把防火墙对应端口放开，用主机 IP 访问即可。
+
+用 compose 的话，README 给的定义也很短：服务名 omni-tools，映射 8080:80，加 restart 策略就够，不需要卷——它不存用户数据。
+
+## 数据不出浏览器意味着什么
+
+所有转换、拆分、合并都在页面里完成，文件不会上传到服务器。由此可以推出三件事：
+
+1. 服务端只是个静态站点，性能压力几乎为零，低配机器也够
+2. 断网后已加载的页面仍能用，适合内网环境
+3. 文件大小受浏览器内存限制，几百 MB 的 PDF 或视频容易卡死标签页
+
+第三条是实际使用的边界。处理大文件时关掉其他标签页，或换用桌面工具。
+
+## 哪些工具真能替代桌面软件
+
+按「用一次就够」的标准分：
+
+- **能替代**：图片格式转换与缩放、PDF 拆页与合并、JSON/CSV 格式化、大小写转换、日期与时区换算
+- **只能应急**：图片编辑（缺图层与精细选区）、PDF 编辑（排版能力有限）、视频裁剪（只够粗剪）
+
+心里有这条线，就不会在它身上浪费时间调一个本来该用专业软件做的效果。
+
+## 中文与界面
+
+README 的国际化覆盖率表里，中文约七成、缺几百个键。表现是部分工具名和说明还是英文。对开发者无碍，给不熟英文的家人用会有点别扭。
+
+## 自己加工具
+
+它是 React + TypeScript + MUI 的项目，加一个新工具有脚手架：
+
+    npm run script:create:tool compress image
+
+参数是工具名和目标目录，目录可以多级（用 / 分隔，Windows 上写 \\）。开发时 npm run dev 起本地调试，改完提 PR 即可。`,
+      resources: [
+        {
+          kind: "html",
+          title: "公共演示站",
+          url: "https://omnitools.app",
+          note: "不想自己部署时先用这个试试手感，判断哪些工具真用得上再决定要不要自建。",
+        },
+        {
+          kind: "html",
+          title: "Docker 镜像页",
+          url: "https://hub.docker.com/r/iib0011/omni-tools",
+          note: "镜像的标签与拉取说明。自建时从这里确认最新版本号。",
+        },
+        {
+          kind: "html",
+          title: "发布与变更记录",
+          url: "https://github.com/iib0011/omni-tools/releases",
+          note: "看新增了哪些工具。它的工具集一直在扩，隔一段时间回来看会有惊喜。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "react-player",
+    linksCheckedAt: "2026-10-24",
+    name: "ReactPlayer",
+    nameZh: "ReactPlayer 播放组件",
+    aliases: ["react-player", "react player", "react 播放器", "视频组件"],
+    summary: "一个 React 组件把 YouTube、Vimeo、HLS、DASH 和本地文件统一成同一套播放器接口。适合内容站要嵌多种来源的视频；代价是 v3 不向下兼容，不少 provider 还停在 v2。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["React", "视频播放", "组件库", "HLS", "前端"],
+    body: "ReactPlayer 解决的是「同一个页面里要播来源各异的视频」这个麻烦。传一个 URL 进去，它解析出该用哪个播放器，加载对应的 markup 和第三方 SDK——YouTube、Vimeo、Wistia、Mux，以及 HLS、DASH 和普通文件路径都走同一个组件。回调、播放控制、音量、倍速这些 props 在各类来源上是统一的。\n它的设计很克制：默认是 chromeless（无控制条），要原生控制条得自己开 `controls`；想完全自定义就用 Media Chrome 这类库拼一套。这种「不替你决定 UI」的做法，在需要和站点视觉统一的场合很合适。\n升级要看清楚。README 开头就写明 v3 是架构重写、与 v2 不兼容，并且**部分 provider 尚未适配 v3**，官方建议这些场景继续用 v2。也就是说版本不是「越新越好」，要按你用到的来源来选。\n还有几个容易踩的细节：自动播放从 Chrome 66 起必须 muted；`light` 模式的缩略图靠 noembed 抓取，Facebook、Wistia、Mixcloud 和本地文件不支持；移动端浏览器普遍要求用户交互才允许播放。",
+    officialUrl: "https://cookpete.github.io/react-player",
+    officialLabel: "cookpete.github.io",
+    links: {
+      official: "https://cookpete.github.io/react-player",
+      github: "https://github.com/cookpete/react-player",
+    },
+    whoFor: "要在内容站、课程页、作品集里嵌多种来源视频的前端；尤其是来源会变、不想为每个平台写一套 iframe 逻辑的项目。",
+    whoNot: "只播自家服务器上的 mp4、且不需要统一接口的项目，一个原生 video 标签更轻；要做直播推流、转码、付费鉴权的场景，也不是它负责的范围。",
+    installTips: [
+      "`npm install react-player`，然后 `<ReactPlayer src=\"...\" />` 就能播，来源由 URL 自动判断。",
+      "v3 与 v2 不兼容，升级前先读 MIGRATING.md；用到的 provider 没适配 v3 就先留在 v2。",
+      "懒加载用 `light`：先渲染缩略图，用户点击才加载完整播放器；缩略图靠 noembed，Facebook/Wistia/Mixcloud 与本地文件抓不到。",
+      "自动播放必须加 `muted`，Chrome 66 之后有声视频不允许自动播。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#2F80ED",
+      simpleIcon: "react",
+    },
+    guide: {
+      intro: "先选版本（这步错了后面全白费），再讲懒加载与响应式布局，最后是自动播放与移动端这几个实际卡点。",
+      markdown: `## 先决定用 v2 还是 v3
+
+这是唯一需要前置判断的事。v3 是架构重写，不向下兼容；README 明说有些 provider 还没跟上 v3，建议这些场景继续用 v2。
+
+判断方法：把你实际要播的来源列出来，去 README 的 Supported media 一节逐项确认。只用到 YouTube/Vimeo/文件路径这类主流来源，v3 没问题；用到小众 provider，先别升。
+
+## 两个必要的 prop
+
+    <ReactPlayer
+      src="https://www.youtube.com/watch?v=..."
+      controls
+      width="100%"
+      height="auto"
+      style={{ aspectRatio: "16/9" }}
+    />
+
+- \`controls\`：不加就是无控制条，用户没法暂停
+- \`width: 100%\` + \`height: auto\` + \`aspectRatio\`：响应式的正解。用固定像素宽高在移动端会溢出
+
+## 列表页一定要懒加载
+
+一页放十几个视频，如果每个都直接加载播放器 SDK，首屏会很重。用 \`light\`：
+
+    <ReactPlayer src={url} light />
+
+它先渲染缩略图和一个播放图标，点击后才挂载真正的播放器。缩略图由 noembed 抓取，所以对 Facebook、Wistia、Mixcloud 和本地文件无效——这些场景自己传图片 URL 给 \`light\`。
+
+## 自动播放的三个前提
+
+1. 必须 \`muted\`
+2. 部分浏览器仍要求用户交互，尤其是移动端
+3. 某些平台（如 Facebook）在用户交互前不允许取消静音
+
+所以设计上不要做「一进页面就有声播放」，会被浏览器直接拦掉。
+
+## 事件回调怎么用
+
+\`onReady\`（加载完）、\`onPlay\`/\`onPause\`（状态变化）、\`onProgress\`（缓冲进度）、\`onEnded\`（播完，loop 时不触发）是最常用的四个。
+
+做「看完解锁下一节」这类逻辑时，用 \`onEnded\` 而不是自己算时长——不同来源的时长精度不一样。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线演示页",
+          url: "https://cookpete.github.io/react-player",
+          note: "各类来源的实播效果与参数面板。选版本前先在这里确认你要的来源能不能播。",
+        },
+        {
+          kind: "markdown",
+          title: "v3 迁移指南",
+          url: "https://github.com/cookpete/react-player/blob/master/MIGRATING.md",
+          note: "从 v2 升 v3 要改什么，全在这份文档里。不读就升，基本会编译失败。",
+        },
+        {
+          kind: "html",
+          title: "发布与变更记录",
+          url: "https://github.com/cookpete/react-player/releases",
+          note: "查各 provider 在 v3 的适配进度。项目已由 Mux 接手维护，节奏比以前快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "tkinter-designer",
+    linksCheckedAt: "2026-10-24",
+    name: "Tkinter Designer",
+    nameZh: "Tkinter Designer 界面生成",
+    aliases: ["tkinter designer", "tkdesigner", "tkinter 可视化", "figma 转代码"],
+    summary: "把 Figma 设计稿转成 Tkinter 代码和切图，省掉手写布局的时间。适合用 Python 做小工具、又想有个像样界面的人；代价是生成的只是静态布局，交互逻辑和状态还得自己接。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Tkinter", "Python", "Figma", "GUI", "代码生成"],
+    body: "Tkinter Designer 的输入是一个 Figma 文件链接加 API token，输出是一份能跑的 Tkinter 工程和配套切图。它走 Figma API 读设计稿的图层结构，把每个元素翻译成对应的控件与位置，连它自己的界面也是用自己生成的。\n对「Python 小工具想有个不难看的界面」这个需求，它确实省事：Tkinter 手写布局要反复试 padx/pady，用 Figma 拖好再生成，起码视觉上先有个底。README 也提了它的定位——加速 GUI 开发，不是替代 Tkinter。\n边界要提前认清。生成的是静态界面：控件摆在哪、显示什么图，这些它管；按钮点下去做什么、数据怎么绑、窗口怎么切，都是你要补的代码。生成的 gui.py 可以被别的模块导入而不自动进 mainloop，正是为这种接法准备的。\n另外两个细节会影响体验：Figma 里选中的是哪一帧，就生成哪一帧（复制链接前先选中目标帧）；多帧导航可以用 `--template pages` 直接生成带上一页/下一页的结构。",
+    officialUrl: "https://www.parthjadhav.com/products/tkinter-designer",
+    officialLabel: "www.parthjadhav.com",
+    links: {
+      official: "https://www.parthjadhav.com/products/tkinter-designer",
+      github: "https://github.com/ParthJadhav/Tkinter-Designer",
+    },
+    whoFor: "用 Python 写小工具、界面又不想太寒酸的人；已经习惯 Figma、希望设计稿能直接落地的独立开发者。",
+    whoNot: "需要复杂交互、大量动态列表或专业级控件（表格、树、图表）的桌面应用——那该换 Qt 或 Web 技术栈；追求像素级还原的人也会失望。",
+    installTips: [
+      "`pip install tkdesigner`，需要 Python 3.9+，另外要准备一个 Figma API token。",
+      "CLI 用法：`tkdesigner \"$FILE_URL\" \"$FIGMA_TOKEN\"`，链接一定加引号，Figma 地址常带 ? 和 &。",
+      "多页导航用 `--template pages`，类式结构用 `--template class`，套 ttk 主题用 `--theme clam`。",
+      "重新生成前加 `-f` 清空 build 目录，否则新旧文件会混在一起。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#3776AB",
+    },
+    guide: {
+      intro: "按真实流程走：Figma 那边要先准备什么、token 从哪来、命令行怎么跑，以及生成之后必须自己接手的那部分。",
+      markdown: `## 先准备三样东西
+
+1. Python 3.9 以上
+2. 一个 Figma 文件，且你对它有查看权限
+3. 一个 Figma API token
+
+token 在 Figma 账号设置里生成。它等价于一把钥匙，别写进代码提交——用环境变量传。
+
+## 链接里的帧是有讲究的
+
+在 Figma 里**先选中你要生成的那个 Frame**，再复制链接。README 说得很明确：选中哪一帧，生成的就是哪一帧。不选的话它可能拿整个页面，结果是空白或者一堆不该有的元素。
+
+一个文件里放多个 Frame，就能生成多页应用：
+
+    tkdesigner --template pages "$FILE_URL" "$FIGMA_TOKEN"
+
+这个模板会生成带上一页/下一页切换的结构。
+
+## 命令行长这样
+
+    tkdesigner "$FILE_URL" "$FIGMA_TOKEN"
+
+URL 必须加引号。Figma 的分享链接通常带 \`?node-id=...&t=...\` 这样的参数，不加引号会被 shell 截断成多个参数，报错信息还很难懂。
+
+## 生成之后才是真正的工作
+
+产物在 build 目录下，主要是 gui.py 和一堆切图。它给的是**静态布局**——控件位置、图片、文字都对，但按钮没有绑定事件、没有数据模型、窗口之间也没有状态传递。
+
+生成的 gui.py 可以被别的文件 import 而不自动启动 mainloop，这就是留给你接逻辑的入口：
+
+    from build.gui import App
+    app = App()
+    app.button_1.config(command=do_something)
+    app.mainloop()
+
+## 重新生成的正确姿势
+
+改完设计稿再跑一次时加 \`-f\`：
+
+    tkdesigner -f "$FILE_URL" "$FIGMA_TOKEN"
+
+不加的话旧文件会留在 build 目录里，切图可能对不上新布局，报错却很隐蔽。
+
+另外要有心理准备：Figma 里的复杂阴影、模糊、任意圆角，Tkinter 表达不了，生成的往往是贴上去的静态块。设计时按「纯色块 + 直线条 + 图片」做成功率最高。`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "官方操作说明",
+          url: "https://github.com/ParthJadhav/Tkinter-Designer/blob/master/docs/instructions.md",
+          note: "图文步骤，从拿 token 到生成第一份代码。第一次用照着做比自己摸索快。",
+        },
+        {
+          kind: "markdown",
+          title: "简体中文 README",
+          url: "https://github.com/ParthJadhav/Tkinter-Designer/blob/master/docs/README.zh-CN.md",
+          note: "中文版说明，术语对照更顺，适合给不熟英文的同事看。",
+        },
+        {
+          kind: "html",
+          title: "发布与变更记录",
+          url: "https://github.com/ParthJadhav/Tkinter-Designer/releases",
+          note: "查版本与已知问题。CLI 参数在不同版本间有过变化，升级前对一下。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "milligram",
+    linksCheckedAt: "2026-10-24",
+    name: "Milligram",
+    nameZh: "Milligram 极简 CSS",
+    aliases: ["milligram", "极简 css", "css 框架", "轻量样式库"],
+    summary: "2KB 的极简 CSS 框架，只给排版、表单、表格、网格这些基础样式，不带 JS 与组件。适合文档站、静态页快速起个干净的版式；代价是别指望它撑起后台管理这种复杂界面。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["CSS", "前端", "极简", "静态站点", "MIT"],
+    body: "Milligram 的自我定位非常清楚：README 第一句就说它是「一套最小的样式起点」，并特意声明它不是 UI 框架。gzip 后 2KB，意味着它几乎没有你不需要的东西。\n它做的事是重设基础元素——标题、段落、引用、按钮、列表、表单、表格、网格、代码块，再加少量工具类。你写语义化的 HTML，它负责让这些东西看起来干净、间距合理、在窄屏上不塌。这套思路适合文档站、个人主页、README 的网页版，以及「不想引 Bootstrap 那么大一坨」的内部页面。\n它的边界来自同一个原因。没有 JS，就没有下拉菜单、模态框、标签页；没有组件体系，就没有现成的卡片、导航、数据表格交互。要拿它做后台管理，很快就会发现自己写的自定义样式比框架还多，那时它的价值就没了。\n安装方式很传统：npm / yarn 装包，或者直接引 CDN 的 css 文件。没有构建步骤，也不需要按需引入——本来就只有 2KB。",
+    officialUrl: "https://milligram.io",
+    officialLabel: "milligram.io",
+    links: {
+      official: "https://milligram.io",
+      github: "https://github.com/milligram/milligram",
+    },
+    whoFor: "写文档站、博客、项目主页，想要一套中性排版又不想引大框架的人；也适合给内部工具快速统一表单与表格样式。",
+    whoNot: "要做后台管理、需要组件库和交互逻辑的项目；已经用 Tailwind 这类原子化方案的人，再叠一层只会打架。",
+    installTips: [
+      "`npm install milligram`（或 yarn / bower），把 css 引进页面即可，没有构建步骤。",
+      "它只重设基础元素样式，没有 JS 组件；按钮、表单都是原生标签加类名。",
+      "先看官网 Getting Started 与 Utilities 两节，再决定要不要叠自定义样式——叠太多就失去用它的意义了。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#E64C4C",
+    },
+    guide: {
+      intro: "讲清「什么样的页面适合它」，再给引入方式、它覆盖到哪一层元素，以及什么时候该果断换方案。",
+      markdown: `## 先判断页面类型
+
+Milligram 适合「内容为主、交互为辅」的页面：
+
+- 文档、说明页、项目主页
+- 博客与文章列表
+- 表单收集页（联系、报名）
+
+不适合「操作密集」的界面：后台表格、带筛选的列表、多步骤向导。这些需要组件和状态管理，它一概不提供。
+
+## 引入方式
+
+    npm install milligram
+
+然后在入口处引 css，或者直接把 milligram.min.css 放进静态目录。
+
+没有按需引入的概念——整包 gzip 后 2KB，全部引进来比配置构建还快。
+
+## 它到底管了什么
+
+打开官网的目录就能看到范围：Typography、Blockquotes、Buttons、Lists、Forms、Tables、Grids、Code、Utilities。
+
+特点是**只重设原生元素**。你写 \`<button class="button">\`，它给你一套统一的内边距、圆角、字号；你不写类名，很多元素也已经比浏览器默认好看。这正是「不是 UI 框架」的含义——它不要求你用它的结构组织页面。
+
+## 网格怎么用
+
+它给的是最朴素的 12 列 flex 网格：
+
+    <div class="row">
+      <div class="column">左</div>
+      <div class="column">右</div>
+    </div>
+
+列宽靠内联样式或自己的工具类控制，没有 col-6 这种断点类。想要响应式断点系统，它给不了——这是它和 Bootstrap 最实际的分野。
+
+## 表单是最值得用的部分
+
+原生 input、select、textarea 在浏览器里样式差异很大。Milligram 统一了边框、内边距、聚焦态，做收集页时能省掉大量对齐调试。
+
+## 什么时候该换
+
+如果出现下面任一情况，就别硬撑：
+
+1. 自定义样式文件超过框架本身
+2. 需要下拉、弹层、标签页这类交互
+3. 设计要求精确到像素级的品牌规范
+
+换到 Tailwind（原子化、自由度高）或 Bootstrap（组件全、体积大）都比继续打补丁划算。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://milligram.io",
+          note: "所有能用的类名与示例都在这一页，单页读完即可，不需要翻别处。",
+        },
+        {
+          kind: "html",
+          title: "Getting Started",
+          url: "https://milligram.io/#getting-started",
+          note: "最简引入方式与文件结构，新项目从这节开始抄。",
+        },
+        {
+          kind: "html",
+          title: "npm 包页",
+          url: "https://www.npmjs.com/package/milligram",
+          note: "版本号与安装命令。老项目引 CDN 时注意对版本，2KB 的包也会有小改动。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "cemu",
+    linksCheckedAt: "2026-10-24",
+    name: "Cemu",
+    nameZh: "Cemu Wii U 模拟器",
+    aliases: ["cemu", "wii u 模拟器", "wiiu", "塞尔达模拟器"],
+    summary: "Wii U 模拟器，多数 Wii U 游戏和自制程序能跑到可玩状态，Windows/Linux/macOS 都有构建。适合手里有游戏文件、想在大屏或高分辨率下重温的人；代价是 macOS 版仍是实验状态，ARM Mac 还有性能折损。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["模拟器", "Wii U", "游戏", "C++", "开源"],
+    body: "Cemu 是 Wii U 模拟器，README 的说法是「多数 Wii U 游戏和自制程序能跑到可玩状态」。它从 2.0 起开源，代码是 C/C++，至今仍在活跃更新。\n它的实际体验取决于三件事：模拟器本身、游戏兼容性、以及你机器上的图形驱动。兼容性不看 README 而看 wiki 的兼容性列表——同一款游戏在不同版本上的表现会变，装之前先查一眼能省很多时间。\n平台差异必须说清楚。Windows 有安装版和免安装便携版，最省心；Linux 除了 Releases 还有 Flathub；macOS 的原生构建在 README 里被明确标为「纯实验性，不应视为稳定或无问题可玩」，ARM Mac 还要经过 MoltenVK 和 Rosetta，性能有折损。\n另外要建立正确预期：装完只是模拟器本体。游戏文件、系统文件的准备是另一套流程，官方指向 cemu.cfw.guide 的 setup guide。想调画质、解锁帧率则靠社区图形包（cemu_graphic_packs），那是独立仓库。",
+    officialUrl: "https://cemu.info",
+    officialLabel: "cemu.info",
+    links: {
+      official: "https://cemu.info",
+      github: "https://github.com/cemu-project/Cemu",
+    },
+    whoFor: "想在 PC 上以更高分辨率重温 Wii U 游戏的人；愿意按教程准备文件、能自己排查图形问题的玩家。",
+    whoNot: "用 ARM Mac 且期待开箱即玩的人；不想折腾文件与图形包、只想插盘就玩的场景——原机体验更省心。",
+    installTips: [
+      "从 GitHub Releases 下对应平台的包；Windows 有安装版与便携版两种，便携版解压即用。",
+      "Linux 可以直接走 Flathub 的 info.cemu.Cemu，省掉自己处理依赖。",
+      "装完只是模拟器本身，游戏与系统文件按 cemu.cfw.guide 的流程准备。",
+      "遇到某款游戏跑不动，先查 wiki 的兼容性列表和社区图形包，多数问题已有结论。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#00A0E9",
+    },
+    guide: {
+      intro: "以「装完打不开游戏」为主线：先分清模拟器与游戏文件，再讲图形包、性能和平台差异这几个真正影响体验的点。",
+      markdown: `## 先分清三样东西
+
+新手最容易混的是这三件事：
+
+1. **模拟器**：Cemu 本体，从 Releases 或 Flathub 装
+2. **游戏文件**：需要你自己准备，格式与来源不在本项目范围内
+3. **图形包**：社区维护的画质/帧率修改，在 cemu_graphic_packs 仓库
+
+只装第 1 样，打开是一片空白，这不是 bug。
+
+## 平台怎么选
+
+- **Windows**：安装版或便携版都行。便携版解压到固定目录，别放在会被清理的临时目录
+- **Linux**：优先 Flathub，省掉一堆依赖问题
+- **macOS**：README 明确写着纯实验性，走 MoltenVK，ARM 机器还有 Rosetta 开销
+
+如果主力是 Mac，建议把预期放低；这不是配置问题，是官方状态如此。
+
+## 第一次运行的顺序
+
+1. 打开 Cemu，先让它建好配置目录
+2. 按 cemu.cfw.guide 的 setup guide 完成初始设置
+3. 确认图形后端与分辨率，别一上来就开 4K
+4. 加载一款兼容性列表里标「可玩」的游戏验证链路
+
+先跑通一款，再谈画质。
+
+## 卡顿与画面异常的排查顺序
+
+按这个顺序查，比乱调设置快：
+
+1. **驱动**：显卡驱动版本太旧是最常见原因
+2. **着色器缓存**：首次进入新场景会卡，属于编译着色器，第二次通常就好
+3. **分辨率与图形包**：4K 图形包对显存要求陡增，先退回原生分辨率对比
+4. **兼容性列表**：确认这款游戏在当前版本的状态，可能是已知问题
+
+图形包不是越多越好。叠加多个来源的包容易互相覆盖，出问题时先全关，再逐个开。
+
+## 关于存档与迁移
+
+存档和配置在 Cemu 的数据目录里，不在游戏文件旁边。重装或换机器时要把整个数据目录一起搬，否则进度就没了。
+
+## 合法性
+
+模拟器本身是合法开源软件，但游戏文件的使用受当地法律与版权约束。这一条得自己拿捏。`,
+      resources: [
+        {
+          kind: "html",
+          title: "兼容性列表 Wiki",
+          url: "https://wiki.cemu.info/wiki/Main_Page",
+          note: "查某款游戏能不能跑、有什么已知问题。装之前先看，比装完再折腾省时间。",
+        },
+        {
+          kind: "html",
+          title: "官方设置指南",
+          url: "https://cemu.cfw.guide",
+          note: "从零完成初始设置与文件准备的逐步教程，README 直接指向这里。",
+        },
+        {
+          kind: "html",
+          title: "发布包下载",
+          url: "https://github.com/cemu-project/Cemu/releases",
+          note: "各平台构建与更新记录。兼容性改善多半写在 release note 里。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "gamenetworkingsockets",
+    linksCheckedAt: "2026-10-24",
+    name: "GameNetworkingSockets",
+    nameZh: "GameNetworkingSockets 联机传输",
+    aliases: ["gamenetworkingsockets", "gns", "valve 网络库", "游戏联机"],
+    summary: "Valve 开源的 UDP 传输层：可靠/不可靠消息、分片重组、加密、NAT 穿透都在里面，专门给游戏联机用。适合自己做联机同步的团队；代价是它只做传输，序列化、压缩、匹配全得自己写。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["网络库", "游戏开发", "UDP", "P2P", "C++"],
+    body: "GameNetworkingSockets 是 Valve 从自家游戏里抽出来的传输层。README 对它的描述很精确：像 TCP 那样面向连接，但像 UDP 那样面向消息——不是字节流，每次发送是一个完整消息，可靠与不可靠可以逐条选。\n底层做了几件游戏真正需要的事。可靠性层用的是 ack vector 模型（来自 DCCP 与 QUIC 的思路），比 TCP 的滑动窗口更适合高丢包环境；消息超过 MTU 会自动分片重组；每个包 AES-GCM-256 加密，密钥交换用 Curve25519；还能在同一条连接上开多条 lane，用优先级或权重分配带宽，缓解队头阻塞。\n它明确不做的事也写在 README 里：实体序列化、增量状态编码、压缩。这些是「游戏逻辑层」的活，得自己搭或者配别的库。\n最后澄清一个常见误会：接口名里到处是 Steam，但 README 明确说**不需要 Steam**。代价是 Steam 版的 SDR 中继与认证服务不在开源版里——想用那些，得是 Steam 合作伙伴。",
+    officialUrl: "https://github.com/ValveSoftware/GameNetworkingSockets",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/ValveSoftware/GameNetworkingSockets",
+      github: "https://github.com/ValveSoftware/GameNetworkingSockets",
+    },
+    whoFor: "自己做联机、需要 UDP 上可靠消息与 P2P 打洞的团队；尤其是自研引擎、又不满足于裸 UDP 的项目。",
+    whoNot: "只想快速加个房间匹配和同步、不想碰底层的人——该用带完整方案的服务；也不是给 Web 或非实时应用准备的。",
+    installTips: [
+      "从源码构建，步骤见仓库的 BUILDING.md；对外是 C++ 接口，另有纯 C 接口方便绑定其他语言。",
+      "先读两个例子：examples/example_chat.cpp 是可靠消息的客户端/服务端，tests/test_p2p.cpp 演示 P2P 连接与信令插件写法。",
+      "名字里的 Steam 不代表必须用 Steam，README 明确说不需要；但 SDR 中继与 Steam 认证只在 Steamworks 版有。",
+      "P2P 要自备信令服务，NAT 穿透用的是 WebRTC 的 ICE 实现。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "G",
+      color: "#1B2838",
+    },
+    guide: {
+      intro: "从「先跑通 example_chat」开始，讲清可靠/不可靠的选择、消息大小与 MTU、lane 的用途，以及 P2P 那套额外要准备的东西。",
+      markdown: `## 先编译并跑通示例
+
+别一上来就往自己引擎里接。构建完成后先跑 examples/example_chat.cpp：一个客户端、一个服务端，全部走可靠消息，跑在普通 IPv4 上。
+
+它能跑通，说明编译、链接、运行时依赖都没问题；再来谈接入。
+
+## 可靠与不可靠是逐条选的
+
+这是和 TCP 最根本的区别。同一条连接上：
+
+- **可靠消息**：保证送达、保证顺序，用于状态同步、关键事件
+- **不可靠消息**：发了就忘，用于位置更新、语音、高频状态
+
+设计上要按消息语义分，不要全用可靠——那等于在 UDP 上重造 TCP，还会被重传拖慢。
+
+## 超过 MTU 会自动分片
+
+README 说明消息可以大于底层 MTU，协议负责分片、重组与重传。方便，但有代价：大消息在丢包环境下重传成本高。
+
+实践上把状态同步的消息控制在几百字节以内，需要传大块数据（地图、资源）时走单独的可靠通道，别和实时包混在一起。
+
+## lane 解决队头阻塞
+
+同一条连接可以开多条 lane，用严格优先级或权重分配带宽。典型用法：
+
+- 高优先级：玩家输入、关键事件
+- 低优先级：资源预载、日志
+
+不配 lane 时所有消息共享一条队列，一个大包就能把实时包堵在后面。
+
+## P2P 要自己准备信令
+
+NAT 穿透走 WebRTC 的 ICE，但「双方怎么交换候选地址」这件事它不管——README 说要插自己的信令服务，tests/test_p2p.cpp 里有插件写法的例子。
+
+还有 symmetric connect 模式，适合双方都不可直连时用。做 P2P 之前先想清楚：你有没有地方放这个信令服务。
+
+## 别忘了它不做的事
+
+序列化、增量编码、压缩，README 明确列在「不做什么」里。上手前先确认这部分你打算用什么——很多人接进来才发现还差半层。`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "P2P 使用说明",
+          url: "https://github.com/ValveSoftware/GameNetworkingSockets/blob/master/README_P2P.md",
+          note: "P2P 连接、信令插件与 symmetric connect 的完整说明。做打洞前必读。",
+        },
+        {
+          kind: "markdown",
+          title: "构建说明",
+          url: "https://github.com/ValveSoftware/GameNetworkingSockets/blob/master/BUILDING.md",
+          note: "各平台的依赖与编译步骤。Windows 与 Linux 的坑不太一样，先按对应章节走。",
+        },
+        {
+          kind: "html",
+          title: "发布与变更记录",
+          url: "https://github.com/ValveSoftware/GameNetworkingSockets/releases",
+          note: "查版本与协议变更。线上项目升级前确认兼容性，别让新旧客户端连不上。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "mobile-mcp",
+    linksCheckedAt: "2026-10-24",
+    name: "Mobile MCP",
+    nameZh: "Mobile MCP 移动端自动化",
+    aliases: ["mobile-mcp", "mcp 移动端", "ios 自动化", "android 自动化"],
+    summary: "让 AI 客户端直接操作 iOS/Android 的 MCP 服务器，靠无障碍树定位元素而不是截图猜坐标。适合写移动端自动化或让 agent 跑 App 流程；代价是本机得配好 Xcode 与 adb，元素读不到时仍会退回截图点击。",
+    scenes: ["code"],
+    platforms: ["macos", "linux", "windows"],
+    source: "opensource",
+    tags: ["MCP", "自动化", "iOS", "Android", "AI Agent"],
+    body: "Mobile MCP 是一个 MCP 服务器，作用是把「操作手机」这件事变成一组工具调用：列设备、装应用、点击、输入、滑动、录屏、取日志、拿崩溃报告。上层可以是 Claude Code、Codex、Cursor 或任何支持 MCP 的客户端。\n它和「截图 + 视觉模型猜坐标」的方案有本质区别：默认走原生无障碍树，直接读到界面元素的文本、位置与层级，再按元素引用去点。README 强调这更快也更省 token——不用把整张图喂给模型。只有在无障碍树拿不到信息时，才退回截图 + 坐标点击。\n覆盖面是它的强项：iOS 模拟器与真机、Android 模拟器与真机，同一套工具名通吃，不用记两套 API。因此不必会 XCUITest 或 Espresso，描述目标让 agent 去点就行。\n代价集中在环境：iOS 要有 Xcode 命令行工具和已启动的模拟器，Android 要有 platform-tools 并开启 USB 调试，Node 需要 20 以上。另外 README 附带的 /mobile-mirror 实时镜像需要终端支持 kitty 图形协议，不是所有终端都行。",
+    officialUrl: "https://mobilenext.ai",
+    officialLabel: "mobilenext.ai",
+    links: {
+      official: "https://mobilenext.ai",
+      github: "https://github.com/mobile-next/mobile-mcp",
+    },
+    whoFor: "要写移动端自动化测试、或让 agent 代跑 App 流程的开发者；已经用 MCP 生态、想把手机纳入工具链的人。",
+    whoNot: "没有本地 iOS/Android 开发环境的纯前端或后端开发者；需要高稳定性 CI 流水线、不能接受点击偶尔失败的团队。",
+    installTips: [
+      "配置里加一条 npx 启动即可：`npx -y @mobilenext/mobile-mcp@latest`，Node 需要 20 以上。",
+      "iOS 要 Xcode 命令行工具和一个已启动的模拟器；Android 要 platform-tools，且 USB 调试已授权。",
+      "真机也能连：iOS 走 USB 并信任这台电脑，Android 授权 adb 即可。",
+      "Claude Code 里可以装插件用 `/mobile-mirror` 在侧栏看设备画面，但终端需要支持 kitty 图形协议（kitty、Ghostty）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#5B5BD6",
+    },
+    guide: {
+      intro: "先把环境跑通（这步占八成时间），再接进客户端，最后讲无障碍树拿不到元素时怎么退而求其次。",
+      markdown: `## 环境检查先做
+
+三样缺一不可：
+
+    xcrun simctl list devices      # iOS：确认有模拟器
+    adb devices                     # Android：确认设备已授权
+    node -v                        # 需要 v20+
+
+任何一条报错，先修它，别急着配 MCP。
+
+## 接进客户端
+
+大多数工具认这段配置：
+
+    {
+      "mcpServers": {
+        "mobile-mcp": {
+          "command": "npx",
+          "args": ["-y", "@mobilenext/mobile-mcp@latest"]
+        }
+      }
+    }
+
+Claude Code 也可以一条命令：
+
+    claude mcp add mobile-mcp -- npx -y @mobilenext/mobile-mcp@latest
+
+## 第一个任务：只做「看」
+
+接好之后别直接让它点。先让它列设备、截一张图、列出当前界面元素：
+
+1. \`mobile_list_available_devices\`
+2. \`mobile_take_screenshot\`
+3. \`mobile_list_elements_on_screen\`
+
+第三步的输出很关键——能看到每个元素有没有稳定的文本或标识。没有标识的元素，后面点击就会不稳。
+
+## 元素找不到时的退路
+
+工具优先用无障碍树。但有些界面（游戏、自绘控件、WebView 里嵌的内容）根本读不到元素。
+
+此时它会退回截图 + 坐标点击。这条路能用，但脆弱：分辨率、状态栏高度、字体大小一变，坐标就偏。
+
+对策是让被测应用给关键控件加可访问性标识，这对所有自动化方案都有好处。
+
+## 批量操作能省往返
+
+\`mobile_batch_commands\` 可以一次调用连做几步（点、输入、再点），最后列出界面元素。相比一步一往返，既快又少出错。
+
+## 最后两点提醒
+
+不想在本地维护模拟器，可以接 Mobile Next Cloud：工具集一样，设备在云上。
+
+移动端自动化天生不稳：动画没结束就点、弹窗拦截、加载慢。写流程要留重试和断言。`,
+      resources: [
+        {
+          kind: "html",
+          title: "项目 Wiki",
+          url: "https://github.com/mobile-next/mobile-mcp/wiki",
+          note: "各客户端的配置方式与调试技巧，遇到连不上先翻这里。",
+        },
+        {
+          kind: "markdown",
+          title: "中文说明",
+          url: "https://github.com/mobile-next/mobile-mcp/blob/main/README.zh-CN.md",
+          note: "中文版 README，工具清单与配置段落对照着看更省事。",
+        },
+        {
+          kind: "html",
+          title: "发布与变更记录",
+          url: "https://github.com/mobile-next/mobile-mcp/releases",
+          note: "工具名与参数偶有调整，升级前看一下免得脚本失效。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "dicebear",
+    linksCheckedAt: "2026-10-24",
+    name: "DiceBear",
+    nameZh: "DiceBear 头像生成",
+    aliases: ["dicebear", "头像生成", "avatar 库", "随机头像"],
+    summary: "用种子字符串生成 SVG 头像的库，同一个种子永远出同一张图，63 种风格、七种语言实现输出一致。适合不想让用户上传头像的产品；代价是风格偏插画，且各套样式许可证不同，商用要逐个确认。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["头像", "SVG", "插画", "设计资源", "多语言"],
+    body: "DiceBear 的核心约定很简单：给一个种子字符串（用户名、邮箱都行），还你一张 SVG 头像。同一个种子永远产出同一张图，所以数据库里存一个字符串就够了，不用存图片，也不用逼用户上传照片。\n10.x 的卖点是跨语言一致：README 说 JS、PHP、Python、Rust、Go、Dart、C# 七个实现共用一套测试，要求输出**字节级相同**。这意味着前端用 JS 生成、后端用 Go 重新生成，拿到的是同一张图——对多端产品很实用。\n风格是 63 套独立的 JSON 定义（在 dicebear/styles 仓库），从手绘角色到抽象几何都有，颜色、背景、旋转、发型眼镜等细节可按 style options 调整；也能用 Figma 或从零自定义一套。\n许可证要分开看：**代码是 MIT，含商用；样式是各自作者的作品，各带各的许可证**，README 说很多只要求署名。真要商用，得逐个查 licenses 页面，这一步不能省。\n不想写代码有三条路：拼 URL 用公共 API、用 CLI 批量出图、用编辑器手动配一个。",
+    officialUrl: "https://www.dicebear.com",
+    officialLabel: "www.dicebear.com",
+    links: {
+      official: "https://www.dicebear.com",
+      github: "https://github.com/dicebear/dicebear",
+    },
+    whoFor: "做社区、评论、协作工具，需要给每个用户一个默认头像的产品；也适合需要批量生成占位头像的设计与测试场景。",
+    whoNot: "需要真实照片头像、或头像要能表达身份的场景；对插画风格敏感的品牌项目，也可能找不到合适的一套。",
+    installTips: [
+      "JS 用 `npm install @dicebear/core`，样式定义单独装；PHP/Python/Rust/Go/Dart/C# 都有对应包。",
+      "不写代码就拼 URL：`https://api.dicebear.com/10.x/lorelei/svg?seed=Felix`，免费且不用注册。",
+      "量大就用 Docker 自建 HTTP API，别把公共实例当生产依赖。",
+      "批量出文件用 CLI：`npx dicebear create lorelei -o ./avatars --count 10`。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#6A5ACD",
+    },
+    guide: {
+      intro: "三件事决定用得顺不顺：种子怎么选、样式许可证怎么查、以及什么时候该从公共 API 换到自建。",
+      markdown: `## 种子决定一切
+
+头像完全由种子字符串推导出来。选种子有实际影响：
+
+- 用**用户名**：改名就换头像，用户会困惑
+- 用**用户 ID**：稳定，但同一 ID 在不同风格下气质差异很大
+- 用**邮箱哈希**：跨服务一致，但涉及隐私时要注意
+
+一般用「用户 ID + 固定盐」最稳：稳定、不可预测、不会暴露邮箱。
+
+## 三种用法按复杂度排
+
+**1. 直接拼 URL（最快）**
+
+    https://api.dicebear.com/10.x/lorelei/svg?seed=Felix
+
+把 seed 换成用户 ID 就行。适合原型和低流量站点。注意版本号 10.x 要写进 URL，跨大版本风格可能变。
+
+**2. 代码里生成（可控）**
+
+    import { Avatar, Style } from '@dicebear/core';
+    import definition from '@dicebear/styles/lorelei.json' with { type: 'json' };
+
+    const avatar = new Avatar(new Style(definition), { seed: 'John', size: 128 });
+    avatar.toString();   // SVG 字符串
+
+好处是可以只打包用到的样式，不依赖外部服务。
+
+**3. 自建 API（量大时的正解）**
+
+公共实例是免费服务，不该被当成 SLA。量大就用 Docker 自建一套，接口一致，数据也不出你的网。
+
+## 许可证要逐个查
+
+这一条最容易在商用上出问题：
+
+- **代码**：MIT，商用没问题
+- **样式**：每套都是独立作者的作品，许可证各不相同，很多只要求署名
+
+README 指向 licenses 页面汇总。上线前把你实际用到的那几套挑出来逐一确认，别用「整个库是 MIT」来推断样式也能随便用。
+
+## 定制到具体部位
+
+样式定义是 JSON，里面的 options 可以改颜色、背景、旋转，也能单独控制发型、眼镜这类特征。想固定品牌色，就在 options 里指定 palette，别指望随机出来的颜色刚好合适。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线试玩",
+          url: "https://www.dicebear.com/playground",
+          note: "换种子、换风格、调参数实时看效果。选风格前先在这挑三轮，比读文档快。",
+        },
+        {
+          kind: "html",
+          title: "许可证总览",
+          url: "https://www.dicebear.com/licenses/",
+          note: "每套样式各自的许可条款。商用前必须逐个确认，代码 MIT 不代表样式也 MIT。",
+        },
+        {
+          kind: "html",
+          title: "HTTP API 文档",
+          url: "https://www.dicebear.com/integrations/http-api/",
+          note: "URL 参数与自建方式的说明。想摆脱公共实例依赖时从这里开始。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "cocos-engine",
+    linksCheckedAt: "2026-10-24",
+    name: "Cocos Engine",
+    nameZh: "Cocos Creator 运行时引擎",
+    aliases: ["cocos", "cocos creator", "cocos engine", "cocos 引擎", "国产游戏引擎"],
+    summary: "Cocos Creator 编辑器里那套运行时引擎的开源仓库，不含编辑器，不能单独拿来做项目。适合要改引擎源码、给 H5 与小游戏做深度定制的人；想下载即用的应该去装 Creator 编辑器。",
+    scenes: ["games"],
+    platforms: ["windows", "macos"],
+    source: "opensource",
+    tags: ["游戏引擎", "2D", "3D", "小游戏", "H5"],
+    body: "Cocos Creator 是一个 2D/3D 游戏开发工具，本仓库是它的运行时引擎：渲染器、场景管理、原生平台适配这些底层都在这里，用一半 C++ 一半 TypeScript 写成，渲染走 Vulkan（Windows / Android）、Metal（macOS / iOS）与 WebGL（Web）。\nREADME 有一句必须看清楚的话：这个仓库「设计上只作为运行时库，不打算被独立使用」。也就是说你不能 clone 下来直接开新项目，正确用法是在 Creator 编辑器里把它设为 custom engine，改完由编辑器编译。它支持的目标平台是 Windows、Mac、iOS、Android、HarmonyOS、Web，以及微信小游戏、抖音小游戏、Facebook Instant Games 这类小游戏渠道——没有 Linux 桌面。\n代价在这里：编辑器本身不在这个仓库里，遇到问题要分清是编辑器行为还是引擎行为；原生平台的构建还有另一套（见 native/README.md），跨端调试的坑多半出在这一层。国内小游戏渠道的适配是它相对其他开源引擎最实在的差别，做微信/抖音小游戏时省掉的适配工作量比省下的授权费更值钱。",
+    officialUrl: "https://www.cocos.com/en/creator",
+    officialLabel: "www.cocos.com",
+    links: {
+      official: "https://www.cocos.com/en/creator",
+      github: "https://github.com/cocos/cocos-engine",
+    },
+    whoFor: "已经在用 Cocos Creator、需要改引擎底层或修引擎 bug 的团队；做微信/抖音小游戏、需要现成渠道适配的人。",
+    whoNot: "想找一个「下载下来就能开工」的独立引擎的人——这里没有编辑器；也不适合完全不想碰 C++ 与构建链的纯脚本开发者。",
+    installTips: [
+      "先装 Node.js（README 要求 v9.11.2 以上）与 gulp-cli（2.3.0 以上），再在引擎目录执行 npm install 装依赖。",
+      "不要指望 clone 完就能跑：引擎要在 Cocos Creator 里通过 custom engine 方式挂进去，编辑器打开时会自动编译；脱离编辑器才需要手动 npm run build。",
+      "要发布原生包还得看 native/README.md，那是与 Web 侧不同的一套构建。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "C",
+      color: "#00A8E1",
+    },
+    guide: {
+      intro: "讲清三件事：这个仓库为什么不能单独用、怎么把它挂进 Creator 编辑器、以及改完引擎后最容易在哪一步卡住。",
+      markdown: `## 先接受一个前提
+
+很多人 clone 下来发现没有入口、没有工程文件，就以为下载错了。README 写得很直接：这个仓库是 **Cocos Creator 的运行时引擎**，「设计上只作为运行时库，不打算被独立使用」。
+
+所以正确的顺序是反过来的：先有 Cocos Creator 编辑器，再把这个仓库当成可替换的引擎。你要做的是「改引擎」，不是「用引擎」。
+
+## 环境只有两步
+
+README 给的前置很少，就两个：
+
+- Node.js v9.11.2 以上
+- gulp-cli v2.3.0 以上
+
+然后在引擎目录里跑 \`npm install\` 下载并构建引擎依赖。README 的原话是「这就是搭建引擎开发环境的全部工作」——它没让你配 CMake、没让你装 NDK，因为原生那部分不在这一步。
+
+## 挂进编辑器才是关键
+
+改完的引擎要生效，得在编辑器里指定 custom engine，也就是把引擎路径指到这个本地目录。之后打开编辑器窗口时，引擎会自动编译，不需要你手动 build。
+
+只有在编辑器之外单独构建时才跑 \`npm run build\`。这一步最容易搞混：有人在编辑器里改了代码不生效，跑去 npm run build，其实编辑器早就自己编译过了，问题出在引擎路径没指对。
+
+## 原生是最容易翻车的一段
+
+要出 Android / iOS 原生包，README 只留了一句「参考 native/README.md」。这部分和 Web 侧完全是两套东西：原生依赖、SDK、签名都在那边。做小游戏或 H5 的话可以整段跳过，做原生就必须先读它，别按 Web 的经验硬套。`,
+      resources: [
+        {
+          kind: "html",
+          title: "编辑器下载与产品说明",
+          url: "https://www.cocos.com/en/creator",
+          note: "引擎对应的编辑器在这里下载。先确认编辑器版本，再决定要不要改引擎，版本对不上是最常见的白忙一场。",
+        },
+        {
+          kind: "html",
+          title: "引擎定制（custom engine）官方文档",
+          url: "https://docs.cocos.com/creator/manual/en/advanced-topics/engine-customization.html",
+          note: "README 直接指过去的那篇，讲怎么把本地引擎接进编辑器、怎么触发自动编译。改引擎前必读。",
+        },
+        {
+          kind: "markdown",
+          title: "原生平台构建说明",
+          url: "https://github.com/cocos/cocos-engine/blob/develop/native/README.md",
+          note: "出 Android / iOS 包时才需要看，和 Web 构建不是一回事。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "finetune",
+    linksCheckedAt: "2026-10-24",
+    name: "FineTune",
+    nameZh: "FineTune 分应用音量控制",
+    aliases: ["finetune", "fine tune", "mac 音量控制", "分应用音量", "SoundSource 替代"],
+    summary: "macOS 菜单栏里的分应用音量控制器：单独调每个 App 的音量、最高 4 倍增益、把声音分流到不同设备，还带 10 段 EQ 与耳机校正。可替代 SoundSource，代价是只支持 macOS 15 以上。",
+    scenes: ["music", "tools"],
+    platforms: ["macos"],
+    source: "opensource",
+    tags: ["音量控制", "EQ", "音频路由", "macOS", "菜单栏"],
+    body: "macOS 本身的音量是全局的：浏览器里一个标签页太吵，只能把整机音量调小。FineTune 做的是把这个粒度拆到单个 App——每个正在出声的程序一行滑块，可单独静音、可 2x/3x/4x 增益，也可以把不同 App 送到不同的输出设备（比如会议走耳机、音乐走音箱）。\n它靠系统的音频捕获权限工作，所以第一次启动必须授予「屏幕与系统音频录制」权限，否则列表是空的。这一点决定了它的代价：在音频链路上插了一层，个别 App 出现爆音或延迟异常时，最省事的排查是把它对该 App 设为「Ignore」——README 说得很明确，忽略会拆掉 audio tap，让那个 App 回到 macOS 原生音频路径。\nEQ 部分是它超出「音量混音器」的地方：10 段 EQ、20 个预设，还能导入 AutoEQ 的 ParametricEQ.txt 做耳机频响校正，以及按 ISO 226:2023 做等响补偿。这些都要你懂一点频响曲线才有意义，否则只是多了几个会调坏声音的旋钮。\n系统要求是 macOS 15 (Sequoia) 及以上，老系统直接装不了。",
+    officialUrl: "https://github.com/ronitsingh10/FineTune",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/ronitsingh10/FineTune",
+      github: "https://github.com/ronitsingh10/FineTune",
+    },
+    whoFor: "在 Mac 上同时开会议、音乐、浏览器，需要分别控音量或分流到不同设备的人；想用 AutoEQ 校正耳机又不想买 SoundSource 的人。",
+    whoNot: "macOS 15 以下的机器装不了；只调全局音量的话系统自带滑块就够，多装一层音频捕获反而多一个故障点。",
+    installTips: [
+      "推荐 Homebrew：brew install --cask finetune；也可以从 Releases 下 dmg 手动装。",
+      "首次启动必须授予「屏幕与系统音频录制」权限，没给权限的话菜单栏里不会出现任何正在播放的 App。",
+      "要求 macOS 15 (Sequoia) 或更新版本；更老的系统没有对应的音频捕获接口。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#0A84FF",
+    },
+    guide: {
+      intro: "按第一次打开会遇到的顺序写：权限、没有 App 出现、增益与 EQ 什么时候该用，以及设备顺序怎么固定下来。",
+      markdown: `## 第一道坎是权限，不是安装
+
+装完打开，最可能看到的是一个空列表。原因不是没检测到音频，而是权限没给：FineTune 需要 **Screen & System Audio Recording**（屏幕与系统音频录制）权限，它靠这个接口拿到每个 App 的音频流。
+
+如果第一次点了「拒绝」，之后不会反复弹窗，得自己去「系统设置 → 隐私与安全性」里手动打开，然后重启 App。
+
+## 谁在响，谁才出现
+
+默认只显示**当前正在出声**的 App。想提前给某个 App 配好音量、EQ 和路由，用「Pinned apps」把它钉住，它会一直留在列表里。
+
+反过来，某个 App 被 FineTune 接管后声音不对劲（爆音、延迟、通话软件异常），用「Ignore apps」把它排除——README 明确说这会把 audio tap 拆掉，让该 App 回到 macOS 原生音频路径。这是最有效的排障手段，比反复重启 App 管用。
+
+## 增益是给「本来就录小了」的素材用的
+
+2x / 3x / 4x 是数字增益，不是重新混音。对播客、访谈这类整体电平偏低的素材有用；对已经接近 0dB 的音乐只会把削波放大。真要提升听感，先看 EQ 与耳机校正，别一上来拉增益。
+
+## 设备顺序决定自动切换
+
+想插上耳机就自动切过去，进编辑模式（铅笔图标），把那个设备拖到内置扬声器**上面**。这是一次性设置，顺序会持久保存；设备断开再连回来时，App 的音量、路由和 EQ 也会一并恢复。
+
+另外，如果 USB DAC 或 HDMI 输出的硬件滑块其实不控制音量，在设备详情里强制改成软件音量，FineTune 会按设备记住这个选择。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Releases 与 dmg 下载",
+          url: "https://github.com/ronitsingh10/FineTune/releases/latest",
+          note: "不用 Homebrew 就从这里下 dmg。注意看版本要求，只支持 macOS 15 以上。",
+        },
+        {
+          kind: "markdown",
+          title: "AutoEQ 与耳机校正说明",
+          url: "https://github.com/ronitsingh10/FineTune/blob/main/guide/autoeq.md",
+          note: "讲怎么导入 AutoEQ 的 ParametricEQ.txt、怎么按设备做频响校正。想用 EQ 的话这篇比功能列表有用。",
+        },
+        {
+          kind: "markdown",
+          title: "排障文档",
+          url: "https://github.com/ronitsingh10/FineTune/blob/main/guide/troubleshooting.md",
+          note: "权限、App 不出现、没声音这三类问题的官方排查顺序，先看它再提 issue。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "o3de",
+    linksCheckedAt: "2026-10-24",
+    name: "O3DE",
+    nameZh: "O3DE 开放 3D 引擎",
+    aliases: ["o3de", "open 3d engine", "开放 3D 引擎", "亚马逊 3D 引擎"],
+    summary: "Apache 2.0 的 AAA 级 3D 引擎，无版税、无商用限制，Windows 上靠 CMake + Visual Studio 从源码构建。适合愿意自己编译、要做大型 3D 或仿真的人；期待双击安装包的会被构建流程挡在门外。",
+    scenes: ["games"],
+    platforms: ["windows", "linux"],
+    source: "opensource",
+    tags: ["游戏引擎", "3D", "仿真", "Apache 2.0", "CMake"],
+    body: "O3DE（Open 3D Engine）是从 Amazon Lumberyard 脱胎出来的实时 3D 引擎，Apache 2.0 许可，README 强调「无任何费用或商业义务」。定位是 AAA 游戏、影视级 3D 场景和高保真仿真，这三类需求在同一个引擎里其实很少见。\n它和 Godot 那种「下载编辑器就能开工」的路线相反：这个仓库里没有预编译编辑器，你得先用 CMake 配出解决方案、编译引擎，再注册引擎，然后才 create-project。README 只给了 Windows 的前置（Visual Studio 2019 16.9.2 以上、CMake 3.25 以上，且明确说不支持 RC 版 CMake），其他平台以官网系统需求为准。\n这一步的代价很实在：第一次构建要下载几 GB 的第三方包，必须装 Git LFS，还要给一个专门的可写目录存第三方依赖，路径**不能带尾斜杠**（README 专门用 Note 提醒，照抄带斜杠的路径就会失败）。\n换来的是可控性：引擎源码、Gems（插件）体系、Asset Processor 都在手里，做长期自研的项目不会被上游条款卡住。但如果只是想做个 2D 独立游戏，前面这套成本完全不划算。",
+    officialUrl: "https://o3de.org",
+    officialLabel: "o3de.org",
+    links: {
+      official: "https://o3de.org",
+      github: "https://github.com/o3de/o3de",
+    },
+    whoFor: "要做大型 3D 项目或高保真仿真、需要长期掌控引擎源码与许可的团队；能接受从源码构建的人。",
+    whoNot: "想快速做个小游戏、或者团队里没有能配 C++ 构建链的人——光是把编辑器编出来就要花掉一整天。",
+    installTips: [
+      "必须装 Git LFS：先在终端确认 git lfs --version 有输出，再跑 git lfs install，否则 clone 下来只有指针文件。",
+      "准备一个单独的可写目录放第三方包，配置时用 -DLY_3RDPARTY_PATH 指过去；这个路径不能带尾斜杠。",
+      "构建完还要注册引擎：scripts\\o3de.bat register --this-engine，之后才能 scripts\\o3de.bat create-project 建项目。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "O",
+      color: "#1E70C0",
+    },
+    guide: {
+      intro: "第一次配 O3DE 会卡在三个地方：Git LFS、第三方包路径、以及「构建完还要注册引擎」。按顺序走完这三步才能看到编辑器。",
+      markdown: `## 一、Git LFS 没装，clone 就是空的
+
+仓库用 Git LFS 存大型二进制文件。README 的第一步不是 clone，而是验证：
+
+\`git lfs --version\`
+
+有版本号才继续，然后 \`git lfs install\` 装钩子，最后才 clone。跳过这步的典型症状是资源文件全是几百字节的文本指针，构建中期才报错。
+
+## 二、第三方包路径，尾斜杠是坑
+
+先建一个可写的空目录专门放第三方包（不要放在源码目录里）。然后：
+
+\`cmake -B <构建目录> -S <源码目录> -G "Visual Studio 16" -DLY_3RDPARTY_PATH=<第三方包目录>\`
+
+README 特意用 Note 标注：**不要给这个路径加尾斜杠**。CMake 里的字符串拼接对尾斜杠很敏感，带了就会在下载阶段失败。
+
+同一台机器上第一次配置要下几 GB，网络不稳就多跑几次，不用删 build 目录重来。
+
+## 三、注册引擎，才能建项目
+
+构建通过不等于能用。还要在仓库根目录执行：
+
+\`scripts\\o3de.bat register --this-engine\`
+
+这一步把引擎注册到本机的 O3DE 注册表里，之后 create-project 才找得到它：
+
+\`scripts\\o3de.bat create-project --project-path <新项目路径>\`
+
+**顺序不能反**：先 register 再 create-project，反过来会报找不到引擎。
+
+## 四、构建项目时注意 target 名
+
+项目构建的目标名等于项目目录名，不是你在界面里起的名字：
+
+\`cmake --build <项目构建目录> --target <项目名>.GameLauncher Editor --config profile\`
+
+产物在 \`bin/profile\` 下。第一次编译很慢，属正常。`,
+      resources: [
+        {
+          kind: "html",
+          title: "从 GitHub 搭建 O3DE",
+          url: "https://o3de.org/docs/welcome-guide/setup/setup-from-github/",
+          note: "README 反复指向的官方安装页，覆盖 README 没写全的平台与可选步骤。",
+        },
+        {
+          kind: "html",
+          title: "系统需求",
+          url: "https://o3de.org/docs/welcome-guide/requirements/",
+          note: "确认你的 VS / CMake / 显卡是否在支持列表里。README 只说「以这里为准」。",
+        },
+        {
+          kind: "html",
+          title: "命令行建项目",
+          url: "https://o3de.org/docs/welcome-guide/create/creating-projects-using-cli/",
+          note: "create-project 与首次构建的完整流程，卡在 target 名字或 Gems 时看这篇。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "autoclip",
+    linksCheckedAt: "2026-10-24",
+    name: "AutoClip",
+    nameZh: "AutoClip 长视频切片",
+    aliases: ["autoclip", "auto clip", "自动切片", "长视频切片", "AI 剪辑"],
+    summary: "贴一个视频链接，自动切成适配抖音/小红书/TikTok 的短片，连字幕、封面和发布文案一起出。剪辑渲染在本机，云端模型按量计费；适合播客访谈的二次分发，不适合要逐帧掌控的剪辑。",
+    scenes: ["social", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["视频剪辑", "短视频", "字幕", "内容分发", "AI"],
+    body: "长播客、访谈、课程要发到短视频平台，最费时间的不是剪，是找片段、改画幅、对字幕、写文案。AutoClip 把这段流程包成「贴链接 → 选平台 → 出片」：按平台的画幅和时长要求自动切，每个平台最多生成 10 条合格片段，其余列为备选，每条带封面、标题、简介、话题和 ZIP 发布包。\n渲染和剪辑在本机跑，这是它与纯云端剪辑工具的主要差别；但分析用的模型不一定是本地的——云端分析会发送字幕与文案，画面理解会发送抽样帧，云端转写会发送音频。README 给了三种转写来源：作者自带字幕、本地 Whisper / SenseVoice、或已配置的云端转写，想完全不外发就选前两个。\n费用要按「模型用量」算，不是免费：README 里的实测（Apple Silicon Mac，qwen-plus 估算）是 1 小时 43 分的英文素材出 10 条短片 7.5 分钟、约 ¥0.09，2 小时 52 分的中文无字幕素材 29.5 分钟、约 ¥0.20。素材没字幕时转写才是大头。\n平台口径也要注意：桌面版只给 macOS Apple Silicon 和 Windows x64，Intel Mac 与 Linux 得走 Docker（Web 界面 + API）或 CLI/MCP；CLI 需要 Python 3.10+ 和 PATH 里的 FFmpeg。",
+    officialUrl: "https://zhouxiaoka.github.io/autoclip_intro",
+    officialLabel: "zhouxiaoka.github.io",
+    links: {
+      official: "https://zhouxiaoka.github.io/autoclip_intro",
+      github: "https://github.com/zhouxiaoka/autoclip",
+    },
+    whoFor: "手上有一堆访谈/播客/课程录像，要批量转成竖版短视频发到多平台的人；想把切片接进自己流水线（CLI / MCP）的开发者。",
+    whoNot: "需要精确控制每一帧、每个转场的专业剪辑——这里给你的是「够用的一条」，不是可精修的时间线；不想把任何素材送到云端 API 的也别用。",
+    installTips: [
+      "桌面版从 Releases 下：macOS Apple Silicon 选 .dmg，Windows 10/11 x64 选 -setup.exe，安装包自带 Python 与 FFmpeg。",
+      "Linux / Intel Mac 不要硬装桌面版，走 Docker：clone 仓库后 cp env.example .env，建 data/logs/uploads 三个目录，再 docker compose up -d --build，Web 界面在 3000 端口。",
+      "先在设置里配好服务商与 API Key 并「测试连接」，再贴链接；本地模型要先在 Ollama / LM Studio 里把服务跑起来并加载模型。",
+      "素材没有自带字幕时先准备 Whisper / SenseVoice，否则默认会走云端转写并产生额外费用。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#FF5A36",
+    },
+    guide: {
+      intro: "第一次用真正会卡住的是三件事：模型怎么配、素材有没有字幕、以及 Linux 上 Docker 的目录权限。按这条线走。",
+      markdown: `## 一、先配模型，再贴链接
+
+装完直接贴链接大概率失败在「模型不可用」。设置里要做完三步：
+
+1. 选服务商、填 API Key
+2. 选一个可用的分析模型
+3. 点测试连接，通过后保存
+
+用本地模型的话顺序反过来：先在 Ollama / LM Studio 里启动服务并加载模型，AutoClip 才连得上。
+
+## 二、第一片找有字幕的素材
+
+README 自己建议：先试一条**有字幕**的访谈或播客。有字幕就跳过转写，整条链路最短，能先把「切片 → 预览 → 下载」跑通。
+
+没有字幕时有三个选择：作者字幕、本地 Whisper / SenseVoice、云端转写。差别在时间和钱：本地转写不吃 API 费用但要占机器，云端转写快但按量计费。
+
+## 三、Linux 上的 Docker，权限先修
+
+标准部署：
+
+\`\`\`
+git clone https://github.com/zhouxiaoka/autoclip.git
+cd autoclip
+cp env.example .env
+mkdir -p data logs uploads
+docker compose up -d --build
+\`\`\`
+
+如果绑定目录报权限错误，别急着改 compose 文件，README 给的解法是先修归属：
+
+\`\`\`
+docker compose run --rm --no-deps --user root --entrypoint sh autoclip \\
+  -c 'chown -R autoclip:autoclip /app/data /app/logs /app/uploads'
+docker compose up -d
+\`\`\`
+
+从局域网 IP 或自定义域名访问时，还要把前端地址填进 .env 的 AUTOCLIP_ALLOWED_ORIGINS，否则页面能开但接口被拦。
+
+## 四、出片后别直接发
+
+预览里重点看三样：字幕断句、人物取景（无人镜头应保留完整画面）、以及内容完整性。要更多片段就点「生成备选」，那会追加处理时间和用量。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与案例库",
+          url: "https://zhouxiaoka.github.io/autoclip_intro/cases/",
+          note: "真实成片按平台分类陈列，先看效果再决定值不值得接。比功能列表更能判断风格是否合适。",
+        },
+        {
+          kind: "markdown",
+          title: "安装与首次使用指南",
+          url: "https://github.com/zhouxiaoka/autoclip/blob/main/docs/USER_INSTALLATION_GUIDE.md",
+          note: "各平台的安装前提、系统首次启动提示，以及每个版本实际验收了什么。",
+        },
+        {
+          kind: "markdown",
+          title: "成本与时间测算",
+          url: "https://github.com/zhouxiaoka/autoclip/blob/main/docs/COST_PER_VIDEO.md",
+          note: "按素材长度估算出片时间与模型费用，含统计口径。要做批量前先按这个算预算。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "fyrox",
+    linksCheckedAt: "2026-10-24",
+    name: "Fyrox",
+    nameZh: "Fyrox Rust 游戏引擎",
+    aliases: ["fyrox", "fyrox engine", "rust 游戏引擎", "Rust 3D 引擎"],
+    summary: "Rust 写的 2D/3D 通用游戏引擎，自带场景编辑器，MIT 许可、发布在 crates.io。适合想用 Rust 做完整游戏、不想自己拼渲染与场景系统的人；中文资料少，基本只能跟着官方 book 走。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["游戏引擎", "Rust", "2D", "3D", "场景编辑器"],
+    body: "Fyrox 是 Rust 生态里少数自带场景编辑器的通用引擎——README 的自我描述是「功能丰富、可用于生产、通用 2D/3D 引擎，带场景编辑器」。这一点决定了它和 Bevy 那类「纯 ECS 框架」的分工：你要自己搭编辑器的地方，它已经给了一个。\n分发方式是标准 Rust 路子：库在 crates.io（fyrox），API 文档在 docs.rs。引擎与示例是分开的仓库，官方示例可以在浏览器里直接跑（fyrox.rs/examples.html），源码在 Fyrox-demo-projects。学习资料集中在一本在线书 fyrox-book.github.io，从「怎么构建」讲到各类教程——没有这本书基本寸步难行。\nREADME 里还有一句比较少见的声明：这个引擎「由人类为人类编写，开发中没有也不会使用 AI/LLM」。对在意代码来源与授权洁净度的团队，这算一个明确表态。\n代价要说清：MIT 许可只约束代码，不解决生态问题。Rust 游戏开发的人才与现成资产都少，遇到引擎没覆盖的需求（比如某种后处理、某个平台的打包链路），能问的人不多，得自己读源码——好在 MIT 允许你改。",
+    officialUrl: "https://fyrox.rs",
+    officialLabel: "fyrox.rs",
+    links: {
+      official: "https://fyrox.rs",
+      github: "https://github.com/FyroxEngine/Fyrox",
+    },
+    whoFor: "想用 Rust 做完整 2D/3D 游戏、需要现成场景编辑器的个人或小团队；已经在写 Rust、不想再学一套脚本语言的人。",
+    whoNot: "想快速出原型、指望大量教程和现成插件的人；团队里没人写 Rust 的话，学习曲线会吃掉引擎省下的时间。",
+    installTips: [
+      "先读官方书 fyrox-book.github.io，它从「how to build」开始，构建步骤和版本差异都以那里为准。",
+      "库通过 crates.io 分发，在 Cargo 项目里按 crates.io 上的 fyrox 包引入；API 直接查 docs.rs/Fyrox。",
+      "想先看效果不用配环境：官方示例可以在浏览器里跑（fyrox.rs/examples.html），源码在 FyroxEngine/Fyrox-demo-projects。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#C2410C",
+    },
+    guide: {
+      intro: "Rust 引擎的门槛不在语法，在于「文档、示例、编辑器」三样东西怎么拼起来用。这里讲第一次上手该按什么顺序看。",
+      markdown: `## 一、别从 README 学，从书学
+
+README 本身很短，真正的上手资料是官方书 **fyrox-book.github.io**。它按「怎么构建 → 引擎概念 → 教程」组织，第一次用请从头读构建那一章，不要拿别处的旧代码直接抄——Rust 生态的 API 变动很快。
+
+## 二、先跑示例，再开自己的项目
+
+在浏览器里能直接看官方示例（fyrox.rs/examples.html），这一步不用装任何东西，用来判断引擎的渲染风格和操作手感是否合你的项目。
+
+要读源码就去 Fyrox-demo-projects 仓库：每个 demo 是一个独立项目，比从零建工程更容易看清目录结构与资源组织方式。
+
+## 三、依赖怎么引
+
+引擎发布在 crates.io，包名就是 fyrox。在 Cargo 项目里加依赖后，API 以 docs.rs/Fyrox 为准——注意 docs.rs 上显示的是已发布版本，不是 master 分支。
+
+如果你在用 master 或某个未发布的分支，文档会落后于代码，这种情况直接读仓库里的源码和示例，别对着 docs.rs 猜。
+
+## 四、场景编辑器是独立的一步
+
+这个引擎带场景编辑器，但它不是「下载即用」的成品工具：编辑器本身也要按书里的构建流程编出来。第一次编的时候留足时间，Rust 的 debug 构建体积大、链接慢，用 release 或在 CI 里编更省心。
+
+## 五、出问题去哪问
+
+Discord 与 GitHub Discussions 是官方指定的两个地方，README 也把「good first issue」标出来了。提问前先确认版本，引擎迭代快，半年前的答案经常不适用。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Fyrox Book（官方教程）",
+          url: "https://fyrox-book.github.io/",
+          note: "唯一系统的上手资料，从构建讲到各子系统。第一次用就按它的顺序读。",
+        },
+        {
+          kind: "html",
+          title: "在线示例",
+          url: "https://fyrox.rs/examples.html",
+          note: "浏览器里直接跑的 demo 列表，用来判断引擎能力与手感，不用先装环境。",
+        },
+        {
+          kind: "html",
+          title: "API 文档（docs.rs）",
+          url: "https://docs.rs/Fyrox/",
+          note: "查具体类型与方法签名。注意它对应已发布版本，跟 master 分支可能有差异。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "unicorn",
+    linksCheckedAt: "2026-10-24",
+    name: "Unicorn Engine",
+    nameZh: "Unicorn CPU 模拟框架",
+    aliases: ["unicorn", "unicorn engine", "CPU 模拟器", "CPU 仿真框架", "unicorn-engine"],
+    summary: "基于 QEMU 的轻量 CPU 模拟框架，C 实现、十几种语言绑定，能在自己的程序里逐条执行 ARM/x86/MIPS 等指令。适合逆向分析与固件调试；它不是能直接跑 Windows 程序的虚拟机。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["CPU 模拟", "逆向工程", "QEMU", "C", "嵌入式"],
+    body: "Unicorn 是从 QEMU 里抽出来的 CPU 模拟核心：只模拟指令集，不模拟整台机器。README 列的支持面很宽——ARM、ARM64、M68K、MIPS、PowerPC、RISCV、SPARC、S390X、TriCore、X86（16/32/64 位），API 被设计成架构中立的，所以同一段代码换架构只要改常量。\n它给的是一组库接口而不是应用：映射内存、写寄存器、设 PC，然后开始执行，遇到系统调用或外部设备访问时停下来交给你处理。正因如此它才轻、才快（JIT 编译），也才能被嵌进 IDA 插件、fuzzer、固件分析工具里。代价是「跑一个 exe」这种需求它满足不了——没有外设、没有内核、没有文件系统，那是 QEMU 或完整模拟器的活。\n绑定覆盖 Crystal、Clojure、VB、Perl、Rust、Ruby、Python、Java、.NET、Go、Delphi/Free Pascal、Haskell、Pharo、Lua、Zig，做二次开发基本不用碰 C。\n许可是 GPL-2.0，这条要提前想清楚：把它静态链接进闭源产品会触发传染，商业项目通常只能走进程隔离或换方案。",
+    officialUrl: "https://www.unicorn-engine.org",
+    officialLabel: "www.unicorn-engine.org",
+    links: {
+      official: "https://www.unicorn-engine.org",
+      github: "https://github.com/unicorn-engine/unicorn",
+    },
+    whoFor: "做逆向、恶意样本分析、嵌入式固件调试或写 fuzzer 的人；需要在自己程序里跑一段异构指令的开发者。",
+    whoNot: "想「在 Mac 上跑 Windows 软件」的用户——那是虚拟机/兼容层的活；产品闭源又不想处理 GPL 传染的团队也别选它。",
+    installTips: [
+      "编译安装以 docs/COMPILE.md 为准，README 不重复写命令；各平台的依赖差异都在那份文件里。",
+      "Python 用户可以直接从 PyPI 装（README 顶部挂了 pypi 的下载量徽章，包名 unicorn），省掉编译步骤。",
+      "提 issue 前先读 docs/FAQ.md，常见问题（架构常量、内存映射、绑定版本）基本都在里面。",
+      "选版本时注意分支：README 要求 PR 提到 dev 分支，说明稳定版与开发版有差距。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "U",
+      color: "#6D28D9",
+    },
+    guide: {
+      intro: "第一次用 Unicorn 最常见的误解是「它应该能跑程序」。先把这个预期纠正过来，再谈绑定与编译。",
+      markdown: `## 一、它模拟 CPU，不模拟机器
+
+Unicorn 只做一件事：按指令集执行机器码。没有 BIOS、没有内核、没有文件系统、没有网卡。你给一段代码和一个内存布局，它按你的设定跑。
+
+所以「用它跑某个 exe」这种需求注定卡住——PE 加载、DLL 导入、系统调用全都得你自己补。真要做这件事，去用 QEMU 或专门的模拟器。
+
+## 二、典型用法是「片段级」的
+
+真实场景通常是：从固件里抠出一段解密函数，或者从样本里取出一个混淆循环，把它放到 Unicorn 里，设定好内存与寄存器，单步跑到关键点看结果。
+
+这条路的关键不是 API，而是**把运行环境补全**：栈要自己映射、字符串常量要自己写进去、调用的外部函数要 hook 掉并返回假结果。补不全就会在某条指令上崩掉，而且报错往往只有「invalid memory access」一类。
+
+## 三、装哪个
+
+- Python 绑定：直接从 PyPI 装，包名 unicorn，装完 \`python -c "import unicorn; print(unicorn.__file__)"\` 能打路径就算成功。
+- C / 其他语言：按 **docs/COMPILE.md** 编译，README 明说编译细节只在那里。各平台（Windows / *nix）的依赖不一样，别照抄别人的命令。
+
+README 也确认了原生支持 Windows 与 *nix（macOS、Linux、Android、BSD、Solaris 都在列）。
+
+## 四、先想许可，再写代码
+
+GPL-2.0。静态链接进闭源产品会把整个产品拖进 GPL。商业场景常见的规避方式是把 Unicorn 跑在独立进程里、通过 IPC 通信，或者干脆只在自己内部的分析工具里用。
+
+## 五、卡住了看 FAQ
+
+docs/FAQ.md 覆盖了架构常量怎么写、内存怎么映射、绑定版本不匹配这几类高频问题。提 issue 之前先过一遍，能省掉一半来回。`,
+      resources: [
+        {
+          kind: "markdown",
+          title: "编译与安装说明",
+          url: "https://github.com/unicorn-engine/unicorn/blob/master/docs/COMPILE.md",
+          note: "README 指定的唯一编译入口，各平台的依赖与命令都以它为准。",
+        },
+        {
+          kind: "markdown",
+          title: "常见问题 FAQ",
+          url: "https://github.com/unicorn-engine/unicorn/blob/master/docs/FAQ.md",
+          note: "架构常量、内存映射、绑定问题的高频答案，提 issue 前先看。",
+        },
+        {
+          kind: "html",
+          title: "项目官网",
+          url: "https://www.unicorn-engine.org/",
+          note: "文档索引与联系方式入口，顺带能看到当前发布状态。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "flowbite",
+    linksCheckedAt: "2026-10-24",
+    name: "Flowbite",
+    nameZh: "Flowbite Tailwind 组件库",
+    aliases: ["flowbite", "tailwind 组件库", "Tailwind UI 组件", "flowbite tailwind"],
+    summary: "Tailwind CSS 之上的开源组件库：模态框、下拉、导航靠 data 属性加一个 flowbite.min.js 驱动。适合已经在用 Tailwind、只缺现成交互组件的前端；想要整套设计系统或 React 组件，得看它的付费版和社区库。",
+    scenes: ["code", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["Tailwind CSS", "组件库", "前端", "UI", "设计系统"],
+    body: "Flowbite 不是另一套 CSS 框架，而是挂在 Tailwind 上的组件层：样式仍然是 Tailwind 的 utility class，它补的是交互行为——模态框、下拉菜单、折叠面板、提示气泡这些光有 class 做不出来的东西。\n接通方式在 Tailwind v4 之后变了。README 现在的写法是：npm 装包，在主 CSS 里 @import 一个主题（default / minimal / enterprise / playful / mono 五选一），然后 @plugin \"flowbite/plugin\"，再用 @source \"../node_modules/flowbite\" 告诉 Tailwind 去扫它的类名。少了最后这行，页面会「装了但没样式」，这是最常见的坑。\n交互有两种用法：一是 data 属性，给按钮加 data-modal-target 与 data-modal-toggle，再在 body 末尾引 flowbite.min.js；二是当库用，import { Modal } from 'flowbite' 自己 new 一个，配 onShow / onHide 回调。后者适合要在打开前后做事的场景。\n代价要看清楚：免费的是组件与 JS，Pro 版（Blocks、Figma 设计系统、图标库）是另一码事；另外 React / Vue / Svelte / Angular / Qwik 的组件库由社区维护，和主仓库版本不一定同步。",
+    officialUrl: "https://flowbite.com",
+    officialLabel: "flowbite.com",
+    links: {
+      official: "https://flowbite.com",
+      github: "https://github.com/themesberg/flowbite",
+    },
+    whoFor: "已经在用 Tailwind、只想补交互组件的项目；不想引入 Ant Design / MUI 那类带自己视觉体系的重型组件库的团队。",
+    whoNot: "要开箱即用的完整设计系统、或者要官方维护的 React 组件——那部分得走 Pro 版或社区库；也不想被 Tailwind 的 class 写法绑住的，直接换组件库更省事。",
+    installTips: [
+      "Tailwind v4 下要三件事一起做：npm install flowbite，主 CSS 里 @import \"flowbite/src/themes/default\"，再加 @plugin \"flowbite/plugin\" 与 @source \"../node_modules/flowbite\"。",
+      "交互组件靠 data 属性绑定（如 data-modal-target、data-modal-toggle），并在 </body> 前引 dist/flowbite.min.js；用打包器的话直接 import 'flowbite'。",
+      "Vue / Nuxt 这类框架里 DOM 是后挂载的，要在 onMounted 里调 initFlowbite()，或者按组件类别只调 initModals() / initDropdowns()。",
+      "老项目还在 Tailwind v3 的，先按官方的 v3 → v4 升级指南改配置，别混着用。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#1C64F2",
+    },
+    guide: {
+      intro: "第一次接 Flowbite 八成会「装完了样式没生效」或「按钮点了没反应」。这两件事的原因分别是 @source 和 JS 加载顺序。",
+      markdown: `## 一、装完之后为什么没样式
+
+Tailwind v4 是按需生成 class 的，它只知道你项目里出现过的类名。Flowbite 的类名在 node_modules 里，Tailwind 默认不扫那里，所以必须显式声明：
+
+\`@source "../node_modules/flowbite";\`
+
+漏了这一行，页面看上去就像没装过——但 npm 装得好好的。这是第一高频问题。
+
+## 二、主题是可替换的
+
+\`@import "flowbite/src/themes/default";\`
+
+README 给了五个主题：default、minimal、enterprise、playful、mono。换主题就是换这一行 import，同时按注释换上对应的字体。想改品牌色，在 theme 层加自定义变量，不要去改组件里的八进制 class 串。
+
+## 三、交互要 JS，而且顺序有讲究
+
+两种接法，选一种：
+
+1. **data 属性**：按钮上写 \`data-modal-target="defaultModal"\`，JS 文件放 \`</body>\` 前。用打包器就 \`import 'flowbite';\`
+2. **当库用**：\`import { Modal } from 'flowbite'\`，自己 new，能挂 onShow / onHide 回调
+
+用 data 属性的前提是「元素已经在 DOM 里」。纯 HTML 没这个问题；Vue / Nuxt / Svelte 里元素是挂载后才出现的，所以要在 onMounted 里调 \`initFlowbite()\`，否则事件监听绑不到东西上。
+
+## 四、RTL 是一行属性
+
+所有组件原生支持 RTL，给 \`<html dir="rtl">\` 就行，不用另找 RTL 版本。
+
+## 五、别指望它给你设计系统
+
+Flowbite 给的是组件与行为，配色、间距、字体仍然由你的 Tailwind 配置决定。想要成套页面模板（Blocks）或 Figma 设计稿，那是 Pro 版的范畴——用之前先把这条边界弄清楚，免得做了一半发现缺东西。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方快速上手",
+          url: "https://flowbite.com/docs/getting-started/quickstart/",
+          note: "npm / CDN / 打包器三种接法的完整示例，含 Tailwind v3 到 v4 的升级说明。",
+        },
+        {
+          kind: "html",
+          title: "JavaScript 行为文档",
+          url: "https://flowbite.com/docs/getting-started/javascript/",
+          note: "data 属性与编程式 API 的对照表，卡在「点了没反应」时先查这里。",
+        },
+        {
+          kind: "html",
+          title: "许可说明",
+          url: "https://flowbite.com/docs/getting-started/license/",
+          note: "分清 MIT 的开源组件与 Pro 版（模板、Figma）的边界，商业项目上线前该看。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "berty",
+    linksCheckedAt: "2026-10-24",
+    name: "Berty",
+    nameZh: "Berty 点对点加密通讯",
+    aliases: ["berty", "berty messenger", "去中心化聊天", "离线通讯", "Wesh Protocol"],
+    summary: "端到端加密的点对点通讯，不靠服务器，没网时还能用蓝牙和 mDNS 传消息，注册不要手机号也不要邮箱。适合在不可信网络里传信息的人；README 自己说项目仍在开发中，别拿它传真正敏感的数据。",
+    scenes: ["social"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["即时通讯", "P2P", "端到端加密", "去中心化", "抗审查"],
+    body: "Berty 的定位很明确：当其他通讯工具都不可用时用它。消息默认端到端加密、元数据尽量少、注册不需要手机号或邮箱；网络层是去中心化 P2P，没有中心服务器，离线时靠 BLE（蓝牙低功耗）与 mDNS 直接传。这是它和 Signal 一类「加密但仍需服务器」的应用最本质的差别。\n协议层叫 Wesh Protocol，消息同步基于 OrbitDB（底层是 IPFS），并提供 SDK 让开发者自己写 P2P 应用——加密、身份、路由、群组、设备管理都由协议兜着。\n但必须把 README 的警告放在前面：项目仍在活跃开发，**不应被用来交换敏感数据**；Wesh Protocol 目前只是部分实现，API 不保证向后兼容，README 原话是「把协议接进自己应用会是一段颠簸的路」。另外它自己也提醒，不要在沙箱弱的设备上使用（比如无法打补丁的老 Android）。\n平台这块要说清楚：Berty Messenger 本体是 Android / iOS 应用，仓库里没有桌面客户端；桌面上能跑的是 go/cmd/berty 的 CLI，提供 berty mini（命令行聊天）与 berty daemon（全节点 + API）两个命令，需要自己 go install 或在仓库里 go run。指望在 Linux 上装个图形界面聊天工具的，这里没有。",
+    officialUrl: "https://berty.tech",
+    officialLabel: "berty.tech",
+    links: {
+      official: "https://berty.tech",
+      github: "https://github.com/berty/berty",
+    },
+    whoFor: "需要在不信任的网络里通信、并且能接受「可能不稳定」的技术用户；想研究 P2P 通讯协议与 gomobile 架构的开发者。",
+    whoNot: "要拿它当日常主力聊天工具的人——没有桌面图形客户端，且官方明确说别传敏感数据；也不想为了聊天去装 Go 工具链。",
+    installTips: [
+      "手机端最省事：Google Play 或 App Store 搜 Berty 直接装，官方发布版就在这两个商店。",
+      "桌面只有 CLI：在仓库里对 go/cmd/berty 执行 go run 或 go install，装完有两个命令——berty mini（命令行聊天）与 berty daemon（全节点，走 Wesh Protocol API）。",
+      "想跑在无公网环境里，注意它还提供 rdvp（Rendez-Vous Point）服务端，见 go/cmd/rdvp；两端找不到彼此时先看这里。",
+      "README 明确警告当前实现未硬化，别在无法打补丁的老设备上传真实敏感内容。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "B",
+      color: "#2845A7",
+    },
+    guide: {
+      intro: "第一次接触 Berty 最容易踩的预期差：以为下载个桌面版就能聊。实际桌面只有 CLI，手机上才是完整应用。",
+      markdown: `## 一、先选对入口
+
+- **手机**：Google Play / App Store 装，这是 README 推荐的正常路径，也是唯一有图形界面的形态。
+- **桌面**：没有 GUI。仓库里能用的是 \`go/cmd/berty\` 这个 CLI，需要 Go 环境。
+
+只想聊天的人看到这里就可以停了——除非你愿意在终端里收发消息。
+
+## 二、CLI 的两个命令不是一回事
+
+\`berty mini\`：一个简单的命令行聊天程序，用 Wesh Protocol 收发消息。两个人对着终端聊，适合验证连通性。
+
+\`berty daemon\`：跑完整的协议节点，通过 Wesh Protocol 的 API 操作。这是给开发者用的——你要自己写客户端或脚本去调它。
+
+安装方式 README 给了两条：在仓库里 \`go run\`，或者 \`go install\` 到 GOPATH。注意它要求从仓库根目录构建，别在子目录里跑。
+
+## 三、没有服务器，那怎么找到对方
+
+这是 P2P 应用最反直觉的一点：不需要中心服务器，但**首次发现**仍然需要一个会合点。Berty 提供 \`go/cmd/rdvp\`（Rendez-Vous Point），负责让两端碰头。同一个局域网里可以靠 mDNS 与蓝牙，跨网就得有会合点或中继。
+
+## 四、把它当研究材料，而不是日用品
+
+README 的警告要原样理解：项目处于活跃开发、Wesh Protocol 部分实现、API 不保证兼容、不要传敏感数据。真要做 P2P 通讯的产品，可以读它的 SDK 设计与 gomobile-ipfs 的接法；要的是「现在就能安全用」，那不该选它。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与协议文档",
+          url: "https://berty.tech/docs/protocol/",
+          note: "Wesh Protocol 的设计说明，理解「群组 + OrbitDB + IPFS」这套模型从这里开始。",
+        },
+        {
+          kind: "html",
+          title: "CLI 与协议包文档",
+          url: "https://pkg.go.dev/berty.tech/berty/v2/go/pkg/bertyprotocol",
+          note: "要写代码接入时查这里的类型与方法；也能看出 API 目前演进到什么程度。",
+        },
+        {
+          kind: "html",
+          title: "Releases",
+          url: "https://github.com/berty/berty/releases",
+          note: "桌面 CLI 与移动端的发布记录。装之前先确认版本，README 提示 API 仍在变动。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "bazzite",
+    linksCheckedAt: "2026-10-24",
+    name: "Bazzite",
+    nameZh: "Bazzite 游戏向 Linux",
+    aliases: ["bazzite", "bazzite os", "steam deck 系统", "游戏 linux", "fedora atomic 游戏"],
+    summary: "基于 Fedora Atomic 的不可变 Linux，预装 Steam、Lutris、MangoHud、vkBasalt 和一堆手柄驱动，掌机版直接开机进游戏模式。适合把掌机或客厅 PC 变成 SteamOS 替代；代价是要接受 rpm-ostree 那套不可变系统。",
+    scenes: ["games", "tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["Linux 发行版", "游戏", "Steam Deck", "Fedora", "不可变系统"],
+    body: "Bazzite 不是装在你现有系统上的软件，而是一个整机系统镜像：基于 Fedora Atomic（Silverblue / Kinoite 那套不可变桌面），用 cloud native 方式构建，目标是让 Linux 游戏「开箱就能用」。\n它预置的东西很具体：OGC 内核、默认开启 HDR 与 VRR、H264 硬解、xone 的 Xbox 手柄驱动、DisplayLink 支持、vkBasalt / MangoHud / OBS VkCapture、Distrobox、Waydroid（跑安卓应用）、以及 OpenRazer 和 OpenTabletDriver。游戏掌机与 HTPC 用的 bazzite-deck 变体更进一步：开机直接进 Game mode，移植了 SteamOS 的驱动与风扇控制，默认带 BTRFS 的 SD 卡支持与 SDGyroDSU。\n代价是系统模型变了。这是 rpm-ostree 的不可变系统：装软件主要走 Flatpak 与 Distrobox，动系统层要用 rpm-ostree，升级是整镜像替换——好处是坏了能回滚到上一个版本，甚至开机时选旧镜像；坏处是你习惯的 apt/dnf 一套在这里不好使。\n还有两个前置：开了 Secure Boot 的机器必须先按文档处理签名，否则换完系统起不来；NVIDIA 显卡要选 bazzite-nvidia 那个镜像，用开源 NVK 的话 README 明说问题要报给 Mesa 而不是 Bazzite。",
+    officialUrl: "https://bazzite.gg",
+    officialLabel: "bazzite.gg",
+    links: {
+      official: "https://bazzite.gg",
+      github: "https://github.com/ublue-os/bazzite",
+    },
+    whoFor: "想把 Steam Deck、ROG Ally 一类掌机换成比 SteamOS 更通用的系统的人；想把客厅 PC 做成手柄开机即玩的游戏机的人。",
+    whoNot: "需要在这台机器上跑大量传统 Linux 桌面工作流、依赖 apt/dnf 装系统包的人；以及不愿为换系统承担重装风险的生产机。",
+    installTips: [
+      "先下 ISO 装：镜像在 download.bazzite.gg，安装步骤见 docs.bazzite.gg 的 Installation Guide。",
+      "已经是 Fedora Atomic 系的话可以不重装，直接 rpm-ostree rebase ostree-unverified-registry:ghcr.io/ublue-os/bazzite:stable；NVIDIA 卡换成 bazzite-nvidia:stable。",
+      "开了 Secure Boot 的机器，先按 README 的 secure boot 章节处理，再 rebase，顺序反了会启动失败。",
+      "掌机/HTPC 用 bazzite-deck 变体；后续零碎开关大多在终端用 ujust 命令完成（如 ujust install-openrazer）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "B",
+      color: "#7C3AED",
+    },
+    guide: {
+      intro: "换系统前先想清楚三件事：选哪个变体、Secure Boot 怎么办、以及不可变系统里软件到底怎么装。",
+      markdown: `## 一、先选变体，别选错镜像
+
+Bazzite 不是一个镜像，是一组：
+
+- **bazzite**：普通桌面用
+- **bazzite-deck**：掌机 / HTPC，开机直接进 Game mode
+- 带 **-nvidia** 后缀的：用 NVIDIA 专有驱动
+- **GNOME** 构建：不喜欢 KDE 的话
+
+装错变体的后果不是不能用，而是「你要的功能没有」——比如想开机进游戏模式却装了桌面版。
+
+## 二、Secure Boot 要先处理
+
+README 特意加粗提醒：开了 Secure Boot 的机器，要**先**按 secure boot 文档处理，再执行 rebase。顺序反了就是启动失败，救回来得进恢复环境。
+
+## 三、不重装也能换过来
+
+已经是 Fedora Atomic（Silverblue / Kinoite）的系统，可以直接换镜像：
+
+\`rpm-ostree rebase ostree-unverified-registry:ghcr.io/ublue-os/bazzite:stable\`
+
+NVIDIA 显卡用另一个：
+
+\`rpm-ostree rebase ostree-unverified-registry:ghcr.io/ublue-os/bazzite-nvidia:stable\`
+
+这一步会拉整个镜像，几个 GB，网速慢就慢慢等。
+
+## 四、装软件的方式变了
+
+这是从普通发行版迁过来最不适应的地方：
+
+- 桌面应用走 **Flatpak**（预装了 Flatseal、Warehouse、Gear Lever 管理权限与来源）
+- 需要别的发行版工具链就开 **Distrobox**
+- 系统层面的东西才用 rpm-ostree，而且改动会进入下一层镜像
+
+常见的一键操作被收进了 \`ujust\`，比如 \`ujust install-openrazer\`、\`ujust install-opentabletdriver\`。先 \`ujust --list\` 看看有什么，比到处搜教程快。
+
+## 五、升级坏了怎么办
+
+不可变系统的最大好处在这里：rpm-ostree 可以回滚到上一个部署，开机菜单里也能直接选旧镜像。升级后黑屏不用慌，先回滚再排查。`,
+      resources: [
+        {
+          kind: "html",
+          title: "镜像下载",
+          url: "https://download.bazzite.gg/",
+          note: "各变体的 ISO 都在这里，选错变体是新手最常见的问题，下之前先对一遍。",
+        },
+        {
+          kind: "html",
+          title: "安装指南",
+          url: "https://docs.bazzite.gg/General/Installation_Guide/",
+          note: "从做启动盘到首次开机的完整步骤，含 Secure Boot 相关说明。",
+        },
+        {
+          kind: "html",
+          title: "掌机与 HTPC 文档",
+          url: "https://docs.bazzite.gg/Handheld_and_HTPC_edition/Steam_Gaming_Mode/",
+          note: "各型号掌机需要的额外设置与 Decky 插件清单，装完 bazzite-deck 后按机器对号入座。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "titanbot",
+    linksCheckedAt: "2026-10-24",
+    name: "TitanBot",
+    nameZh: "TitanBot Discord 机器人",
+    aliases: ["titanbot", "discord 机器人", "discord bot", "discord 全能机器人"],
+    summary: "自托管的 Discord 全能机器人：管理、经济系统、工单、等级、抽奖、生日、音乐一把装齐。适合想在自己服务器里一次配好的服主；代价是得自己准备 Bot Token、Postgres 和 Lavalink 节点。",
+    scenes: ["social", "tools"],
+    platforms: ["linux", "windows", "macos"],
+    source: "opensource",
+    tags: ["Discord", "机器人", "社区运营", "自托管", "Node.js"],
+    body: "TitanBot 把 Discord 服务器里零散的需求打成一个包：批量封禁/踢人、版主备注与案件记录、经济系统（商店、赌博、转账）、工单（认领、优先级、转录）、等级与 XP、抽奖、生日提醒、欢迎语与自动角色、服务器统计频道、反应角色，再外加音乐播放。技术栈是 Discord.js v14 + PostgreSQL。\n它要自己部署，不是点一下就加进服务器的托管 Bot。最省事的是 Docker：clone 仓库、cp .env.example .env、填 DISCORD_TOKEN / CLIENT_ID / GUILD_ID，然后 docker compose up -d --build，容器里带一个 PostgreSQL，起来后可以用 curl localhost:3000/health 看状态。也有 ghcr.io/codebymitch/titanbot:main 镜像。\n几个容易踩的点：slash 命令是**全局**注册的（用 CLIENT_ID），所以 GUILD_ID 只是教程里的占位，不决定命令注册到哪个服；首次部署全局命令可能要一小时才生效；每个服的数据是隔离的（键前缀 guild:{guildId}:）。\n音乐是这套里最不稳的一环：默认连 lavalink/nodes.json 里的公共 Lavalink v4 节点，节点挂了歌就放不出来，想稳得自己起 Lavalink（compose 里有 local-lavalink profile）。",
+    officialUrl: "https://github.com/codebymitch/TitanBot",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/codebymitch/TitanBot",
+      github: "https://github.com/codebymitch/TitanBot",
+    },
+    whoFor: "自己有服务器（或 VPS）与 Docker、想一次装齐管理+娱乐功能的 Discord 服主；想把机器人改成自己逻辑的开发者。",
+    whoNot: "只想点个按钮把机器人加进服务器的人——这需要你自己跑进程；也不想维护数据库和 Lavalink 节点的人，用托管 Bot 更省心。",
+    installTips: [
+      "Docker 是最短路径：git clone 后 cp .env.example .env，至少填 DISCORD_TOKEN、CLIENT_ID、GUILD_ID，再 docker compose up -d --build。",
+      "起来后 docker compose ps 看容器，curl http://localhost:3000/health 验活；端口被占用时它会按 PORT_RETRY_ATTEMPTS 自动往后找。",
+      "不需要 Docker 的话要求 Node.js 20.10.0 以上 + PostgreSQL；先 npm install，再 cp .env.example .env 填 POSTGRES_* 连接串，npm start。",
+      "到 Discord Developer Portal 里把 README 列出的 intents（Guilds、Guild Messages、Message Content、Guild Members、Guild Voice States 等）打开，少一个功能就哑火。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "T",
+      color: "#5865F2",
+    },
+    guide: {
+      intro: "第一次部署卡在四处：intents 没开、命令不出现、音乐没声、以及以为 GUILD_ID 决定命令注册范围。",
+      markdown: `## 一、先把 intents 打开
+
+这是最高频的失败原因。Discord 默认不给 Message Content 这类敏感 intent，没开的话机器人能上线，但读不到消息内容，等级、自动回复全都不工作。
+
+去 Developer Portal → 你的应用 → Bot，按 README 的清单逐个勾选：Guilds、Guild Messages、Message Content、Guild Members、Guild Message Reactions、Guild Voice States、Direct Messages。权限方面还要给 Manage Messages、Manage Roles、Kick/Ban Members 这些，否则管理功能会报缺权限。
+
+## 二、命令为什么没出现
+
+slash 命令在启动时**全局**注册，用 CLIENT_ID。两个后果：
+
+1. 全局命令首次部署可能要**一小时**才传播完，别急着以为坏了
+2. GUILD_ID 只出现在教程的 .env 里，并不参与注册
+
+如果填了 GUILD_ID 就以为只注册到一个服，那是误解——邀请到别的服一样能用（每个服数据独立，键前缀是 guild:{guildId}:）。
+
+## 三、Docker 起不来先看两个地方
+
+\`docker compose up -d --build\` 之后：
+
+\`docker compose ps\` 看容器状态，\`curl http://localhost:3000/health\` 验活。
+
+compose 默认给内置 Postgres 设了 POSTGRES_SSL=false 与 AUTO_MIGRATE=true，接外部数据库时这两个要按实际情况改，否则表不会自动建。
+
+## 四、音乐不出声，锅通常在节点
+
+默认读 lavalink/nodes.json 里的公共 v4 节点——公共节点随时可能挂。要么改这个文件换节点，要么自己起：
+
+\`docker compose --profile local-lavalink up -d\`
+
+然后把 .env 里的 LAVALINK_HOST / PORT / PASSWORD / SECURE 填上，并把 nodes.json 移走（否则它会优先用文件里的节点）。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Releases 与镜像",
+          url: "https://github.com/codebymitch/TitanBot/releases",
+          note: "版本记录与更新说明。用 ghcr 镜像部署的话，确认标签对应哪个版本。",
+        },
+        {
+          kind: "html",
+          title: "Lavalink 项目",
+          url: "https://github.com/lavalink-devs/Lavalink",
+          note: "音乐功能依赖的服务端。公共节点不稳时，按这里自己搭一个。",
+        },
+        {
+          kind: "html",
+          title: "Discord 开发者后台",
+          url: "https://discord.com/developers/applications",
+          note: "拿 Token、开 intents、生成 OAuth2 邀请链接都在这。部署前先把这些配好。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "webstudio",
+    linksCheckedAt: "2026-10-24",
+    name: "Webstudio",
+    nameZh: "Webstudio 可视化建站",
+    aliases: ["webstudio", "webstudio is", "webflow 替代", "可视化建站", "开源建站工具"],
+    summary: "开源的 Webflow 替代品，可视化编辑但产出的是标准 HTML/CSS，能接任意 headless CMS，也能自托管。适合要精细控制样式、又不想手写页面的设计师与前端；AGPL-3.0，动效包还另收许可。",
+    scenes: ["design", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["建站", "可视化编辑", "Webflow 替代", "CSS", "自托管"],
+    body: "Webstudio 的自我定位是「面向开发者、设计师与跨职能团队的开源可视化开发平台」，关键词是「你拥有数据、组件和基础设施」——这句话是冲着 Webflow 那类 SaaS 建站工具说的：在那边，站点、数据、托管都在别人手里。\n它和「拖拽生成网页」的工具差别在产物：编辑的是真实 CSS 属性与 DOM 结构，导出的是标准前端代码，不是一层私有运行时。所以会写前端的人不会觉得自己被关进笼子，不会写的人也能靠可视化面板做完大部分版面。\n部署有两条路：用官方托管版，或者自己滚。自托管意味着运维、升级、备份都归你，换来的是数据不出自己的基础设施。\n许可要分两层看，这是 README 里最需要留意的一段：**本仓库的全部功能是 AGPL-3.0-or-later**，这是强 copyleft，改完对外提供服务需要开放源码；而 **sdk-components-animation 这个可选包是专有软件**，用之前必须接受 Webstudio 公司的 EULA。想把它嵌进闭源产品的团队，得先把这两条约束和法务对一遍。",
+    officialUrl: "https://webstudio.is",
+    officialLabel: "webstudio.is",
+    links: {
+      official: "https://webstudio.is",
+      github: "https://github.com/webstudio-is/webstudio",
+    },
+    whoFor: "要自己掌控站点数据与托管的设计师/前端；从 Webflow 迁出、又不想退回手写 HTML 的团队。",
+    whoNot: "不接受 AGPL 传染条款的闭源商业产品；也不想承担自托管运维成本、只想要「付钱就有人管」的人。",
+    installTips: [
+      "先用托管版 webstudio.is 试工作流——仓库 README 只给文档与社区入口，没有一键部署脚本，自建得照 docs.webstudio.is 一步步来。",
+      "自托管前先读许可：仓库本体是 AGPL-3.0-or-later；如果要带动效，sdk-components-animation 是专有包，必须先接受 EULA。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "W",
+      color: "#111827",
+    },
+    guide: {
+      intro: "这个仓库的 README 很短，上手前真正要判断的是三件事：用托管还是自建、能不能接受 AGPL、动效包要不要买。",
+      markdown: `## 一、README 说的「你拥有全部」是什么意思
+
+原文是：你拥有数据、组件与基础设施，可以用托管版，也可以自己部署。对应到实际选择就两条路：
+
+- **托管版**：开箱用，代价是数据与托管回到服务商手里（和 Webflow 的差别主要在可导出、可迁移）
+- **自建**：从仓库部署，数据在自己机器上，代价是运维归你
+
+README 没有给自建的快捷命令，部署方式以 docs.webstudio.is 为准——别照着别的教程抄 docker 命令，版本与依赖会变。
+
+## 二、许可比功能更该先看
+
+两句话，分量不同：
+
+1. 「**Webstudio core**（本仓库全部功能）是 AGPL-3.0-or-later 的自由/开源软件」
+2. 「**sdk-components-animation** 包（可选）是专有软件，使用前必须接受 Webstudio 公司的 EULA」
+
+AGPL 是强 copyleft：如果你改了它、并以网络服务的形式提供给别人用，通常要把改动开放。这跟「自己内部用」完全不是一回事，做商业产品前请让法务确认。
+
+## 三、动效是单独的账
+
+需要滚动动效、复杂交互动画时才会用到大包，而它不在开源范围里。判断顺序应该是：先确认静态站点部分够不够用，再决定要不要接这个依赖——反过来先接了动画，再发现许可不合适，返工成本更高。
+
+## 四、贡献与反馈
+
+Builder 的 issue 在 webstudio-is/webstudio，路线图在 GitHub Projects 上公开。想提需求前先翻一遍，很多能力已经在计划里。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.webstudio.is/",
+          note: "自托管与功能说明的正式入口。README 本身很薄，实际信息都在这里。",
+        },
+        {
+          kind: "html",
+          title: "托管版",
+          url: "https://webstudio.is",
+          note: "不想自己运维就从这里开始，先验证工作流再决定要不要自建。",
+        },
+        {
+          kind: "html",
+          title: "Issue 与路线图",
+          url: "https://github.com/webstudio-is/webstudio/issues",
+          note: "查已知问题与在做的功能，避免把「还没做」当成「坏了」。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "juce",
+    linksCheckedAt: "2026-10-24",
+    name: "JUCE",
+    nameZh: "JUCE 音频应用框架",
+    aliases: ["juce", "juce framework", "音频插件框架", "VST 开发", "C++ 音频框架"],
+    summary: "C++ 跨平台框架，一套代码出 VST3 / AU / AUv3 / AAX / LV2 插件和桌面、移动 App。做商业音频插件的首选之一；但它是 AGPLv3 与商业许可双轨，闭源发布基本得买授权。",
+    scenes: ["code", "music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音频插件", "C++", "VST3", "AU", "跨平台"],
+    body: "JUCE 解决的是音频软件里最烦的那部分：同一个插件要分别适配 VST3、AU、AUv3、AAX、LV2 五种格式，还要在 Windows / macOS / Linux / iOS / Android 上编译。它把这些包成一套 C++ 模块，外加 GUI、音频设备、MIDI、文件格式等基础设施，写一次业务逻辑就能导出全部目标。\n工程管理有两条路：CMake（要求 3.22 以上）或自家的 Projucer。Projucer 能生成 Xcode、Visual Studio、Android Studio 工程和 Linux Makefile，README 明确说**仓库里不含预编译的 Projucer**，得自己从 extras/Projucer/Builds 编出来。想省事就用 CMake。\n许可这件事必须先说：JUCE 是 AGPLv3 与商业许可双轨。AGPL 对闭源插件几乎等于不可用（分发给用户的插件同样受约束），所以商业项目通常要买 JUCE 商业授权。README 甚至专门要求 AI 助手在解释 JUCE 代码时必须提示用户可能需要商业许可——这条很少见，说明它被误解得够多。\n另一个具体门槛是 AAX：要在正式版 Pro Tools 里跑，插件必须用 PACE 的工具签名，而签名前得先申请 Pro Tools Developer 版本做测试，流程要发邮件、交录屏。做 Pro Tools 生态的话，这段行政流程比写代码更耗时间。",
+    officialUrl: "https://juce.com",
+    officialLabel: "juce.com",
+    links: {
+      official: "https://juce.com",
+      github: "https://github.com/juce-framework/JUCE",
+    },
+    whoFor: "要做商业音频插件或音频 App 的团队，尤其是同时要出 VST3 + AU + AAX 多格式的；需要一套跨桌面与移动的 C++ 音频基础设施的人。",
+    whoNot: "做闭源插件又不想付许可费的；只想写个小工具、能接受用现成 DAW 脚本或 Web Audio 的人——上 JUCE 的成本不划算。",
+    installTips: [
+      "走 CMake 的话先确认版本 ≥ 3.22，然后 cmake . -B cmake-build -DJUCE_BUILD_EXAMPLES=ON -DJUCE_BUILD_EXTRAS=ON，再 cmake --build cmake-build --target DemoRunner 验证环境。",
+      "Projucer 没有预编译版本，要自己在 extras/Projucer/Builds 下按平台编出来；不想编就直接用 CMake 建工程。",
+      "升级版本前必读 BREAKING_CHANGES.md，里面逐版本写了破坏性改动与迁移方式，比翻旧教程可靠。",
+      "要出 AAX 的话提前准备：先申请 AAX 开发者账号与 Pro Tools Developer，再用 PACE 工具签名，这步不能临时抱佛脚。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "J",
+      color: "#E11D48",
+    },
+    guide: {
+      intro: "上手 JUCE 的顺序应该是：先定许可、再选 CMake 还是 Projucer、然后跑通一个示例，最后才谈插件格式。",
+      markdown: `## 一、先定许可，再写第一行代码
+
+JUCE 是 **AGPLv3 或商业许可**二选一。这不是「开源版功能少一点」那种差别，而是法律约束：
+
+- 用 AGPL 版分发闭源插件，基本等于要求你开源
+- 商业授权按产品或按年计费，具体条款看 juce.com
+
+README 甚至要求 AI 助手解释 JUCE 代码时必须提醒「可能需要商业许可」。如果你在做要卖的产品，这一步先跟法务过，别写完了才发现。
+
+## 二、CMake 还是 Projucer
+
+**CMake（推荐）**：要求 3.22 以上。先跑官方示例验证环境和编译链：
+
+\`cmake . -B cmake-build -DJUCE_BUILD_EXAMPLES=ON -DJUCE_BUILD_EXTRAS=ON\`
+\`cmake --build cmake-build --target DemoRunner\`
+
+能把 DemoRunner 编出来，说明编译器、SDK、依赖都对了。
+
+**Projucer**：JUCE 自带的工程生成器，能出 Xcode / VS / Android Studio 工程。但仓库**不含预编译的 Projucer**，得从 extras/Projucer/Builds 自己编——第一次用常在这里卡住，以为下载漏了文件。
+
+## 三、查文档别查错版本
+
+API 文档由模块头文件里的 Doxygen 注释直接生成，源码就是最新文档。线上版分 master 与 develop 两个分支，docs.juce.com/master 与 /develop 不是一回事。
+
+版本号看 juce_StandardHeader.h 里的 JUCE_MAJOR_VERSION / JUCE_MINOR_VERSION / JUCE_BUILDNUMBER，别靠 About 窗口猜。
+
+## 四、AAX 是行政流程，不是技术问题
+
+AAX 插件要用 PACE 的工具数字签名才能在正式 Pro Tools 里加载。在此之前你得：
+
+1. 注册 AAX 开发者
+2. 发邮件申请 Pro Tools Developer 激活码
+3. 在 Developer 版里测通，再发录屏申请签名工具
+
+这段流程以周计。只做 VST3/AU 的话可以完全跳过。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方下载与授权",
+          url: "https://juce.com/get-juce",
+          note: "拿到最新发布版与商业授权说明。选 AGPL 还是商业版，在这一页就要定下来。",
+        },
+        {
+          kind: "html",
+          title: "JUCE 教程",
+          url: "https://juce.com/learn/tutorials/",
+          note: "从第一个音频插件到 GUI 的官方教程集合，源码在 JUCE-tutorials 仓库里可对照。",
+        },
+        {
+          kind: "html",
+          title: "API 文档（master）",
+          url: "https://docs.juce.com/master/",
+          note: "查类与方法签名。注意它对应 master 分支，与你本地版本可能不同。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "rawgraphs-app",
+    linksCheckedAt: "2026-10-24",
+    name: "RAWGraphs",
+    nameZh: "RAWGraphs 图表工具",
+    aliases: ["rawgraphs", "raw graphs", "rawgraphs-app", "在线图表工具", "svg 图表"],
+    summary: "在浏览器里把表格数据转成 SVG 图表的开源工具，补的正是 Excel 与 Illustrator 之间那段空白。适合要出可再编辑矢量图的设计师与记者；图表类型是固定的，做交互看板或实时大屏不合适。",
+    scenes: ["data", "design"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["数据可视化", "SVG", "图表", "d3.js", "设计"],
+    body: "RAWGraphs 的定位说得很准：它想做电子表格软件（Excel、Numbers、LibreOffice Calc）与矢量绘图软件（Illustrator、Inkscape）之间「缺失的那一环」。表格里长出数据，但表格画不出好图；矢量软件画得出好图，但不会读数据。它把中间这段接上：导入表格 → 选图表类型 → 映射字段 → 导出 SVG。\n数据是**只在浏览器里处理**的，README 专门强调「没有服务端操作与存储」——这对处理敏感数据的人很关键，你不需要相信任何服务器的运营方。输出是 SVG，意味着可以进 Illustrator / Inkscape 继续调字体、改配色、加标注，而不是导出一张死图。\n它的延续性也做得不错：支持用户自定义 layout，可以按开发者指南加新的图表类型，这让它在学术与新闻编辑室里活得比一般在线图表工具久。\n代价在定位本身：它产出的是**静态矢量图**，不是可交互图表，也没有数据连接与刷新。要做带 tooltip、能筛选的看板，或者要每天自动更新的报表，用 d3 自己写或上 BI 工具更合适。",
+    officialUrl: "https://rawgraphs.io",
+    officialLabel: "rawgraphs.io",
+    links: {
+      official: "https://rawgraphs.io",
+      github: "https://github.com/rawgraphs/rawgraphs-app",
+    },
+    whoFor: "要交一张能再编辑的矢量图表的设计师、记者、研究者；手上有 CSV/Excel、又不想为此写 d3 代码的人。",
+    whoNot: "要做交互式仪表盘、实时数据看板的人；也不适合需要复杂统计图（回归、分布拟合）的场景，那更接近 R / Python 的活。",
+    installTips: [
+      "最快是用官方实例 app.rawgraphs.io，不用装任何东西，数据全程在浏览器里处理。",
+      "要自己跑：先装 Git 与 Node.js（建议 LTS），git clone 后 cd rawgraphs-app，npm install，再 npm start。",
+      "想部署到自己的服务器就 npm run build 出静态文件，再把构建产物放上去。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "R",
+      color: "#E4572E",
+    },
+    guide: {
+      intro: "第一次用 RAWGraphs 的坎不在界面，而在「数据怎么进去、出去的图怎么改」。走一遍就顺手了。",
+      markdown: `## 一、先确认它解决的是哪一段
+
+你有一张表，需要一张**能再编辑的矢量图**——这是它的场景。反过来说，要交互、要实时、要自动刷新，都不该用它。
+
+## 二、数据怎么进去
+
+三种来源都支持：本地表格文件（如 CSV）、从别的软件**复制粘贴**文本、以及直接拖拽。粘贴这条很实用：从 Excel 里选中一块区域复制，切到浏览器粘贴，它按制表符切列。
+
+数据量别太大。README 强调数据只在浏览器里处理，这也意味着内存和渲染都在本机，几万行就会明显变慢。
+
+## 三、字段类型要自己确认
+
+导入后它会推断每列是数字、字符串还是日期，推断错了图就画不出来（比如把数字识别成文本，坐标轴会空）。这一步值得花两分钟逐列看一眼，比事后调图表快。
+
+## 四、本地跑起来
+
+\`\`\`
+git clone https://github.com/rawgraphs/rawgraphs-app.git
+cd rawgraphs-app
+npm install
+npm start
+\`\`\`
+
+需要 Git 与 Node.js（建议 LTS）。要部署到自己的服务器，用 \`npm run build\` 生成静态文件即可——它没有后端，本质是一堆前端资源。
+
+## 五、导出之后才是重点
+
+SVG 出来后进 Illustrator / Inkscape：文字转曲与否、字体替换、配色对齐品牌规范，这些都在矢量软件里做。RAWGraphs 负责把数据变成结构正确的图形，不负责最终排版。
+
+## 六、图表不够用怎么办
+
+它支持自定义 layout。要加新图表类型，按仓库 wiki 的开发者指南写，比 fork 整个项目干净。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线使用（无需安装）",
+          url: "https://app.rawgraphs.io",
+          note: "官方最新版实例。第一次用建议先在这里把流程走通，再考虑本地部署。",
+        },
+        {
+          kind: "html",
+          title: "项目主页",
+          url: "https://rawgraphs.io/about/",
+          note: "团队背景、论文引用方式与更新动态。写报告要引用它时，引用格式在这里。",
+        },
+        {
+          kind: "html",
+          title: "开发者指南（自定义图表）",
+          url: "https://github.com/rawgraphs/raw/wiki/Developer-Guide",
+          note: "想加自己的图表类型时看这个，讲 layout 的结构与接入方式。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "bottles",
+    linksCheckedAt: "2026-10-24",
+    name: "Bottles",
+    nameZh: "Bottles Wine 管理器",
+    aliases: ["bottles", "bottles wine", "wine 管理器", "linux 跑 windows 软件"],
+    summary: "Linux 上跑 Windows 软件的图形化 Wine 管理器，用 Flatpak 分发，每个「瓶子」是一个隔离的 Wine 前缀，装依赖与 DXVK 都在界面里点。适合不想背 wine 命令的人；它只是把 Wine 包得顺手，兼容性仍由 Wine 决定。",
+    scenes: ["tools", "games"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["Wine", "Linux", "兼容层", "Flatpak", "DXVK"],
+    body: "Bottles 做的事一句话能说完：给 Wine 套一个 GTK4 + libadwaita 的图形界面。但 Wine 真正的痛点不是命令难记，而是环境会互相污染——装 A 软件时改的 DLL 覆盖，会让 B 软件起不来。Bottles 用「瓶子（bottle）」解决这个：每个瓶子是独立前缀，还带版本管理，能回滚到之前的状态。\n它把常用操作都做成了按钮：选 Wine 或 Proton 运行器、装 DXVK / VKD3D、装常见依赖（.NET、字体、运行库）、按 exe 直接安装、给每个程序单独配环境变量。对不熟悉 winecfg 与 winetricks 的人来说，这层封装省掉的时间是实打实的。\n分发方式是 Flatpak（Flathub），这一点有两面：好处是依赖与运行时由 Flatpak 管，升级干净；坏处是沙箱会限制文件访问，程序要读写你 home 目录之外的路径时得额外授权，新手常在这里卡住（装了程序，找不到自己的文件）。\n要提醒的是它解决不了的根本问题：反作弊、需要内核级驱动的软件、以及 Wine 本身没实现的 API。这些不是换个管理器能好的。",
+    officialUrl: "https://usebottles.com",
+    officialLabel: "usebottles.com",
+    links: {
+      official: "https://usebottles.com",
+      github: "https://github.com/bottlesdevs/Bottles",
+    },
+    whoFor: "刚转 Linux、需要跑几个 Windows 小工具或老游戏的人；想给不同软件隔离 Wine 环境、又不想手工维护前缀的人。",
+    whoNot: "要跑带反作弊的网游、或者依赖内核驱动的专业软件——这不是瓶子能解决的问题；也不想学 Flatpak 权限模型的人，遇到文件访问问题会很受挫。",
+    installTips: [
+      "优先从 Flathub 装（com.usebottles.bottles），这是官方主推的分发方式；也有 cpak 渠道。",
+      "想试开发版要自己构建：装 org.flatpak.Builder，clone 仓库后在根目录跑 flatpak run org.flatpak.Builder --install --install-deps-from=flathub --default-branch=master --force-clean build-dir build-aux/com.usebottles.bottles.Devel.json。",
+      "README 对开发版有一句加粗提醒：试实验构建前先备份数据。",
+      "程序和文档在 docs.usebottles.com，Flatpak 权限、依赖安装这些细节在那查，别照抄旧版教程。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "B",
+      color: "#3584E4",
+    },
+    guide: {
+      intro: "装 Bottles 只是第一步，真正会卡住的是 Flatpak 沙箱下的文件访问，以及「瓶子」里该装什么运行器。",
+      markdown: `## 一、从哪装
+
+官方主推 **Flathub**：\`com.usebottles.bottles\`，在软件中心或命令行装都行。
+
+不建议一上手就编源码——README 的构建说明全是给 Flatpak 环境准备的（要装 org.flatpak.Builder，再用 build-aux 里的 Devel 清单构建），而且它明确提醒：试实验构建前先备份数据。因为开发版和稳定版共用同一个应用 ID 与数据目录，两边改动会互相影响。
+
+## 二、第一个瓶子怎么建
+
+新建时主要选两样：
+
+1. **运行器**：Wine 的某个版本，或 Proton 系。不确定就用默认，跑不起来再换
+2. **架构**：一般 x86_64，老软件可能需要 32 位支持
+
+装完 exe 后如果程序报缺 DLL，先看瓶子里的「依赖」页，常见运行库（.NET、VC++、字体）在那，别急着去外面下 DLL 塞进 system32。
+
+## 三、沙箱是最大的坑
+
+Flatpak 版本跑在沙箱里，默认只能访问有限路径。典型症状：程序装好了，打开文件对话框看不到你的文档目录。
+
+解法是给 Bottles 加文件系统权限（Flatseal 里改，或用 flatpak override）。这一步和 Wine 无关，是 Flatpak 的模型，理解这点能省掉很多「以为是 Wine 的锅」的排查。
+
+## 四、坏了怎么退回去
+
+瓶子有版本管理，改动前会留快照，出问题可以回滚。这是它比手工维护前缀省心的地方——但也别把它当备份，重要数据还是自己另存。
+
+## 五、哪些情况别浪费时间
+
+反作弊、内核级驱动、需要特定硬件的专业软件，Wine 层解决不了。先去 WineHQ 的应用数据库查一眼别人跑通没有，再决定要不要投入时间。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.usebottles.com",
+          note: "瓶子、运行器、依赖与 Flatpak 权限的说明都在这里，比翻 issue 快。",
+        },
+        {
+          kind: "html",
+          title: "Flathub 安装页",
+          url: "https://flathub.org/apps/com.usebottles.bottles",
+          note: "官方推荐的安装渠道，页面上能看到版本与权限说明。",
+        },
+        {
+          kind: "html",
+          title: "社区讨论区",
+          url: "https://github.com/orgs/bottlesdevs/discussions",
+          note: "具体某个软件怎么在瓶子里跑通，这里的问题帖比文档更贴近实际。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "aeron",
+    linksCheckedAt: "2026-10-24",
+    name: "Aeron",
+    nameZh: "Aeron 低延迟消息传输",
+    aliases: ["aeron", "aeron messaging", "低延迟消息", "udp 组播", "ipc 消息传输"],
+    summary: "面向低延迟高吞吐的 UDP 单播/组播与 IPC 消息传输库，Java、C、C++ 客户端齐全，另带 Archive 持久化与基于 Raft 的 Cluster。适合交易与行情系统；拿它当通用消息队列用是杀鸡用牛刀。",
+    scenes: ["code", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["消息传输", "低延迟", "UDP", "IPC", "Java"],
+    body: "Aeron 的设计目标写在 README 第一段：做「任何消息系统里吞吐最高、延迟最低且最可预测」的那一个。它不是又一个 MQ——没有 broker、没有主题管理、没有管理界面，只有传输：UDP 单播、UDP 组播、以及同机进程间的 IPC，三种模式用同一套 API。\n架构上它把「传输」抽成独立的 Media Driver 进程，应用通过共享内存与它通信，这样发送接收路径上没有锁、没有系统调用抖动。消息编解码推荐配 Simple Binary Encoding（SBE），数据结构基础来自同门的 Agrona 项目。\n围绕核心还有两个模块值得知道：**Aeron Archive** 把消息流录到持久存储，之后可以实时或回放；**Aeron Cluster** 基于 Raft 做容错服务，把状态机复制出去。这两块让它从「快」变成「能用于生产系统」。\n代价要说清楚：这是给懂网络与并发的人用的基础设施。你要自己管 Media Driver 的生命周期、自己设计 channel URI、自己处理流控与背压；没有现成的运维工具，出问题要看监控与调试文档。普通业务系统上它只会增加复杂度——那种场景 RabbitMQ / Kafka 更合适。\n商业化部分：Aeron 由 Adaptive Financial Consulting 维护，内核旁路（DPDK）与加密等增强在付费的 Aeron Premium 里。",
+    officialUrl: "https://aeron.io",
+    officialLabel: "aeron.io",
+    links: {
+      official: "https://aeron.io",
+      github: "https://github.com/aeron-io/aeron",
+    },
+    whoFor: "做交易系统、行情分发、实时风控这类对延迟极敏感的团队；需要在同机进程间做高吞吐 IPC 的 Java / C++ 项目。",
+    whoNot: "要的是「可靠、好运维、有管理界面」的通用消息队列；或者团队里没人愿意深入理解网络与并发模型——这套东西的调试成本很高。",
+    installTips: [
+      "Java 侧直接从 Maven Central 取 io.aeron:aeron-all，不需要先编译仓库；版本与变更看 CHANGELOG.adoc。",
+      "C / C++ 客户端在仓库内，构建步骤以 wiki 的 Building Aeron 为准，别照搬 Java 的流程。",
+      "先读 Java Programming Guide 或 C++11 Programming Guide 再动手——Aeron 的核心概念（Media Driver、channel URI、subscription/publication）不理解会写不下去。",
+      "上生产前把 Monitoring and Debugging 与 Configuration Options 两篇过一遍，默认参数不是给生产环境调的。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "A",
+      color: "#0F766E",
+    },
+    guide: {
+      intro: "Aeron 的门槛不在 API，而在两个概念：Media Driver 是独立进程、消息走 channel URI。先搞懂这两点，代码才写得下去。",
+      markdown: `## 一、Media Driver 是另一个进程
+
+第一次用最常见的困惑：我 new 了一个 Publication，为什么还要启动别的东西？
+
+因为 Aeron 把传输拆出去了。**Media Driver** 负责真正的网络收发与缓冲管理，应用通过共享内存与它交互。三种起法：
+
+- 嵌入模式：在应用进程里起（开发方便，生产少见）
+- 独立进程：单独跑，应用通过 aeron.dir 找到它
+- 由容器/服务管理器托管：生产常见
+
+如果你的程序发不出消息，第一件事是确认 Media Driver 真的在跑、并且应用指向的目录和它是同一个。
+
+## 二、channel URI 决定走哪种传输
+
+Aeron 用 URI 描述通道，形如 \`aeron:udp?endpoint=host:port\` 或 \`aeron:ipc\`。同一个 API，换 URI 就换了底层：
+
+- **IPC**：同机进程间，走共享内存，最快
+- **UDP 单播**：点对点
+- **UDP 组播**：一对多，行情分发常用
+
+选错模式的典型后果是「本地测得好好的，跨机就不通」——本地默认走 IPC，跨机必须配 udp endpoint 与网络。
+
+## 三、消息编码别自己拼
+
+README 推荐配 **Simple Binary Encoding（SBE）**，Agrona 提供底层数据结构。自己用 JSON 或 Java 序列化，延迟优势会被编码吃掉，也就失去用 Aeron 的意义。
+
+## 四、需要持久化就上 Archive
+
+消息流要落盘、要回放，用 **Aeron Archive** 模块录制，之后可以实时或按时间点重放。这一块有自己的配置与存储规划，别等上线才加。
+
+## 五、容错服务用 Cluster
+
+**Aeron Cluster** 基于 Raft 复制状态机。它能给你一致性，但也会带来 leader 选举与成员管理的复杂度——先确认你的业务真的需要，再引入。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Java 编程指南",
+          url: "https://github.com/aeron-io/aeron/wiki/Java-Programming-Guide",
+          note: "从第一个 Publication/Subscription 讲起，理解 Media Driver 与 channel 的最佳入口。",
+        },
+        {
+          kind: "html",
+          title: "最佳实践",
+          url: "https://github.com/aeron-io/aeron/wiki/Best-Practices-Guide",
+          note: "缓冲、批处理、错误处理这些决定实际性能的细节，正式调优前必读。",
+        },
+        {
+          kind: "html",
+          title: "监控与调试",
+          url: "https://github.com/aeron-io/aeron/wiki/Monitoring-and-Debugging",
+          note: "丢了消息、延迟毛刺、流控卡住时的排查方法，生产环境必备。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "dashboard-icons",
+    linksCheckedAt: "2026-10-24",
+    name: "Dashboard Icons",
+    nameZh: "Dashboard Icons 图标库",
+    aliases: ["dashboard-icons", "dashboard icons", "面板图标", "homarr 图标", "服务图标库"],
+    summary: "3400+ 个服务与应用图标，SVG/PNG/WEBP 三种格式、明暗两套，走 jsDelivr CDN，还给 AI agent 准备了 MCP。适合给自建面板（Homarr/Homepage/Dashy）配图标；要做品牌 VI 或原创插画的人用不上。",
+    scenes: ["design", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图标", "自建面板", "SVG", "CDN", "MCP"],
+    body: "自建服务的人都有过这个时刻：面板上十几个服务，图标要么找不到，要么风格五花八门。Dashboard Icons 就是为这件事做的——把常用服务、应用、工具的 logo 统一成一套视觉语言，3400 多个，按 kebab-case 命名（「Nextcloud Calendar」对应 nextcloud-calendar）。\n用法极轻：不装包、不下载仓库，直接走 CDN。URL 结构是 `<Base URL>/<Format>/<Icon Name>.<Format>`，Base URL 用 jsDelivr 或 GitHub raw 都行，格式有 SVG（原始矢量）、PNG 与 WEBP（512px 高，自动生成）。明暗主题靠后缀区分：-light 给深色背景用，-dark 给浅色背景用。\n它还多做了一件和现在工作流贴合的事：提供一个免费的 MCP 服务（https://dashboardicons.com/api/mcp，不需要 API Key），能一次读完你的 docker-compose.yml 并把每个服务匹配到图标，还能顺带搜 selfh.st、LobeHub 与 Simple Icons 三个库。对用 Claude Code / Codex / Cursor 搭面板的人，这比自己一个个搜快得多。\n要注意的是授权边界：图标本身来自各家品牌，README 明确写了商标归各自所有者、仅用于识别，Simple Icons 的 CC0 也不解除第三方商标与品牌规范的限制。做对外产品时别把别人的 logo 当自有素材用。",
+    officialUrl: "https://dashboardicons.com",
+    officialLabel: "dashboardicons.com",
+    links: {
+      official: "https://dashboardicons.com",
+      github: "https://github.com/homarr-labs/dashboard-icons",
+    },
+    whoFor: "用 Homarr、Homepage、Dashy 搭自建入口页的人；需要给一堆自托管服务配统一图标的运维与 NAS 玩家。",
+    whoNot: "需要原创品牌设计、或要能商用改编的图标素材的人——这里是第三方商标的索引，不是可自由再创作的素材库。",
+    installTips: [
+      "不用装：CDN 直链形如 https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/plex.svg，把文件名换成你要的服务即可。",
+      "明暗主题按后缀选：深色背景用 -light，浅色背景用 -dark；PNG / WEBP 是 512px 高，适合不支持 SVG 的面板。",
+      "命令行下载：curl -O 或 wget 上述链接即可；文件名一律 kebab-case，对不上就是拼写问题。",
+      "接了 AI agent 的话可以直接挂 MCP：claude mcp add --transport http dashboard-icons https://dashboardicons.com/api/mcp，然后让它按 docker-compose.yml 批量配图标。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "D",
+      color: "#A020F0",
+    },
+    guide: {
+      intro: "用起来很简单，但三个细节会反复绊人：文件名怎么拼、明暗后缀选哪个、以及面板缓存。",
+      markdown: `## 一、文件名是归一化的 kebab-case
+
+图标名不是服务的显示名，而是小写加连字符：
+
+- 「Nextcloud Calendar」→ \`nextcloud-calendar\`
+- 「Home Assistant」→ \`home-assistant\`
+
+对不上时先去 dashboardicons.com 搜，搜到后直接复制它给的直链，不要凭名字猜。
+
+## 二、直链只有两段要改
+
+\`https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/plex.svg\`
+
+三段可变：Base URL（jsDelivr 或 raw.githubusercontent.com）、格式目录（svg / png / webp）、文件名。
+
+jsDelivr 有缓存，刚提交的新图标可能要等一会儿；急着用就换 GitHub raw 地址试。
+
+## 三、明暗变体别用反
+
+后缀的语义是「给什么背景用」：
+
+- \`-light\`：图标整体偏浅，放在**深色**背景上
+- \`-dark\`：图标整体偏深，放在**浅色**背景上
+
+面板切换主题时忘了换后缀，就会出现「白底白图标」的尴尬。
+
+## 四、批量配图标直接交给 agent
+
+MCP 端点不需要 API Key：\`https://dashboardicons.com/api/mcp\`。
+
+\`claude mcp add --transport http dashboard-icons https://dashboardicons.com/api/mcp\`
+
+配好后直接说「给我 docker-compose.yml 里每个服务配上图标」，它会一次返回匹配结果与 CDN 链接。Codex、Cursor、VS Code、OpenClaw 的配置写法 README 都列了，照抄即可。
+
+## 五、商用前看商标
+
+图标是各家品牌资产，README 只授权用于「识别」。把别人的 logo 放进自己的产品界面或宣传物料前，请单独确认品牌规范。`,
+      resources: [
+        {
+          kind: "html",
+          title: "在线浏览与下载",
+          url: "https://dashboardicons.com",
+          note: "搜索图标、预览明暗变体、复制直链都在这里。找不到图标也可以在这里提交。",
+        },
+        {
+          kind: "markdown",
+          title: "MCP 使用文档",
+          url: "https://github.com/homarr-labs/dashboard-icons/blob/main/web/docs/MCP.md",
+          note: "各客户端的配置方式、可用工具与调用限额，接 agent 前先读这篇。",
+        },
+        {
+          kind: "html",
+          title: "贡献规范",
+          url: "https://github.com/homarr-labs/dashboard-icons/blob/main/CONTRIBUTING.md",
+          note: "提交新图标要满足的尺寸、格式与命名要求。注意提交走网站表单，不再用 issue。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "love",
+    linksCheckedAt: "2026-10-24",
+    name: "LÖVE",
+    nameZh: "LÖVE 2D 游戏框架",
+    aliases: ["love", "love2d", "löve", "love 2d", "lua 游戏框架"],
+    summary: "用 Lua 写 2D 游戏的极简框架：一个 main.lua 加几个回调就能跑起来，Windows / macOS / Linux / Android / iOS 都支持。适合想快速做出能玩的 2D 小游戏的人；没有内置编辑器，大项目得自己搭架构。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["2D", "游戏框架", "Lua", "LuaJIT", "独立游戏"],
+    body: "LÖVE 的哲学是「只给你需要的东西」：没有场景树、没有可视化编辑器、没有资源管线。一个游戏就是一个文件夹，里面有 main.lua，定义 love.load / love.update / love.draw 几个回调，双击就跑。对已经会写代码、只想做 2D 游戏的人来说，这条路径短得几乎没有摩擦。\n它把底层包得很干净：渲染走 OpenGL 3.3+ / OpenGL ES 3.0+ / Vulkan / Metal（依赖里列了 SDL3），音频走 OpenAL，图像字体是 FreeType + harfbuzz，还带 ModPlug / Vorbis / Theora。脚本层可选 Lua、LuaJIT 或 LLVM-lua，想榨性能可以切 LuaJIT。\n平台支持写得很清楚：Windows、macOS、Linux、Android、iOS。发布包在各版本的 releases 里，官网有对应平台的额外内容；Linux 上还有 PPA（ppa:bartbes/love-unstable）与 AUR 的 love-git 可以拿 nightly。\n代价是没有「引擎」的那部分：UI、存档、场景切换、物理之外的东西都得自己搭或找社区库，项目一大就会变成自研框架。另外，README 明确说不接受由 LLM / 生成式 AI 产出的 PR 与 issue——这点对想用 AI 辅助提交上游的人有直接影响（本地写代码不受限）。",
+    officialUrl: "https://love2d.org",
+    officialLabel: "love2d.org",
+    links: {
+      official: "https://love2d.org",
+      github: "https://github.com/love2d/love",
+    },
+    whoFor: "会写 Lua 或愿意学、想做 2D 小游戏与原型的人；想用极简栈快速验证玩法、不想被引擎概念淹没的开发者。",
+    whoNot: "要 3D、要现成编辑器与可视化关卡设计的人；团队协作的大项目也会发现它缺工具链，需要自己补一整层。",
+    installTips: [
+      "直接下二进制最省事：各版本文件在 GitHub 的 releases 区，官网有最新版的平台说明与附加内容。",
+      "Linux 想跟开发进度可以加 nightly：Ubuntu 有 ppa:bartbes/love-unstable，Arch 用 AUR 的 love-git。",
+      "自己编译 *nix 版要分开构建目录：cmake -B build -S. --install-prefix $PWD/prefix，然后 cmake --build build --target install -j$(nproc)。",
+      "想验证安装是否正常，可以跑自带测试套件：love testing（它会像一个普通 LÖVE 项目那样运行）。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#E6529B",
+    },
+    guide: {
+      intro: "LÖVE 上手只要五分钟，卡人的地方在后面：项目结构、资源路径、以及「没有编辑器」这件事怎么补。",
+      markdown: `## 一、最小可运行结构
+
+一个 LÖVE 游戏就是一个文件夹，根目录下必须有 \`main.lua\`。里面写回调：
+
+- \`love.load()\`：启动时初始化
+- \`love.update(dt)\`：每帧更新，dt 是距上一帧的秒数
+- \`love.draw()\`：每帧绘制
+
+用 \`love .\` 在项目目录运行（或把文件夹拖到 LÖVE 图标上）。没有 main.lua 会直接报错，这是新手第一个卡点。
+
+## 二、资源路径是相对于项目根的
+
+图片、字体、音频都要用相对项目根目录的路径，比如 \`love.graphics.newImage("assets/player.png")\`。绝对路径、系统路径在打包后都会失效。
+
+写代码时用 \`dt\` 而不是固定步长，否则帧率一变速度就变——这是 2D 游戏最常见的手感问题。
+
+## 三、没有编辑器，就得自己定结构
+
+LÖVE 不提供场景、实体、UI 系统。项目一大，你会需要：
+
+- 一个场景/状态机（菜单、游戏中、暂停）
+- 一套实体管理（列表或简单的 ECS）
+- 一个资源缓存（避免重复加载同一张图）
+
+社区有现成库可挑，但选型要谨慎：LÖVE 生态的库维护状况差异很大，绑上一个停更的库比手写更麻烦。
+
+## 四、性能来自 LuaJIT
+
+默认宿主可能用 LuaJIT，也可能用标准 Lua。热点循环里避免频繁创建表、避免每帧 new 对象，比任何微优化都有效。真到瓶颈再考虑用 LuaJIT 的 FFI 调 C。
+
+## 五、贡献上游前先看清规则
+
+README 写明：不接受由 LLM / 生成式 AI 产生的 PR、issue 与其他贡献。自己本地用 AI 辅助不受影响，但提交到官方仓库会被拒。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方 Wiki（唯一的文档）",
+          url: "https://love2d.org/wiki",
+          note: "LÖVE 不用 README 写文档，全部 API 与教程都在 wiki。遇到问题先在这里搜函数名。",
+        },
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://love2d.org",
+          note: "各平台安装包与最新版说明，发布文件同时挂在 GitHub releases。",
+        },
+        {
+          kind: "html",
+          title: "测试套件说明",
+          url: "https://github.com/love2d/love/tree/main/testing",
+          note: "覆盖全部 LÖVE API 的测试项目，既能验证安装，也能当用法示例读。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "flecs",
+    linksCheckedAt: "2026-10-24",
+    name: "flecs",
+    nameZh: "Flecs ECS 框架",
+    aliases: ["flecs", "flecs ecs", "ecs 框架", "实体组件系统", "entity component system"],
+    summary: "C/C++ 的实体组件系统框架，零依赖、C99 与 C++17 两套 API，官方说能撑百万实体；但它只管数据组织，渲染、物理、资源管线一概不含，指望开箱做游戏会失望。",
+    scenes: ["games", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["ECS", "游戏开发", "C++", "C99", "数据导向"],
+    body: "Flecs 是一个 C 写的实体组件系统（ECS）框架，用来组织游戏或模拟里上万乃至百万级实体的数据。卖点是内存布局：组件按 archetype 分组存放，系统遍历时是顺序读一片连续内存，而不是在对象指针之间乱跳。README 给的指标很具体——C99 零依赖 API、不使用 STL 容器的 C++17 API、整个代码库 5 秒内编译完、13000 多个测试跑在主流编译器与平台上。\n它与其他 ECS 最大的差别在「关系」：README 称它是第一个完整支持实体关系的开源 ECS，层级与 prefab 是原生能力，查询语言支持 join 与继承。所以「父子节点」「挂在某个实体上的装备」这类结构不用自己造轮子。此外自带反射框架与 JSON 序列化、性能统计插件，示例可以用 emscripten 原样编到浏览器里跑。\n代价得说清楚：它是库不是引擎。渲染、物理、音频、资源加载都不在里面；README 提到的 input、transform、renderer 等模块放在独立的 flecs-hub 组织下，成熟度与主库不是一个水平。C#/Rust/Zig/Lua 的绑定由社区维护，README 明确说可能跟不上 master。\n上手最容易卡在概念堆叠：entity、component、system 之外还有 relationship、prefab、archetype、pipeline，一次想全学会基本会崩。",
+    officialUrl: "https://www.flecs.dev",
+    officialLabel: "www.flecs.dev",
+    links: {
+      official: "https://www.flecs.dev",
+      github: "https://github.com/SanderMertens/flecs",
+    },
+    whoFor: "写 C/C++ 游戏或模拟、愿意自己掌控内存布局与多核调度的团队；已经在用别的 ECS、被层级与实体关系卡住的人。",
+    whoNot: "想找一个带编辑器、开箱就有渲染与物理的引擎的人；团队里没人熟悉 C++ 模板与数据导向设计、只想脚本快速出原型的也別勉强。",
+    installTips: [
+      "前置只有一个 C99 编译器：Flecs 零依赖，不需要装任何第三方库；走 C++ 侧则要求 C++17。",
+      "官方示例按主题放在 examples/ 下（cpp/queries、cpp/systems、cpp/reflection），先照着一个 main 编译通过，再回头读文档。",
+      "要跑在浏览器里不用改代码，README 明确说用 emscripten 可直接构建运行。",
+      "调试用 Flecs Explorer（flecs.dev/explorer），它是在网页上监控与控制运行中应用的工具，需要工程里接入对应组件。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#2E7D6B",
+    },
+    guide: {
+      intro: "按第一次使用的顺序讲：ECS 的三个名词怎么对上、C 与 C++ 两套 API 怎么选、以及为什么大多数人卡在关系与 prefab 上。",
+      markdown: `## 先把三个词对上
+
+ECS 里 **entity** 只是一个 id，**component** 是挂在 id 上的纯数据，**system** 是「对所有满足某组组件的实体跑一遍」的函数。它换的不是语法，是内存布局：同类组件排在一起，遍历时顺序读。
+
+Flecs 的 README 用同一个例子讲了 C 与 C++：C99 侧用 \`ECS_COMPONENT\` 注册类型、\`ECS_SYSTEM\` 声明系统，主循环里靠 \`ecs_progress()\` 推进；C++17 侧是 \`flecs::world\` 加 \`ecs.system<Position, const Velocity>().each(...)\`。两套 API 能力对齐，选一套读透，比两套混抄强。
+
+## 第一次跑起来的顺序
+
+1. 确认编译器支持 C99；要用 C++ 就确认 C++17。
+2. 把 \`examples/cpp/queries/basics\` 里那个 Position/Velocity 的 main 抄下来，编译一次。
+3. 改动它：加一个组件，看系统是不是只对符合条件的实体生效。
+
+这一步别跳过。很多人直接进项目，结果分不清「没匹配到」和「逻辑写错」——\`ecs_field\` 拿到空指针，多半是查询条件与实体上的组件对不上，而不是 API 用错。
+
+## 最容易卡住的三个地方
+
+**archetype**：实体按组件组合分桶，增删组件等于换桶。高频加删组件的写法会很慢，组件集合稳定的场景才是它的主场。
+
+**关系与 prefab**：这是它区别于其他 ECS 的能力，也是新手最容易过度设计的地方。层级、实例化 prefab、带数据的 relationship 单独用都很香，叠在一起调试成本陡增。先用普通组件把玩法跑通，再回来换。
+
+**多线程**：README 提到无锁调度器能把系统分到多个核心。它不是自动并行——系统之间能不能并跑，取决于你声明了哪些读写依赖，写错就是偶发数据竞争，而且极难复现。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://www.flecs.dev/flecs/Docs.html",
+          note: "API 手册与各 addon 的入口，关系、层级、prefab 这些概念都在这里展开，比 README 详细。",
+        },
+        {
+          kind: "link",
+          title: "示例代码目录",
+          url: "https://github.com/SanderMertens/flecs/tree/master/examples",
+          note: "按 queries / systems / reflection 分类的可运行示例，照着改比读文档快。",
+        },
+        {
+          kind: "link",
+          title: "ECS FAQ",
+          url: "https://github.com/SanderMertens/ecs-faq",
+          note: "作者自己维护的问答，先说清 ECS 适合什么、不适合什么——决定要不要换架构前值得看。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ffmpegfreeui",
+    linksCheckedAt: "2026-10-24",
+    name: "FFmpegFreeUI",
+    nameZh: "3FUI 视频压制工具",
+    aliases: ["3fui", "ffmpegfreeui", "ffmpeg gui", "视频压制", "ffmpeg 图形界面"],
+    summary: "Windows 上的 ffmpeg 图形外壳，编码参数逐项摊开、任务可无限排队，适合想精细控制压制方案的人；它不内置编解码器，没放 ffmpeg 就一步都跑不了。",
+    scenes: ["tools", "music"],
+    platforms: ["windows"],
+    source: "opensource",
+    tags: ["ffmpeg", "视频压缩", "转码", "图形界面", "批量处理"],
+    body: "3FUI 是 Windows 上 ffmpeg 的交互外壳，和 HandBrake、ShanaEncoder、ShutterEncoder 坐在同一桌：把命令行参数做成面板，再配上队列、预设、性能监控与质量评测。README 的定位写得很直白——这不是给纯小白的一键全自动软件，面向懂基本参数的进阶编码人员，小白上手有门槛但上限很高。\n与同类最大的区别是它只做界面，不内置任何编解码器：ffmpeg 要自己放进去，或加进环境变量。好处是性能始终跟得上最新 ffmpeg，换一个 exe 就能用上新编码器，不必等软件更新；坏处是第一次打开若没配 ffmpeg，界面能开、任务跑不动。\n功能面上 README 列得很长：自由组合参数、预设分享、批量任务数量无上限、实时剩余时间与预估体积、完整色彩管理、烧字幕选项、便捷调用 AviSynth 与 VapourSynth、简易混流合并、ffprobe 与 ffplay 调用、插件体系，以及 UDP 远程调用（默认 10591 端口）。界面走自研的 DirectX 渲染层，需要支持 D3D11 的显卡。\n代价有三条：只有 Windows（README 写明 Win10 1609+，x64/arm64），只有简体中文且明确不做多语言，另外 .NET 10 必须装在系统里（更新器可代下）。跑批出错时它给的基本是 ffmpeg 的原始输出，不懂命令行的人依然会卡住。",
+    officialUrl: "https://ffmpegfreeui.top",
+    officialLabel: "ffmpegfreeui.top",
+    links: {
+      official: "https://ffmpegfreeui.top",
+      github: "https://github.com/Lake1059/FFmpegFreeUI",
+    },
+    whoFor: "已经会写几条 ffmpeg 参数、想用界面管批量任务的人；需要固定预设反复压制同一类片源的小团队。",
+    whoNot: "完全不懂封装与编码区别的新手，README 自己就劝退；以及 macOS / Linux 用户——它没有这两个平台的构建。",
+    installTips: [
+      "系统要求 Windows 10 1609 以上，仅 x64 与 arm64；程序不自带 .NET 运行时，需先装 .NET 10。",
+      "自备 ffmpeg：把 ffmpeg.exe 放进程序目录，或加入系统环境变量，否则任何任务都起不来。",
+      "解压即用，所有数据都存在当前目录的单文件里，不写注册表、不收集信息。",
+      "要跨机或脚本化调用，在设置里打开远程调用，用 UDP 10591 端口按启动参数格式发任务。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#C2410C",
+    },
+    guide: {
+      intro: "讲三件最容易拦住人的事：封装与编码的区别、为什么必须先放 ffmpeg、以及任务和预设是怎么组织的。",
+      markdown: `## 先分清封装与编码
+
+这是 3FUI 里最常被问的问题，README 专门开了一节：**mp4 是封装格式，不是编码格式**。外壳（mp4 / mkv）决定容器，里面的视频流可能是 x264、x265 或 AV1。这一层选错，参数怎么调都不对。mkv 能装的编码最多，遇到奇怪的片源先换封装试试。
+
+## 第一件事是放 ffmpeg
+
+3FUI 不内置任何编解码器。装好程序后要自己准备 ffmpeg：把 \`ffmpeg.exe\` 放进程序目录，或者把它的路径加进系统环境变量。没做这一步，界面照样能打开，但任何任务都跑不动——这是新手最常见的「点了没反应」。
+
+同理，它依赖 .NET 10，系统里没有就得装，更新器可以代下。
+
+## 任务是怎么组织的
+
+它的底层逻辑基于**预设**：输入文件 + 一套参数 = 一个任务，任务进队列。正确用法是先调好一个预设、跑通一条片子、确认输出没问题，再批量套用。跳过验证直接排几百个任务，是最贵的教训。
+
+它也能像 ffmpeg 一样被外部调用：
+
+\`\`\`
+3FUI.exe -i input.mkv -3fui_file 我的预设
+\`\`\`
+
+\`-i\` 与 \`-3fui_file\` 必须成对使用；\`-ffmpeg\` 后面的内容会原样喂给 ffmpeg，适合把别处写好的命令行搬过来。远程调用打开后，用 UDP 10591 端口发同样格式的消息，就能把这台机器当编码机。
+
+## 出错时别猜
+
+README 反复强调：报错请带完整命令行与源文件参数。ffmpeg 的输出常常只有一句「参数不正确」，没有命令行根本没法定位——文档里甚至专门写了「不要算卦」，意思就是别把报错丢给 AI 让它猜。
+
+另外提醒：界面只有简体中文，官方没有多语言计划；跨平台也不必等，只有 Windows。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与下载",
+          url: "https://ffmpegfreeui.top",
+          note: "安装包与更新器入口。README 注明该域名 2028 年后废弃，届时换短域名。",
+        },
+        {
+          kind: "link",
+          title: "开发者知乎宣传页",
+          url: "https://zhuanlan.zhihu.com/p/1979540305800892949",
+          note: "作者自述 v6 的设计取舍与功能边界，判断这软件合不合自己用最快。",
+        },
+        {
+          kind: "link",
+          title: "逐页功能教程",
+          url: "https://www1.arxchem.top/docs/3-3fui",
+          note: "社区维护的界面逐页说明，配合上面的参数科普一起看，能少走一半弯路。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "mumble",
+    linksCheckedAt: "2026-10-24",
+    name: "Mumble",
+    nameZh: "Mumble 语音聊天",
+    aliases: ["mumble", "murmur", "mumble-server", "语音聊天", "低延迟语音"],
+    summary: "开源低延迟语音聊天，客户端与服务端都能自己架，适合小队开黑或公会长期用一台服务器；界面朴素，没有视频、屏幕共享这类现代功能。",
+    scenes: ["social", "games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["语音聊天", "VoIP", "自建服务", "低延迟", "游戏开黑"],
+    body: "Mumble 是建立在 Qt 与 Opus 之上的语音聊天程序，两个模块：客户端 mumble 和服务端 mumble-server（旧名 murmur）。README 给客户端的平台是 Windows、Linux、FreeBSD、OpenBSD、macOS；服务端只要能装 Qt 就能跑。它追求的是低延迟与语音质量，而不是花哨的社交功能。\n和 Discord 这类产品比，差别在「谁掌握服务器」：Mumble 需要一个你自己的服务器地址，官方 README 没有指向公共服务器，给的是自建路径——Linux 上命令行跑 `mumble-server`，或者用官方 Docker 镜像 mumble-docker。频道、权限、ACL 都在服务端配置，这也是它能长期服务固定小圈子的原因。\n第一次用最容易卡在两件事。一是**没有地址就进不去**：客户端启动后要填服务器，自建的填自己 IP 或域名，端口默认 64738。二是**超级用户密码**：服务端装完 SuperUser 是禁用的，必须先用 `--set-su-pw <password>` 设一个密码，这条命令会把密码写进数据库然后退出，没设之前你在客户端里没有管理权限。\n另外两个加分项：Linux 下可以用 `mumble-overlay` 给游戏叠一层显示谁在说话的浮层；服务端有 ini 模板与完整配置文档。代价是它不会替你解决服务器运维，证书、带宽、并发都得自己盯。",
+    officialUrl: "https://www.mumble.info",
+    officialLabel: "www.mumble.info",
+    links: {
+      official: "https://www.mumble.info",
+      github: "https://github.com/mumble-voip/mumble",
+    },
+    whoFor: "有自己服务器、想让固定小队长期用同一套语音频道的人；对延迟敏感、受不了商业语音软件压缩音质的玩家。",
+    whoNot: "只想拉个链接就开聊的人——它没有公共服务器可蹭；也不需要视频、屏幕共享或复杂机器人生态的团队。",
+    installTips: [
+      "客户端各平台都有安装包：Windows 装完从开始菜单启动，macOS 把磁盘映像里的应用拖进 /Applications，Linux 用发行版仓库的包即可。",
+      "服务端与客户端是两个东西：Linux 上直接跑 mumble-server，Windows 上双击图标后任务栏会出现日志入口。",
+      "装完第一件事是设超级用户密码：mumble-server --set-su-pw <password>，没设之前 SuperUser 是禁用的。",
+      "不想自己配环境就用官方 Docker 镜像，仓库在 github.com/mumble-voip/mumble-docker。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#3B6EA5",
+    },
+    guide: {
+      intro: "按第一次连上的顺序讲：服务器地址从哪来、超级用户密码为什么必须先设、以及自建时最容易漏的配置。",
+      markdown: `## 客户端装完为什么连不上
+
+Mumble 与商业语音软件最大的不同：**它不给你一个公共房间**。第一次打开会要求填服务器地址，随便点下一步只会失败。地址要么是你自己架的服务端，要么是朋友给的，默认端口 \`64738\`。
+
+## 自建服务端的最小步骤
+
+Linux 上装好包后直接在终端跑：
+
+\`\`\`
+mumble-server --set-su-pw 你的强密码
+\`\`\`
+
+这条命令只做一件事——把 SuperUser 的密码写进数据库，然后退出。**在此之前 SuperUser 是禁用的**，也就是说你第一次进服务器会发现自己是普通用户，建不了频道。README 特意提醒这个密码要保管好，因为它绕过所有 ACL。
+
+然后正常启动服务端，前台带日志跑用 \`--foreground\`，看细节加 \`--verbose\`：
+
+\`\`\`
+mumble-server --foreground --verbose
+\`\`\`
+
+同一台机器要跑多个实例，用 \`--ini\` 指定不同的配置文件，并且**每个实例必须用各自的数据库**，否则会互相踩。
+
+## Windows 与 macOS 的差异
+
+Windows 上服务端与客户端在同一个安装包里，双击图标即可，任务栏会出现一个小图标看日志。macOS 上服务端是单独发布的（叫 Static OS X Server），不在客户端那个 dmg 里，得去官网单独下。这一点最容易让人以为「macOS 没有服务端」。
+
+## 服务器配置去哪改
+
+仓库里有现成的 \`auxiliary_files/mumble-server.ini\` 模板，比对着改。频道结构与权限在客户端里用 SuperUser 登录后配置。改完记得重启服务端，配置不会热加载。
+
+## 游戏内浮层（仅 Linux）
+
+想让谁在说话的提示叠在游戏画面上，用：
+
+\`\`\`
+mumble-overlay gamename
+\`\`\`
+
+它本质是 \`LD_PRELOAD\` 注入，所以只对 OpenGL 游戏有效，Vulkan 与原生 Wayland 下未必正常——这是它没跟上时代的地方。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与文档",
+          url: "https://www.mumble.info/documentation/",
+          note: "客户端使用与服务端管理的官方文档入口，频道权限那部分建议先读。",
+        },
+        {
+          kind: "link",
+          title: "Docker 镜像",
+          url: "https://github.com/mumble-voip/mumble-docker",
+          note: "官方镜像与用法说明。不想在宿主机装 Qt 依赖时走这条路最省事。",
+        },
+        {
+          kind: "link",
+          title: "服务端配置模板",
+          url: "https://github.com/mumble-voip/mumble/blob/master/auxiliary_files/mumble-server.ini",
+          note: "带注释的 ini 模板，对照着改端口、欢迎语与日志级别，比盲猜字段名快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "librephotos",
+    linksCheckedAt: "2026-10-24",
+    name: "LibrePhotos",
+    nameZh: "LibrePhotos 自建相册",
+    aliases: ["librephotos", "libre photos", "自建相册", "私有相册", "google photos 替代"],
+    summary: "自托管照片管理服务，人脸聚类、语义搜索、RAW/HEIC 都支持，照片不出版自己机器；代价是机器学习吃内存，8GB 以下跑起来会明显卡。",
+    scenes: ["photo", "tools"],
+    platforms: ["linux", "windows"],
+    source: "opensource",
+    tags: ["相册管理", "自托管", "人脸识别", "语义搜索", "Docker"],
+    body: "LibrePhotos 是一套自托管的照片与视频管理服务，定位是 Google Photos 的开源替代：扫描你已有的目录或从网页/手机上传，按天与地点组织时间线，再叠上人脸聚类、地点地图、自动标签与语义搜索（README 举的例子是「沙滩上的狗」）。它现在的形态是一个 monorepo，把原先五个仓库合并了——Django 后端、React 前端、Expo 手机端、文档站、部署配置各占一个目录。\n功能上它给得比多数同类狠：RAW / HEIC / JPEG XL 都收，视频与 Live Photo 也管；RAW+JPEG 配对算一张照片，连拍与包围曝光能堆叠，重复照片会检测；多用户、共享相册、公开链接、OpenID Connect 单点登录都有。机器学习全走 ONNX Runtime，README 特意强调不用 PyTorch，模型包括 InsightFace 做人脸、OpenCLIP 做标签与语义检索。\n代价集中在资源上。官方最低配置是 4GB 内存、2 核 CPU，但同一页也写了：人脸识别、场景分类、图像描述这些功能很吃内存，**强烈建议 8GB 以上**，否则首次索引会慢到怀疑人生。存储按照片原始体积算，另加 10GB 系统占用。\n部署方式有五种，官方推荐大多数人的是单容器（一个镜像同时提供 API 与网页），其次是 Docker Compose（可加 NVIDIA GPU 加速）；Windows 还有免 Docker 的独立版，一个文件夹里带 librephotos.exe。macOS 没有原生构建，只能走 Docker。",
+    officialUrl: "https://docs.librephotos.com",
+    officialLabel: "docs.librephotos.com",
+    links: {
+      official: "https://docs.librephotos.com",
+      github: "https://github.com/LibrePhotos/librephotos",
+    },
+    whoFor: "手里有几万张照片、想要人脸与语义搜索又不愿意传上云的人；已经有一台常开 Linux 服务器或 NAS 的人。",
+    whoNot: "内存只有 4GB 的小机器用户——跑得动但机器学习部分会拖垮体验；也不想维护一个需要长期跑后台任务的服务的轻度用户。",
+    installTips: [
+      "按官方文档选部署方式：大多数人用单容器（一个镜像同时提供 API 与网页），要 GPU 加速再用 Docker Compose。",
+      "给容器留足内存，官方最低 4GB 但机器学习的部分建议 8GB 以上，首次索引阶段尤其明显。",
+      "Windows 用户可下免 Docker 的独立版，一个文件夹里带 librephotos.exe；macOS 没有原生包，只能走 Docker。",
+      "启动后先扫描已有照片目录再开上传，索引与缩略图生成都是后台任务，别指望立刻出结果。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#0F766E",
+    },
+    guide: {
+      intro: "讲清部署怎么选、第一次索引为什么会等很久、以及手机端与 API 文档在哪找。",
+      markdown: `## 先选部署方式，别一上来就全上
+
+README 给了五种：单容器、Docker Compose、Kubernetes、Unraid、Windows 独立版。官方推荐**大多数人用单容器**——一个镜像同时提供 API 与网页，少一层反向代理就少一处配置错误。
+
+要 GPU 加速（人脸与 CLIP 推理）才上 Compose，那是另一套后端/前端/代理分离的拓扑。
+
+## 内存是最容易低估的一项
+
+规格表写最低 4GB、推荐 8GB+，同一页还有一句更关键的：人脸识别、场景分类、图像描述这些机器学习功能**很吃内存**，8GB 以上才能顺畅。实际体验里，首次全库索引就是压力测试——几千张照片也要跑一阵，几万张请安排在夜里。
+
+CPU 同理，2 核能跑，4 核以上才谈得上可用。
+
+## 照片是怎么进来的
+
+两条路：让它扫描你已有的目录（适合从旧硬盘/旧相册迁移），或者在网页端与手机 App 里直接上传。扫描不会搬动文件，索引的是路径，所以**挂载目录的路径别随便改**，改了等于让库找不到原件。
+
+建库后先去设置里触发索引，缩略图与元数据提取在后台队列里跑，中途刷新页面看到照片不全属正常。
+
+## 手机端与接口
+
+Android / iOS 有 Expo 写的 App，README 强调是 offline-first，适合在外面先攒着回家再传。启动服务后还有两份交互式接口文档：
+
+- Swagger UI：\`http://localhost:3000/api/swagger\`
+- ReDoc：\`http://localhost:3000/api/redoc\`
+
+想接自家脚本或做二次开发，从这两个地址开始比翻源码快。
+
+## 适合谁
+
+想把人脸与语义搜索握在自己手里、且愿意长期维护一台机器的人。只想「把照片存起来」的话，这套东西对你是过重的。`,
+      resources: [
+        {
+          kind: "html",
+          title: "安装文档",
+          url: "https://docs.librephotos.com/docs/installation/",
+          note: "五种部署方式的分步说明，先在这里挑一种再动手，别混着抄。",
+        },
+        {
+          kind: "html",
+          title: "单容器部署指南",
+          url: "https://docs.librephotos.com/docs/installation/unified-deployment",
+          note: "官方推荐给大多数人的方式，一个镜像搞定 API 与网页，配置项最少。",
+        },
+        {
+          kind: "link",
+          title: "源码仓库",
+          url: "https://github.com/LibrePhotos/librephotos",
+          note: "monorepo 结构与各子应用的 README 都在这里，排错时要按模块找。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "imagesharp",
+    linksCheckedAt: "2026-10-24",
+    name: "ImageSharp",
+    nameZh: "ImageSharp 图像库",
+    aliases: ["imagesharp", "sixlabors imagesharp", ".net 图像处理", "c# 图片库"],
+    summary: ".NET 的纯托管 2D 图像库，不依赖 GDI+ 所以跨平台行为一致；但 3.x 起改用 Six Labors 分拆许可，商用要买授权，闭源项目先看条款再决定。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: [".NET", "图像处理", "C#", "2D 图形", "跨平台"],
+    body: "ImageSharp 是 .NET 上全托管的高性能二维图像处理与绘图库，目标场景包括设备端、云端和嵌入式/IoT。它最大的工程价值在「全托管」三个字：不套 System.Drawing，也就不受 GDI+ 在 Linux 上的历史包袱影响，同一份代码在 Windows、Linux、macOS 上行为一致，容器里也不会因为缺字体库直接崩。\n能力覆盖面按 README 的说法是「完整」：常见格式的读写、绘制、EXIF 等元数据处理、以及给专业流程留的底层构建块。它编译目标是 .NET 8，因此不能用在更老的框架上；官方另有 Samples 仓库放可直接构建的示例，文档站有概念说明。\n真正的门槛不在技术，在许可证。项目用的是 Six Labors Split License 1.0，README 首页就把「购买商业授权」摆在赞助入口第一位。这不是可以忽略的细节：如果你在做闭源商业产品，得先确认自己的用法落在哪个档位，否则等到要发布时才发现要付费，返工成本比授权费高得多。\n另一个常见误判是把它当成图像服务：它只是库，没有 HTTP 接口、没有缩略图任务队列，要做图片服务得自己套一层。想直接跑批量压缩的话，命令行工具或 ffmpeg 更省事。",
+    officialUrl: "https://sixlabors.com/products/imagesharp",
+    officialLabel: "sixlabors.com",
+    links: {
+      official: "https://sixlabors.com/products/imagesharp",
+      github: "https://github.com/SixLabors/ImageSharp",
+    },
+    whoFor: "在 .NET 服务端做图片上传、缩略图、水印、格式转换的开发者；需要跨平台一致行为、又不愿被 libgdiplus 折腾的团队。",
+    whoNot: "闭源商用又不想付授权费的项目；以及只想「批量压图」的普通用户——它是给开发者用的库，没有现成界面。",
+    installTips: [
+      "从 NuGet 装稳定版 SixLabors.ImageSharp，开发版在 Feedz.io 的源上，正式项目别用夜间版。",
+      "目标框架按 README 是 .NET 8，老项目升级前先确认框架版本。",
+      "想先看能做什么，直接跑官方 Samples 仓库里的示例工程，比逐个翻 API 文档快。",
+      "商业用途先读 Six Labors Split License 1.0 的条款，必要时购买商业授权。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "I",
+      color: "#7C3AED",
+    },
+    guide: {
+      intro: "讲清它解决的问题、第一次接入要做哪几步、以及那道最容易被忽视的许可证门槛。",
+      markdown: `## 它解决的其实是「跨平台一致」
+
+.NET 老牌的图像处理走 System.Drawing，而它在 Linux 上依赖 libgdiplus，容器里经常缺库、缺字体、渲染结果和 Windows 不一致。ImageSharp 全托管、不碰这些原生依赖，所以同一份代码在 CI 的 Linux 容器和你本机 Windows 上跑出来是一样的——这是它真正的卖点，不是「快多少倍」。
+
+## 接入只要两步
+
+\`\`\`
+dotnet add package SixLabors.ImageSharp
+\`\`\`
+
+装包之后，项目目标框架要满足 README 写的 .NET 8。这一步最容易漏：老项目 .NET Framework 4.x 上装不上，报错信息还不太直观。
+
+## 想先看效果，去跑示例
+
+README 指向 SixLabors/Samples 仓库里的 ImageSharp 示例工程，都是可直接构建的代码，覆盖常见操作。对新手来说，读一堆 API 文档不如先跑一个示例再改。
+
+## 从源码构建的坑
+
+真要自己编（比如打补丁），README 的步骤里有几处容易踩：
+
+\`\`\`
+git clone https://github.com/SixLabors/ImageSharp
+git submodule update --init --recursive
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+\`\`\`
+
+子模块不初始化会缺依赖；Windows 上还要先 \`git config --system core.longpaths true\`，否则长路径会让 checkout 失败。仓库用了 Git LFS，没装的话拉下来的测试资源是占位文件。
+
+## 许可证这道坎
+
+这是决定「能不能用」而不是「好不好用」的问题。ImageSharp 3.x 起是 Six Labors Split License 1.0，README 首页第一项就是购买商业授权。闭源商用、SaaS 分发这些场景各有对应档位，发布前务必读完 LICENSE 全文；拿不准就问他们的销售，别靠猜。
+
+顺带一提，它只是库：没有 HTTP 服务、没有任务队列。要做图片服务，还得自己包一层。`,
+      resources: [
+        {
+          kind: "html",
+          title: "API 文档",
+          url: "https://sixlabors.github.io/docs/",
+          note: "完整 API 与概念说明，格式支持与元数据处理的具体方法都在这里查。",
+        },
+        {
+          kind: "link",
+          title: "官方示例仓库",
+          url: "https://github.com/SixLabors/Samples/tree/main/SixLabors.Samples.ImageSharp",
+          note: "可直接构建的示例工程，照着改比自己拼 API 快得多。",
+        },
+        {
+          kind: "link",
+          title: "商业授权与定价",
+          url: "https://sixlabors.com/pricing/",
+          note: "商用前必看：分拆许可的各档位差别就在这里，别等上线才发现要付费。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ffsubsync",
+    linksCheckedAt: "2026-10-24",
+    name: "ffsubsync",
+    nameZh: "ffsubsync 字幕对轴",
+    aliases: ["ffsubsync", "ffs", "subsync", "字幕同步", "字幕对轴"],
+    summary: "按语音活动自动对齐字幕时间轴，能修正整体偏移与帧率不匹配；它只动时间不动文字，字幕本身译错或内容缺失时，它一点忙也帮不上。",
+    scenes: ["tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["字幕", "视频", "ffmpeg", "命令行", "自动化"],
+    body: "ffsubsync 解决的是一个很具体的麻烦：视频与字幕来自不同片源，时间轴整体差几秒、或者因为帧率不同越放越偏。它的做法是从视频音轨里检测人声活动，再和字幕的时间点做相关性对齐，算出偏移与帧率比。README 强调它不依赖语言，中英日韩字幕都按同一套逻辑处理。\n用法有两种参考源。默认拿视频/音频当参考；也可以指定一个字幕当参考——典型场景是你有一份时间轴正确但语言看不懂的字幕，和一份翻好了但时间错位的中文字幕，这时让后者对齐前者，比对齐音轨更准。\n细节上它比很多同类考虑得多：字幕文件编码自动探测（cp1251、GBK、Big5、Shift-JIS、带 BOM 的 UTF-16 都收），输出默认 UTF-8 也可以保留原编码；支持远程 URL 作参考（http/rtmp/rtsp/ftp），长片可以用 `--max-duration-seconds` 只处理前 N 秒；片长很长又担心中段才开始漂移时，`--multi-segment-sync` 会分散采样几段而不是只看开头。中途断档（删了广告、导演剪辑版、两张碟拼一起）用 `--split-penalty` 允许时间轴分段变化，这才是这类问题的正解。\n代价是它只处理时间。字幕翻错、少了几句、硬字幕嵌在画面里，它都无能为力。批量处理时建议开 `--skip-sync-on-low-quality`：对齐结果不可信时原样保留，比生成一份错位的字幕好。",
+    officialUrl: "https://github.com/smacke/ffsubsync",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/smacke/ffsubsync",
+      github: "https://github.com/smacke/ffsubsync",
+    },
+    whoFor: "经常从不同片源拼视频与字幕、手动拖时间轴拖到烦的人；需要批量处理整季剧集、能接受命令行的人。",
+    whoNot: "想让工具顺手把字幕翻译或校对的人——它只对时间；也不想装 Python 与 ffmpeg 的纯图形界面用户（可以先试网页版）。",
+    installTips: [
+      "先装 ffmpeg 并确保命令行能直接调用，Windows 上要确认它在 PATH 里，否则脚本找不到。",
+      "用 pip install ffsubsync 安装，ffs / subsync / ffsubsync 三个名字都能当入口。",
+      "最简用法：ffs video.mp4 -i 未同步.srt -o 已同步.srt；省略 -i 时会自动找同目录同名的字幕并输出 *.synced.srt。",
+      "对齐失败按顺序试：--no-fix-framerate、--gss、把 --max-offset-seconds 调大、中段漂移用 --split-penalty。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#1D4ED8",
+    },
+    guide: {
+      intro: "从一次最普通的对轴讲到失败排查：参考源怎么选、自动探测字幕怎么用、以及结果不可信时该看哪个开关。",
+      markdown: `## 一条命令的最小用法
+
+\`\`\`
+pip install ffsubsync
+ffs video.mp4 -i 未同步.srt -o 已同步.srt
+\`\`\`
+
+前置是 ffmpeg 必须在 PATH 里，macOS 上 \`brew install ffmpeg\` 就行。它靠 ffmpeg 解码音轨做人声检测，没有 ffmpeg 会直接报错，而不是给你一个「差不多」的结果。
+
+## 懒得打 -i 的时候
+
+省略 \`-i\`，它会在参考文件所在目录找同名同前缀的字幕，例如 \`video.srt\`、\`video.en.srt\`，各自输出成 \`<名字>.synced.srt\`，**不动原文件**。已经存在的 \`.synced.srt\` 会被跳过，所以重复跑是安全的。要就地覆盖加 \`--overwrite-input\`。
+
+这个行为对整季剧集特别有用：把一集视频和它旁边的几条字幕丢进去，一条命令全对完。
+
+## 什么时候该拿字幕当参考
+
+如果你手上有一份时间轴正确的外语字幕，和一份译好但错位的中文字幕，别用视频当参考——用那份外语字幕：
+
+\`\`\`
+ffsubsync reference.srt -i 未同步.srt -o 已同步.srt
+\`\`\`
+
+程序按扩展名判断参考是音轨还是字幕。对白稀疏的片子（文艺片、纪录片）用字幕当参考通常更稳。
+
+## 对不上的排查顺序
+
+1. \`--no-fix-framerate\`：先假设帧率一致，只算偏移。
+2. \`--gss\`：用黄金分割搜索找帧率比，比默认只试几个常见比例更细。
+3. \`--max-offset-seconds\`：默认 60 秒，差得更多就调大。
+4. \`--split-penalty\`：开头对得上、中段开始漂的（删广告、加长版、两碟拼接）必须用它，全局单一偏移救不了。
+5. \`--vad=fused\`：噪声大的片源换融合 VAD，但要额外装 torch。
+
+## 批量时的安全阀
+
+\`--skip-sync-on-low-quality\` 值得默认开：当相关性得分反常或偏移大得离谱时，它原样返回、不改文件。批量跑一百集，一次坏对齐比没对齐更麻烦。`,
+      resources: [
+        {
+          kind: "html",
+          title: "浏览器版（免安装）",
+          url: "https://smacke.github.io/ffsubsync",
+          note: "文件不上传、在本地解码，先拿一集试试效果再决定要不要装命令行版。",
+        },
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://ffsubsync.readthedocs.io/en/latest/",
+          note: "高级参数与编码处理的完整说明，中段漂移那套分段对齐的原理也在这里。",
+        },
+        {
+          kind: "markdown",
+          title: "项目 README",
+          url: "https://github.com/smacke/ffsubsync#readme",
+          note: "所有开关与库调用方式的源头，排错前先扫一遍「Sync Issues」那一节。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "hacs",
+    linksCheckedAt: "2026-10-24",
+    name: "HACS",
+    nameZh: "HACS 扩展商店",
+    aliases: ["hacs", "home assistant community store", "home assistant 扩展", "家庭助手插件"],
+    summary: "Home Assistant 的第三方扩展商店，装集成、主题、卡片不用再手改 YAML 和目录；但它只管下载与更新，装完的组件出问题仍要自己看各自文档。",
+    scenes: ["tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["Home Assistant", "智能家居", "扩展管理", "自托管"],
+    body: "HACS 是 Home Assistant 的一个自定义集成，作用是把「找扩展、下载、跟踪更新」这件事搬进界面。没它的时候，装一个第三方集成意味着手动建 custom_components 目录、下载压缩包、解压、重启，遇上更新还得再来一遍；有了它，侧边栏里点几下就完成，还能看到已装组件的版本与仓库地址。\n它管三类东西：集成（integration）、前端卡片与主题、以及一些模板类资源。README 的定位很老实——「帮助你发现、下载、跟踪自定义组件」，附带仓库与 issue 的快捷入口。它自己不生产组件，是个商店兼更新器。\n门槛要说清：**必须先有一个跑起来的 Home Assistant**，HACS 是插件不是独立软件。HA 官方推荐的部署（HAOS、Supervised、Docker）本质都跑在 Linux 上，所以这里标 linux；Windows 与 macOS 只能通过虚拟机或容器间接跑，不是它的目标环境。\n第二个门槛是 GitHub 授权。HACS 用 GitHub 账号做设备授权来拉取仓库信息，没有账号或网络受限时会卡在授权那一步。\n最后一个预期管理：HACS 不保证你装的东西质量。第三方集成有的是个人维护、版本随意，升级把系统搞崩的情况不少见——装之前看一眼仓库最后提交时间，比看星标有用。",
+    officialUrl: "https://hacs.xyz",
+    officialLabel: "hacs.xyz",
+    links: {
+      official: "https://hacs.xyz",
+      github: "https://github.com/hacs/integration",
+    },
+    whoFor: "已经在跑 Home Assistant、想装第三方集成与主题但不想每次手改文件的人；维护一套家庭自动化、需要批量看更新的人。",
+    whoNot: "还没搭好 Home Assistant 的人——它是插件，没宿主装不上；也不用第三方组件的极简用户，核心功能用不上它。",
+    installTips: [
+      "它是 Home Assistant 的自定义集成，装在 HA 实例里，不是独立桌面程序；先确认你的 HA 已经跑起来。",
+      "安装步骤以 hacs.xyz 的 Configuration 文档为准，README 本身只给入口链接，别照第三方博客抄命令。",
+      "装完要在 HA 的「集成」页面添加 HACS，并完成 GitHub 设备授权，否则拉不到仓库列表。",
+      "升级 HACS 自身也走它的面板；组件出问题先去 hacs.xyz 的 FAQ，再去看该组件自己的仓库。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "H",
+      color: "#0EA5E9",
+    },
+    guide: {
+      intro: "讲清它是什么、装在哪、以及为什么「装完不等于能用」——重点在授权与第三方组件的质量判断。",
+      markdown: `## 先把关系理清
+
+HACS 不是独立软件，是 **Home Assistant 的一个自定义集成**。它做的事只有三件：让你发现第三方组件、把它们下载到 HA 里、以及跟踪更新。
+
+所以第一句话就决定了它适不适合你：**没有跑起来的 Home Assistant，装不了 HACS**。HA 官方那几种部署（HAOS、Supervised、Docker）本质都在 Linux 上，Windows / macOS 只能靠虚拟机或容器绕，这也是它只在 Linux 平台列出的原因。
+
+## 安装只有一条正路
+
+打开 hacs.xyz，进 Configuration 页面，按你当前的 HA 安装方式选对应步骤。README 里没有贴安装命令，只给了文档入口——这不是偷懒，是因为 HA 的安装形态差异太大，抄错一种就会把配置搞坏。
+
+大致顺序是：把 HACS 放进 \`custom_components\`（或用官方脚本）→ 重启 HA → 在「设置 → 设备与服务 → 添加集成」里搜 HACS → 完成 GitHub 设备授权。
+
+## 卡在授权这一步的人最多
+
+HACS 依赖 GitHub 拉取仓库元数据。授权是设备码流程：它会给你一个码，让你在浏览器里登录 GitHub 输入。网络访问不了 GitHub 的话，这一步会一直转圈，后面全废。国内环境要提前解决这个问题，而不是装完再想。
+
+## 装完之后的判断力
+
+HACS 只负责搬运，不负责质量。列表里同一个功能可能有三四个实现，挑的时候看三个信号：仓库最近提交时间、issue 里有没有人报同一个错、以及它依赖的 HA 版本区间。星标高但两年没动的项目，升级 HA 后大概率直接报错。
+
+## 更新策略
+
+HACS 会提示可更新的组件，但**不要无脑全更**。HA 大版本升级前后是最容易出事的窗口，建议先备份配置快照，再逐个更新并重启验证。一次更十几个，出问题时你连是哪个引起的都不知道。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方站点",
+          url: "https://hacs.xyz",
+          note: "安装、配置与常见问题的总入口，所有步骤以这里为准。",
+        },
+        {
+          kind: "html",
+          title: "配置文档",
+          url: "https://hacs.xyz/docs/use/configuration/basic",
+          note: "首次安装与授权流程的官方说明，装之前先对照自己的 HA 部署方式。",
+        },
+        {
+          kind: "html",
+          title: "FAQ",
+          url: "https://hacs.xyz/docs/faq",
+          note: "「装完看不到侧边栏」「授权失败」这类问题基本都在这里，先查再提问。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "masstransit",
+    linksCheckedAt: "2026-10-24",
+    name: "MassTransit",
+    nameZh: "MassTransit 消息总线",
+    aliases: ["masstransit", "mass transit", ".net 消息总线", "消息队列框架"],
+    summary: ".NET 的消息总线框架，把 RabbitMQ、Azure Service Bus、SQS、Kafka 的差异抹平，还带 saga 状态机；单体小项目引它只会多出一层概念负担。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: [".NET", "消息队列", "微服务", "RabbitMQ", "分布式"],
+    body: "MassTransit 是 .NET 上的分布式应用框架，核心是把「基于消息的异步通信」抽象成统一接口：你写消费者与消息契约，底下的传输层可以换——README 的包列表里能看到 RabbitMQ、Azure Service Bus、Amazon SQS、ActiveMQ、Kafka、Event Hubs，以及用 PostgreSQL / SQL Server 当传输的选项。\n它真正省事的地方不是发消息，而是配套的那一圈：消息重试与错误队列、saga 状态机（长流程编排）、调度（Hangfire / Quartz）、持久化（EF Core、Dapper、MongoDB、Marten、Redis、DynamoDB 等）、测试框架。这些如果自己拼，每个都是几周的活。\n代价是抽象层本身的学习成本。第一次接触会遇到一堆概念：bus、endpoint、consumer、saga、message contract、topology。README 把这些都推给文档站（masstransit-project.com），仓库里只有包清单——意味着你没法只靠 GitHub 页面学会它。\n版本上有两个要注意的点：包表里主干包标的是 .NET 8.0 / 9.0（另有 .NET Standard 2.0 与 .NET Framework 4.7.2 的兼容行），而从源码构建要求 .NET 9 SDK。老项目停在 .NET Framework 上不是不能用，但新特性基本与你无关。\n还有一个社区约定：README 明确说**不要拿 GitHub issue 提问**，问题走 Discussions，issue 只留给真 bug。照着做能少很多等待。",
+    officialUrl: "https://masstransit.io",
+    officialLabel: "masstransit.io",
+    links: {
+      official: "https://masstransit.io",
+      github: "https://github.com/MassTransit/MassTransit",
+    },
+    whoFor: "在做 .NET 微服务、要在多种消息中间件之间保持代码一致的后端团队；需要 saga 编排长流程（订单、支付、审批）的人。",
+    whoNot: "单体应用或只需要一个进程内队列的项目——本地队列或直接调库更省事；也不想先学一套消息拓扑概念的初学者。",
+    installTips: [
+      "按传输选包：主体装 MassTransit，再按中间件加 MassTransit.RabbitMQ / MassTransit.Azure.ServiceBus.Core / MassTransit.Kafka 等，别只装主体。",
+      "持久化与调度是独立包（EntityFrameworkCore、MongoDb、Hangfire、Quartz…），需要哪个装哪个，不装就没有对应能力。",
+      "从源码构建需要 .NET 9 SDK，clone 后直接 dotnet build。",
+      "提问走 GitHub Discussions，README 明确说 issue 只收真正的 bug。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#B91C1C",
+    },
+    guide: {
+      intro: "从「为什么需要它」讲到第一次落地：传输怎么选、包怎么装、以及抽象层最容易埋的坑。",
+      markdown: `## 它到底替你做了什么
+
+不用 MassTransit 也能发消息：拿 RabbitMQ 客户端直接 publish，几十行就够。问题在后面——消费失败怎么重试、几次后进死信、长流程（下单→扣库存→发货）状态存哪、多个服务怎么保证不重复消费。这些它都有现成件，这是值钱的地方。
+
+## 第一步是选传输，不是选框架
+
+README 的包表把传输列得很全：RabbitMQ、Azure Service Bus、Amazon SQS、ActiveMQ、Kafka、Event Hubs，还能直接拿 PostgreSQL / SQL Server 当传输（适合已经有数据库、不想再维护一套中间件的场景）。
+
+**这一步决定了你后面所有的运维成本**。选 RabbitMQ 就要自己保证它的可用性；选云上的 Service Bus 就锁定供应商。别因为示例都用 RabbitMQ 就跟着选。
+
+装包时注意是「主体 + 传输」两件事：
+
+\`\`\`
+dotnet add package MassTransit
+dotnet add package MassTransit.RabbitMQ
+\`\`\`
+
+只装主体是没有传输的，跑起来会直接报错。
+
+## 目标框架别踩空
+
+包表里主干包对应 .NET 8.0 / 9.0，另有 .NET Standard 2.0 与 .NET Framework 4.7.2 的兼容行。要给老项目用，先确认这条兼容线还在不在你的目标版本里。从源码构建则要求 .NET 9 SDK。
+
+## 抽象层的三个坑
+
+**概念先过一遍**：bus、endpoint、consumer、saga、contract、topology。README 不解释这些，全推给文档站——别只看 GitHub 页面就动手。
+
+**默认拓扑会替你建队列和交换机**，省事，但也意味着线上结构与代码强绑定。改消费者名字或命名规则，旧消息就可能落在没人听的队列里。
+
+**saga 不是万能**：它适合「多步、有状态、可能失败要补偿」的流程。把简单的一次性任务塞进 saga，只会得到一堆难排查的状态机。
+
+## 社区规矩
+
+README 有一句加粗提醒：**不要在 GitHub 开 issue 提问**，问题去 Discussions，issue 只留给确认的 bug。按这个来，回复速度差很多。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档站",
+          url: "https://masstransit.io",
+          note: "概念、配置与各传输的用法都在这里，README 把学习路径完全指向它。",
+        },
+        {
+          kind: "link",
+          title: "源码仓库",
+          url: "https://github.com/MassTransit/MassTransit",
+          note: "包清单与构建说明在这，遇到版本兼容问题先看这里的包表。",
+        },
+        {
+          kind: "link",
+          title: "NuGet 包页面",
+          url: "https://www.nuget.org/packages/MassTransit",
+          note: "查实际发布版本与依赖树，判断能不能装到你的目标框架上。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "learning-area",
+    linksCheckedAt: "2026-10-24",
+    name: "MDN learning-area",
+    nameZh: "MDN 学习区示例库",
+    aliases: ["learning-area", "mdn learning area", "mdn 示例代码", "前端学习示例"],
+    summary: "MDN 前端教程里所有示例代码的官方仓库，目录结构与文章模块一一对应；它本身不是课程，脱离 MDN 正文单看代码会缺上下文。",
+    scenes: ["education", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["前端", "学习资料", "示例代码", "HTML", "MDN"],
+    body: "这是 MDN Learning Area（developer.mozilla.org 的学习区）配套的代码仓库。README 只有几句，但把定位说清楚了：文章里讲到、展示的示例代码基本都能在这里找到，**仓库的目录结构就是文章的模块结构**。所以它的正确用法是「读文章 → 找到对应目录 → 改代码验证」，而不是当成一套独立教程从头刷。\n唯一被拆出去的是服务端编程那一块，原因写得很实在：为了好管理，拆成了 express-locallibrary-tutorial 与 django-locallibrary-tutorial 两个独立仓库。找 Node 与 Django 的示例时别在这个库里翻，翻不到。\n它的价值在于「可直接运行」。示例是 HTML/CSS/JS 的静态文件为主，多数目录双击 index.html 就能在浏览器里看效果，不需要构建工具、不需要装依赖——对刚学前端的人来说，这一点比任何脚手架都友好。\n局限也要讲：仓库不含讲解，注释也少，单纯 clone 下来当教材会一头雾水；另外 MDN 文章本身在持续修订，示例偶尔会与正文有小幅错位，遇到对不上时以文章为准，并可以去仓库提 issue。",
+    officialUrl: "https://developer.mozilla.org/en-US/Learn",
+    officialLabel: "developer.mozilla.org",
+    links: {
+      official: "https://developer.mozilla.org/en-US/Learn",
+      github: "https://github.com/mdn/learning-area",
+    },
+    whoFor: "跟着 MDN 学习区学前端、想边看边改代码的人；做教学或写教程、需要一批可直接运行的示例的人。",
+    whoNot: "想要一套有讲解、有练习、有进度安排的系统课程的人——这里只有代码；也不想读英文文档的初学者。",
+    installTips: [
+      "直接 git clone 或用网页下载 zip，不需要 npm install，多数示例是纯静态文件。",
+      "按 MDN 文章的模块名去找目录，目录结构与学习区的章节对应。",
+      "服务端的示例不在这个仓库：Node 版在 mdn/express-locallibrary-tutorial，Django 版在 mdn/django-locallibrary-tutorial。",
+      "示例以浏览器直接打开为主，少数需要本地服务器的场景用任意静态服务器起一个目录即可。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "L",
+      color: "#2563EB",
+    },
+    guide: {
+      intro: "讲清这仓库该怎么用：目录怎么对文章、哪些内容不在这里、以及为什么它不适合当独立教材。",
+      markdown: `## 它不是课程，是课件
+
+最容易犯的错是把它当教材：clone 下来打开一堆目录，不知道从哪开始。README 第一句就交代了——这里是 MDN Learning Area 文章里讲到与展示的示例代码，**目录结构对应文章的模块结构**。
+
+所以顺序是反的：先去 developer.mozilla.org 的学习区读文章，读到示例时再回仓库找对应目录。
+
+## 怎么拿下来
+
+\`\`\`
+git clone https://github.com/mdn/learning-area
+\`\`\`
+
+不用装依赖，也不用构建。绝大部分示例是 HTML / CSS / JS 静态文件，直接双击打开就能看效果——对刚学前端的人，这比配一套构建工具友好太多。
+
+## 有两块内容不在这里
+
+README 明确写了例外：**服务端网站编程**那部分被拆成了两个独立仓库，为了好管理：
+
+- Node/Express 版：mdn/express-locallibrary-tutorial
+- Django 版：mdn/django-locallibrary-tutorial
+
+在 learning-area 里翻服务端示例是翻不到的，别浪费时间。
+
+## 第一次改代码的建议
+
+挑一个最简单的 HTML 示例，改三处再刷新：改一段文字、改一个 CSS 颜色、在 script 里加一行 console.log。目的是确认「改文件 → 浏览器刷新 → 看到变化」这条链路通了，再去看复杂示例。
+
+需要请求本地文件的示例（fetch、模块导入这类）直接双击打开会被浏览器拦，这时起一个静态服务器即可：
+
+\`\`\`
+python3 -m http.server 8000
+\`\`\`
+
+然后在浏览器打开 localhost:8000 进对应目录。
+
+## 版本错位怎么办
+
+MDN 文章在持续修订，示例偶尔和正文对不上。遇到这种情况以文章为准；如果确实是示例坏了，去仓库开 issue，维护者会处理。别把「示例跑不通」当成自己学错了。`,
+      resources: [
+        {
+          kind: "html",
+          title: "MDN 学习区",
+          url: "https://developer.mozilla.org/en-US/Learn",
+          note: "所有配套文章的入口，先在这里读正文，再来仓库找代码。",
+        },
+        {
+          kind: "link",
+          title: "Express 版服务端示例",
+          url: "https://github.com/mdn/express-locallibrary-tutorial",
+          note: "服务端章节拆出去的 Node 仓库，找 Express 示例直奔这里。",
+        },
+        {
+          kind: "link",
+          title: "Django 版服务端示例",
+          url: "https://github.com/mdn/django-locallibrary-tutorial",
+          note: "同一章的 Python 版本，两个仓库结构对应，可对照着看同一功能的两套实现。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "parabolic",
+    linksCheckedAt: "2026-10-24",
+    name: "Parabolic",
+    nameZh: "Parabolic 视频下载",
+    aliases: ["parabolic", "tube converter", "yt-dlp gui", "视频下载", "bilibili 下载"],
+    summary: "yt-dlp 的图形前端，粘贴链接选格式就能下 mp4 或 mp3，支持批量并发；解析失败时它帮不上忙，最后还是得去 yt-dlp 那边看原因。",
+    scenes: ["tools", "music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["视频下载", "音频下载", "yt-dlp", "GTK", "批量下载"],
+    body: "Parabolic 是 yt-dlp 的图形前端，README 的第一行就自报家门「a powerful yt-dlp frontend」。它的价值是把命令行那套参数收进界面：粘贴链接、选容器与编码、选保存位置，剩下的交给 yt-dlp。支持的站点数量等于 yt-dlp 的支持列表——几百个。\n功能上比较实用的是这几点：格式覆盖 mp4、webm、mp3、opus、flac、wav；可以同时跑多个下载；能顺带把元数据与字幕一起下下来。界面有两套原生实现——Linux 上是 GTK4 + libadwaita 的 GNOME 版，Windows 上是 WinUI 版，macOS 从 Releases 拿包。另外还提供 Firefox 与 Chrome 的浏览器扩展，用来把当前页面的链接直接甩给桌面端。\n边界必须说清：它不解析网页，也不绕过任何限制，解析全靠 yt-dlp。所以遇到「视频下不下来」，真正的错误信息在 yt-dlp 里，Parabolic 只能把它显示给你——不会替你修。yt-dlp 更新频繁，站点改版后旧版本失效是常态，这时要等 Parabolic 换新版内置的 yt-dlp 或自己替换。\n法务上 README 有一条醒目的提示：YouTube 等站点的视频可能受 DMCA 保护，作者不对违规使用负责。下自己买的课程、自己上传的内容没问题；搬运他人版权内容的风险由使用者承担。",
+    officialUrl: "https://flathub.org/apps/details/org.nickvision.tubeconverter",
+    officialLabel: "flathub.org",
+    links: {
+      official: "https://flathub.org/apps/details/org.nickvision.tubeconverter",
+      github: "https://github.com/NickvisionApps/Parabolic",
+    },
+    whoFor: "偶尔要存几个视频或把音频抽出来、但不想背 yt-dlp 参数的人；需要在 Windows 与 Linux 上用同一套操作的人。",
+    whoNot: "要写脚本批量跑几千个链接的人——直接调 yt-dlp 更可控；也不能指望它绕过会员或地区限制。",
+    installTips: [
+      "Linux 用 Flathub 安装（org.nickvision.tubeconverter），这是官方推荐路径，依赖打包在沙箱里。",
+      "Windows 与 macOS 从 GitHub Releases 下载对应安装包，没有商店版。",
+      "想要「右键把链接发给桌面端」，再装它的 Firefox 或 Chrome 扩展。",
+      "下载失败先怀疑 yt-dlp 版本落后：站点改版后旧解析器会失效，等应用更新或换新版。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#9333EA",
+    },
+    guide: {
+      intro: "从装到用讲一遍，重点在「它只是外壳」这件事——出问题时该去哪找答案。",
+      markdown: `## 它的定位一句话
+
+Parabolic 不解析网页。所有下载由 **yt-dlp** 完成，它做的是给 yt-dlp 套一层界面：拼参数、显示进度、管队列。理解这点，后面很多困惑就没了。
+
+## 安装按平台走
+
+- **Linux**：Flathub 上的 \`org.nickvision.tubeconverter\`，官方推荐路径，GTK4 + libadwaita 原生界面。
+- **Windows**：GitHub Releases 下 WinUI 版安装包。
+- **macOS**：同样在 Releases 里，没有单独商店。
+
+它在 Windows 上还有 Chrome / Firefox 扩展，装完可以在网页右键把链接直接丢给桌面端，省去复制粘贴。
+
+## 格式怎么选
+
+界面里能选 mp4、webm、mp3、opus、flac、wav。两个经验：
+
+**要兼容性就 mp4 + aac**，剪辑软件和电视都认。**要音质就 opus 或 flac**，但注意很多播放器对 opus 支持一般。选「仅音频」时它下的是音频流，不是从视频里再抽一遍，速度快很多。
+
+顺带勾上元数据与字幕——不然下完是一堆没有标题、没有封面的裸文件，后期整理很痛苦。
+
+## 并发别开太猛
+
+它能同时跑多个任务。但同一个站点并行太多请求很容易触发限流，表现为部分任务失败或只下到一半。稳妥做法是同时 2–3 个，剩下的排队。
+
+## 下不来的时候
+
+先看错误信息里有没有提到解析器或版本。常见原因就两类：
+
+1. **站点改版**，旧版 yt-dlp 解析器失效——等 Parabolic 更新，或自己换掉它内置的 yt-dlp。
+2. **需要登录或地区限制**——Parabolic 不会也不该绕过这类限制，这类链接它本来就不该成功。
+
+## 版权这条线
+
+README 有醒目提示：YouTube 等平台的视频可能受 DMCA 保护，作者不背书也不承担违规使用的责任。下自己的内容、公开授权的内容没问题；批量搬运他人作品的风险由你自己担。`,
+      resources: [
+        {
+          kind: "html",
+          title: "Flathub 安装页",
+          url: "https://flathub.org/apps/details/org.nickvision.tubeconverter",
+          note: "Linux 官方推荐安装方式，也是项目主页指向的地址。",
+        },
+        {
+          kind: "link",
+          title: "GitHub Releases",
+          url: "https://github.com/NickvisionApps/Parabolic/releases",
+          note: "Windows 与 macOS 的安装包都在这里，查版本更新也看这页。",
+        },
+        {
+          kind: "markdown",
+          title: "yt-dlp 支持站点列表",
+          url: "https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md",
+          note: "Parabolic 能下什么完全取决于这张表，找不到目标站点时先来这确认。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "miniaudio",
+    linksCheckedAt: "2026-10-24",
+    name: "miniaudio",
+    nameZh: "miniaudio 音频库",
+    aliases: ["miniaudio", "mini audio", "单文件音频库", "c 音频库"],
+    summary: "单文件 C 音频库，播放、采集、解码、重采样都在一个 .c 里，塞进项目就能用；要的是成熟音频中间件那套总线与插件宿主，它给不了。",
+    scenes: ["code", "music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音频", "C 语言", "单文件库", "解码", "跨平台"],
+    body: "miniaudio 是一个单文件 C 音频库：把 miniaudio.c 编进你的程序、include 它的头文件，就同时拿到了播放、录音、解码、重采样、声道映射、波形生成与基础效果器。README 的说法是除标准库外零依赖，主流编译器上应该能直接编过，不用装任何开发包。\n它的 API 分两层。高层是 ma_engine：初始化引擎、播一个音效、调音量，几行就够；低层是 ma_device 加回调，你自己往缓冲区写 PCM 数据。需要更复杂的混音时还有节点图系统。解码内置 WAV、FLAC、MP3，其他格式可以自己接解码器；编码只支持 WAV。\n跨平台是它真正的卖点。后端适配了一长串：Windows 的 WASAPI / DirectSound / WinMM，Apple 的 Core Audio，Linux 的 ALSA / PulseAudio / JACK，BSD 的 sndio / OSS，Android 的 AAudio 与 OpenSL|ES，以及 Emscripten 的 Web Audio。README 说不在列表里的平台也能编，只是不带播放后端，此时可以自己实现自定义后端而不必改库源码。\n代价有两个。一是**集成方式**：README 明确说版本之间不保证 ABI 兼容，建议把源码直接放进你的工程树，而不是编成 DLL/SO 共享。二是范围——它是音频引擎的地基，不是成品中间件，没有现成的总线路由、插件宿主、3D 场景管理（虽然有可选的空间化）。要这些得往上自己搭。",
+    officialUrl: "https://miniaud.io",
+    officialLabel: "miniaud.io",
+    links: {
+      official: "https://miniaud.io",
+      github: "https://github.com/mackron/miniaudio",
+    },
+    whoFor: "写 C/C++ 小工具、游戏或嵌入式程序，只需要「能出声、能录音」而不想引入大依赖的人；给自制引擎找音频层的开发者。",
+    whoNot: "需要成熟音频中间件（复杂总线、插件格式、专业 DAW 级处理）的项目；也不想碰 C 与手动内存管理的应用开发者。",
+    installTips: [
+      "把 miniaudio.c 与 miniaudio.h 直接加进源码树一起编译，不要把库编成 DLL/SO——README 明确说版本间不保证 ABI 兼容。",
+      "Linux 与 BSD 上额外链接 -lpthread 与 -lm；出现 __atomic_* 未定义引用时再加 -latomic。",
+      "Windows 与 macOS 不需要链接任何额外库；iOS 上要按 Objective-C 编译。",
+      "想先听个响，照 README 里 ma_engine 那个例子写十行 main 就行，比从低层 device 回调入手快。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#0D9488",
+    },
+    guide: {
+      intro: "讲清两种 API 该选哪个、怎么把它塞进工程、以及跨平台链接时最容易卡住的地方。",
+      markdown: `## 先选 API 层级
+
+README 给了同一个功能的两套写法，选错会走很多弯路。
+
+**高层 ma_engine**：初始化引擎、加载音效、播放、调音量，适合「我要放背景音乐和音效」的游戏或工具。README 的第一个例子就是十行左右的 \`ma_engine_init\` + \`ma_engine_play_sound\`。
+
+**低层 ma_device**：注册一个回调，自己往输出缓冲区写 PCM。适合要接自定义解码器、做实时处理、或者需要精确控制缓冲的场景。第二个例子用 \`ma_decoder\` 读文件、在回调里 \`ma_decoder_read_pcm_frames\`。
+
+新手建议从高层起步，需要控制力时再下沉。
+
+## 集成方式：抄进源码树
+
+这是它和别人最不一样的地方——**不要编成动态库**。README 说得很直接：版本之间不保证 ABI 兼容，推荐做法是把源码直接加进工程。
+
+\`\`\`
+your_app/
+  main.c
+  miniaudio.c
+  miniaudio.h
+\`\`\`
+
+编译时把 \`miniaudio.c\` 当成普通源文件，头文件正常 include。有些项目会写一个 \`MINIAUDIO_IMPLEMENTATION\` 的宏来单文件集成，但官方推荐的是「编译 miniaudio.c」这条路，别混着抄网上两种写法。
+
+## 链接这一步
+
+- Windows / macOS：不用链任何东西。
+- Linux / BSD：\`-lpthread -lm\`。
+- 报 \`__atomic_load_8\` 之类未定义引用：补 \`-latomic\`。
+- iOS：按 Objective-C 编译。
+
+\`\`\`
+cc main.c miniaudio.c -lpthread -lm -o player
+\`\`\`
+
+## 文档在哪
+
+权威文档不在官网，而在 \`miniaudio.h\` 顶部的注释里；miniaud.io 上的文档就是从那里生成的。查参数直接看头文件，最不容易过时。`,
+      resources: [
+        {
+          kind: "html",
+          title: "编程手册",
+          url: "https://miniaud.io/docs/manual/",
+          note: "功能全貌与各模块说明，先扫一遍能确认它覆盖到你的需求没有。",
+        },
+        {
+          kind: "html",
+          title: "示例集",
+          url: "https://miniaud.io/docs/examples/",
+          note: "官方示例的在线版，播放、采集、解码、自定义后端各有一份。",
+        },
+        {
+          kind: "link",
+          title: "源码与头文件",
+          url: "https://github.com/mackron/miniaudio",
+          note: "权威文档在 miniaudio.h 的头部注释里，比任何二手教程都准。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "final2x",
+    linksCheckedAt: "2026-10-24",
+    name: "Final2x",
+    nameZh: "Final2x 图片超分",
+    aliases: ["final2x", "final 2x", "图片放大", "超分辨率", "ai 画质修复"],
+    summary: "跨平台图片超分工具，内置模型也能加载自训模型，适合把老图、截图、二刺螈素材放大；Linux 上它只是壳，后端要自己装 Python 3.10+ 与 PyTorch。",
+    scenes: ["photo"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["超分辨率", "图片放大", "AI 修复", "Electron", "PyTorch"],
+    body: "Final2x 是一个跨平台的图像超分辨率工具，桌面端用 Electron + Vue 3 写界面，真正干活的是 Python 侧的 core 包（基于同门的 cccv 做图像修复与超分）。使用时选图、选模型、选放大倍数，输出就是放大后的图。\n它的优点是模型可换：内置几个常用模型，也支持加载自己的模型，README 里给了自定义模型的示例仓库。对经常处理同一类素材的人（二次元插画、扫描件、老照片），换模型比调参有用得多。\n三个平台的安装体验差别很大，这点必须提前知道。Windows 下从 Releases 装或用 winget / Scoop（README 提示包管理器版本可能落后）；macOS 放好应用后如果被拦，要在终端跑 `xattr -cr /Applications/Final2x.app`；**Linux 只提供壳**，得自己装 Python 3.10+ 与 PyTorch 2.0+，再 `pip install Final2x-core` 装后端，另外补 `libomp5` 与 `xdg-utils` 两个系统库。\n代价算力。超分是重活，CPU 跑一张 4K 图能等很久，有独立显卡才谈得上顺手；显存不够时大图会直接失败。另外这类模型的输出是「猜」出来的细节，人脸与文字放大后可能长出并不存在的东西，需要精确还原的场合（证件、档案）别用它替代人工。",
+    officialUrl: "https://github.com/EutropicAI/Final2x",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/EutropicAI/Final2x",
+      github: "https://github.com/EutropicAI/Final2x",
+    },
+    whoFor: "要把老照片、游戏截图、插画素材放大的普通用户；愿意自己换模型、批量处理同一类图片的人。",
+    whoNot: "只有 CPU、还想批量跑大图的人——等不起；也不能用在需要像素级真实还原的场景（证件、档案、医学图像）。",
+    installTips: [
+      "Windows 从 Releases 安装，或用 winget / Scoop；包管理器版本可能落后于最新发布。",
+      "macOS 若首次启动被系统拦下，在终端执行 xattr -cr /Applications/Final2x.app 解除隔离标记。",
+      "Linux 要先装 Python 3.10+ 与 PyTorch 2.0+，再 pip install Final2x-core，并用 Final2x-core -h 验证后端可用。",
+      "Debian / Ubuntu 上还需 sudo apt install -y libomp5 xdg-utils，缺了会在启动或打开文件时出错。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "F",
+      color: "#DB2777",
+    },
+    guide: {
+      intro: "按平台讲安装差异（Linux 最麻烦）、模型怎么选、以及什么样的图不该用它放大。",
+      markdown: `## 它其实是两层
+
+界面是 Electron + Vue 3，干活的是 Python 后端（Final2x-core，基于 cccv）。这决定了三平台的安装体验完全不同：
+
+- **Windows**：一个安装包装完就能用，模型随包分发。
+- **macOS**：应用拖进 /Applications，首次启动会被系统拦，这是签名问题，不是损坏。
+- **Linux**：**只有界面**，后端得自己装。
+
+## Linux 装不上的典型过程
+
+\`\`\`
+pip install Final2x-core
+Final2x-core -h        # 能打印帮助才算装好
+sudo apt install -y libomp5 xdg-utils
+\`\`\`
+
+前置是 **Python 3.10 以上**和 **PyTorch 2.0 以上**。这三条里最容易漏的是系统库：\`libomp5\` 缺了模型加载会报 OpenMP 相关错误，\`xdg-utils\` 缺了「打开输出目录」这类按钮会失灵。
+
+macOS 上被拦时执行：
+
+\`\`\`
+xattr -cr /Applications/Final2x.app
+\`\`\`
+
+## 模型怎么挑
+
+内置模型各有偏科：有的擅长照片、有的擅长动漫线条、有的保守不出错但放大感弱。同一张图换模型对比输出，是选模型的唯一可靠办法——README 也把「用内置模型或加载自己的」列为主要特性，并给了自定义模型的示例仓库。
+
+处理同一批素材时，先在一张图上试完再批量，别拿一百张跑完才发现模型不对。
+
+## 放大量与显存
+
+放大倍数越大越吃显存。4K 输入直接 4 倍放大，中端显卡很容易爆显存然后失败。稳妥做法是分块处理或先裁切，跑完再拼。
+
+## 什么图不该交给它
+
+超分模型是在「猜」缺失的细节。人脸、文字、票据上的数字，放大后可能生成并不存在的笔画——看起来更清楚，但内容变了。证件、档案、医学影像这类要求忠实还原的场景，别用它替代人工核对。`,
+      resources: [
+        {
+          kind: "link",
+          title: "GitHub Releases",
+          url: "https://github.com/EutropicAI/Final2x/releases",
+          note: "三平台安装包都在这里，也是查版本更新的地方。",
+        },
+        {
+          kind: "link",
+          title: "自定义模型示例",
+          url: "https://github.com/EutropicAI/cccv_demo_remote_model",
+          note: "想换自训模型时从这份示例入手，比自己试模型格式快。",
+        },
+        {
+          kind: "link",
+          title: "后端核心 cccv",
+          url: "https://github.com/EutropicAI/cccv",
+          note: "超分与修复的实际实现，排查模型加载失败时要看它的依赖要求。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "mediabunny",
+    linksCheckedAt: "2026-10-24",
+    name: "Mediabunny",
+    nameZh: "Mediabunny 媒体库",
+    aliases: ["mediabunny", "js 音视频库", "浏览器 ffmpeg 替代", "webcodecs 封装"],
+    summary: "纯 TypeScript 的浏览器音视频工具库，读写 MP4/WebM/MP3、转封装转码都能在前端做完；它依赖 WebCodecs，老浏览器与部分内核直接不可用。",
+    scenes: ["code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音视频", "TypeScript", "WebCodecs", "浏览器", "转码"],
+    body: "Mediabunny 是一个从零用纯 TypeScript 写的媒体工具库，目标是把「读写与转换音视频文件」这件事搬进浏览器。README 自己的比喻是「有点像 FFmpeg，但从一开始就是为 Web 设计的」——它没有 WASM 桥接，也不依赖任何第三方包。\n覆盖面按 README：读写 MP4、MOV、WebM、MKV、HLS、WAVE、MP3、Ogg、ADTS、FLAC、MPEG-TS；编解码支持 25 种以上，靠 WebCodecs 走硬件加速；读写精度到微秒；Conversion API 提供转封装、转码、缩放、旋转、裁剪、重采样、剪辑；流式 I/O 让任意大小的文件都不必整个读进内存。打包后最小 5 kB（gzip），可摇树，只带你用的部分。\n工程上有两个隐藏前提。一是**运行环境**：浏览器要支持 WebCodecs，这直接排除了旧版 Safari 与不少内置内核（部分国产浏览器的壳）；Node/Bun/Deno 里要用 `@mediabunny/server` 这个包，不是同一份 import。二是**语言版本**：需要 ECMAScript 2021 以上，类型定义要 TypeScript 5.7 以上。\n许可证是 MPL-2.0，比 MIT 多一条义务：你改了它的源码并分发（比如 fork 后发布），改动部分要以 MPL-2.0 公开。只是调用它做闭源产品没有问题，这点 README 写得很明白。",
+    officialUrl: "https://mediabunny.dev",
+    officialLabel: "mediabunny.dev",
+    links: {
+      official: "https://mediabunny.dev",
+      github: "https://github.com/Vanilagy/mediabunny",
+    },
+    whoFor: "做在线剪辑、录屏上传、格式转换这类 Web 应用的前端团队；需要在前端读元数据、抽帧、转封装而不想上传到服务器的场景。",
+    whoNot: "要支持老旧浏览器或微信内置浏览器、无法依赖 WebCodecs 的项目；以及需要 FFmpeg 全套滤镜与冷门编码的人。",
+    installTips: [
+      "npm install mediabunny 即可；也可以直接用构建产物以 script 标签引入，会暴露全局 Mediabunny 对象。",
+      "运行环境要求 ECMAScript 2021 以上，类型定义需要 TypeScript 5.7+。",
+      "服务端（Node / Bun / Deno）要另装 @mediabunny/server，浏览器那份包在服务端跑不通。",
+      "播放与编解码依赖 WebCodecs，上线前先检测目标浏览器是否支持，否则要准备降级方案。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#EA580C",
+    },
+    guide: {
+      intro: "讲清它能在前端做哪些事、三行代码读元数据、以及 WebCodecs 这个硬前提会把谁挡在门外。",
+      markdown: `## 它替代的是「上传到服务器再转」
+
+传统做法是前端上传、后端跑 ffmpeg、再下载回来。Mediabunny 让读取、转封装、裁剪、转码都在浏览器完成，文件不出本机——既省服务器带宽，也省隐私上的顾虑。
+
+## 最小可用：读元数据
+
+\`\`\`js
+import { Input, ALL_FORMATS, BlobSource } from 'mediabunny';
+
+const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+const duration = await input.computeDuration();   // 秒
+const video = await input.getPrimaryVideoTrack();
+const width = await video.getDisplayWidth();
+\`\`\`
+
+这一步不碰编解码，纯解析容器，所以在不支持的浏览器里也能跑——适合做上传前校验（时长、分辨率、编码格式）。真正吃 **WebCodecs** 的是转码环节：Chrome / Edge 早已支持，Safari 与一些内置内核的浏览器要看版本，上线前务必做能力检测。
+
+## 转封装与转码
+
+\`\`\`js
+const conversion = await Conversion.init({ input, output });
+await conversion.execute();
+\`\`\`
+
+转封装（换容器不重编码）很快，几乎等于复制；转码才吃 CPU/GPU，时间长还可能掉帧。**先想清楚是不是真要转码**，很多「格式不对」换个容器就解决了。
+
+## 服务端怎么用
+
+浏览器那份包在 Node 里跑不了，要装 \`@mediabunny/server\`。README 特意分开说明，很多人却以为一个包能前后端通用。
+
+## 许可证那句要注意的
+
+MPL-2.0 是弱 copyleft：调用它做闭源产品没问题，但**改了源码再分发**，改动部分必须公开。打算 fork 改完再发布，先跟法务确认。
+
+## 体积
+
+打包最小 5 kB 的前提是只 import 用到的部分；全量引入会大很多，别在入口整包引入。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://mediabunny.dev/guide/introduction",
+          note: "概念、API 与各容器的支持矩阵都在这，选型前先看 features 一节。",
+        },
+        {
+          kind: "html",
+          title: "示例集",
+          url: "https://mediabunny.dev/examples",
+          note: "可交互的在线示例，读元数据、转码、剪辑各有对应代码。",
+        },
+        {
+          kind: "link",
+          title: "npm 包",
+          url: "https://www.npmjs.com/package/mediabunny",
+          note: "查最新版本与下载量，判断项目活跃度与兼容性再决定是否采用。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "wickedengine",
+    linksCheckedAt: "2026-10-24",
+    name: "Wicked Engine",
+    nameZh: "Wicked Engine 3D 引擎",
+    aliases: ["wicked engine", "wickedengine", "3d 引擎", "c++ 游戏引擎", "自研渲染引擎"],
+    summary: "自带编辑器与 Lua 脚本的 C++ 3D 引擎，Windows 走 DX12、Linux 走 Vulkan，适合自己写渲染或做原型；上手门槛是 C++ 与图形 API，不是拖拽拼装。",
+    scenes: ["games"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["游戏引擎", "3D", "C++", "渲染", "Lua"],
+    body: "Wicked Engine 是一个开源 3D 引擎，README 给的用法有三种：当成 C++ 图形框架、当成独立的 3D 编辑器、或者纯粹拿来学渲染。它支持 Windows、Linux、macOS、iOS，以及 Xbox Series X|S 与 PS5——后两者的构建扩展文件目前是私有的，公开仓库里没有。\n渲染后端按平台分：Windows 默认 DirectX 12，Linux 用 Vulkan，Apple 系走 Metal。命令行可以切设备（加 `vulkan` 参数在 Windows 上用 Vulkan，`debugdevice` 开调试层，`igpu` / `nvidiagpu` 这类参数指定显卡偏好）。模型格式是自家的 WISCENE，编辑器还能导入 OBJ、FBX、glTF/GLB、VRM/VRMA、PLY 并转存。\n脚本是它的另一条腿：Lua 覆盖引擎大部分功能，编辑器里按 Home 键就能敲命令，或者放一个 startup.lua 在程序旁边自动执行。想快速验证玩法，不用重编译 C++。\n代价要说白。它不像 Unity 那样有资源商店与完整工作流，编辑器手册是一份 PDF，脚本 API 是一份 Markdown；遇到问题基本靠自己读源码。构建上也分三套：Windows 用 Visual Studio 打开 sln 按 F5，Linux 用 CMake（要装 SDL2 与 build-essential），macOS/iOS 用各自的 xcodeproj。跑起来还有个小坑：从 Visual Studio 编出来的 exe 如果把工作目录设在 build 目录，会找不到资源，得按 README 的排错一节处理。",
+    officialUrl: "https://wickedengine.net",
+    officialLabel: "wickedengine.net",
+    links: {
+      official: "https://wickedengine.net",
+      github: "https://github.com/turanszkij/WickedEngine",
+    },
+    whoFor: "想读一份完整现代渲染器实现的人；要做小团队原型、愿意用 C++ 自己搭上层系统的开发者。",
+    whoNot: "想要可视化拖拽、现成组件与资源商店的团队——它的编辑器更像场景预览与调参工具；也不想碰 C++ 构建链的人。",
+    installTips: [
+      "Windows：用最新 Visual Studio 打开 WickedEngine.sln，按 F5 会同时构建引擎与 Editor；也可以用 cmake -B build 后 cmake --build build --config Release。",
+      "Linux：先装 sudo apt install libsdl2-dev build-essential，再 mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && make。",
+      "macOS / iOS 用仓库里提供的 xcodeproj（WickedEngine、Editor、Samples/Template_*），不要拿 CMake 硬套。",
+      "跑起来找不到资源时，按 README 排错一节处理：把 exe 放回对应的工程目录，或把工作目录设成工程目录。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "W",
+      color: "#4B5563",
+    },
+    guide: {
+      intro: "讲三件事：三平台各自怎么编、编辑器与 Lua 脚本怎么配合、以及为什么「能跑起来但看不到模型」。",
+      markdown: `## 构建是三套体系，别互相套
+
+**Windows**：\`WickedEngine.sln\` 用最新版 Visual Studio 打开，F5 会一起构建引擎、示例与 Editor。要用在自己的 C++ 工程里，就构建 WickedEngine_Windows 静态库再链接，头文件包含 \`WickedEngine.h\`。
+
+**Linux**：用 CMake。
+
+\`\`\`
+sudo apt install libsdl2-dev build-essential
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+\`\`\`
+
+**macOS / iOS**：用仓库里的 xcodeproj（引擎静态库、Editor、Template_MacOS、Template_iOS 各一份），Apple 平台上别用 CMake。Xbox 与 PS5 的构建扩展文件是私有的，公开仓库拿不到。
+
+## 跑起来却没有模型，先看工作目录
+
+README 排错一节专门写了这条：Visual Studio 编出来的 exe 如果直接双击或在 build 目录下运行，相对路径找不到 \`Content/\`，场景是空的。两种解法：从 Visual Studio 里启动（它把工作目录设成工程目录），或把 exe 复制到工程目录再运行。
+
+## 图形后端与参数
+
+默认后端：Windows 用 DX12，Linux 用 Vulkan，Apple 用 Metal。启动参数不加前缀：\`vulkan\`（在 Windows 上改用 Vulkan）、\`debugdevice\`（开调试层，掉性能但图形报错会写进输出窗口）、\`igpu\` / \`nvidiagpu\` 这类显卡偏好。调渲染时先开 \`debugdevice\`，很多问题调试层里直接就有名字。
+
+## 脚本这条快速通道
+
+编辑器里按 **Home** 打开命令行直接敲 Lua；或在程序旁放一个 \`startup.lua\`，启动时自动执行。\`getprops(application)\`、\`getprops(scene)\` 能把方法全列出来——不知道 API 叫什么时比翻文档快。模型格式是自家的 WISCENE，编辑器可导入 OBJ / FBX / glTF / VRM / PLY 再转存。`,
+      resources: [
+        {
+          kind: "pdf",
+          title: "编辑器手册",
+          url: "https://github.com/turanszkij/WickedEngine/blob/master/Content/Documentation/WickedEditor-Manual.pdf",
+          note: "编辑器各面板与工作流的官方说明，第一次打开 Editor 前值得过一遍。",
+        },
+        {
+          kind: "markdown",
+          title: "C++ 文档",
+          url: "https://github.com/turanszkij/WickedEngine/blob/master/Content/Documentation/WickedEngine-Documentation.md",
+          note: "引擎对象模型与主要子系统说明，接自己的 C++ 工程时对着看。",
+        },
+        {
+          kind: "markdown",
+          title: "Lua 脚本 API",
+          url: "https://github.com/turanszkij/WickedEngine/blob/master/Content/Documentation/ScriptingAPI-Documentation.md",
+          note: "脚本能调用的全部接口，配合编辑器里 getprops 使用效率最高。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "spotify-player",
+    linksCheckedAt: "2026-10-24",
+    name: "spotify-player",
+    nameZh: "终端 Spotify 播放器",
+    aliases: ["spotify-player", "spotify player", "终端音乐播放器", "spotify tui", "ncspot 替代"],
+    summary: "跑在终端里的 Spotify 播放器，功能对齐官方客户端，还能遥控其他 Spotify Connect 设备；硬门槛是必须 Premium，默认共用 ncspot 的 client ID 容易被限流。",
+    scenes: ["music"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音乐播放", "终端", "Spotify", "Rust", "命令行"],
+    body: "spotify_player 是用 Rust 写的终端音乐播放器。README 的第一句是「fast, easy to use, and configurable」，它敢说 feature parity with the official Spotify application——播放控制、搜索、播放列表、同步歌词、桌面通知、跨平台媒体控制键、图片渲染（终端里显示封面）、音频可视化都在。\n两个能力值得单独说。一是 **Spotify Connect**：按 D 列出设备，回车把播放切到音箱或手机，等于用终端当遥控器。二是**内置流式播放**：它通过 librespot 把自己注册成一个 Spotify 设备，音频直接从终端出。这两件事不是所有终端播放器都能做。\n门槛集中在前置条件上。**必须 Spotify Premium**，README 用加粗写的。首次启动会连续弹两次浏览器授权——一次拿 Web API token，一次拿 librespot 的流媒体凭据，因为它们用的是两个不同的 client ID。这是每台机器一次性的步骤，之后凭据缓存在本地。\n另一个坑是配额：默认用 ncspot 的 client ID，那个 ID 被大量用户共用，容易被限流成 429。README 强烈建议自己注册一个 Spotify 应用、配好 client_id，把日常请求算到自己名下；需要用 2024 年 11 月后被限制的接口时，它还会回落到 ncspot 那个老 client。\n安装方式很全：Homebrew、Scoop、Cargo、Arch、Void、FreeBSD、NetBSD、NixOS 都有，Docker 镜像也可以但要记住镜像里关掉了流式播放。",
+    officialUrl: "https://github.com/aome510/spotify-player",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/aome510/spotify-player",
+      github: "https://github.com/aome510/spotify-player",
+    },
+    whoFor: "长期在终端里工作、不想为切歌离开键盘的人；有多个 Spotify Connect 设备、想用键盘统一控制的人。",
+    whoNot: "没有 Spotify Premium 的人——流式播放与 Connect 都用不了；也不想注册开发者应用、能接受网页版的人（默认 client ID 会限流）。",
+    installTips: [
+      "macOS 用 brew install spotify_player，Windows 用 scoop install spotify-player，Arch 用 pacman -S spotify-player，其余平台可以从 Releases 拿预编译包或 cargo install spotify_player --locked。",
+      "Linux 要额外装依赖：Debian 系 sudo apt install libssl-dev libasound2-dev libdbus-1-dev，Fedora 系对应 -devel 包。",
+      "首次启动会连续两次浏览器授权（Web API token 与 librespot 凭据），分别缓存，属于正常现象；想一次性做完用 spotify_player authenticate。",
+      "默认共用 ncspot 的 client ID，容易被限流；建议去 Spotify 开发者后台注册应用，并在 app.toml 里配 client_id 与回调地址。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#1DB954",
+    },
+    guide: {
+      intro: "从装到能出声：依赖怎么补、为什么要授权两次、以及限流与自定义 client ID 的关系。",
+      markdown: `## 前置：Premium 与依赖
+
+README 用加粗写了 **Spotify Premium 是必须的**。免费账号连不上流式播放，Connect 遥控也用不了。
+
+Linux 上还要补系统库，缺一个就编不过或跑不起来：
+
+\`\`\`
+sudo apt install libssl-dev libasound2-dev libdbus-1-dev
+\`\`\`
+
+三个库对应三件事：openssl 走网络、alsa 出声、dbus 接媒体控制键。安装按平台选：macOS \`brew install spotify_player\`，Windows \`scoop install spotify-player\`，Arch \`pacman -S spotify-player\`，其他平台从 Releases 拿包或 \`cargo install spotify_player --locked\`。
+
+## 为什么授权两次
+
+第一次启动会开两次浏览器：
+
+1. **Web API token**——搜歌、读列表、控制播放靠它，走配置里的 client_id（默认 ncspot 的）。
+2. **librespot 凭据**——真正出声的部分，注册成 Spotify 设备，用官方 client ID。
+
+两个是独立的 OAuth 流程，必须各授权一次。凭据缓存在本地，之后不再打扰你。想一次做完就跑 \`spotify_player authenticate\`。
+
+## 限流这件事
+
+默认 client ID 是 ncspot 的，很多人共用，配额摊薄后容易 \`429 Too Many Requests\`。解法是注册自己的应用：去开发者后台建应用、把 \`http://127.0.0.1:8989/login\` 加进回调白名单、在 \`app.toml\` 填 \`client_id\`，然后重跑 \`spotify_player authenticate\`。
+
+新应用的配额模式受限，部分接口用不了，这时它会自动回落到 ncspot 那个老 client，属于设计好的降级。
+
+## 终端里的基本操作
+
+按 **D** 列出设备，回车切换；播放、搜索、音量都有默认键位。也能跑 daemon 模式配合 CLI 控制。注意官方 Docker 镜像里**流式播放是关掉的**，只适合当遥控器，想出声得本地装。`,
+      resources: [
+        {
+          kind: "link",
+          title: "GitHub Releases",
+          url: "https://github.com/aome510/spotify-player/releases",
+          note: "各平台预编译包与更新记录，Linux 装完别忘了补系统依赖。",
+        },
+        {
+          kind: "markdown",
+          title: "配置文档",
+          url: "https://github.com/aome510/spotify-player/blob/master/docs/config.md",
+          note: "键位、主题、client_id 都在这里改，第一次定制前先读它。",
+        },
+        {
+          kind: "html",
+          title: "Spotify 开发者后台",
+          url: "https://developer.spotify.com/dashboard",
+          note: "注册自己的 client ID 摆脱共用配额，注册时记得填对回调地址。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "immich-go",
+    linksCheckedAt: "2026-10-24",
+    name: "immich-go",
+    nameZh: "immich-go 相册迁移工具",
+    aliases: ["immich-go", "immich go", "immich 导入", "谷歌相册迁移", "google photos takeout"],
+    summary: "把 Google 相册 Takeout、iCloud、本地目录和别的 Immich 实例的资产批量灌进自建 Immich，单个二进制，不依赖 Node 与 Docker。代价是 README 自己标了「早期版本」，要求先备份再跑。",
+    scenes: ["photo", "tools"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["照片管理", "Immich", "相册迁移", "自建服务", "命令行"],
+    body: "immich-go 是官方 immich-CLI 的替代品，用 Go 写成单个二进制，省掉了 Node.js 运行环境。它解决的问题很具体：Immich 新装好，几万张历史照片怎么进去。\n真正的价值不在「上传」，在还原结构。Google Takeout 把照片和 JSON 元数据拆成两拨文件，直接扔进相册就是一堆没有时间、没有地点、没有相册归属的散图。immich-go 的 from-google-photos 会把 JSON 和图片配对，把相册、描述、位置重新对上；from-folder 按目录结构建相册、读 XMP sidecar；from-picasa 读 .picasa.ini；from-icloud 从 CSV 里认创建时间和相册。上传时它还会在服务端建相册与标签、把 RAW+JPEG 或连拍照片叠成一叠、跳过已存在的文件。\n代价要摊开说。README 开头就三行警示：兼容 Immich V2/V3、**早期版本、尚未充分测试**、**请自行备份文件**。也就是说批量导入这类不可逆操作，得先留副本。另外它只是搬运工具：需要一个跑着且开了 API 的 Immich，API key 权限不够会在中途报错。\n十 GB 以下的相册用网页上传就够了，装它是为了上十万张那种规模——README 称处理过 100,000+ 张。",
+    officialUrl: "https://github.com/simulot/immich-go",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/simulot/immich-go",
+      github: "https://github.com/simulot/immich-go",
+    },
+    whoFor: "已经自建 Immich、正从 Google 相册或 iCloud 搬家的人；曲库式的大批量导入（十万张量级），需要保留相册与拍摄地点。",
+    whoNot: "还没搭 Immich 的人——它只是客户端；想要图形界面点选上传的也别装它。不做备份就想直接对着唯一一份原始照片跑的人，风险自负。",
+    installTips: [
+      "从 GitHub Releases 下对应系统的预编译二进制即可，Windows / macOS / Linux / FreeBSD 都有，不需要 Node.js，也不需要 Docker。",
+      "前置条件是一个跑着并开放 API 的 Immich：地址填 --server=http://your-ip:2283，鉴权用 --api-key=，key 权限按 docs/installation.md 里的清单给。",
+      "迁移 Google 相册用 upload from-google-photos 并把 takeout-*.zip 传进去；普通目录用 upload from-folder，按目录建相册。",
+      "NAS 上的 @eaDir/、.DS_Store、Lightroom Catalog/ 等已在默认屏蔽列表；额外要排除的用 --ban-file 追加，结尾带斜杠表示目录。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "I",
+      color: "#3B6E8F",
+    },
+    guide: {
+      intro: "按第一次使用的顺序：三条子命令各管什么、API key 与服务器怎么填、十万张规模该怎么分批跑，以及为什么必须先备份。",
+      markdown: `## 三条子命令，先分清
+
+\`upload from-folder\` 吃任何本地目录；\`upload from-google-photos\` 吃 Takeout 的 zip；\`archive from-immich\` 反过来，把服务器上的资产导出到文件夹。
+
+最常见的第一个错误是拿 \`from-folder\` 去跑 Takeout 目录。它只按目录建相册，**不认 Takeout 里那堆 JSON**，跑完你会发现相册名对了一部分，拍摄时间和地点全丢。选错子命令不会报错，只会安静地少还原一半信息。
+
+## 服务器与 API key 是硬前置
+
+README 写得很直白：需要一台运行中的 Immich 和一把有权限的 API key。命令长这样：
+
+\`immich-go upload from-folder --server=http://your-ip:2283 --api-key=xxx /path/to/photos\`
+
+key 权限不足时的表现是传到一半 403，很容易被误判成网络问题。v0.32.0 起 ReplaceAsset 接口被移除，asset.replace 权限不再需要，照着老教程配 key 会多给一个用不上的权限。
+
+## 十万张怎么跑
+
+先用一个子目录跑通再全量。重复检测会跳过服务端已存在的文件，所以中断后重跑不会翻倍，这一点让「分批推进」变得安全。上传期间它还能暂停 Immich 的后台任务（缩略图等），这是性能开关，不是必须。
+
+## 备份不是客套
+
+README 开头写着 early version、not yet extensively tested、keep a backup copy。批量导入最坏的结局不是失败，是元数据被覆盖。先把 Takeout 或原始目录复制一份，再动手。
+
+## NAS 垃圾文件
+
+默认已屏蔽 @eaDir/、@__thumb/、SYNOFILE_THUMB_*、thumbnails/、.DS_Store、.Spotlight-V100/ 等；自己的规则用 \`--ban-file\` 补，带斜杠的匹配目录。`,
+      resources: [
+        {
+          kind: "link",
+          title: "安装与 API 权限说明",
+          url: "https://github.com/simulot/immich-go/blob/main/docs/installation.md",
+          note: "API key 到底要给哪些权限写在这里。权限给少了会在中途 403，先看它再跑第一条命令。",
+        },
+        {
+          kind: "link",
+          title: "Google 相册迁移最佳实践",
+          url: "https://github.com/simulot/immich-go/blob/main/docs/best-practices.md",
+          note: "官方对 Takeout 分批导入、重复检测与断点续跑的建议，十万张级别的操作顺序照这个来。",
+        },
+        {
+          kind: "link",
+          title: "版本发布与二进制下载",
+          url: "https://github.com/simulot/immich-go/releases",
+          note: "各平台预编译包在这里；注意 README 提示的 v0.32.0 接口变更会影响旧命令。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "sandstorm",
+    linksCheckedAt: "2026-10-24",
+    name: "Sandstorm",
+    nameZh: "Sandstorm 自托管办公套件",
+    aliases: ["sandstorm", "自托管办公套件", "web app 包管理器", "sandstorm oasis"],
+    summary: "自托管的 Web 办公套件，本质是一个带沙箱隔离的应用包管理器：文档、表格、博客、Git、待办都装进同一台服务器。只支持 x86-64 Linux，装的是按它规范打包的应用。",
+    scenes: ["office", "tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["自建服务", "办公套件", "沙箱隔离", "Web 应用", "Linux"],
+    body: "Sandstorm 的自我描述有点绕：self-hostable web productivity suite，实现方式是 security-hardened web app package manager。翻成人话——它先是一个跑在服务器上的应用商店加沙箱运行时，然后才是「办公套件」。\n装进去的东西是独立应用：文档、表格、博客、Git 仓库、任务清单，README 举的例子就是这几类，装法被形容成「像在手机上装 App 一样」。安全模型是它的卖点：每个应用被隔在沙箱里跑，README 单独指向 security practices 文档，仓库 topics 里也标了 seccomp。对「一台机器上跑别人写的 Web 程序」这件事有顾虑的人，这是主要理由。\n代价同样明确。第一，只支持 x86-64 Linux，ARM 小主机和迷你 NAS 直接出局，macOS / Windows 本机也别想。第二，生态绑定：装的是按 Sandstorm 规范打的包，不是随便拉个 Docker 镜像就能跑。第三，README 里没有逐步安装命令，全部指向 docs.sandstorm.io，属于「文档在别处」的项目。\n它不适合被当成网盘或在线 Office 的替代品来理解——你要的若是单一功能，专门工具更省事；它的价值在于「一台机器、多个应用、彼此隔离」这一层。",
+    officialUrl: "https://sandstorm.org",
+    officialLabel: "sandstorm.org",
+    links: {
+      official: "https://sandstorm.org",
+      github: "https://github.com/sandstorm-io/sandstorm",
+    },
+    whoFor: "有一台 x86-64 Linux 服务器、想给几个人搭一套互相隔离的 Web 办公应用，并且在意沙箱边界的团队。",
+    whoNot: "用 ARM 设备或想在 Windows / macOS 本机跑的人；只想开一个网盘或一个在线文档、不打算维护服务器的，装它属于给自己找活。",
+    installTips: [
+      "README 明确只支持 x86-64 Linux；ARM、树莓派、macOS、Windows 都不在支持范围内。",
+      "安装步骤不在仓库里，官方指向 docs.sandstorm.io 的 install 章节，先通读再动手。",
+      "应用从 apps.sandstorm.io 里选装，文档、表格、博客、Git、待办都有现成条目。",
+      "想把自己写的程序装进去，得按 docs 的 developer hub 做 Sandstorm 打包，不是丢个容器镜像就行。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#B4553B",
+    },
+    guide: {
+      intro: "先讲清它到底装的是什么，再说硬件与域名的前置条件，最后是第一次部署最容易卡住的三个点。",
+      markdown: `## 它到底装的是什么
+
+不是「一个网盘」，也不是「一个在线 Office」，而是一个跑在服务器上的应用包管理器：文档、表格、博客、Git、待办都作为独立应用装进去，每个应用被沙箱隔开。README 的比喻是「像在手机上装 App 一样」。
+
+理解这一层，后面很多困惑会自动消失——它不提供单个杀手级功能，提供的是「一台机器上安全地跑多个别人写的 Web 程序」这件事。
+
+## 装之前先确认硬件
+
+只支持 x86-64 Linux。ARM 小主机、树莓派、macOS、Windows 一律不在范围内，这不是配置问题，是构建目标的问题。
+
+安装说明全部指向 docs.sandstorm.io，仓库 README 只有一句「见安装文档」。所以别指望 clone 完照 README 敲命令就能起——先去读 install 章节，确认系统版本与依赖。
+
+## 第一次会卡在哪
+
+**其一，访问入口。** 它是 Web 服务，装完要能用浏览器打开，就得有可解析的域名或地址，还要处理 TLS。这一步不做，装完等于没装。
+
+**其二，应用从哪来。** 应用在 apps.sandstorm.io 上，装的时候是按它的包格式拉取。自己写的程序要先打包，普通 Docker 镜像塞不进去。
+
+**其三，别把它当容器平台。** 它的定位是「一组受管的应用」，不是让你随便跑任意后端服务的地方。想要通用容器编排，去找别的工具。
+
+## 什么时候值得
+
+一台长期在线的 Linux 机器、几个人、在意应用之间的隔离边界。如果只是想要一个网盘或一份在线文档，专门的工具更省事，也别为了「套件」两个字付运维成本。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方安装文档",
+          url: "https://docs.sandstorm.io/en/latest/install/",
+          note: "README 把安装全部甩给了这里。先确认系统是 x86-64 Linux，再照步骤走。",
+        },
+        {
+          kind: "html",
+          title: "应用市场",
+          url: "https://apps.sandstorm.io/",
+          note: "文档、表格、博客、Git、待办的实际条目都在这里，先看有没有你要的再决定装不装服务器。",
+        },
+        {
+          kind: "html",
+          title: "它如何工作",
+          url: "https://sandstorm.io/how-it-works",
+          note: "解释沙箱与打包模型。判断「我的程序能不能装进去」看这一页最快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "eqmac",
+    linksCheckedAt: "2026-10-24",
+    name: "eqMac",
+    nameZh: "eqMac 系统级均衡器",
+    aliases: ["eqmac", "eq mac", "mac 均衡器", "系统音量增强", "audio equalizer mac"],
+    summary: "macOS 上接管系统声音做全局 EQ、音量增强和按应用调音量。注意开源仓库只到 v1.3.2 的免费功能，之后的 Pro 功能在私有分支——想白嫖全部功能会失望。",
+    scenes: ["music", "tools"],
+    platforms: ["macos"],
+    source: "opensource",
+    tags: ["音频", "均衡器", "macOS", "音量控制", "AutoEQ"],
+    body: "eqMac 解决的是 macOS 一直没给的东西：系统级的声音处理。它用一个用户态的 Core Audio 驱动把系统输出的音频截下来，处理完再送到实际的输出设备，所以浏览器、播放器、会议软件的声音都走同一条链路，而不是只管某一个 App。\n驱动跑在用户空间而不是内核，这是它相对 SoundFlower 那代方案的关键差别——README 特意强调这样更安全也更稳。功能上分免费与 Pro 两档：免费有系统音频处理、音量增强、HDMI 音量、左右平衡、三段均衡（低/中/高）、固定 10 段均衡，以及导入 AutoEQ 的耳机曲线；Pro 才有无限段的 Expert EQ、频谱分析、Audio Unit 宿主、空间音频和按应用分别调音量。\n必须提醒的坑写在 README 第一段：**仓库里的代码对应 v1.3.2，只包含免费功能**，之后的所有版本都在私有分支上开发，因为把免费部分拆出来开源太费维护精力。换句话说，clone 下来自己编译，拿到的是一个停更的免费版；想要 Pro 得去官网买。\n另外它的界面是网页，托管在远端并支持 OTA 更新，本地有缓存——好处是修 UI 不用发版，代价是界面不跟着仓库走。只支持 macOS，Windows 与 Linux 没有对应实现。",
+    officialUrl: "https://eqmac.app",
+    officialLabel: "eqmac.app",
+    links: {
+      official: "https://eqmac.app",
+      github: "https://github.com/bitgapp/eqMac",
+    },
+    whoFor: "macOS 用户，耳机或音箱低频轰头想拉一条曲线，或者嫌系统音量上限不够、想给不同 App 设不同音量。",
+    whoNot: "Windows / Linux 用户（没有对应实现）；只想调某个播放器的 EQ，播放器自带功能就够。冲着「开源 Pro 版」来的也会落空。",
+    installTips: [
+      "只有 macOS 版本：它依赖一个用户态的 Core Audio 驱动接管系统输出，其它平台没有对应实现。",
+      "从 eqmac.app 下载安装；首次启动要允许音频驱动加载，没授权时表现为「界面正常但声音没变化」。",
+      "免费档就能用固定 10 段均衡与 AutoEQ 导入（后者对应 Advanced EQ）；Expert EQ、频谱、AU 宿主、按应用音量属于 Pro。",
+      "想自己编译要注意：仓库代码停留在 v1.3.2 的免费部分，后续版本不在这个仓库里。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "E",
+      color: "#5B4B8A",
+    },
+    guide: {
+      intro: "先说清它改的是系统声音而不是某个播放器，再划出免费与 Pro 的边界，最后是装完没效果时的排查顺序。",
+      markdown: `## 它改的是系统声音，不是播放器
+
+eqMac 在系统层把音频截走、处理、再送回输出设备。所以浏览器、Spotify、视频会议的声音都过同一条链路——这也是它跟「播放器自带 EQ」的根本区别。想给某个 App 单独调音量，那是 Pro 的 Volume Mixer。
+
+## 开源版停在 v1.3.2
+
+README 第一段就写明：仓库代码对应 v1.3.2，只含免费功能，之后的新版本在私有分支上做。
+
+免费能拿到什么：系统音频处理、音量增强、HDMI 音量、所有设备（含 HDMI）的左右平衡、三段均衡（低/中/高）、固定 10 段均衡、AutoEQ 导入。
+
+Pro 才有：无限段的 Expert EQ（可调滤波类型、频率、增益、带宽）、频谱分析、Audio Unit 宿主、空间音频、按应用调音量。
+
+所以「仓库开源」和「产品免费」是两件事。想用 Expert EQ 就去官网买，别指望 clone 一份就全有。
+
+## 装完没声音变化怎么查
+
+它靠一个用户态 Core Audio 驱动接管输出。驱动没被系统允许加载时，App 界面一切正常，声音就是不经过它。先去系统设置里确认驱动/扩展已授权，再检查输出设备选的是不是那个虚拟设备。
+
+驱动跑在用户空间而非内核（README 拿它跟 SoundFlower 对比），这是它更稳的原因，但也意味着权限流程绕不开。
+
+## 界面为什么像网页
+
+UI 是 Angular 写的网页，托管在远端并做 OTA 更新，本地有缓存可离线。好处是修界面不用发版；代价是界面版本跟你装的二进制不完全同步。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网与功能对比",
+          url: "https://eqmac.app/",
+          note: "免费与 Pro 的功能分界、价格与下载都在这里。决定要不要付费前先看这页，别拿仓库当功能清单。",
+        },
+        {
+          kind: "html",
+          title: "AutoEQ 项目",
+          url: "https://github.com/jaakkopasanen/AutoEq",
+          note: "README 推荐的耳机均衡曲线库，eqMac 的 AutoEQ 导入就是吃它的数据，按机型找曲线再导入。",
+        },
+        {
+          kind: "link",
+          title: "问题讨论区",
+          url: "https://github.com/bitgapp/eqMac/issues",
+          note: "驱动装不上、升级后没声音这类问题在这里搜，比反复重装快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "supercollider",
+    linksCheckedAt: "2026-10-24",
+    name: "SuperCollider",
+    nameZh: "SuperCollider 声音编程环境",
+    aliases: ["supercollider", "sc", "sclang", "scsynth", "算法作曲", "live coding"],
+    summary: "用代码合成声音的编程环境：一个实时音频服务器加一门叫 sclang 的语言。适合算法作曲与声音实验，不给你钢琴卷帘和时间轴——学习曲线就是编程本身。",
+    scenes: ["music", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音频合成", "算法作曲", "编程语言", "实时音频", "电子音乐"],
+    body: "SuperCollider 由四部分组成：scsynth 是实时音频服务器，带几百个 UGen（音频分析、合成、处理的基本单元）；supernova 是它的多核并行版本；sclang 是一门解释型语言，用来控制服务器；scide 是带内置帮助系统的编辑器。写代码的是 sclang，真正出声的是 scsynth——这个分工是新手第一个坎。\n它和 DAW 的差别不是「功能多少」，是工作方式。DAW 给你时间轴、钢琴卷帘、插件机架，你用鼠标摆；SuperCollider 给你一个语言和一堆信号处理单元，你描述声音怎么生成。算法作曲、生成式音乐、现场编程（live coding）这类需求，它是主场；想做流行歌编曲，它不合适。\n扩展有两条路：语言侧的包管理器叫 Quarks；音频侧可以用 C 与 C++ API 写第三方插件。平台覆盖很广：Windows、macOS、多种 Linux 与 BSD、树莓派、Bela，甚至能通过 WebAssembly 跑到浏览器里。\n安装的落差不小：macOS 与 Windows 有官方稳定版安装包，**Linux 用户得自己编译或走 Flatpak**，README 原文如此。文档不在网上零散找——官方文档就在 IDE 内置浏览器里，另有一份免费的《A Gentle Introduction to SuperCollider》可以入门。",
+    officialUrl: "https://supercollider.github.io",
+    officialLabel: "supercollider.github.io",
+    links: {
+      official: "https://supercollider.github.io",
+      github: "https://github.com/supercollider/supercollider",
+    },
+    whoFor: "做算法作曲、生成音乐、声音装置、现场编程的人；愿意用写代码的方式描述声音、而不是拖时间轴的开发者。",
+    whoNot: "想编曲、混音、做流行歌的人——没有时间轴与钢琴卷帘，用它会很别扭。Linux 上不想自己编译、也不接受 Flatpak 的，安装阶段就会卡住。",
+    installTips: [
+      "macOS 与 Windows 直接去 supercollider.github.io/downloads 下稳定版安装包，不用自己编。",
+      "Linux 没有官方二进制：README 明确说要自己构建，或者用 Flatpak 版本。",
+      "装完先打开 scide，帮助系统就在 IDE 内置浏览器里，不用去官网翻零散页面。",
+      "需要额外音色库或工具时用 Quarks 装（sclang 自带的包管理器），别手动 clone 到目录里。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#2A6E5F",
+    },
+    guide: {
+      intro: "按第一次上手的顺序：四个部件谁管谁、装完之后为什么必须先启动服务器、以及在哪里查文档而不是到处搜教程。",
+      markdown: `## 四个部件，先分清谁管谁
+
+scsynth 是实时音频服务器，几百个 UGen 都在它里面跑；supernova 是它的多核版本，需要并行 DSP 时换它；sclang 是解释型语言，负责给服务器下指令；scide 是编辑器加帮助浏览器。
+
+关键点：**写代码的是 sclang，出声的是 scsynth**。这两个是不同进程，代码能跑通不代表有声音——服务器没启动，指令就是发给了空气。第一次「跑通了但没声音」基本都栽在这。
+
+启动服务器的那一行是 \`s.boot;\`，在 scide 里先求值它，等服务器起来再求值发声的代码。
+
+## 装：三平台不是一个难度
+
+macOS 与 Windows 有官方稳定版安装包，去 supercollider.github.io/downloads 拿。
+
+Linux 没有官方二进制，README 的原话是要自己构建或使用 Flatpak 版本。这是很多人第一次放弃的地方——不是装不上，是预期错了。
+
+## 文档在哪
+
+不在搜索引擎里。官方文档内嵌在 scide 的帮助浏览器中，选中一个类名就能查它的说明。网上还散着一堆十年前的教程，API 早就变了，以 IDE 内的为准。
+
+入门推荐 README 列的免费电子书《A Gentle Introduction to SuperCollider》，比零散博客系统。
+
+## 扩展怎么加
+
+语言层的包用 Quarks 管（sclang 自带）；音频层要加自定义 UGen，走 C 或 C++ 的插件 API。两条路互不相干，别混着找。
+
+## 什么时候别用它
+
+要时间轴、要拖音频块、要混一首完整的歌——那是 DAW 的活。SuperCollider 的强项是「用代码描述声音的生成规则」，算法作曲、生成式音乐、现场编程才是它的主场。`,
+      resources: [
+        {
+          kind: "pdf",
+          title: "A Gentle Introduction to SuperCollider",
+          url: "https://ccrma.stanford.edu/~ruviaro/texts/A_Gentle_Introduction_To_SuperCollider.pdf",
+          note: "README 首推的免费入门书，从服务器与语言的分工讲起，比零散教程更适合第一次上手。",
+        },
+        {
+          kind: "html",
+          title: "在线文档",
+          url: "https://doc.sccode.org/",
+          note: "和 IDE 内置帮助同源。查 UGen 参数、类的方法都在这里，版本要跟你装的对应。",
+        },
+        {
+          kind: "html",
+          title: "下载页",
+          url: "https://supercollider.github.io/downloads",
+          note: "macOS / Windows 安装包与 Linux 的构建/Flatpak 说明入口，先确认自己平台走哪条路。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "ejabberd",
+    linksCheckedAt: "2026-10-24",
+    name: "ejabberd",
+    nameZh: "ejabberd 即时通讯服务器",
+    aliases: ["ejabberd", "xmpp 服务器", "jabber 服务器", "mqtt broker", "自建聊天服务器"],
+    summary: "Erlang 写的 XMPP 服务器，同进程兼做 MQTT broker 与 SIP 服务，强项是海量长连接。它只给服务端：客户端、域名、证书、运维全部你自己来。",
+    scenes: ["social", "tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["XMPP", "即时通讯", "自建服务", "MQTT", "Erlang"],
+    body: "ejabberd 是 ProcessOne 维护的 Erlang/OTP 实时通讯平台。README 的定位是三合一：XMPP 服务器、MQTT broker、SIP 服务。XMPP 管即时消息与群聊，MQTT 管物联网设备，SIP 管语音——同一套节点里跑，共享连接管理与集群能力。\n选它的理由通常是连接密度。Erlang 的进程模型天生适合几十万条长连接，这也是它在 IM 后端站得住的原因；换 PHP 或 Java 写同一件事，运维成本会高一个量级。\n部署路径很清楚：Docker 镜像（ecs 与 ejabberd 两个，x64 与 arm64 都有）、deb/rpm 安装包、系统包管理器、Homebrew，或者源码编译看 COMPILE.md。装完的日常入口就两个命令：ejabberdctl 管进程与账号，配置项查 man ejabberd.yml。\n代价要说清。第一，它只是服务器——头像、移动端 App、网页客户端都得你自己配。第二，XMPP 的地址形态是 user@你的域名，域名解析与 TLS 证书没弄好，客户端会连不上，而且报错信息不友好。第三，开源版是 GPL v2，商用支持与 Business Edition 是 ProcessOne 的商业产品，两者不是一回事。",
+    officialUrl: "https://www.process-one.net/ejabberd",
+    officialLabel: "www.process-one.net",
+    links: {
+      official: "https://www.process-one.net/ejabberd",
+      github: "https://github.com/processone/ejabberd",
+    },
+    whoFor: "要自建 IM 或物联网消息接入的后端团队；已经有域名和 Linux 服务器、能自己处理证书与运维的人。",
+    whoNot: "想开箱就有一个能聊天的 App 的人——它只有服务端。也不想碰 Erlang 运行时与 XMPP 配置细节的个人用户，门槛偏高。",
+    installTips: [
+      "最省事走 Docker：官方 ecs 镜像（x64）与 ejabberd 镜像（x64 / arm64），镜像说明见仓库的 CONTAINER.md 与 docker-ejabberd 仓库。",
+      "也有现成安装包：GitHub Releases 与 ProcessOne 下载页提供 deb/rpm（x64、arm64），Homebrew 也能装。",
+      "部署后先跑 ejabberdctl help 摸清管理命令，配置字段直接 man ejabberd.yml 查，比翻 README 快。",
+      "MQTT 与 SIP 是同一平台里的另外两项服务，启用方式在 docs.ejabberd.im 的模块与监听配置里，不在 README。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "E",
+      color: "#2B5F8A",
+    },
+    guide: {
+      intro: "先说清一个进程怎么同时是 XMPP、MQTT 与 SIP 服务，再讲 Docker 部署与第一次配置必然卡住的三处。",
+      markdown: `## 一个平台，三种协议
+
+XMPP 是即时消息的主协议，群聊走 MUC；MQTT 面向物联网设备；SIP 处理语音。三者在同一个 Erlang 节点里跑，共享连接与集群能力。
+
+这决定了它的适用场景：不是「给家里搭个小聊天室」，而是「一批长连接 + 多个协议入口」的后端。个人用户装它，多半是想要自己的 XMPP 域名。
+
+## 装：先走 Docker
+
+官方给了两套镜像：ecs 与 ejabberd，x64 都有，后者还有 arm64。也有 deb/rpm 与 Homebrew，源码编译看 COMPILE.md。
+
+第一次部署建议先起容器，把配置跑通再考虑迁移到宿主机。
+
+## 第一次必然卡住的三处
+
+**其一，域名与证书。** XMPP 的账号形态是 user@域名，客户端按域名找服务、按域名校验证书。域名解析没做对、证书不是这个域名的，客户端就是连不上，而且提示往往只说「无法连接」。
+
+**其二，配置在 ejabberd.yml 里。** README 的建议很实在：\`man ejabberd.yml\` 查字段，\`ejabberdctl help\` 查命令。别指望 README 列出所有配置项。
+
+**其三，客户端要另找。** 它只提供服务器，网页端和移动端 App 都不带。先想好用户用什么客户端登录，再决定要不要上。
+
+## 开源版与商业版
+
+GPL v2 是社区版；Business Edition 与云端 Fluux 是 ProcessOne 的商业产品，带支持服务。选型时把这两者分清楚，别把商业文档当成开源版的功能清单。
+
+## 什么时候别选它
+
+只要一个简单的内部群聊、不想维护 XMPP 生态，用现成的托管服务更省事；它的价值在「自己的域名 + 自己的服务器 + 大规模长连接」，缺一条就得重新算账。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.ejabberd.im/",
+          note: "配置、模块、监听端口与实际运维步骤都在这里，README 只给了入口。",
+        },
+        {
+          kind: "link",
+          title: "Docker 镜像说明",
+          url: "https://github.com/processone/docker-ejabberd",
+          note: "ecs 镜像的环境变量与挂载方式，第一次用容器部署照这个配。",
+        },
+        {
+          kind: "link",
+          title: "版本发布与安装包",
+          url: "https://github.com/processone/ejabberd/releases",
+          note: "deb/rpm 安装包与 release notes 在这里，升级前先看变更说明。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "namida",
+    linksCheckedAt: "2026-10-24",
+    name: "Namida",
+    nameZh: "Namida 音乐播放器",
+    aliases: ["namida", "namida music", "flutter 音乐播放器", "本地音乐播放器"],
+    summary: "本地曲库为主的播放器，同时能接 YouTube、Jellyfin、Subsonic、WebDAV，标签编辑与参数均衡都内置。桌面端 Linux 还是 beta，得先自己装 mpv 才能出声。",
+    scenes: ["music"],
+    platforms: ["windows", "linux"],
+    source: "opensource",
+    tags: ["音乐播放器", "本地曲库", "Flutter", "标签编辑", "YouTube"],
+    body: "Namida 是 Flutter 写的音乐与视频播放器，主线是本地曲库：索引器基于 taglib，能改标签、按文件夹建库、排除目录、按任意字段排序，还支持多艺术家与流派分隔符。\n它把其他播放器常丢给外部工具的事做进了应用里：参数均衡器可导入 AutoEQ 曲线、逐曲的音量/音高/均衡设置、歌词抓取与自行对轴、播放统计、智能播放列表、局域网内同步歌单与历史。桌面端另有 bit-perfect 播放、USB DAC 直连、独占模式，以及系统托盘、全局快捷键、桌面歌词窗。\n第二层是「不止本地」：可以同时挂本地库、YouTube、Subsonic、Jellyfin、WebDAV、SMB 多个来源，服务器内容能缓存到本地离线听。YouTube 侧支持多账号、下载、SponsorBlock、Return YouTube Dislike、字幕，下载文件名模板接近 yt-dlp 的写法。\n代价在平台与成熟度。安装表里只有 Android、Windows 和 Linux，**没有 macOS 也没有 iOS**；Linux 至今只有 beta，稳定版标着 Soon，而且必须先装 mpv 才能播放，想登录 YouTube 还要 webkit2gtk-4.1。功能密度高也意味着设置项多，第一次进来容易在权限与索引目录上耗掉耐心。",
+    officialUrl: "https://github.com/namidaco/namida",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/namidaco/namida",
+      github: "https://github.com/namidaco/namida",
+    },
+    whoFor: "本地无损曲库为主、又想顺手接 YouTube 与自建音乐服务器（Jellyfin / Subsonic）的人；Android 或 Windows 用户。",
+    whoNot: "iPhone / Mac 用户——安装表里没有这两个平台。只想在线听歌、不打算整理本地文件的人，它的索引与标签功能都用不上。",
+    installTips: [
+      "Android 与 Windows 从 GitHub Releases 下安装包；Linux 目前只有 beta（稳定版标注 Soon），装 beta 页里的 .deb / .rpm。",
+      "Linux 必须先装 mpv 才能播放，要登录 YouTube 还得补 webkit2gtk-4.1；Arch 用户可直接 yay -Sy namida-bin。",
+      "首次启动先指定音乐文件夹再等索引跑完，索引基于 taglib，标签乱的曲子会被归到错误的艺术家或专辑下。",
+      "桌面端独占模式一开，其它应用就没声音了；bit-perfect 与 USB DAC 直连只在桌面版可用。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "N",
+      color: "#6B4E7A",
+    },
+    guide: {
+      intro: "按第一次使用的顺序：怎么把库建起来、三个来源怎么混用、桌面端（尤其 Linux）要补什么依赖，以及最常见的三个坑。",
+      markdown: `## 先把「库」建起来
+
+首次启动只做一件事：指定音乐文件夹，然后等索引跑完。索引器基于 taglib 读标签，所以曲库标签乱的话，艺术家和专辑会被拆得七零八落。
+
+设置里可以先设最小文件大小与最短时长，把试听片段、提示音这类杂文件挡在库外；不想被扫的目录可以加排除。
+
+## 三个来源可以混用
+
+本地、YouTube、Subsonic / Jellyfin / WebDAV / SMB 能同时挂，界面上按库切换。服务器内容可以缓存到本地，断网也能听。
+
+YouTube 那侧的功能（下载、SponsorBlock、字幕）依赖登录状态，没登录就只有本地部分。
+
+## 桌面端要补的依赖
+
+Windows 有稳定版，装了就能用。
+
+Linux 只有 beta，且依赖自己装：
+
+\`sudo apt install mpv libmpv2\`（Debian/Ubuntu；Arch 是 \`sudo pacman -S mpv\`）
+
+想登录 YouTube 还得 \`libwebkit2gtk-4.1-0\`。Arch 可以直接 \`yay -Sy namida-bin\`，Debian / Fedora 用 beta 页的 deb / rpm 包。官方也给了一行安装脚本，但读一遍再执行更稳。
+
+## 最常见的三个坑
+
+**没装 mpv。** 界面完全正常，点播放毫无反应——不是 bug，是解码器不在。
+
+**索引很慢。** 曲库上万首时第一次扫描要等，先只选一个子目录试，确认标签解析正常再全量。
+
+**独占模式。** 桌面端开了独占 / bit-perfect 之后，其它应用会没声音。这是预期行为，不是冲突。
+
+## 它不擅长什么
+
+它不是流媒体客户端：没有版权曲库，在线部分靠你自己登录的账号与自建服务器。想要「打开就有歌」的体验，它给不了。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://docs.namida.app",
+          note: "索引、YouTube 登录、播放设置的分项说明，README 只列了功能清单，具体步骤在这。",
+        },
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://namida.app",
+          note: "下载入口与版本说明，判断自己平台该拿稳定版还是 beta 看这里。",
+        },
+        {
+          kind: "link",
+          title: "版本发布页",
+          url: "https://github.com/namidaco/namida/releases",
+          note: "Android 与 Windows 的安装包在这里；Linux 的构建在 beta 仓库 namida-snapshots。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "halide",
+    linksCheckedAt: "2026-10-24",
+    name: "Halide",
+    nameZh: "Halide 图像处理语言",
+    aliases: ["halide", "halide-lang", "图像处理编译器", "高性能图像处理", "image pipeline"],
+    summary: "把「算什么」和「怎么排」分开写的图像处理语言，同一份算法能编到 CPU、CUDA、Metal 上。它是给写算子的人用的编译器工具链，不是修图软件。",
+    scenes: ["photo", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图像处理", "编译器", "GPU", "C++", "Python 绑定"],
+    body: "Halide 的定位一句话：让高性能图像与数组处理代码好写。它不是独立语言，而是嵌在 C++ 里的一套 API——你写 C++ 构造出一条 pipeline 的内存表示，再把它编译成目标文件，或者 JIT 编完当场跑。也有 Python 绑定，可以完全不碰 C++。\n它真正改变的是工作方式：算法部分只描述像素之间怎么算，调度部分单独决定怎么分块、怎么向量化、怎么并行、跑在哪个后端。同一份算法换一套调度，就能从「能跑」变成「跑满多核」，或者从 CPU 换到 GPU。目标覆盖面很广：CPU 侧的 x86、ARM、Hexagon、PowerPC、RISC-V、WebAssembly；GPU 侧的 CUDA、OpenCL、Metal、DirectX 12、Vulkan。\n上手成本集中在工具链。装二进制很轻松——pip install halide 就有 Windows x86-64、macOS 双架构、Linux x86-64 的 wheel；只跑已编译好的 AOT 管线还能只装 halide-runtime，连 LLVM 都省掉。但只要涉及自己编译 Halide，就绕不开 LLVM：README 明确当前支持 21、22、23，**20 不支持**。这条卡住的人最多。\n它不是修图工具。想把照片调色、批量裁切，用它属于杀鸡用牛刀；它的收益在「自己写高性能算子」这件事上。",
+    officialUrl: "https://halide-lang.org",
+    officialLabel: "halide-lang.org",
+    links: {
+      official: "https://halide-lang.org",
+      github: "https://github.com/halide/Halide",
+    },
+    whoFor: "写图像/数组处理算子、需要同时吃满多核与 GPU 的 C++ 或 Python 开发者；做相机管线、计算摄影、医学影像后端的团队。",
+    whoNot: "只想调色、批量改尺寸的普通用户——现成工具更合适。不想碰 LLVM 版本约束、也不打算自己编编译器的人，会被工具链劝退。",
+    installTips: [
+      "最快路径是 pip install halide：Windows x86-64、macOS x86-64/arm64、Linux x86-64 都有预编译 wheel，C++ 用也能靠它拿二进制。",
+      "只调用已编好的 AOT 管线时改装 halide-runtime，可以不装编译器与 LLVM。",
+      "C++ 侧用 CMake 的 find_package(Halide)；Windows 上需要把虚拟环境根目录加进 CMAKE_PREFIX_PATH，否则找不到。",
+      "源码编译要求 C++17 与 LLVM 21/22/23（20 不支持），CMake 版本需 3.28 以上。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "H",
+      color: "#1F6F5C",
+    },
+    guide: {
+      intro: "先说清算法与调度分离这个核心概念，再给 Python 与 C++ 两条上手路径，最后是编译与版本上最容易翻车的地方。",
+      markdown: `## 它解决的不是「滤镜」
+
+传统写法里，算法和优化揉在一起：为了让循环跑得快，你把代码改成难以阅读的形状。Halide 把两件事拆开——算法描述像素间的依赖关系，调度决定分块、向量化、并行、跑在哪个后端。
+
+同一个算法换调度，就能在 CPU 与 GPU 之间搬。这是它值得学的原因，也是它跟 OpenCV 那类「调函数」的库完全不同的地方。
+
+## 两条上手路径
+
+**Python。** \`pip install halide\`，wheel 覆盖 Windows x86-64、macOS 双架构、Linux x86-64。写 pipeline 或调用现成的 AOT 产物都行。
+
+**C++。** 需要 C++17 起，用 CMake 的 find_package(Halide)。Windows 上有个坑：pip 装完之后要把虚拟环境根目录加进 CMAKE_PREFIX_PATH（\`set CMAKE_PREFIX_PATH=%VIRTUAL_ENV%\`），否则 CMake 找不到。
+
+## 编译时最容易翻车的地方
+
+自己编 Halide 要 LLVM。README 写得很死：当前支持 21、22、23，**20 不支持**。系统里装着旧 LLVM 却直接 cmake，是最常见的失败原因。
+
+官方给了省事办法：用它们发布的 halide-llvm 包，uv sync 指定版本后把 Halide_LLVM_ROOT 指过去，就不用自己编 LLVM（自己编要很久，README 专门加了警告）。
+
+## 只部署不编译
+
+线上只需要跑已编好的管线时，装 halide-runtime 就够——不带编译器、不带 LLVM，镜像能小一大截。这是它比较实用的一个切分。
+
+## 什么时候别用
+
+调色、批量裁剪、加水印这类事，用现成图像库几行就完；Halide 的收益在「你要自己写算子，并且要它在多种硬件上都快」。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方教程",
+          url: "https://halide-lang.org/tutorials",
+          note: "从第一条 pipeline 到调度写法，比读 README 有效；代码在仓库 tutorials/ 目录里可直接跑。",
+        },
+        {
+          kind: "html",
+          title: "API 文档",
+          url: "https://halide-lang.org/docs",
+          note: "查具体函数与调度原语。写调度时卡住基本都在这查。",
+        },
+        {
+          kind: "link",
+          title: "版本发布（二进制包）",
+          url: "https://github.com/halide/Halide/releases",
+          note: "各平台预编译包与变更记录；注意版本与 LLVM 的对应关系，升级前先看。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "scikit-image",
+    linksCheckedAt: "2026-10-24",
+    name: "scikit-image",
+    nameZh: "scikit-image 图像处理库",
+    aliases: ["scikit-image", "skimage", "python 图像处理", "图像算法库"],
+    summary: "Python 的图像处理算法库，滤波、分割、形态学、特征提取都是现成函数。它只给算法，不给界面也不管批量流程——指望它当修图软件会失望。",
+    scenes: ["photo", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["图像处理", "Python", "科学计算", "计算机视觉", "算法库"],
+    body: "scikit-image 是 Python 科学计算生态里的图像处理库，README 的全部内容只有一句话的定位、两个安装命令和文档入口——这种克制的 README 本身就是信号：它是给写代码的人用的基础设施，不是给终端用户的产品。\n它覆盖的是经典图像处理任务：滤波、形态学、分割、边缘与特征提取、几何变换、色彩空间转换。科研与工程管线里「先把图处理干净再喂给模型」的那一段，它最常出场；相比自己拼 NumPy 索引，现成函数更不容易写错边界条件。\n和同类比，它的位置在「算法齐全 + 文档扎实 + 与科学计算栈同源」。不做深度学习，也不做 GUI——这两件事分别属于别的库和别的软件。\n用之前要知道的取舍：其一，它只负责算，读图、遍历目录、存结果、并行调度都得你自己写或接别的库；其二，函数会随版本调整，网上老教程对不上就以 stable 文档为准；其三，大图直接整张读进来做形态学很容易吃满内存，得分块。\n安装只有两条路：pip install scikit-image，或 conda install -c conda-forge scikit-image。学术使用按 README 的要求引用 PeerJ 2014 那篇论文。",
+    officialUrl: "https://scikit-image.org",
+    officialLabel: "scikit-image.org",
+    links: {
+      official: "https://scikit-image.org",
+      github: "https://github.com/scikit-image/scikit-image",
+    },
+    whoFor: "用 Python 做科研影像、工业检测、预处理管线的开发者；需要一个稳定、文档齐全的经典图像算法库，而不是端到端深度学习方案的人。",
+    whoNot: "想找个能打开图片点几下就修好的人——它没有界面。要的是目标检测、分割模型这类深度学习方法，也不该来这儿找。",
+    installTips: [
+      "README 只给两条安装命令：pip install scikit-image，或 conda install -c conda-forge scikit-image。",
+      "装完先照官网 docs 的 stable 版本示例跑一遍，函数签名以你装的版本对应文档为准，别照抄博客。",
+      "它只提供算法：读图、批量遍历、写回文件要自己接 IO 库，或另写脚本。",
+      "论文引用按 README 给的 PeerJ 2:e453 (2014)，写论文时别漏。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "S",
+      color: "#2F6F9F",
+    },
+    guide: {
+      intro: "讲清它在 Python 图像栈里的位置、两条安装命令、第一次用会卡在文档版本与内存上的地方，以及论文引用要求。",
+      markdown: `## 它在栈里的位置
+
+scikit-image 是算法库：给数组进、给数组出。读文件、遍历目录、保存结果、并行调度都不归它管，这些要自己写或者接别的库。
+
+理解这一点很关键——很多人第一次用，是来找「一个能处理照片的 Python 工具」，结果发现拿到的是几百个函数，缺的是外围那圈胶水代码。
+
+## 装：只有两条
+
+\`pip install scikit-image\`
+
+或
+
+\`conda install -c conda-forge scikit-image\`
+
+README 全文就这两个命令加一个文档链接，没有更多安装说明。conda 那条走 conda-forge 频道，别装到 defaults 里的旧版本上。
+
+## 第一次会卡在哪
+
+**文档版本对不上。** 官网分 stable 与 dev 两套文档，你装的是发布版就照 stable 看。函数会调整，两年前的博客示例照抄大概率报参数错误。
+
+**只给算法不给流程。** 批量处理一万张图，得自己写循环、自己决定并行方式、自己处理失败重试。这部分工作量常常比调算法本身还大。
+
+**内存。** 整张大图读进来做形态学或全图傅里叶，很容易把内存打满。分块处理是常规做法，不是优化技巧。
+
+## 和深度学习的边界
+
+它不做神经网络。经典算法的优势是可解释、样本需求低、CPU 上就能跑；如果任务是「识别这是什么物体」，该去找模型，而不是在这儿硬凑特征。
+
+## 引用
+
+学术工作里用它，README 要求引用 PeerJ 2014 那篇 scikit-image 论文。写进 methods 里是常规操作，别漏。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档（stable）",
+          url: "https://scikit-image.org/docs/stable/",
+          note: "按你装的版本查函数签名与示例。这是唯一可信的 API 来源，别照抄博客。",
+        },
+        {
+          kind: "link",
+          title: "源码仓库",
+          url: "https://github.com/scikit-image/scikit-image",
+          note: "issue 与安装细节在 INSTALL.rst；遇到编译或依赖问题先搜这里。",
+        },
+        {
+          kind: "html",
+          title: "用户论坛",
+          url: "https://forum.image.sc/tag/scikit-image",
+          note: "图像处理的具体问题在这问，比在 GitHub issue 里排队快。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pedalboard",
+    linksCheckedAt: "2026-10-24",
+    name: "Pedalboard",
+    nameZh: "Pedalboard 音频效果库",
+    aliases: ["pedalboard", "spotify pedalboard", "python 音频效果", "vst3 python"],
+    summary: "在 Python 里把 VST3 / AU 插件串成效果链批量处理音频，Spotify 出品，单线程比 pySoX 快两个量级。它替代不了 DAW，也没有实时调音台界面。",
+    scenes: ["music", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音频处理", "VST3", "Python", "机器学习", "数据增强"],
+    body: "Pedalboard 是 Spotify 音频智能实验室做的 Python 音频库，管三件事：读写音频文件、内置一批效果、加载第三方 VST3 与 Audio Unit 插件。\n内部用途决定了它的设计取向：Spotify 拿它做机器学习的数据增强，所以性能是硬指标。README 给的数字很具体——单线程下单一变换比 pySoX 快最多 300 倍，比 SoxBindings 快 2–5 倍；读文件比 librosa.load 快最多 4 倍；处理时释放 GIL，不用 multiprocessing 就能吃多核。还明确说与 tf.data 管线兼容。\n内置效果覆盖常见需求：Chorus、Distortion、Phaser、Clipping 这类吉他效果，Compressor、Gain、Limiter 这类动态处理，Highpass / Ladder / Lowpass 滤波，Convolution、Delay、Reverb 空间类，PitchShift，以及 Resample、Bitcrush 这类降质工具。够搭一条完整处理链，不够做混音工程。\n要说清的代价有三条。第一，Audio Unit 只在 macOS 可用，VST3 三平台都行。第二，GPL-3 许可，闭源分发前得先想清楚。第三，Linux 的 x86_64 wheel 要求 CPU 支持 AVX，老机器装不上。\n它不是 DAW：没有时间轴、没有轨道、没有自动化曲线，做的是「把一批音频按固定链路处理完」。",
+    officialUrl: "https://spotify.github.io/pedalboard",
+    officialLabel: "spotify.github.io",
+    links: {
+      official: "https://spotify.github.io/pedalboard",
+      github: "https://github.com/spotify/pedalboard",
+    },
+    whoFor: "做音频数据增强、批量加效果、想把 DAW 里的处理链固化成脚本的 Python 开发者；需要在自己的服务里跑 VST3 的团队。",
+    whoNot: "要做实时演出调音台、多轨混音的人——它没有那套交互。闭源商业分发前也得先过 GPL-3 这一关。",
+    installTips: [
+      "pip install pedalboard 即可，Python 3.10–3.15 都有预编译 wheel，不用自己编 C++ 或装 JUCE。",
+      "用第三方插件把 .vst3 路径传给 load_plugin；Audio Unit 只在 macOS 上能加载。",
+      "处理长音频按块读（配合 AudioFile 的 read 循环），别一次把整首歌读进内存再处理。",
+      "实时效果走 pedalboard.io.AudioStream，指定输入与输出设备名就能边弹边加效果。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#1D7A4C",
+    },
+    guide: {
+      intro: "从一条最小可跑的效果链开始，再讲按块处理、加载 VST3、实时流，最后是三个实际会踩的坑。",
+      markdown: `## 五分钟跑通
+
+装完直接照 README 的 quick start 抄：
+
+\`\`\`python
+from pedalboard import Pedalboard, Chorus, Reverb
+from pedalboard.io import AudioFile
+
+board = Pedalboard([Chorus(), Reverb(room_size=0.25)])
+\`\`\`
+
+board 是效果链，调用时把音频和采样率一起传进去。Pedalboard 对象行为像列表，可以 append、可以按下标改参数。
+
+## 长音频按块读
+
+README 的示例就是一个循环：每次读一秒，处理完写出，直到读完。别整文件读进内存——几百兆的录音这么干很容易爆。
+
+连续分块处理时注意 reset 参数：它决定效果器的内部状态（比如混响尾巴）在块之间要不要清零。README 专门指向 Plugin.process 的文档说这件事，是这个库最容易用错的一个参数。
+
+## 加载 VST3 插件
+
+\`load_plugin("./xxx.vst3")\` 拿到插件对象，参数名用 effect.parameters.keys() 看，然后直接赋值。示例里还演示了给乐器插件喂 MIDI 消息渲染音频。
+
+注意平台差异：VST3 在 macOS、Windows、Linux 都能用，Audio Unit 只有 macOS。
+
+## 实时处理
+
+AudioStream 可以直接接声卡输入输出，把效果链挂上去就是软件效果器。适合练琴、做原型验证，不适合现场演出——它没有低延迟保障的承诺。
+
+## 三个坑
+
+**许可。** GPL-3，闭源产品里静态链接前先看条款。
+
+**CPU 指令集。** Linux 的 x86_64 wheel 要求 AVX，十年前的机器装完会报非法指令。
+
+**版本匹配。** 它对 Python 版本有明确支持范围，别在过新的解释器上硬装。`,
+      resources: [
+        {
+          kind: "html",
+          title: "官方文档",
+          url: "https://spotify.github.io/pedalboard",
+          note: "Plugin.process 与 AudioFile 的完整参数说明，reset 这类容易用错的点在这里展开。",
+        },
+        {
+          kind: "link",
+          title: "示例代码",
+          url: "https://github.com/spotify/pedalboard/tree/master/examples",
+          note: "从基础链到并行链的可运行示例，照着改比读文档快。",
+        },
+        {
+          kind: "link",
+          title: "安装与兼容性指南",
+          url: "https://github.com/spotify/pedalboard/blob/master/INSTALLATION.md",
+          note: "Python 版本、平台 wheel 与依赖问题的官方说明，装不上时先看这份。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "pyaudioanalysis",
+    linksCheckedAt: "2026-10-24",
+    name: "pyAudioAnalysis",
+    nameZh: "pyAudioAnalysis 音频分析库",
+    aliases: ["pyaudioanalysis", "py audio analysis", "音频特征提取", "音频分类 python"],
+    summary: "把 MFCC、谱图这些特征提取和分类、分割、说话人分离封装好的 Python 库，走「特征工程 + 经典分类器」路线。2015 年的方法，别指望它追平深度模型。",
+    scenes: ["music", "code"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    tags: ["音频分析", "特征提取", "机器学习", "信号处理", "Python"],
+    body: "pyAudioAnalysis 是希腊 Demokritos 研究中心 MagCIL 组维护的音频分析库，覆盖的任务列得很实在：提特征（MFCC、谱图、色度图）、训练与评估分类器、给未知音频分类、检测事件并剔除静音段、有监督分割、无监督分割（例如说话人分离）与音频缩略图、回归模型（官方举的例子是情绪识别）、以及降维可视化。\n工作流是经典那一套：先切窗提特征，再用 SVM 之类的分类器训练，最后推理。README 的示例只有两行——用一个函数对两个目录训练，再用另一个函数给单个 wav 分类，返回值里带着各类概率。数据组织也简单：一个类别一个文件夹，里面放 wav。\n它的价值在于省掉重复劳动。自己拿 librosa 提特征再接 sklearn，代码不难但容易在窗长、步长、归一化上写歪；这里把常用组合固化成了可调参数。命令行也有对应入口，比如直接出一个文件的谱图。\n预期要摆正。这套方法是 2015 年的（论文发在 PLOS ONE），在样本少、要可解释性的场景仍然好用；追求准确率的话，现在是深度模型的地盘，README 末尾也把同组的 deep_audio_features、deepaudio-x 这些深度学习工具单独列了出来。\n另外它按 wav 组织数据，别的格式得先转；依赖走 requirements.txt，装之前最好用独立环境，免得和系统里的科学计算包打架。",
+    officialUrl: "https://magcil.github.io",
+    officialLabel: "magcil.github.io",
+    links: {
+      official: "https://magcil.github.io",
+      github: "https://github.com/tyiannak/pyAudioAnalysis",
+    },
+    whoFor: "做音频分类、说话人分离、事件检测的研究者与工程师；样本量不大、需要可解释特征而不是黑箱模型的项目。",
+    whoNot: "要 SOTA 准确率的人——同组自己的深度学习工具更合适。只想批量转码或剪音频的，这个库帮不上忙。",
+    installTips: [
+      "README 的三步：git clone 仓库 → pip install -r ./requirements.txt → pip install -e .；没有直接 pip 安装的包名。",
+      "训练数据按「一个类别一个文件夹」摆，示例是 classifierData/music 与 classifierData/speech，里面放 wav。",
+      "命令行也能用，例如 python audioAnalysis.py fileSpectrogram -i data/doremi.wav 直接输出谱图。",
+      "依赖按 requirements.txt 锁版本，建议用独立虚拟环境，别和系统里的科学计算包装在一起。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "P",
+      color: "#7A5230",
+    },
+    guide: {
+      intro: "讲清它的经典工作流：特征怎么提、训练数据怎么摆、两行代码怎么分类，以及为什么不要拿它跟深度模型比准确率。",
+      markdown: `## 它做什么
+
+三段式：提特征（MFCC、谱图、色度图）→ 训练分类器 → 分类或分割。分类器是 SVM 这类经典模型，不是神经网络。
+
+这就是它的定位：可解释、样本需求低、在 CPU 上跑得动。
+
+## 装：三步，没有捷径
+
+README 给的是源码方式：
+
+\`\`\`bash
+git clone https://github.com/tyiannak/pyAudioAnalysis.git
+pip install -r ./requirements.txt
+pip install -e .
+\`\`\`
+
+注意没有 pip install pyaudioanalysis 这条——直接搜包名装是错的。依赖按 requirements.txt 锁版本，建议开独立虚拟环境，免得和系统里的科学计算包互相顶。
+
+## 训练数据怎么摆
+
+一个类别一个文件夹，里面放 wav。README 的示例目录是 classifierData/music 与 classifierData/speech。
+
+摆好之后两行就能跑：先 extract_features_and_train 用这两个目录训练，再 file_classification 给一个未知 wav 分类，返回类别下标、各类概率和类名列表。
+
+## 命令行也能用
+
+\`python audioAnalysis.py fileSpectrogram -i data/doremi.wav\`
+
+其余子命令看项目 wiki，README 只给了这一个例子。
+
+## 预期管理
+
+这是 2015 年的方法，论文发在 PLOS ONE。样本几百条、要解释「为什么判成这一类」时它很好用；数据上量、追求准确率时，同组的 deep_audio_features、deepaudio-x 才是对的方向，README 末尾专门列了。
+
+另外它按 wav 组织数据，mp3、m4a 先转格式再进来。`,
+      resources: [
+        {
+          kind: "link",
+          title: "项目 Wiki",
+          url: "https://github.com/tyiannak/pyAudioAnalysis/wiki",
+          note: "README 说完整文档在这。各子命令的参数、分割与回归的用法都靠它。",
+        },
+        {
+          kind: "html",
+          title: "论文（PLOS ONE 2015）",
+          url: "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0144610",
+          note: "方法细节与实验在这里；写论文引用也用它，README 给了 BibTeX。",
+        },
+        {
+          kind: "html",
+          title: "作者所在研究组",
+          url: "https://magcil.github.io",
+          note: "同组的其他音频工具（深度模型方向）都列在这，判断要不要换路线时对照看。",
+        },
+      ],
+    },
+  },
+  {
+    slug: "music-tag-web",
+    linksCheckedAt: "2026-10-24",
+    name: "Music Tag Web",
+    nameZh: "Music Tag Web 音乐标签编辑器",
+    aliases: ["music-tag-web", "音乐标签", "音乐刮削", "nas 音乐标签", "mp3tag web"],
+    summary: "跑在 Docker 里的音乐标签编辑器，浏览器打开就能批量改 NAS 上曲库的标签并刮削封面歌词。只改元数据不碰音频本体，默认 admin/admin 必须先改。",
+    scenes: ["music", "tools"],
+    platforms: ["linux"],
+    source: "opensource",
+    tags: ["音乐标签", "ID3", "NAS", "Docker", "自建服务"],
+    body: "Music Tag Web 解决的是一个很具体的场景：曲库放在 NAS 或远程 Linux 服务器上，而 MP3Tag、MusicBrainz Picard 这类工具只能改本机文件。它把自己做成 Docker 服务，挂上音乐目录，用浏览器远程改标签。\n功能面铺得很宽：全格式元数据查看与批量编辑（FLAC、APE、WAV、AIFF、WV、TTA、MP3、M4A、OGG、MPC、OPUS、WMA、DSF、MP4）、自动刮削专辑信息与封面歌词、内置音乐指纹识别来处理无标签或文件名混乱的曲子、按艺术家/专辑自动整理目录、繁简转换、文件名拆解补全标签、批量文本替换清脏数据、ffmpeg 转码、整轨 APE/FLAC 加 CUE 自动分轨、歌词翻译写回。\n定位是 Navidrome / Jellyfin 的边车工具：主库负责播放，它负责把元数据理顺。这个分工比「再装一个媒体服务器」清醒。\n要说清的代价：默认账号密码是 admin/admin，README 三处提醒首次登录必须改；DJANGO_SECRET_KEY 要自己生成并注入，别抄示例；V1 与 V2 的端口和启动命令不同（8001 带 command: /start，8002 不带），照旧教程抄会起不来；挂载路径写错，进去看到的曲库是空的。另外作者在免责声明里明确禁止商业使用。",
+    officialUrl: "https://github.com/xhongc/music-tag-web",
+    officialLabel: "github.com",
+    links: {
+      official: "https://github.com/xhongc/music-tag-web",
+      github: "https://github.com/xhongc/music-tag-web",
+    },
+    whoFor: "曲库在 NAS 或 Linux 服务器上、需要浏览器远程批量整理标签的人；已经在跑 Navidrome / Jellyfin、想让元数据不再乱的人。",
+    whoNot: "曲库就在本机的 Windows / macOS 用户——MP3Tag、Picard 更直接，不用为此维护一个容器。要下载音乐本体的人也会失望：它只改元数据。",
+    installTips: [
+      "先 export DJANGO_SECRET_KEY=\"$(openssl rand -hex 32)\" 生成每个部署独有的密钥，再传给容器，别用示例值。",
+      "V2 推荐写法：docker run -d -p 8002:8002 -e DJANGO_SECRET_KEY=\"$DJANGO_SECRET_KEY\" -v /path/to/music:/app/media -v /path/to/config:/app/data --restart=always xhongc/music_tag_web:latest。",
+      "曲库必须挂到 /app/media、配置挂到 /app/data，路径写错进去就是空库；镜像有 amd64 与 arm64 两种。",
+      "访问 127.0.0.1:8002/admin，默认 admin/admin，首次登录立刻改密码。",
+    ],
+    alternatives: [],
+    icon: {
+      letter: "M",
+      color: "#8A4B3B",
+    },
+    guide: {
+      intro: "先说清为什么需要 Web 版而不是本地工具，再给 V2 的部署命令，最后是三个必改项与批量刮削的正确顺序。",
+      markdown: `## 为什么要有 Web 版
+
+MP3Tag、Picard 只能操作本机文件。曲库在 NAS 上，要么把几 TB 拖到本地改完再传回去，要么用挂载——前者慢，后者在 Windows 上容易出编码问题。
+
+它是第三种做法：把目录挂进容器，浏览器远程改，改完文件还在原处。
+
+## 部署（V2 是当前推荐）
+
+先生成密钥，每个部署独立一份：
+
+\`\`\`bash
+export DJANGO_SECRET_KEY="$(openssl rand -hex 32)"
+\`\`\`
+
+再起容器：
+
+\`\`\`bash
+docker run -d -p 8002:8002 -e DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \\
+  -v /path/to/your/music:/app/media \\
+  -v /path/to/your/config:/app/data \\
+  --restart=always xhongc/music_tag_web:latest
+\`\`\`
+
+NAS 用户用 Portainer 的堆栈把同样的 YAML 粘进去即可。
+
+## 三个必须改的地方
+
+**默认口令。** admin/admin 是给首次登录用的，README 反复提醒要改。
+
+**密钥。** SECRET_KEY 不能复用示例值，每个部署单独生成。
+
+**挂载路径。** 曲库挂到 /app/media、配置挂到 /app/data。挂错的表现不是报错，是进去之后曲库空空——这时候先回头查 -v 参数，别怀疑扫描功能。
+
+## V1 与 V2 别混
+
+V1 是 8001 端口、compose 里带 \`command: /start\`；V2 是 8002 且去掉这行。照着旧教程抄 V1 配置去跑新镜像，容器会起不来。
+
+## 刮削前先小范围试
+
+批量刮削会直接把结果写回音频标签。先拿一张专辑试，确认匹配到的封面和艺术家是对的，再全量——匹配错了就是几千个文件一起错，回滚很麻烦。
+
+它只改元数据，不下载音频本体；作者也禁止商业使用。`,
+      resources: [
+        {
+          kind: "html",
+          title: "使用手册 V2（推荐）",
+          url: "https://xiers-organization.gitbook.io/music-tag-web-v2/",
+          note: "README 指定 V2 部署看这份，端口、挂载与 NAS 适配的图文步骤都在里面。",
+        },
+        {
+          kind: "html",
+          title: "使用手册 V1",
+          url: "https://xiers-organization.gitbook.io/music-tag-web/",
+          note: "仍在维护旧部署时对照用；V1 是 8001 端口且 compose 里带 command: /start。",
+        },
+        {
+          kind: "link",
+          title: "版本发布与镜像",
+          url: "https://github.com/xhongc/music-tag-web/releases",
+          note: "看变更与已知问题；升级前确认自己的端口与启动命令跟新版一致。",
+        },
+      ],
+    },
+  },
 ];
