@@ -9,7 +9,8 @@
  * 配置不对时**拒绝执行**而不是照常重建：默认停用词表含单字母 a/i，
  * 会让含 a/i 的英文词搜不到（git / figma / kicad），这必须是响亮的失败。
  *
- * 本脚本同时负责回填 search_pinyin（迁移 0007 只加列不填值）。
+ * 本脚本同时负责回填三个派生检索列：search_text（生成规则变过就要重算）、
+ * search_pinyin（迁移 0007 只加列不填值）、search_initials（迁移 0008 同）。
  * **顺序不能反**：索引里的 token 取决于插入/更新时该列的内容，
  * 必须先 UPDATE 出值，再重建索引，否则索引里是空的。
  * 回填读的是**数据库当前行**而不是种子文件 —— 后台编辑过的条目也要覆盖到。
@@ -22,7 +23,7 @@ import process from "node:process";
 
 import mysql from "mysql2/promise";
 
-import { searchInitialsOf, searchPinyinOf } from "../lib/catalog-rows.ts";
+import { searchInitialsOf, searchPinyinOf, searchTextOf } from "../lib/catalog-rows.ts";
 import { migrationConnectionOptions } from "../lib/db.ts";
 import { parseFlags } from "./_shared.mjs";
 
@@ -39,32 +40,49 @@ async function indexExists(conn, name) {
 }
 
 /**
- * 回填两个派生检索列（search_pinyin 全拼 / search_initials 首字母）。
+ * 回填三个派生检索列（search_text 原文 / search_pinyin 全拼 / search_initials 首字母）。
  * 基于数据库现有行计算，保证覆盖后台新建/编辑的条目。
- * 只传两个函数真正读取的三个字段，避免构造完整 Software。
+ *
+ * search_text 也要回填：它虽然平时由写入路径逐条生成，但**生成规则会变**
+ * （2026-10-24 加了汉字↔拉丁边界的空格合并，见 lib/catalog-rows.ts 的
+ * glueScriptBoundaries）。规则一改，存量行的 token 就停留在旧口径上，
+ * 表现为「按新规则建的索引搜不到」—— 只有重算整列再重建索引才对得上。
  */
 async function backfillSearchColumns(conn) {
-  const [rows] = await conn.query("SELECT slug, name, name_zh, aliases FROM items");
+  const [rows] = await conn.query("SELECT id, slug, name, name_zh, aliases, summary FROM items");
+  // 标签在子表里，不在 items 上（items 没有 tags 列）。一次查全再按 item_id 归组，
+  // 比每行一个子查询稳，也避免 JSON_ARRAYAGG 的排序不确定性。
+  const [tagRows] = await conn.query("SELECT item_id, tag FROM item_tags ORDER BY item_id, sort_index");
+  const tagsByItem = new Map();
+  for (const row of tagRows) {
+    const id = String(row.item_id);
+    if (!tagsByItem.has(id)) tagsByItem.set(id, []);
+    tagsByItem.get(id).push(String(row.tag));
+  }
   let filled = 0;
   for (const row of rows) {
-    let aliases = [];
-    try {
-      aliases = JSON.parse(String(row.aliases) || "[]");
-    } catch {
-      aliases = [];
-    }
+    const parseJson = (value) => {
+      try {
+        const parsed = JSON.parse(String(value ?? "[]"));
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    };
     const source = {
       name: String(row.name ?? ""),
       nameZh: row.name_zh == null ? "" : String(row.name_zh),
-      aliases: Array.isArray(aliases) ? aliases : [],
+      aliases: parseJson(row.aliases),
+      tags: tagsByItem.get(String(row.id)) ?? [],
+      summary: String(row.summary ?? ""),
     };
+    const text = searchTextOf(source);
     const pinyin = searchPinyinOf(source) || null;
     const initials = searchInitialsOf(source) || null;
-    await conn.query("UPDATE items SET search_pinyin = ?, search_initials = ? WHERE slug = ?", [
-      pinyin,
-      initials,
-      String(row.slug),
-    ]);
+    await conn.query(
+      "UPDATE items SET search_text = ?, search_pinyin = ?, search_initials = ? WHERE slug = ?",
+      [text, pinyin, initials, String(row.slug)],
+    );
     filled += 1;
   }
   return filled;
@@ -118,7 +136,7 @@ async function main() {
       return;
     }
 
-    console.log("[db:reindex] 回填 search_pinyin / search_initials …");
+    console.log("[db:reindex] 回填 search_text / search_pinyin / search_initials …");
     const filled = await backfillSearchColumns(conn);
     console.log("[db:reindex] 已回填 " + filled + " 行");
 

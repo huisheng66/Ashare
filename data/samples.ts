@@ -14,7 +14,9 @@ export const samples: Software[] = [
     tags: ["CLI", "视频", "开源"],
     summary: "命令行视频下载脚本，支持大量站点，可只下音频或指定清晰度。",
     body: "yt-dlp 是一个持续维护的命令行下载脚本，用来把网页视频存成本地文件。它不做界面，所有能力都通过参数表达：只取音频、限最高清晰度、批量按列表下载都可以一条命令完成，同一个命令换个参数就能重复执行，适合归档和批量任务。\n适合愿意开终端、想要可重复命令的人；偶尔下一次视频、只想点按钮的话，它不是最顺手的选择，图形界面的下载器会更省事。\n项目开源且更新频繁，建议从 GitHub Releases 获取最新版，旧版常因站点改版失效，遇到下载失败先升级再排查。",
-    scenes: ["code", "design"],
+    // 场景归「工具」：下载器是通用小工具，放开发 / 设计下会让这两个场景混进非创作类条目。
+    // yoinks（同类 GUI 前端）在 software.ts 里也是 tools。
+    scenes: ["tools"],
     platforms: ["windows", "macos", "linux"],
     source: "opensource",
     links: {

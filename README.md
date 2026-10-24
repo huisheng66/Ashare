@@ -89,6 +89,7 @@ npm run build   # 生产构建
 | `npm run admin:password` | 在终端隐藏输入并生成后台口令哈希 |
 | `npm run backup` | 把运行库与上传图片复制成带时间戳的快照（`--out` 换目录、`--keep N` 保留最近 N 份、`--list` 列出现有备份）。`--keep` 只删除带本脚本 `manifest.json` 的目录；快照若含用户投稿/反馈文件会提示分享前剔除 |
 | `npm run content:audit` | 列出条目缺失字段、场景库存与待补清单（`--scene <id>` 只看某个场景，`--json` 机器可读） |
+| `npm run license:audit` | 许可证缺口审计：列出「标了开源却没写许可证」的条目，并附 GitHub 的检测结果（`--files` 额外查根目录许可文件识别 MIT OR Apache-2.0 双许可，`--json` 机器可读）。**只报告不写数据**，原因见脚本头部注释 |
 | `npm run smoke:detail` | 详情页渲染冒烟：需先跑 `npm run dev`，逐个检查正文分段、外链、来源徽章与价格是否如实呈现 |
 | `npm run seed:drift` | 比对运行库与种子是否一致（`--strict` 有差异时非零退出），确认「两个落点」写的是同一份内容 |
 | `npm run stale-links` | 外链巡检：列出超过阈值没核验的条目（默认 90 天）。`--check` 探活、`--check-all` 探活全站、`--update` 回写通过者的核验日期、`--days N` 改阈值、`--strict` 有待复验或异常链接时非零退出（CI 用）、`--flaky-ok` 豁免人工确认过的误报、`--source seed` 从种子读目录、`--json` 机器可读 |

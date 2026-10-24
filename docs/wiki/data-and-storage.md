@@ -60,6 +60,16 @@ npm run seed:drift    # 比对两处是否一致（--strict 有差异非零退�
 
 ⚠️ **已知陷阱**：`lib/seed.ts` 的字段透传清单加新字段时，必须同步 `scripts/seed-drift.mjs` 的比对字段，漏了会让漂移检测对该字段静默失明（脚本 22-25 行注释记录了这个真实踩过的坑）。
 
+同步范围分三档（`lib/seed.ts`，由 `tests/seed-contract.test.mjs` 钉住）：
+
+| 清单 | 行为 | 放什么字段 |
+|---|---|---|
+| `SEED_SYNC_FIELDS` | 无条件覆盖运行库 | 种子是唯一事实源的：summary、body、scenes、license、links… |
+| `SEED_FILL_FIELDS` | **只在运行库为空时**补 | alternatives —— 后台改得更准，但「空」是没补，不是人工判定为空 |
+| 其余 `SEED_CARRIED_FIELDS` | 不写，只报漂移 | whoFor / whoNot / price 这类后台维护得更准的 |
+
+`SEED_FILL_FIELDS` 是 2026-10-24 补的第三档：在此之前，27 条种子里有 alternatives、运行库为空的条目，`seed:sync` 说「已是最新」、`seed:drift` 报 27 处不一致，两个脚本互相甩锅。
+
 ## 媒体存储：`lib/media-storage.ts`
 
 预览图与图标图的存储抽象，`MEDIA_DRIVER` 选择：

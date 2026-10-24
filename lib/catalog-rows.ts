@@ -103,6 +103,32 @@ export const ITEM_KEYS: string[] = [
   "createdAt", "updatedAt", "license", "version", "linksCheckedAt", "icon",
 ];
 
+/**
+ * 去掉「汉字 ↔ 拉丁/数字」之间的空格。
+ *
+ * 为什么必须做：ngram 索引是**按字切 bigram**，空格会切断 bigram。
+ * 目录里写着「3D 打印」，token 是 `3d` + `打印`；用户输入「3d打印」（中文用户
+ * 更习惯不带空格），token 是 `3d` + `d打` + `打印` —— 布尔模式要求每个 token 都命中，
+ * 而 `d打` 在库里不存在，于是**这条查询 0 结果**。
+ *
+ * 实测（676 条）：搜「3D 打印」召回 cura/prusaslicer/orcaslicer/bambu-studio 四条，
+ * 搜「3d打印」只剩 openscad 一条（它的正文里恰好有连写的「3D打印」）。
+ *
+ * 统一在**入库侧**连写之后，两种输入都能命中：
+ *   - 存「3d打印」，bigram = 3d / d打 / 打印
+ *   - 查「3d打印」→ 三个 bigram 全在
+ *   - 查「3D 打印」→ 切成 `3d` + `打印` 两个词，也都还在
+ * 所以查询侧不用改，改存储侧一处就够 —— 反过来说，只改查询侧救不了「带空格查不带空格的库」。
+ *
+ * 只处理边界处的空格：`git 提交` 这类**两个独立的词**不受影响（中间是汉字+汉字的空格，不动），
+ * 合并成一个词的只是「3d 打印」这种本来就该连读的写法。
+ */
+export function glueScriptBoundaries(text: string): string {
+  return text
+    .replace(/(?<=[\p{Script=Han}])\s+(?=[A-Za-z0-9])/gu, "")
+    .replace(/(?<=[A-Za-z0-9])\s+(?=[\p{Script=Han}])/gu, "");
+}
+
 /** 拼出供 FULLTEXT(ngram) 使用的可搜文本。查询侧同样做 NFKC，两边口径必须一致。 */
 export function searchTextOf(item: Software): string {
   return [
@@ -111,7 +137,10 @@ export function searchTextOf(item: Software): string {
     ...(item.aliases ?? []),
     ...(item.tags ?? []),
     item.summary,
-  ].join(" ").normalize("NFKC");
+  ]
+    .map((field) => glueScriptBoundaries(field.normalize("NFKC")))
+    .join(" ")
+    .normalize("NFKC");
 }
 
 /** 汉字 Unicode 范围（用 Script=Han，比手写区间更全，能覆盖扩展区与兼容表意文字）。 */

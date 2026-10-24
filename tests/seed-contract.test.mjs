@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { seedToItem, SEED_CARRIED_FIELDS, SEED_DRIFT_EXCLUDED, SEED_DRIFT_FIELDS, SEED_SYNC_FIELDS } from "../lib/seed.ts";
+import { seedToItem, SEED_CARRIED_FIELDS, SEED_DRIFT_EXCLUDED, SEED_DRIFT_FIELDS, SEED_FILL_FIELDS, SEED_SYNC_FIELDS } from "../lib/seed.ts";
 
 /**
  * 种子透传契约。
@@ -38,6 +38,18 @@ test("登记表被完整交代：CARRIED = DRIFT ∪ EXCLUDED，且 SYNC ⊆ DRI
   for (const field of SEED_SYNC_FIELDS) {
     assert.ok(SEED_DRIFT_FIELDS.includes(field), `同步会写 ${field}，漂移检查却看不见它`);
   }
+});
+
+test("补空档必须是漂移比对的一部分，且与无条件同步互斥", () => {
+  // 与上面同一条理由：补空会写运行库，漂移看不见它，就会重演「同步说已最新、漂移报不一致」。
+  for (const field of SEED_FILL_FIELDS) {
+    assert.ok(SEED_DRIFT_FIELDS.includes(field), `补空会写 ${field}，漂移检查却看不见它`);
+  }
+  // 同一个字段既无条件覆盖又只补空，语义自相矛盾：SYNC 会赢，FILL 永远不生效。
+  const both = SEED_FILL_FIELDS.filter((field) => SEED_SYNC_FIELDS.includes(field));
+  assert.deepEqual(both, [], "既在 SYNC 又在 FILL 里的字段，补空逻辑永远不会生效：" + both.join(", "));
+  // 补空档不写 guide：它有专门的归一化分支，走通用补空会比较「原始值 vs 归一化值」。
+  assert.ok(!SEED_FILL_FIELDS.includes("guide"), "guide 必须先过 normalizeGuide，不能走补空分支");
 });
 
 test("登记表与实际透传行为一致：每个字段都能从种子带进运行库", () => {

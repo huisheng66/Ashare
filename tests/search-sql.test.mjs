@@ -49,6 +49,10 @@ const QUERIES = [
   // 2 字符首字母：**含 a/i 的 token 最容易被停用词坑掉**（af → 暗房的首字母）。
   // db:reindex 必须用 OPTIMIZE TABLE 才能正确重建 token，只 DROP/ADD INDEX 时这条会红。
   "af", "an fang",
+  // 汉字↔拉丁混写：目录里写「3D 打印」，用户更常打「3d打印」。
+  // ngram 的空格会切断 bigram（d打），带空格入库时这条必然 0 结果 ——
+  // 入库侧连写（lib/catalog-rows.ts 的 glueScriptBoundaries）之后两种写法都要命中。
+  "3d打印", "3D 打印",
   "-foo", "(", "\"", "+++", "   ", "zzzznotfound",
 ];
 

@@ -5239,7 +5239,7 @@ README 开头就警告了：**MarkItDown 的 I/O 权限就是当前进程的权�
     summary: "可视化工作流自动化平台：拖拽画布加自定义代码，1500+ 集成与 9000+ 模板，可自托管或用云。",
     scenes: ["tools", "code"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["自动化", "工作流", "低代码", "自托管", "Docker"],
     body: "n8n 是一个用来搭 AI 智能体和工作流的平台。它的形态是可视化画布 + 自定义代码的组合：简单步骤拖拽，复杂逻辑直接写 JavaScript、Python 或引入 npm 包。\n核心卖点是不锁定模型供应商。 它接 OpenAI、Anthropic、Google 或开源模型，换 provider 不用改架构。对不想被某一家模型绑死的人来说这是关键。\n它的能力线是「从原型到生产」：多步 AI 工作流、逻辑分支、工具调用、人工审批环节、完整的可观测性。企业侧有基于角色的访问控制、审计日志、敏感数据处理支持。\n生态规模是它最实的优势：1500+ 集成，加上 9000+ 工作流模板。集成不是「导入配置」那种脆弱粘贴，通常是官方维护的节点。\n部署两种：一条安装脚本（需要 Docker），或者手动 Docker；也可以用官方的 n8n Cloud。\n但有一件事必须说清楚：n8n 不是 OSI 意义上的开源软件。 它的许可证是 fair-code 模式下的 Sustainable Use License 加上 n8n Enterprise License。官方自己列的三点是：源码始终可见、可自托管部署、可扩展（能加自己的节点和功能）。这三条是 fair-code 的定义，它不等于 MIT/Apache 那种可以随便拿去改改再发布的许可证。商业使用、嵌入到产品里对外提供服务这类场景，要自己去读 LICENSE.md 确认边界，必要时联系官方买企业许可。评估「能不能用」之前先看许可，这是选型里最容易事后翻车的一步。\n名字的来历也挺有意思：n8n = \"nodemation\"（Node-View + Node.js + automation），但作者觉得太长不适合命令行，最后取了 n8n。发音是 n-eight-n。",
     officialUrl: "https://n8n.io",
@@ -7503,38 +7503,104 @@ cd python && pip install maturin && maturin develop && python -m unittest discov
   },
 
   {
-    license: "GPL-3.0",
-    version: "2.22.3",
     slug: "heroic",
-    linksCheckedAt: "2026-10-13",
+    linksCheckedAt: "2026-10-24",
+    version: "2.22.3",
+    price: "免费",
     name: "Heroic Games Launcher",
-    nameZh: "Heroic 游戏启动器",
-    aliases: ["heroic", "heroic games", "epic 启动器", "gog 启动器", "游戏启动器"],
-    kind: "opensource",
-    source: "opensource",
+    nameZh: "Heroic 开源游戏启动器",
+    aliases: ["heroic", "heroic games launcher", "heroicgameslauncher", "Heroic 启动器", "GOG 启动器", "Epic 启动器"],
+    summary: "开源游戏启动器，用 Legendary / gogdl / Nile 在 Linux、Windows、macOS 上装并启动 Epic、GOG、Amazon 已购游戏。Linux 上靠 Wine / Proton 跑 Windows 游戏并显示 ProtonDB 兼容信息；代价是平台支持只覆盖到 macOS 14+ 与 Windows 10/11。",
     scenes: ["games"],
     platforms: ["windows", "macos", "linux"],
-    tags: ["游戏启动器", "Epic", "GOG", "开源"],
-    summary: "开源游戏启动器，把 Epic、GOG、Amazon 三个商店的游戏库收进一个跨平台界面，Linux 上靠 Wine/Proton 跑 Windows 游戏。",
-    body: "Heroic 是开源的游戏启动器，把 Epic、GOG、Amazon Prime 三个商店的游戏库收进同一个界面，Windows、macOS、Linux 都能用。它解决的是「游戏分散在三个官方启动器里」，以及 Linux 用户长期没有官方客户端的问题。\n三个商店各有实现：Epic 走 Legendary，GOG 用项目自研的 gogdl，Amazon 用 Nile。登录对应账号即可同步游戏库，已购游戏直接下载安装，也支持把本地已有的安装包 sideload 进来。Linux 上可以用 Wine 或 Proton 跑 Windows 游戏，能下载社区维护的自定义兼容层版本，内置 ProtonDB 与 Steam Deck 兼容性信息的查询入口。\n代价要先知道：它不是官方客户端，商店接口变动时功能可能暂时受损；Linux 上游戏能不能跑取决于具体游戏的反作弊与兼容性，README 明确写了 Epic 线上反作弊在 macOS 和 Linux 上取决于游戏本身；Windows 用户的收益最小——官方启动器在那边覆盖已经很全，它的独特价值在 Linux，其次是 macOS。\n项目以 GPL-3.0 开源，官网与 GitHub Releases 提供三平台安装包，Linux 另有 flatpak 渠道。",
+    source: "opensource",
+    license: "GPL-3.0",
+    tags: ["游戏启动器", "Epic Games", "GOG", "Proton", "开源"],
+    body: "Heroic 解决的是「我买的 Epic / GOG / Amazon 游戏，官方商店客户端在 Linux 上不好用甚至没有」这件事。它不是自己实现协议，而是站在三个命令行项目上：Epic 走 Legendary，GOG 走自家的 gogdl，Amazon 走 Nile。登录已有账号后能装、卸、更新、修复、移动游戏，也能导入已经装好的游戏，还能加非这三个商店的游戏与自定义分类。\nLinux 上的关键能力是 Wine / Proton：可以下载自定义的 Wine 与 Proton 版本，界面里直接显示 ProtonDB 与 Steam Deck 的兼容信息，装之前就知道这游戏能不能跑。macOS 走 Crossover。云存档同步、下载队列、自定义主题、40 多种语言（含简繁中文）也都有。反作弊那句要读清楚：Epic 的联机游戏在 macOS 与 Linux 上能不能玩，取决于游戏本身。\n支持范围写得比较硬：Linux 官方点名 Ubuntu（最近两个 LTS）、Fedora（最近两个版本）、Arch 及衍生版，其他发行版「能跑但得自己搞定」；Windows 要 10 / 11；macOS 要 14 或更新。\n安装渠道很多：Linux 有 Flatpak（推荐，多数发行版的软件中心可直接装）、deb、AUR（官方只支持 heroic-games-launcher-bin 这一个包）、rpm、AppImage、tar.xz 与 NixOS；Windows 用 winget install Heroic 或下载 Setup / Portable；macOS 用 brew install --cask --no-quarantine heroic 或拖 dmg。AppImage 与 tar.xz 没有依赖管理，README 提醒先确认 curl 在，否则会出怪问题。",
     officialUrl: "https://heroicgameslauncher.com",
     officialLabel: "heroicgameslauncher.com",
     links: {
       official: "https://heroicgameslauncher.com",
       github: "https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher",
     },
-    price: "免费",
+    whoFor: "在 Linux / Steam Deck 上想玩已购买的 Epic、GOG、Amazon 游戏的人；不想用官方商店客户端、希望一个界面管三个库的人。",
+    whoNot: "指望所有游戏都能跑的人（Linux 上靠 Wine / Proton，兼容与否看游戏）；用 macOS 13 或更老系统的人（要求 14+）；想从 AUR 装非官方包并回来要支持的人（README 明确说只支持 heroic-games-launcher-bin）。",
     installTips: [
-      "从官网或 GitHub Releases 下载对应系统的安装包；Linux 也可以用 flatpak。",
-      "登录 Epic、GOG 或 Amazon 任一账号，对应游戏库会自动同步进来。",
-      "选游戏点安装；Linux 上在安装设置里挑 Wine 或 Proton 版本，拿不准就先用默认。",
-      "跑不起来先查 ProtonDB 上这款游戏的页面，再试换兼容层版本。",
+      "Linux 首选 Flatpak：flathub.org/apps/details/com.heroicgameslauncher.hgl，多数发行版的软件中心（Discover、Pop!_Shop）可直接装。",
+      "Debian / Ubuntu 系从最新 release 下 .deb，双击或 sudo dpkg -i Heroic*amd64.deb；Fedora 下 .rpm 后 sudo dnf install ./heroic-*.x86_64.rpm。",
+      "Arch 只认 heroic-games-launcher-bin 这一个 AUR 包；其他 AUR 包出了问题别来 GitHub 或 Discord 问。",
+      "Windows：winget install Heroic；macOS：brew install --cask --no-quarantine heroic，或下 .dmg 把 Heroic 拖进 Applications。",
+      "用 AppImage 要先 chmod +x Heroic*.AppImage；AppImage 与 tar.xz 没有依赖管理，README 明确要求先确认 curl 命令可用。",
+      "Linux 上不用 Flatpak 时，README 建议保留 GE-Proton 作为 Wine runner，并说明 umu 默认开启、不需要额外装 Wine 依赖。",
     ],
-    whoFor: "游戏分散在 Epic、GOG、Amazon 三家，或者在 Linux、macOS 上想玩这些库的人。",
-    whoNot: "只玩 Steam 的人——Steam 官方客户端在哪个平台都覆盖得更好。",
-    alternatives: ["sunshine", "moonlight-qt"],
-    featured: false,
-    icon: { letter: "H", color: "#7C3AED", simpleIcon: "heroicgameslauncher" },
+    alternatives: ["lutris", "playnite"],
+    icon: {
+      letter: "H",
+      color: "#6D4AFF",
+    },
+    guide: {
+      intro: "按第一次用会卡在哪讲：从哪个渠道装最省事、登录后怎么装游戏、Linux 上 Wine / Proton 怎么选，以及为什么反作弊联机游戏可能上不去。",
+      markdown: `## 先选对安装渠道
+
+Linux 上最省心的是 Flatpak——多数发行版的软件中心里直接能搜到，依赖也一起带上：
+
+- Flathub：\`com.heroicgameslauncher.hgl\`
+- Debian / Ubuntu：下载 \`.deb\`，\`sudo dpkg -i Heroic*amd64.deb\`
+- Fedora：下载 \`.rpm\`，\`sudo dnf install ./heroic-*.x86_64.rpm\`
+- Arch（AUR）：\`heroic-games-launcher-bin\`（官方只认这一个）
+
+Windows 直接 \`winget install Heroic\`，或者从 release 下载 \`Heroic-x.x.x-Setup.exe\` / \`Heroic-x.x.x-Portable.exe\`。macOS 用 \`brew install --cask --no-quarantine heroic\`，或挂 dmg 后把应用拖进 Applications。
+
+用 AppImage 记得先给执行权限：
+
+\`\`\`bash
+chmod +x Heroic*.AppImage
+./Heroic*.AppImage
+\`\`\`
+
+AppImage 与 \`tar.xz\` 没有依赖管理，README 特别提醒**先确认 curl 存在**，不然会遇到各种奇怪的失败。
+
+## 登录后装第一个游戏
+
+打开 Heroic，用已有的 Epic Games、GOG 或 Amazon 账号登录，库里的游戏就会列出来。装之前先看界面上的兼容信息：Linux 下会显示 **ProtonDB 与 Steam Deck 的兼容等级**，这比装完再试省时间。
+
+已经装过的游戏不用重装，用「Import an already installed game」导入即可；不在三个商店里的程序也能手动加进库，并用自定义分类整理。
+
+## Linux 上 Wine / Proton 怎么选
+
+不用 Flatpak 的话，README 的建议是**保持 GE-Proton 作为 Wine runner**，并且 umu 默认开启，所以不需要额外装一套 Wine 依赖。想换版本可以在设置里下载自定义的 Wine / Proton。
+
+这一层是 Heroic 在 Linux 上体验的分水岭：Proton 版本不对，症状通常是能装但启动即退。遇到这种情况优先换 runner，而不是重装游戏。
+
+## 关于联机与反作弊
+
+README 的原话是「Play Epic games online [AntiCheat on macOS and on Linux depends on the game]」。也就是说带反作弊的多人游戏在 macOS / Linux 上能不能进，取决于游戏厂商，不是 Heroic 能决定的。想玩这类游戏请先查 ProtonDB 上别人的反馈，再决定要不要投入时间。
+
+## 存档与多设备
+
+云存档同步是内建功能，PC 上停、另一台机器上继续的前提是那台机器也用同一个账号登录。需要帮助时走 Discord（README 里给了链接），翻译问题去 Weblate 项目页。
+`,
+      resources: [
+        {
+          kind: "html",
+          title: "官网",
+          url: "https://heroicgameslauncher.com",
+          note: "功能总览与各平台下载入口。判断要不要从官方商店客户端换过来，先看这一页。",
+        },
+        {
+          kind: "html",
+          title: "GitHub 安装说明",
+          url: "https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher",
+          note: "Linux 各发行版、Windows、macOS 的逐条安装命令，以及支持的发行版与系统版本要求。装之前对照一遍。",
+        },
+        {
+          kind: "html",
+          title: "Flathub 页面",
+          url: "https://flathub.org/apps/details/com.heroicgameslauncher.hgl",
+          note: "Linux 上推荐的安装方式。发行版不在官方支持列表里时，Flatpak 通常是最稳的一条路。",
+        },
+      ],
+    },
   },
   {
     slug: "ecc",
@@ -13129,8 +13195,10 @@ yarn dev:collector
     name: "30 Days Of Python",
     nameZh: "Python 30 天",
     aliases: ["30-days-of-python", "30 days of python", "30daysofpython", "python 30天", "30天python"],
-    kind: "opensource",
-    source: "opensource",
+    // 仓库里没有 LICENSE 文件 = 默认版权保留，不是开源授权。按 n8n 的先例标 app，
+    // 别让「开源项目」这个标签替作者做出他没做的授权。
+    kind: "app",
+    source: "official",
     scenes: ["education"],
     platforms: ["windows", "macos", "linux"],
     tags: ["Python", "编程教程", "自学挑战", "练习"],
@@ -13749,7 +13817,7 @@ yarn dev:collector
     name: "tldraw",
     aliases: ["tldraw", "tldraw sdk", "无限画布", "canvas sdk", "白板 sdk"],
     kind: "app",
-    source: "opensource",
+    source: "official",
     scenes: ["design"],
     platforms: ["windows", "macos", "linux"],
     tags: ["白板", "无限画布", "SDK", "协作", "React"],
@@ -19363,6 +19431,7 @@ README 顶部写明：这是独立社区项目，与 Anthropic PBC 无关；库�
   },
   {
     slug: "happy-llm",
+    license: "CC-BY-NC-SA-4.0",
     linksCheckedAt: "2026-10-21",
     name: "Happy-LLM",
     nameZh: "Happy-LLM 从零构建大模型",
@@ -20708,6 +20777,7 @@ uvx mcp-for-blender install-addon
   },
   {
     slug: "serena",
+    license: "GPL-3.0-or-later",
     linksCheckedAt: "2026-10-21",
     name: "serena",
     nameZh: "Serena 语义代码工具包",
@@ -21031,6 +21101,8 @@ RealtimeAgent 通过 WebSocket 维护低延迟会话；VoicePipeline 串联转�
   },
   {
     slug: "rag-techniques",
+    price: "非商业免费",
+    kind: "app",
     linksCheckedAt: "2026-10-21",
     name: "RAG_Techniques",
     nameZh: "RAG Techniques 实战笔记库",
@@ -21038,9 +21110,9 @@ RealtimeAgent 通过 WebSocket 维护低延迟会话；VoicePipeline 串联转�
     summary: "用 42+ 个可运行 Notebook 拆解基础 RAG、CSV、评估、JSON、MemoRAG 等检索增强技巧，适合逐项做实验。它是学习与参考仓库，不是可直接部署的平台；每个技巧仍要在自己的数据上重做评估。",
     scenes: ["education", "code", "data"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["RAG", "Jupyter Notebook", "教程", "检索评估", "开源"],
-    body: "RAG_Techniques 是一个社区维护的进阶 RAG Notebook 集合，目标是把原理、代码和参考资料放在同一个可运行实验里。README 统计有 42 个以上 Notebook，从 Basic RAG、CSV 检索起步，逐步覆盖更复杂的检索与评估；近期列出的内容包括 MemoRAG、端到端 RAG 评估、Open-RAG-Eval 与 JSON RAG。多数条目同时提供 GitHub Notebook 与 Colab 入口。\n它更像实验手册而不是框架：你可以逐个观察分块、表示、召回、重排和答案验证如何影响结果，再把适合自己场景的部分移植进应用。仓库还链接 Agents Towards Production、GenAI Agents、Prompt Engineering 与 Agent Memory 等相关教程，适合建立学习路线。\n代价是“先进技巧”不等于自动优于简单基线。README 中对六个仓库的文档层实验甚至出现 LangChain 加文档后得分下降，提醒你现有规则、错误文档与测试集都会影响结论。每个 Notebook 的模型、数据与依赖可能不同，不能把示例分数直接外推到内部文档；选技巧前先固定问题集、引用标准、延迟和成本基线。",
+    body: "RAG_Techniques 是一个社区维护的进阶 RAG Notebook 集合，目标是把原理、代码和参考资料放在同一个可运行实验里。README 统计有 42 个以上 Notebook，从 Basic RAG、CSV 检索起步，逐步覆盖更复杂的检索与评估；近期列出的内容包括 MemoRAG、端到端 RAG 评估、Open-RAG-Eval 与 JSON RAG。多数条目同时提供 GitHub Notebook 与 Colab 入口。\n它更像实验手册而不是框架：你可以逐个观察分块、表示、召回、重排和答案验证如何影响结果，再把适合自己场景的部分移植进应用。仓库还链接 Agents Towards Production、GenAI Agents、Prompt Engineering 与 Agent Memory 等相关教程，适合建立学习路线。\n代价是“先进技巧”不等于自动优于简单基线。README 中对六个仓库的文档层实验甚至出现 LangChain 加文档后得分下降，提醒你现有规则、错误文档与测试集都会影响结论。每个 Notebook 的模型、数据与依赖可能不同，不能把示例分数直接外推到内部文档；选技巧前先固定问题集、引用标准、延迟和成本基线。\n许可是自定义的非商业许可：可读可改，商用要单独授权。",
     officialUrl: "https://diamant-ai.com",
     officialLabel: "diamant-ai.com",
     links: {
@@ -21646,6 +21718,7 @@ Agent 能操作 DOM 不代表它应该拥有所有业务权限。登录、删除
   },
   {
     slug: "cs249r-book",
+    license: "CC-BY-NC-SA-4.0",
     linksCheckedAt: "2026-10-21",
     name: "Machine Learning Systems",
     nameZh: "Machine Learning Systems 机器学习系统教材",
@@ -23225,6 +23298,7 @@ ETAPI（REST API）可用来做批量导入导出与自动化；支持 Evernote 
   },
   {
     slug: "dokploy",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-21",
     name: "Dokploy",
     nameZh: "Dokploy 自托管 PaaS",
@@ -23761,6 +23835,7 @@ npm run dev                 # 打开 http://localhost:6002
   },
   {
     slug: "changedetection-io",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-21",
     name: "changedetection.io",
     nameZh: "changedetection.io 网页变更监控",
@@ -24685,6 +24760,7 @@ README 明确写了：默认会**同时把页面存到 archive.org** 做冗余�
   },
   {
     slug: "setup-ipsec-vpn",
+    license: "CC-BY-SA-3.0",
     linksCheckedAt: "2026-10-21",
     name: "setup-ipsec-vpn",
     nameZh: "IPsec VPN 一键部署脚本",
@@ -25096,6 +25172,8 @@ Beszel 是**指标**监控与告警，不做日志检索，也不做链路追踪
   },
   {
     slug: "nocobase",
+    price: "社区版免费，商业插件付费",
+    kind: "app",
     linksCheckedAt: "2026-10-21",
     name: "NocoBase",
     nameZh: "NocoBase 无代码业务系统平台",
@@ -25103,9 +25181,9 @@ Beszel 是**指标**监控与告警，不做日志检索，也不做链路追踪
     summary: "开源无代码平台：数据模型、权限、工作流、审计日志都是现成基础设施，AI 在这之上用 CLI 与 skills 帮你搭，人也能用所见即所得界面改。适合要快速堆内部业务系统、又怕 AI 生成一堆黑盒代码的人；代价是插件化的概念不少，上手先得理解数据模型与界面区块的关系。",
     scenes: ["office", "code"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["无代码", "业务系统", "工作流", "AI 代理", "自建服务"],
-    body: "NocoBase 的定位不是「AI 从零生成一套系统」，而是「AI 在生产验证过的基础设施上帮你搭」。它把数据模型、权限、工作流、审计日志这些最容易写错的部分做成内置能力，AI 与人都在这套结构上工作，所以速度来自 AI、可靠性来自既有基础设施。\n三条主线。协作：编码代理拿到完整 CLI 与 skills（支持 Claude Code、Cursor、Codex、OpenCode、TRAE 等），人则有一键切换「使用模式 / 配置模式」的所见即所得界面，两边可以交替改——AI 先建数据模型和页面，人再手工调交互，反过来也成立。智能：内置 AI 员工能直接进业务流程（前端做分析、问答、辅助填表，后端做文档识别、风险监测、任务路由），对外通过 MCP、HTTP API、CLI 与 skills 接 OpenClaw、Hermes、Dify、Coze、n8n 等，也能连 Telegram、WhatsApp、Slack、Gmail；每个 AI 员工有自己的角色与字段级读写权限，改动都有审计日志。可靠：数据模型驱动、数据与界面解耦，数据留在你自己的数据库（也支持外部数据库与第三方 API 作为数据源），微内核 + 插件架构，功能都能通过插件组合扩展。\n上手是三条命令：npm install -g @nocobase/cli 装 CLI，nb --version 验证，nb init --ui 建应用；想让编码代理一起搭，README 的示例是在项目里跑 codex（或 claude、opencode）。不想装也能先去 demo.nocobase.com/new 试。\n代价要说清：它概念多（数据模型、区块、工作流、角色、插件），第一次上手比纯表单类工具陡；AI 建的部分仍然需要人来审，尤其是权限与工作流这种出错代价高的配置。",
+    body: "NocoBase 的定位不是「AI 从零生成一套系统」，而是「AI 在生产验证过的基础设施上帮你搭」。它把数据模型、权限、工作流、审计日志这些最容易写错的部分做成内置能力，AI 与人都在这套结构上工作，所以速度来自 AI、可靠性来自既有基础设施。\n三条主线。协作：编码代理拿到完整 CLI 与 skills（支持 Claude Code、Cursor、Codex、OpenCode、TRAE 等），人则有一键切换「使用模式 / 配置模式」的所见即所得界面，两边可以交替改——AI 先建数据模型和页面，人再手工调交互，反过来也成立。智能：内置 AI 员工能直接进业务流程（前端做分析、问答、辅助填表，后端做文档识别、风险监测、任务路由），对外通过 MCP、HTTP API、CLI 与 skills 接 OpenClaw、Hermes、Dify、Coze、n8n 等，也能连 Telegram、WhatsApp、Slack、Gmail；每个 AI 员工有自己的角色与字段级读写权限，改动都有审计日志。可靠：数据模型驱动、数据与界面解耦，数据留在你自己的数据库（也支持外部数据库与第三方 API 作为数据源），微内核 + 插件架构，功能都能通过插件组合扩展。\n上手是三条命令：npm install -g @nocobase/cli 装 CLI，nb --version 验证，nb init --ui 建应用；想让编码代理一起搭，README 的示例是在项目里跑 codex（或 claude、opencode）。不想装也能先去 demo.nocobase.com/new 试。\n代价要说清：它概念多（数据模型、区块、工作流、角色、插件），第一次上手比纯表单类工具陡；AI 建的部分仍然需要人来审，尤其是权限与工作流这种出错代价高的配置。\n许可不是标准开源许可：仓库根目录挂的是 NocoBase 自家的许可协议，商用与二次分发前要读原文。",
     officialUrl: "https://www.nocobase.com",
     officialLabel: "www.nocobase.com",
     links: {
@@ -25574,6 +25652,7 @@ gemini -p "Run tests and deploy" --output-format stream-json
   },
   {
     slug: "playwright",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-21",
     name: "Playwright",
     nameZh: "Playwright 浏览器自动化与测试",
@@ -25660,7 +25739,7 @@ test.use({ storageState: 'auth.json' });
 export default defineConfig({
   use: {
     trace: 'on-first-retry',
-    license: "Apache-2.0",
+
   },
 });
 \`\`\`
@@ -30904,6 +30983,8 @@ openclaude kill auth-refactor
   },
   {
     slug: "surrealdb",
+    kind: "app",
+    license: "BSL-1.1",
     linksCheckedAt: "2026-10-22",
     name: "SurrealDB",
     nameZh: "SurrealDB 多模型数据库",
@@ -30911,7 +30992,7 @@ openclaude kill auth-refactor
     summary: "Rust 写的多模型数据库：文档、图、关系、时序、向量放在一个引擎里，单二进制可嵌入也可集群。适合想砍掉一层后端服务的团队；代价是 SurrealQL 自成一套，生态与人才远不如 PostgreSQL。",
     scenes: ["code", "data"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["数据库", "多模型", "图数据库", "Rust"],
     body: "SurrealDB 想解决的是「一个应用要连好几个数据系统」：文档存储、图关系、关系型约束、时序、地理、向量检索，全在一个引擎里用同一种查询语言 SurrealQL 处理。它把记录 ID 做成一等公民（person:tobie 这种），所以图上一条 RELATE user:tobie->write->article:surreal 就能建边，不需要 JOIN 表也不用外键。\n部署形态很灵活：单个 Rust 二进制，可以当服务端跑，也可以作为库嵌进应用、通过 WASM 进浏览器、或者组成分布式集群。内置了行级权限、JWT/scope 认证、实时 live query，官方直接把它定位成「数据库 + API 后端」，能省掉中间那层 CRUD 服务。另外还提供 MCP server，方便接 LLM 与代理。\n代价是迁移成本。SurrealQL 看着像 SQL，但 record link、DEFINE FIELD 的表达式、图遍历语法都得重学，现有 ORM 与 BI 工具基本指望不上。生态是第二个问题：驱动、托管方案、能招到的人，都远少于主流关系库。许可证也不是常见的 Apache/MIT，商用前要自己读一遍。适合新项目或明确的图/实时场景，不适合把已有核心库平移过来。",
     officialUrl: "https://surrealdb.com",
@@ -31377,6 +31458,7 @@ gws sheets spreadsheets values get \\
   },
   {
     slug: "tqdm",
+    license: "MPL-2.0",
     linksCheckedAt: "2026-10-22",
     name: "tqdm",
     nameZh: "tqdm 进度条",
@@ -31794,6 +31876,7 @@ bilibili 的视频下载需要本机有 yt-dlp，没装会失败。其他平台�
   },
   {
     slug: "infisical",
+    license: "MIT",
     linksCheckedAt: "2026-10-22",
     name: "Infisical",
     nameZh: "Infisical 密钥管理",
@@ -32084,6 +32167,7 @@ session 存在 Redis，多副本部署时它是共享登录态的唯一途径。
   },
   {
     slug: "superset",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-22",
     name: "Apache Superset",
     nameZh: "Superset 数据可视化",
@@ -32273,6 +32357,8 @@ ffmpeg -i in.mp4 -vf fps=1 out_%04d.jpg   # 每秒一帧
   },
   {
     slug: "remotion",
+    price: "个人与小团队免费",
+    kind: "app",
     linksCheckedAt: "2026-10-22",
     name: "Remotion",
     nameZh: "Remotion 用 React 做视频",
@@ -32280,7 +32366,7 @@ ffmpeg -i in.mp4 -vf fps=1 out_%04d.jpg   # 每秒一帧
     summary: "用 React 写视频：每一帧就是一次组件渲染，npx create-video 起项目，渲染可走 Node、Lambda 或浏览器。适合要批量生成、数据驱动的视频；代价是许可证不是纯开源，公司规模到线要单独买授权。",
     scenes: ["photo", "code"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["视频生成", "React", "自动化", "开源"],
     body: "Remotion 把视频还原成「一帧一个 React 组件」：给定帧号，组件渲染出那一帧的画面。所以视频里的每个元素都是代码——能从接口拉数据、能按条件变颜色、能复用你现有的组件库。README 的一句话总结是「React 代码是唯一事实来源」，也意味着交互式编辑与编程式生成可以在同一个项目里来回切。\n三种工作方式对应三类人：让编码代理把想法变成视频、用拖拽做交互式编辑、直接写代码接数据。往上还有三种工程用途：给组织建一套动画资产库、在自己的机器上批量渲染成千上万条视频、或者把播放器嵌进一个工具里做成产品。渲染出口有 Node.js API、AWS Lambda、Vercel Sandbox 和浏览器端，按规模选。\n真正的门槛在思维方式而不是 API。习惯剪辑软件的人会本能地找时间轴，但这里时间是从帧号推出来的——所有动画都要由当前帧驱动，写成「渲染时跑到哪算哪」的逻辑。用 CSS 过渡或定时器写动画，在预览里看着能动，渲染出来每帧都一样，这是新手最典型的翻车。\n第二个必须提前知道的是许可证。README 没有含糊其辞：Remotion 有专门的许可证，某些情况下需要购买公司授权。团队要用之前先去读 LICENSE 那一页，而不是默认「GitHub 上的就是随便用」。另外批量渲染是 CPU/GPU 密集活，几千条视频的成本要先算清楚。",
     officialUrl: "https://remotion.dev",
@@ -33070,6 +33156,7 @@ Windows 的命令行把单引号换成双引号。这样只拿英文主线和图
   },
   {
     slug: "mpv",
+    license: "GPL-2.0",
     linksCheckedAt: "2026-10-22",
     name: "mpv",
     nameZh: "mpv 命令行播放器",
@@ -35398,6 +35485,7 @@ README 明说：直接用 Vercel 的「新建项目」克隆，Vercel 会给你�
   },
   {
     slug: "termux-app",
+    license: "GPL-3.0-only",
     linksCheckedAt: "2026-10-22",
     name: "Termux",
     nameZh: "Termux 安卓终端",
@@ -39069,6 +39157,7 @@ README 没有教程性质的内容，这是它和很多框架不同的地方。�
   },
   {
     slug: "wavesurfer-js",
+    license: "BSD-3-Clause",
     linksCheckedAt: "2026-10-22",
     name: "wavesurfer.js",
     nameZh: "wavesurfer.js（音频波形播放器）",
@@ -40581,6 +40670,7 @@ launcher 里通常有 release 与 develop 两条。想稳定造园选 release；
   },
   {
     slug: "openage",
+    license: "GPL-3.0-or-later",
     linksCheckedAt: "2026-10-22",
     name: "openage",
     nameZh: "openage 帝国时代引擎重写",
@@ -40861,6 +40951,7 @@ curl "127.0.0.1:7350/v2/account/authenticate/device?create=true" \\
   },
   {
     slug: "cataclysm-dda",
+    license: "CC-BY-SA-3.0",
     linksCheckedAt: "2026-10-22",
     name: "Cataclysm: Dark Days Ahead",
     nameZh: "CDDA 末世生存 Roguelike",
@@ -40946,6 +41037,7 @@ stable 与 experimental 的差别不只是新功能多少，而是内容会不�
   },
   {
     slug: "tiled",
+    license: "GPL-2.0",
     linksCheckedAt: "2026-10-22",
     name: "Tiled",
     nameZh: "Tiled 瓦片地图编辑器",
@@ -41208,6 +41300,8 @@ update(dt) 的 dt 是秒，移动要写成 position += velocity * dt，不乘 dt
   },
   {
     slug: "et",
+    price: "商业使用 ¥4999",
+    kind: "app",
     linksCheckedAt: "2026-10-22",
     name: "ET",
     nameZh: "ET 分布式游戏框架",
@@ -41215,7 +41309,7 @@ update(dt) 的 dt 是秒，移动要写成 position += velocity * dt，不乘 dt
     summary: "Unity 客户端 + C# 服务端一体化的 MMO 框架，纤程 / Actor 架构，配套分析器约束代码风格。开源版只允许学习，商用要另买授权，先看清 License 再动手。",
     scenes: ["games", "code"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["Unity", "C#", "MMO", "分布式框架"],
     body: "ET 是国人维护的 Unity 客户端 + C# 服务端框架，现在的主线是 ET10，自称面向 AI 编码时代。架构上是多进程多线程的 Actor 模型，抽象出纤程（fiber）——写起来像单线程同步代码，底层可以铺到多核上。前后端共用一套 C# 代码，服务端可跨 Windows 与 Linux 发布。\n它的一整套配套才是重点：分析器在编译期强制架构约束（await 安全、Entity 生命周期、包依赖），行为树、技能与 Buff、条件表达式、服务发现、.NET Aspire 编排都是独立包；测试框架能直接拉起多个客户端机器人跑完整的前后端交互，这也是它宣传的「AI 写完自己验证」的基础。\n必须把 License 摆在前面：开源版只允许学习，不能二次开源修改，商业使用需要购买许可，README 标价 4999。另外它体量大、概念多（Scene、Entity、System、Fiber、Package），没有 Unity 与 C# 基础的人很难啃下来。",
     officialUrl: "https://github.com/egametang/ET",
@@ -41289,6 +41383,7 @@ ET 面向的是长线运营的 MMO：多进程、分布式、热重载、机器�
   },
   {
     slug: "devilutionx",
+    kind: "app",
     linksCheckedAt: "2026-10-22",
     name: "DevilutionX",
     nameZh: "DevilutionX 暗黑破坏神移植",
@@ -41296,7 +41391,7 @@ ET 面向的是长线运营的 MMO：多进程、分布式、热重载、机器�
     summary: "把 1996 年的暗黑破坏神搬到现代系统上跑，带 bug 修复、宽屏和可选的血条经验条。仍然需要你自己的 DIABDAT.MPQ，它不附带任何游戏素材。",
     scenes: ["games"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["暗黑破坏神", "经典游戏", "C++", "游戏移植"],
     body: "DevilutionX 是 Diablo 与 Hellfire 的源码移植，目标很朴素：让老游戏在现代系统上能顺利跑起来，顺带修 bug、加一些可选的人性化开关。血条与经验条默认是关的，可以在设置里打开；不喜欢宽屏也能关掉。\n它跑的平台多得离谱：Windows、macOS、Linux、Android、iOS，还有 PS4、Xbox、Switch、Vita、3DS 甚至 Amiga。这份列表本身就说明代码被移植得相当干净。\n前提条件必须讲明：它不含游戏数据，你得有原版 Diablo 的 DIABDAT.MPQ（GOG 或暴雪商城能买，也可以从 GOG 安装包里提取）；想玩 Hellfire 资料片还要另外四个 mpq。没有正版的话，可以用共享版的 spawn.mpq 代替，但只能玩前几层内容。授权是 Sustainable Use License，仅限非商业使用，不能拿它或其衍生作品收费。",
     officialUrl: "https://github.com/diasurgical/DevilutionX",
@@ -41453,6 +41548,7 @@ CompactGUI 不打包、不移动文件，只是给文件夹打上 NTFS 的透明
   },
   {
     slug: "openttd",
+    license: "GPL-2.0",
     linksCheckedAt: "2026-10-22",
     name: "OpenTTD",
     nameZh: "OpenTTD 运输大亨",
@@ -42530,6 +42626,7 @@ pnpm dev
   },
   {
     slug: "photodemon",
+    license: "BSD-2-Clause",
     linksCheckedAt: "2026-10-22",
     name: "PhotoDemon",
     nameZh: "PhotoDemon 便携修图",
@@ -43433,6 +43530,7 @@ yarn install && yarn start
   },
   {
     slug: "plasmic",
+    license: "MIT",
     linksCheckedAt: "2026-10-22",
     name: "Plasmic",
     nameZh: "Plasmic 可视化建站与 CMS",
@@ -43481,7 +43579,7 @@ export default function HeroSection({ children }) {
 PLASMIC.registerComponent(HeroSection, {
   props: {
     children: "slot",
-    license: "MIT",
+
   },
 });
 \`\`\`
@@ -43704,6 +43802,7 @@ README 很短，这本身就是信息：它是个人项目，为了自己的需�
   },
   {
     slug: "transitions-dev",
+    kind: "app",
     linksCheckedAt: "2026-10-22",
     name: "Transitions.dev",
     nameZh: "Transitions.dev 动效片段库",
@@ -43711,7 +43810,7 @@ README 很短，这本身就是信息：它是个人项目，为了自己的需�
     summary: "可复制的 CSS 过渡片段集：弹窗、数字翻滚、通知角标、图标切换这类高频动效都有现成实现，片段自带命名空间与减动效保护。适合不想手调缓动曲线的前端；代价是 Pro 片段要登录才能拉，免费部分覆盖有限。",
     scenes: ["design", "code"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["动效", "CSS", "交互动画", "Tailwind", "开源"],
     body: "Transitions.dev 是一个动效片段站：每张卡片演示一种交互模式，配一段可直接粘贴的 CSS。README 的表格列了 12 个高频场景——卡片尺寸切换、数字弹入、通知角标、文本状态切换、菜单展开（带方向感知）、模态开合、面板滑出、页面左右切换、图标交换、成功打勾（含 SVG 路径描边）、头像组悬停、校验失败抖动。\n它比在 CodePen 上随手抄一段靠谱的地方在于片段的封装方式：自定义属性统一挂在 :root，过渡规则用 t-* 前缀做命名空间，还带了 @media (prefers-reduced-motion: reduce) 兜底。也就是说粘进项目不会污染全局类名，也不会让对动效敏感的用户难受。\n除了网站，它还有三条使用路径：CLI、agent skill（npx skills add 后让 Cursor / Claude Code 直接在你的项目里套用）、以及 Refine 工具——一条命令往运行中的应用注入时间轴面板，点选元素让 agent 对齐动效参数，改动是实时且可回滚的。\n要留意的是商业边界：Pro 片段先要 npx transitions-dev login 走浏览器设备码，再按名字拉取；授权允许个人与商业项目免费使用和修改，但不许把库本身重新分发成竞品。",
     officialUrl: "https://transitions.dev",
@@ -45725,6 +45824,7 @@ ports:
   },
   {
     slug: "tinyrenderer",
+    license: "Zlib",
     linksCheckedAt: "2026-10-22",
     name: "tinyrenderer",
     nameZh: "tinyrenderer 软件渲染器教程",
@@ -45822,6 +45922,7 @@ TGA 用 BGRA 顺序。你以为传的是红色，画出来是蓝色。这不是 
   },
   {
     slug: "p5js",
+    license: "LGPL-2.1",
     linksCheckedAt: "2026-10-22",
     name: "p5.js",
     nameZh: "p5.js 创意编程库",
@@ -46102,6 +46203,7 @@ setup.sh 是第一个卡点。它要先把镜像准备好，网络差的时候�
   },
   {
     slug: "learn-vim",
+    license: "CC-BY-NC-SA-4.0",
     linksCheckedAt: "2026-10-22",
     name: "Learn-Vim",
     nameZh: "Learn Vim 教程（29 章）",
@@ -47043,6 +47145,7 @@ using PlutoUI
   },
   {
     slug: "godot",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Godot Engine",
     nameZh: "Godot 游戏引擎",
@@ -47127,6 +47230,7 @@ Godot 的 2D 是独立的一套坐标系与渲染流程，不是 3D 的简化版
   },
   {
     slug: "opencv",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "OpenCV",
     nameZh: "OpenCV 计算机视觉库",
@@ -47212,6 +47316,7 @@ README 里的贡献要点一共五条，最常被忽略的是两条：一个 PR 
   },
   {
     slug: "penpot",
+    license: "MPL-2.0",
     linksCheckedAt: "2026-10-23",
     name: "Penpot",
     nameZh: "Penpot 开源设计协作平台",
@@ -47302,6 +47407,7 @@ Penpot 原生支持 **Design Tokens、Components、Variants**：
   },
   {
     slug: "professional-programming",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Professional Programming",
     nameZh: "Professional Programming 工程师书单",
@@ -47393,6 +47499,7 @@ Penpot 原生支持 **Design Tokens、Components、Variants**：
   },
   {
     slug: "supervision",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Supervision",
     nameZh: "Supervision 视觉工具箱",
@@ -47512,6 +47619,7 @@ sv.DetectionDataset.from_yolo(...).as_pascal_voc(...)
   },
   {
     slug: "bulma",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Bulma",
     nameZh: "Bulma CSS 框架",
@@ -47616,6 +47724,7 @@ Bulma 用 autoprefixer 处理 Flexbox 前缀，按 README 的说法兼容 Chrome
   },
   {
     slug: "bevy",
+    license: "MIT OR Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "Bevy",
     nameZh: "Bevy 游戏引擎",
@@ -47735,6 +47844,7 @@ Bevy 在 stable Rust 的默认配置下能正常编译，但迭代很慢。想�
   },
   {
     slug: "swiper",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Swiper",
     nameZh: "Swiper 触摸轮播组件",
@@ -47838,6 +47948,7 @@ npm run build:prod
   },
   {
     slug: "phaser",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Phaser",
     nameZh: "Phaser HTML5 游戏框架",
@@ -47939,6 +48050,7 @@ README 专门解释了这件事。\`phaser.js\` 有 8.23 MB，其中 **84% 是�
   },
   {
     slug: "voxcpm",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "VoxCPM",
     nameZh: "VoxCPM 语音合成模型",
@@ -48035,6 +48147,7 @@ wav = model.generate(text="(A young woman, gentle and sweet voice)Hello, welcome
   },
   {
     slug: "materialize",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Materialize",
     nameZh: "Materialize CSS 框架",
@@ -48143,6 +48256,7 @@ README 底部的版权声明写的是 **Code Copyright 2018 Materialize**，加�
   },
   {
     slug: "chatwoot",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Chatwoot",
     nameZh: "Chatwoot 客服工作台",
@@ -48248,6 +48362,7 @@ README 里有一句很实在的提醒：如果不设置相关的环境变量，*
   },
   {
     slug: "nextcloud",
+    license: "AGPL-3.0",
     linksCheckedAt: "2026-10-23",
     name: "Nextcloud Server",
     nameZh: "Nextcloud 私有云",
@@ -48347,6 +48462,7 @@ Nextcloud 的能力很大一部分在应用上。官方应用包括日历（cale
   },
   {
     slug: "bitchat",
+    license: "Unlicense",
     linksCheckedAt: "2026-10-23",
     name: "bitchat",
     nameZh: "bitchat 蓝牙 mesh 聊天",
@@ -48452,6 +48568,7 @@ README 有一句诚实的说明：mesh 使用一个由身份密钥派生的**持
   },
   {
     slug: "ocrmypdf",
+    license: "MPL-2.0",
     linksCheckedAt: "2026-10-23",
     name: "OCRmyPDF",
     nameZh: "OCRmyPDF 扫描件文字识别",
@@ -48563,6 +48680,7 @@ ocrmypdf myfile.pdf myfile.pdf
   },
   {
     slug: "sharp",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "sharp",
     nameZh: "sharp 图片处理模块",
@@ -48681,6 +48799,7 @@ readableStream
   },
   {
     slug: "egui",
+    license: "MIT OR Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "egui",
     nameZh: "egui Rust 界面库",
@@ -48784,114 +48903,8 @@ README 的 Non-goals 也说清楚了：**不做最强大的 GUI 库**，也**不
     },
   },
   {
-    slug: "musicfree",
-    linksCheckedAt: "2026-10-23",
-    name: "MusicFree",
-    nameZh: "MusicFree 插件化音乐播放器",
-    aliases: ["musicfree", "music free", "插件化音乐播放器", "无广告音乐播放器", "猫头猫音乐"],
-    summary: "插件化的免费音乐播放器，软件本身不带任何音源，搜索播放全靠插件。适合想要无广告、能自己接音源的播放器的人；代价是要自己找插件，且第三方插件存在安全与版权风险。",
-    scenes: ["music"],
-    platforms: ["windows", "macos", "linux"],
-    source: "opensource",
-    tags: ["音乐播放器", "插件化", "无广告", "Android", "开源"],
-    body: "MusicFree 是一个插件化、可定制、无广告的免费音乐播放器。它最重要的设计是**软件本身不集成任何平台的任何音源**：搜索、播放、查看专辑与作者、导入歌单、获取歌词，全部由插件完成。README 的说法是「只要能在互联网上搜到的音源，只要有对应插件，就能用它搜索播放」。\n这种解耦带来的结果是：播放器专心做播放器（浅色/深色主题、自定义背景、歌词关联——可以把 A 的歌词关联到 B，链式 A→B→C 也支持），音源交给插件。所有数据存在本地，不收集个人信息，AGPL-3.0 开源。\n代价与风险必须讲清：插件要你自己装，README 明确要求自行鉴别第三方插件的安全性（「不要安装来路不明的东西」），且插件产生的数据与软件无关。官方立场是不提供任何破解功能，示例插件仓库过滤掉 VIP、试听、付费歌曲。另外两个坑：小米/华为/vivo 等应用市场里的「MusicFree」是套用名称与 Logo 的广告软件，与本软件无关；有人卖「收费版/去广告版」也都是假的。\n移动端只支持 Android 与 Harmony OS，桌面版在另一个仓库（MusicFreeDesktop）。",
-    officialUrl: "https://musicfree.catcat.work",
-    officialLabel: "musicfree.catcat.work",
-    links: {
-      official: "https://musicfree.catcat.work",
-      github: "https://github.com/maotoumao/MusicFree",
-    },
-    whoFor: "受不了主流音乐 App 广告与推荐流、愿意自己折腾插件的人；以及想用自己搭建的离线音乐库来听歌的用户。",
-    whoNot: "只想装完就能听、不想碰插件的人——它不自带音源，装好是空的；或者不愿意承担第三方插件安全与版权风险的人。",
-    installTips: [
-      "只从 GitHub Releases 页下载（打不开可把 github 换成 gitcode）；应用市场里搜到的同名应用多为套名广告软件，别装。",
-      "装插件在侧边栏「设置 - 插件设置」里，支持本地安装与从网络安装（可解析 .js 文件与 .json 描述文件）。",
-      "官方示例插件源：在「从网络安装」里填 https://raw.gitcode.com/maotoumao/MusicFreePlugins/raw/master/plugins.json 。",
-      "第三方插件要自己鉴别安全性（留意是否有异常网络请求），插件产生的数据与软件无关，请注意版权并及时清理；软件本身不提供任何破解功能。",
-    ],
-    alternatives: [],
-    icon: {
-      letter: "M",
-      color: "#FF6B81",
-    },
-    guide: {
-      intro: "按第一次用会卡住的顺序讲：为什么装好是空的、插件怎么装、怎么判断插件能不能信、以及哪些「版本」一定不能装。",
-      markdown: `## 装好是空的，这不是坏了
-
-MusicFree 的核心设计是：**软件本身不集成任何音源**。搜索、播放、看专辑、看作者、导入歌单、取歌词，全部由插件完成。
-
-所以刚装好的播放器什么都搜不到——这是预期行为，不是安装失败。它只是一个播放器，音源要你通过插件接进来。
-
-想清楚这一点再决定要不要用：如果你期待「装完就能听」，那它不适合你。
-
-## 插件怎么装
-
-路径：侧边栏 **设置 → 插件设置**。支持两种方式：
-
-- **本地安装**：装已经下载好的插件文件
-- **从网络安装**：填入一个 URL，支持解析 \`.js\` 文件和 \`.json\` 描述文件
-
-官方给的示例插件源可以直接填进去试：
-
-\`\`\`text
-https://raw.gitcode.com/maotoumao/MusicFreePlugins/raw/master/plugins.json
-\`\`\`
-
-插件开发也有文档（站点上有插件开发说明），想自己写的话，插件本质是一个满足插件协议的 commonjs 模块，你只关心输入输出，分页与缓存交给播放器。
-
-## 第三方插件：先鉴别，再安装
-
-README 反复强调了这一点，值得照做：
-
-- 自己写的最安全，**不要安装来路不明的东西**
-- 装第三方插件前，基本看一下有没有奇怪的网络请求就够了
-- 因第三方恶意插件造成的损失与软件无关
-
-另外：插件可能产生与软件无关的版权数据，作者明确请使用者自行斟酌、及时删除。**软件不提倡也不提供任何破解行为**，示例插件仓库过滤掉了 VIP、试听、付费歌曲，也不会提供具备破解功能的插件。
-
-想长期稳定地用，搭建自己的离线音乐仓库是最干净的路。
-
-## 这几个「版本」一定不要装
-
-README 点名了两件事：
-
-1. **小米 / 华为 / vivo 等应用市场里的「MusicFree」与本软件无关**，是套用名称和 Logo 的广告软件
-2. 其它平台看到的**收费版 / 去广告版 / 破解版都是假的**——它本来就开源免费，遇到收费版请直接举报
-
-下载只认 GitHub Releases 页（打不开可以把 github 换成 gitcode）。
-
-## 平台与维护预期
-
-移动端目前只支持 **Android 与 Harmony OS**；桌面版在另一个仓库 MusicFreeDesktop。
-
-作者也说明了这是业余作品，每天能写的时间有限，会长期处于不稳定测试版本、更新频率不定——**请谨慎使用**，别拿它当唯一的听歌工具。
-
-常用问题可以看站点上的 Q&A 页面。
-`,
-      resources: [
-        {
-          kind: "html",
-          title: "官方站点",
-          url: "https://musicfree.catcat.work",
-          note: "下载方式、插件使用说明与插件开发文档都在这里。第一次装插件前先看使用说明。",
-        },
-        {
-          kind: "html",
-          title: "Releases 下载页",
-          url: "https://github.com/maotoumao/MusicFree/releases",
-          note: "唯一可信的下载来源（打不开可换成 gitcode）。其它渠道的收费版一律是假的。",
-        },
-        {
-          kind: "html",
-          title: "官方示例插件仓库",
-          url: "https://github.com/maotoumao/MusicFreePlugins",
-          note: "示意用的插件源，已过滤 VIP、试听、付费歌曲。从网络安装时可填它的 plugins.json 地址。",
-        },
-      ],
-    },
-  },
-  {
     slug: "claude-code-game-studios",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Claude Code Game Studios",
     nameZh: "Claude Code Game Studios 游戏开发模板",
@@ -48992,6 +49005,7 @@ README 给了实测数据来决定默认值：从同一份 brief 出发，minima
   },
   {
     slug: "onlook",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "Onlook",
     nameZh: "Onlook 可视化代码编辑器",
@@ -49097,6 +49111,7 @@ README 里的功能清单写得很诚实。已打勾的有：从文字或图片�
   },
   {
     slug: "babylon-js",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "Babylon.js",
     nameZh: "Babylon.js Web 3D 引擎",
@@ -49226,6 +49241,7 @@ README 用警告框写明的：CDN 的目的是**给正在学习平台或跑小�
   },
   {
     slug: "simple-icons",
+    license: "CC0-1.0",
     linksCheckedAt: "2026-10-23",
     name: "Simple Icons",
     nameZh: "Simple Icons 品牌图标库",
@@ -49363,6 +49379,7 @@ README 在 Usage 开头就用 IMPORTANT 框写明了：**所有使用者请先�
   },
   {
     slug: "huashu-design",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Huashu Design",
     nameZh: "Huashu Design 设计生成 skill",
@@ -49474,6 +49491,7 @@ npx skills add alchaincyf/huashu-design
   },
   {
     slug: "nsq",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "NSQ",
     nameZh: "NSQ 分布式消息平台",
@@ -49576,6 +49594,8 @@ README 在开头就用 NOTE 标出来了：**master 是开发分支，任何时�
   },
   {
     slug: "spacetimedb",
+    kind: "app",
+    license: "BSL-1.1",
     linksCheckedAt: "2026-10-23",
     name: "SpacetimeDB",
     nameZh: "SpacetimeDB 数据库即服务器",
@@ -49583,7 +49603,7 @@ README 在开头就用 NOTE 标出来了：**master 是开发分支，任何时�
     summary: "把业务逻辑直接上传进数据库、客户端不再经过中间服务器的「数据库即服务器」。用 Rust / C# / TypeScript / C++ 写模块，客户端订阅表就能拿到实时推送。要留意授权：BSL 1.1，几年后才转 AGPLv3（带链接例外，不要求你开源自己的代码）。",
     scenes: ["games", "code"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["数据库", "实时同步", "多人游戏", "Rust", "后端"],
     body: "SpacetimeDB 的核心主张就一句话：**它是关系型数据库，同时也是服务器**。你把应用逻辑以「模块」的形式上传进数据库，客户端直接连数据库、直接执行模块里的逻辑，中间不再有一层 web 或游戏服务器。权限与鉴权也写在模块里，跟写普通服务端没区别。\n具体形态是表（table）+ reducer（你的逻辑入口）：客户端连上来、调用 reducer、订阅表，数据一变 SpacetimeDB 就把更新推给订阅方，不需要轮询、不需要额外的 API 服务或 pub/sub 层。每个 reducer 都是一个 ACID 事务。模块可以用 Rust、C#、TypeScript、C++ 写，客户端 SDK 覆盖 TypeScript（含 React / Vue / Svelte / Angular / Node / Bun / Deno）、Rust、C#（含 Unity）和 C++（含 Unreal）。官方 MMORPG《BitCraft Online》的整个后端——聊天、物品、地形、玩家位置——就跑在一个 SpacetimeDB 模块里，实时同步给数千名玩家。\n性能与持久化的取舍它讲得很清楚：全部应用状态常驻内存换取访问速度，磁盘上的 commitlog 负责持久化与崩溃恢复；事务按批 fsync（group commit）。自 2.0 起客户端默认拿到 confirmed reads——服务端会等事务真正落盘再推订阅更新和返回 reducer 结果；能容忍崩溃丢一次写入的场景（很多游戏就是）可以用 withConfirmedReads(false) 换更低延迟。\n代价主要在两方面。一是授权：BSL 1.1，几年后才转为带链接例外的 AGPLv3——链接例外的意思是你**不必**开源自己的代码，只需回馈对 SpacetimeDB 本身的改动。二是它针对的是低延迟事务型负载，**不适合批处理或分析型查询**。",
     officialUrl: "https://spacetimedb.com",
@@ -49715,6 +49735,7 @@ README 直接说了：它**针对低延迟事务型负载优化，而不是批�
   },
   {
     slug: "rembg",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "rembg",
     nameZh: "rembg 图片去背景",
@@ -49850,6 +49871,7 @@ for file in Path('path/to/folder').glob('*.png'):
   },
   {
     slug: "eza",
+    license: "EUPL-1.2",
     linksCheckedAt: "2026-10-23",
     name: "eza",
     nameZh: "eza 现代化 ls 替代品",
@@ -49985,6 +50007,7 @@ eza 支持一个 \`theme.yml\` 配置文件，可以写进原本 LS_COLORS / EXA
   },
   {
     slug: "yjs",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Yjs",
     nameZh: "Yjs 协同编辑 CRDT 框架",
@@ -50109,6 +50132,7 @@ Yjs 是 **MIT 许可，可免费商用**。
   },
   {
     slug: "forem",
+    license: "AGPL-3.0",
     linksCheckedAt: "2026-10-23",
     name: "Forem",
     nameZh: "Forem 开源社区平台",
@@ -50241,6 +50265,7 @@ README 里有一句很诚实的提醒：developers.forem.com 的文档是很好�
   },
   {
     slug: "rocketmq",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "Apache RocketMQ",
     nameZh: "Apache RocketMQ 消息中间件",
@@ -50362,6 +50387,7 @@ README 列了一长串，挑几个真正影响选型的：
   },
   {
     slug: "tabler-icons",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "Tabler Icons",
     nameZh: "Tabler Icons 图标库",
@@ -50504,6 +50530,7 @@ README 明确建议：**把 \`latest\` 换成具体版本号**（示例给的是
   },
   {
     slug: "blueprint",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "Blueprint",
     nameZh: "Blueprint 数据密集 UI 组件库",
@@ -50629,6 +50656,7 @@ Apache 2.0。另外仓库提供了 \`@blueprintjs/eslint-plugin\` 与 \`stylelin
   },
   {
     slug: "atlas",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-23",
     name: "Atlas",
     nameZh: "AtlasOS Windows 优化 Playbook",
@@ -50745,6 +50773,7 @@ README 在 docs 站上为每个选项都写了利弊说明（\`docs.atlasos.net/
   },
   {
     slug: "nats-server",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "NATS Server",
     nameZh: "NATS 消息系统服务端",
@@ -50875,6 +50904,7 @@ Apache 2.0（除特别说明的源文件外）。
   },
   {
     slug: "funasr",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "FunASR",
     nameZh: "FunASR 语音识别工具包",
@@ -51019,6 +51049,7 @@ res = model.generate(input=chunk, cache=cache, is_final=(i == n_chunks - 1), ...
   },
   {
     slug: "ish",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-23",
     name: "iSH",
     nameZh: "iSH iOS 上的 Linux shell",
@@ -51152,6 +51183,7 @@ README 里有一段很坦诚的自述，值得读：iSH 的解释器**不是 JIT
   },
   {
     slug: "daily",
+    license: "AGPL-3.0",
     linksCheckedAt: "2026-10-23",
     name: "daily.dev",
     nameZh: "daily.dev 开发者资讯首页",
@@ -51443,6 +51475,7 @@ README 建议的新用户路线是：安装 → 连接团队 / 加入用户群�
   },
   {
     slug: "gun",
+    license: "MIT",
     linksCheckedAt: "2026-10-23",
     name: "GUN",
     nameZh: "GUN 去中心化图数据库",
@@ -51662,6 +51695,7 @@ README 明确鼓励走打包器：输出压缩、代码分割、tree shaking 都
   },
   {
     slug: "ruffle",
+    license: "MIT OR Apache-2.0",
     linksCheckedAt: "2026-10-23",
     name: "Ruffle",
     nameZh: "Ruffle Flash 模拟器",
@@ -52106,6 +52140,7 @@ https://ffmpegwasm.netlify.app/docs/faq                   # 高频问题
   },
   {
     slug: "imagemagick",
+    license: "ImageMagick",
     linksCheckedAt: "2026-10-23",
     name: "ImageMagick",
     nameZh: "ImageMagick 命令行图像处理",
@@ -52492,6 +52527,8 @@ npm run docs    # 构建 API 参考文档，输出到 docs
   },
   {
     slug: "emqx",
+    kind: "app",
+    license: "BSL-1.1",
     linksCheckedAt: "2026-10-23",
     name: "EMQX",
     nameZh: "EMQX MQTT 消息中间件",
@@ -52499,7 +52536,7 @@ npm run docs    # 构建 API 参考文档，输出到 docs
     summary: "面向 IoT 的高性能 MQTT broker，支持 MQTT 5.0/3.1.1/3.1，外加 MQTT-SN、CoAP、LwM2M 与 MQTT over QUIC，单集群可到 1 亿并发。代价要提前算：v5.9.0 起全特性统一为 BSL 1.1 许可，且源码构建必须用 EMQX 自己 fork 的 Erlang/OTP。",
     scenes: ["data", "code"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["MQTT", "IoT", "消息中间件", "规则引擎", "车联网"],
     body: "EMQX 是做设备接入与消息流转的消息中间件，主业是把海量 IoT 设备的连接和数据收进来、再往下传给后端。协议覆盖完整：MQTT 5.0 / 3.1.1 / 3.1 全支持，还有 MQTT over QUIC（README 说能更快的建连、减少队头阻塞、支持连接迁移），以及通过 gateway 支持的 MQTT-SN、CoAP、LwM2M。规模方面官方口径是单集群 1 亿并发连接、每秒数百万消息、亚毫秒级延迟，并且是无主（masterless）集群保证高可用。\n它不满足于只做 broker：内置 SQL 形态的规则引擎可以在数据流转过程中做处理、转换、富化和过滤，然后桥接到 50+ 的后系统（Kafka、RabbitMQ、Pulsar、RocketMQ、PostgreSQL、MySQL、MongoDB、Redis、ClickHouse、InfluxDB、以及各家云服务），也支持 Webhook。5.x 之后还加了消息队列语义（持久化队列、TTL、大小限制、负载均衡消费、可选 last-value）、零代码的 Flow Designer 编排画布，以及面向设备数据流的 AI 处理集成。安全面有 TLS/SSL、JWT / PSK / X.509 等多种认证与 ACL 精细授权，可接 LDAP / SQL / Redis 外部认证库。可观测性对接 Prometheus、Grafana、Datadog、OpenTelemetry，自带 Dashboard 与 HTTP API。\n两条必须提前知道的代价。其一，**许可变了**：README 加粗写明，从 v5.9.0 起原本开源版与企业版的所有特性统一到一个发行物，许可改为 **BSL 1.1**——它不再是 OSI 意义上的开源许可，商用和二次分发前要自己读清楚条款（官方有篇博客解释为什么改）。其二，**源码构建门槛**：EMQX 构建依赖的是 EMQX 自己 fork 的 Erlang/OTP（emqx/otp），用上游发行版构建明确不受支持，仓库根目录的 .tool-versions 给出确切版本（形如 erlang 27.3.4.2-9，末尾是 fork 修订号）；最省事的做法是用官方的 emqx-builder 容器镜像。版本对应关系也要留意：5.4+ 用 OTP 25/26，5.9+ 用 OTP 27，6.1+ 用 OTP 28。\n日常起服务最快是 Docker：一条 docker run 把 1883（MQTT）、8083（WebSocket）、8084（WSS）、8883（TLS）、18083（Dashboard）都映射出来即可。",
     officialUrl: "https://www.emqx.com",
@@ -53420,6 +53457,7 @@ README 描述的流程是：
   },
   {
     slug: "docker-android",
+    kind: "app",
     linksCheckedAt: "2026-10-24",
     name: "docker-android",
     nameZh: "docker-android 容器化安卓模拟器",
@@ -53429,7 +53467,7 @@ README 描述的流程是：
     platforms: ["linux"],
     source: "opensource",
     tags: ["Android", "Docker", "自动化测试", "CI"],
-    body: "docker-android 是一个为「一切与 Android 相关的事」准备的 Docker 镜像，主用途是应用的开发、运行与测试（原生、WebView 与混合应用都能覆盖）。它把模拟器的一整套依赖封进容器，对外暴露三样东西：一个 noVNC 网页桌面可以直接看容器里发生了什么、一个网页版日志界面、以及容器外用 adb connect 连上来控制的能力。\n对 CI 的价值在于一致性：镜像按安卓版本与 API 级别打好了标签（emulator_9.0 到 emulator_14.0，对应 API 28 到 34，另有 genymotion 与 mcp 两个独立标签），设备外观也有 Samsung Galaxy S6~S10、Nexus 系列、Pixel C 等十余种可选。README 列出的用例文档覆盖了构建 Android 项目、Appium UI 测试、在宿主机上控制模拟器、短信模拟、Jenkins 集成以及在 Azure/AWS/GCP 上部署。\n代价讲在前面：README 明确说这个镜像 **can be run under Ubuntu OS only**，所以 macOS 与 Windows 用户要先起一台支持虚拟化的 Ubuntu 虚拟机；另外宿主机必须开启虚拟化，官方建议用 kvm-ok 检查；再有，容器重启默认是会销毁模拟设备的，要持久化得把卷挂到 /home/androidusr。还有一条容易被忽略 —— 免费版带用户行为分析而 Pro 版没有；新安卓版本（15/16/17）、root 权限执行、无头模式、录像这些都在 Pro 版里，而 Pro 镜像只有活跃赞助者能拉取。",
+    body: "docker-android 是一个为「一切与 Android 相关的事」准备的 Docker 镜像，主用途是应用的开发、运行与测试（原生、WebView 与混合应用都能覆盖）。它把模拟器的一整套依赖封进容器，对外暴露三样东西：一个 noVNC 网页桌面可以直接看容器里发生了什么、一个网页版日志界面、以及容器外用 adb connect 连上来控制的能力。\n对 CI 的价值在于一致性：镜像按安卓版本与 API 级别打好了标签（emulator_9.0 到 emulator_14.0，对应 API 28 到 34，另有 genymotion 与 mcp 两个独立标签），设备外观也有 Samsung Galaxy S6~S10、Nexus 系列、Pixel C 等十余种可选。README 列出的用例文档覆盖了构建 Android 项目、Appium UI 测试、在宿主机上控制模拟器、短信模拟、Jenkins 集成以及在 Azure/AWS/GCP 上部署。\n代价讲在前面：README 明确说这个镜像 **can be run under Ubuntu OS only**，所以 macOS 与 Windows 用户要先起一台支持虚拟化的 Ubuntu 虚拟机；另外宿主机必须开启虚拟化，官方建议用 kvm-ok 检查；再有，容器重启默认是会销毁模拟设备的，要持久化得把卷挂到 /home/androidusr。还有一条容易被忽略 —— 免费版带用户行为分析而 Pro 版没有；新安卓版本（15/16/17）、root 权限执行、无头模式、录像这些都在 Pro 版里，而 Pro 镜像只有活跃赞助者能拉取。\n许可写的是「Apache 2.0 加附加条款」的自定义许可：fork 时被要求换掉原作者的表单 ID，不能当标准 Apache-2.0 用。",
     officialUrl: "https://github.com/budtmo/docker-android",
     officialLabel: "github.com",
     links: {
@@ -54658,6 +54696,7 @@ README 有一节标题就是 Commercial Features and Support，列出客户付�
   },
   {
     slug: "pillow",
+    license: "MIT-CMU",
     linksCheckedAt: "2026-10-24",
     name: "Pillow",
     nameZh: "Pillow 图像处理库",
@@ -55390,104 +55429,6 @@ npm install @react-icons/all-files --save
           title: "npm 包页面",
           url: "https://www.npmjs.com/package/react-icons",
           note: "看当前发布版本与安装命令。项目锁版本时以这里为准。",
-        },
-      ],
-    },
-  },
-  {
-    slug: "heroicgameslauncher",
-    linksCheckedAt: "2026-10-24",
-    name: "Heroic Games Launcher",
-    nameZh: "Heroic 开源游戏启动器",
-    aliases: ["heroic", "heroic games launcher", "heroicgameslauncher", "Heroic 启动器", "GOG 启动器", "Epic 启动器"],
-    summary: "开源游戏启动器，用 Legendary / gogdl / Nile 在 Linux、Windows、macOS 上装并启动 Epic、GOG、Amazon 已购游戏。Linux 上靠 Wine / Proton 跑 Windows 游戏并显示 ProtonDB 兼容信息；代价是平台支持只覆盖到 macOS 14+ 与 Windows 10/11。",
-    scenes: ["games"],
-    platforms: ["windows", "macos", "linux"],
-    source: "opensource",
-    license: "GPL-3.0",
-    tags: ["游戏启动器", "Epic Games", "GOG", "Proton", "开源"],
-    body: "Heroic 解决的是「我买的 Epic / GOG / Amazon 游戏，官方商店客户端在 Linux 上不好用甚至没有」这件事。它不是自己实现协议，而是站在三个命令行项目上：Epic 走 Legendary，GOG 走自家的 gogdl，Amazon 走 Nile。登录已有账号后能装、卸、更新、修复、移动游戏，也能导入已经装好的游戏，还能加非这三个商店的游戏与自定义分类。\nLinux 上的关键能力是 Wine / Proton：可以下载自定义的 Wine 与 Proton 版本，界面里直接显示 ProtonDB 与 Steam Deck 的兼容信息，装之前就知道这游戏能不能跑。macOS 走 Crossover。云存档同步、下载队列、自定义主题、40 多种语言（含简繁中文）也都有。反作弊那句要读清楚：Epic 的联机游戏在 macOS 与 Linux 上能不能玩，取决于游戏本身。\n支持范围写得比较硬：Linux 官方点名 Ubuntu（最近两个 LTS）、Fedora（最近两个版本）、Arch 及衍生版，其他发行版「能跑但得自己搞定」；Windows 要 10 / 11；macOS 要 14 或更新。\n安装渠道很多：Linux 有 Flatpak（推荐，多数发行版的软件中心可直接装）、deb、AUR（官方只支持 heroic-games-launcher-bin 这一个包）、rpm、AppImage、tar.xz 与 NixOS；Windows 用 winget install Heroic 或下载 Setup / Portable；macOS 用 brew install --cask --no-quarantine heroic 或拖 dmg。AppImage 与 tar.xz 没有依赖管理，README 提醒先确认 curl 在，否则会出怪问题。",
-    officialUrl: "https://heroicgameslauncher.com",
-    officialLabel: "heroicgameslauncher.com",
-    links: {
-      official: "https://heroicgameslauncher.com",
-      github: "https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher",
-    },
-    whoFor: "在 Linux / Steam Deck 上想玩已购买的 Epic、GOG、Amazon 游戏的人；不想用官方商店客户端、希望一个界面管三个库的人。",
-    whoNot: "指望所有游戏都能跑的人（Linux 上靠 Wine / Proton，兼容与否看游戏）；用 macOS 13 或更老系统的人（要求 14+）；想从 AUR 装非官方包并回来要支持的人（README 明确说只支持 heroic-games-launcher-bin）。",
-    installTips: [
-      "Linux 首选 Flatpak：flathub.org/apps/details/com.heroicgameslauncher.hgl，多数发行版的软件中心（Discover、Pop!_Shop）可直接装。",
-      "Debian / Ubuntu 系从最新 release 下 .deb，双击或 sudo dpkg -i Heroic*amd64.deb；Fedora 下 .rpm 后 sudo dnf install ./heroic-*.x86_64.rpm。",
-      "Arch 只认 heroic-games-launcher-bin 这一个 AUR 包；其他 AUR 包出了问题别来 GitHub 或 Discord 问。",
-      "Windows：winget install Heroic；macOS：brew install --cask --no-quarantine heroic，或下 .dmg 把 Heroic 拖进 Applications。",
-      "用 AppImage 要先 chmod +x Heroic*.AppImage；AppImage 与 tar.xz 没有依赖管理，README 明确要求先确认 curl 命令可用。",
-      "Linux 上不用 Flatpak 时，README 建议保留 GE-Proton 作为 Wine runner，并说明 umu 默认开启、不需要额外装 Wine 依赖。",
-    ],
-    alternatives: [],
-    icon: {
-      letter: "H",
-      color: "#6D4AFF",
-    },
-    guide: {
-      intro: "按第一次用会卡在哪讲：从哪个渠道装最省事、登录后怎么装游戏、Linux 上 Wine / Proton 怎么选，以及为什么反作弊联机游戏可能上不去。",
-      markdown: `## 先选对安装渠道
-
-Linux 上最省心的是 Flatpak——多数发行版的软件中心里直接能搜到，依赖也一起带上：
-
-- Flathub：\`com.heroicgameslauncher.hgl\`
-- Debian / Ubuntu：下载 \`.deb\`，\`sudo dpkg -i Heroic*amd64.deb\`
-- Fedora：下载 \`.rpm\`，\`sudo dnf install ./heroic-*.x86_64.rpm\`
-- Arch（AUR）：\`heroic-games-launcher-bin\`（官方只认这一个）
-
-Windows 直接 \`winget install Heroic\`，或者从 release 下载 \`Heroic-x.x.x-Setup.exe\` / \`Heroic-x.x.x-Portable.exe\`。macOS 用 \`brew install --cask --no-quarantine heroic\`，或挂 dmg 后把应用拖进 Applications。
-
-用 AppImage 记得先给执行权限：
-
-\`\`\`bash
-chmod +x Heroic*.AppImage
-./Heroic*.AppImage
-\`\`\`
-
-AppImage 与 \`tar.xz\` 没有依赖管理，README 特别提醒**先确认 curl 存在**，不然会遇到各种奇怪的失败。
-
-## 登录后装第一个游戏
-
-打开 Heroic，用已有的 Epic Games、GOG 或 Amazon 账号登录，库里的游戏就会列出来。装之前先看界面上的兼容信息：Linux 下会显示 **ProtonDB 与 Steam Deck 的兼容等级**，这比装完再试省时间。
-
-已经装过的游戏不用重装，用「Import an already installed game」导入即可；不在三个商店里的程序也能手动加进库，并用自定义分类整理。
-
-## Linux 上 Wine / Proton 怎么选
-
-不用 Flatpak 的话，README 的建议是**保持 GE-Proton 作为 Wine runner**，并且 umu 默认开启，所以不需要额外装一套 Wine 依赖。想换版本可以在设置里下载自定义的 Wine / Proton。
-
-这一层是 Heroic 在 Linux 上体验的分水岭：Proton 版本不对，症状通常是能装但启动即退。遇到这种情况优先换 runner，而不是重装游戏。
-
-## 关于联机与反作弊
-
-README 的原话是「Play Epic games online [AntiCheat on macOS and on Linux depends on the game]」。也就是说带反作弊的多人游戏在 macOS / Linux 上能不能进，取决于游戏厂商，不是 Heroic 能决定的。想玩这类游戏请先查 ProtonDB 上别人的反馈，再决定要不要投入时间。
-
-## 存档与多设备
-
-云存档同步是内建功能，PC 上停、另一台机器上继续的前提是那台机器也用同一个账号登录。需要帮助时走 Discord（README 里给了链接），翻译问题去 Weblate 项目页。
-`,
-      resources: [
-        {
-          kind: "html",
-          title: "官网",
-          url: "https://heroicgameslauncher.com",
-          note: "功能总览与各平台下载入口。判断要不要从官方商店客户端换过来，先看这一页。",
-        },
-        {
-          kind: "html",
-          title: "GitHub 安装说明",
-          url: "https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher",
-          note: "Linux 各发行版、Windows、macOS 的逐条安装命令，以及支持的发行版与系统版本要求。装之前对照一遍。",
-        },
-        {
-          kind: "html",
-          title: "Flathub 页面",
-          url: "https://flathub.org/apps/details/com.heroicgameslauncher.hgl",
-          note: "Linux 上推荐的安装方式。发行版不在官方支持列表里时，Flatpak 通常是最稳的一条路。",
         },
       ],
     },
@@ -56443,6 +56384,7 @@ README 说它有 5000 多个新字形（字母数字、双线体、Fraktur、运
   },
   {
     slug: "eartrumpet",
+    kind: "app",
     linksCheckedAt: "2026-10-24",
     name: "EarTrumpet",
     nameZh: "EarTrumpet 音量控制器",
@@ -56452,7 +56394,7 @@ README 说它有 5000 多个新字形（字母数字、双线体、Fraktur、运
     platforms: ["windows"],
     source: "opensource",
     tags: ["音量控制", "音频", "Windows", "系统工具", "开源"],
-    body: "EarTrumpet 解决的是 Windows 音量面板太粗糙这件事：系统自带的混音器藏得深、不能按应用直接调、也不能指定某个应用走哪块声卡。它常驻在托盘，点开就是每个应用的音量条，能做的事写在 README 的功能列表里：多声道感知的峰值可视化、独立的音量混合器、把应用在不同播放设备之间移动、默认播放设备管理、通过 Microsoft Store 自动更新、浅色 / 深色与全部强调色、可配置快捷键、现代右键菜单，以及 20 多种语言（翻译通过 Crowdin 由社区维护）。\n它的口碑可以作为参考：2022 年 Microsoft Store Community Choice Awards 的 Open Platform 类别获奖作品，README 里引了 Linus Tech Tips、TechQuickie、The Verge 与 Windows Central 的评价，其中 The Verge 那句点出了核心——Windows 11 自带的音频管理仍然不好用，而 EarTrumpet 把每个应用的音量、输入与输出都能单独指定。\n代价与边界很直接：它只做 Windows（WPF 写的，README 顶部有 Microsoft Store 与 Chocolatey 两个渠道的徽章），没有 macOS / Linux 版本；它是托盘工具，靠常驻后台工作。另外 README 里没有给出具体的系统版本要求，所以别假设老版本 Windows 一定能用——实际支持范围以商店页面为准。",
+    body: "EarTrumpet 解决的是 Windows 音量面板太粗糙这件事：系统自带的混音器藏得深、不能按应用直接调、也不能指定某个应用走哪块声卡。它常驻在托盘，点开就是每个应用的音量条，能做的事写在 README 的功能列表里：多声道感知的峰值可视化、独立的音量混合器、把应用在不同播放设备之间移动、默认播放设备管理、通过 Microsoft Store 自动更新、浅色 / 深色与全部强调色、可配置快捷键、现代右键菜单，以及 20 多种语言（翻译通过 Crowdin 由社区维护）。\n它的口碑可以作为参考：2022 年 Microsoft Store Community Choice Awards 的 Open Platform 类别获奖作品，README 里引了 Linus Tech Tips、TechQuickie、The Verge 与 Windows Central 的评价，其中 The Verge 那句点出了核心——Windows 11 自带的音频管理仍然不好用，而 EarTrumpet 把每个应用的音量、输入与输出都能单独指定。\n代价与边界很直接：它只做 Windows（WPF 写的，README 顶部有 Microsoft Store 与 Chocolatey 两个渠道的徽章），没有 macOS / Linux 版本；它是托盘工具，靠常驻后台工作。另外 README 里没有给出具体的系统版本要求，所以别假设老版本 Windows 一定能用——实际支持范围以商店页面为准。\n许可在 MIT 之上加了排除名单：几个被点名的实体不在授权范围内。",
     officialUrl: "https://eartrumpet.app",
     officialLabel: "eartrumpet.app",
     links: {
@@ -56644,6 +56586,7 @@ README 顶部有一条方向声明：Kornia 正在做成 PyTorch 生态里可微
   },
   {
     slug: "mosquitto",
+    license: "EPL-2.0 OR BSD-3-Clause",
     linksCheckedAt: "2026-10-24",
     name: "Eclipse Mosquitto",
     nameZh: "Mosquitto MQTT 消息代理",
@@ -56869,6 +56812,7 @@ README 的设计原则一节很有参考价值，**别指望它有这些能力**
   },
   {
     slug: "libzmq",
+    license: "MPL-2.0",
     linksCheckedAt: "2026-10-24",
     name: "ZeroMQ",
     nameZh: "libzmq 消息内核",
@@ -56951,6 +56895,7 @@ README 说 DRAFT API 随时可能变、且不提前通知，发行版打包建�
   },
   {
     slug: "centrifugo",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Centrifugo",
     nameZh: "Centrifugo 实时消息服务",
@@ -57038,6 +56983,7 @@ insecure 参数把鉴权整个关掉了，所以本地怎么连都通。上线�
   },
   {
     slug: "fluentui-system-icons",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Fluent UI System Icons",
     nameZh: "Fluent 系统图标集",
@@ -57127,6 +57073,7 @@ README 里的依赖示例都带完整版本号（写作时的 1.1.344）。Andro
   },
   {
     slug: "caire",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Caire",
     nameZh: "Caire 内容感知缩放",
@@ -57218,6 +57165,7 @@ README 里的依赖示例都带完整版本号（写作时的 1.1.344）。Andro
   },
   {
     slug: "pixelorama",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Pixelorama",
     nameZh: "Pixelorama 像素画工具",
@@ -57309,6 +57257,7 @@ PNG 序列是兼容性最好的中间产物：任何引擎都能读，出错也�
   },
   {
     slug: "ytdlnis",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "YTDLnis",
     nameZh: "YTDLnis 安卓下载器",
@@ -57400,6 +57349,7 @@ YouTube 一类站点的高清视频是音视频分离的两条流，下载后需
   },
   {
     slug: "rapidraw",
+    license: "AGPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "RapidRAW",
     nameZh: "RapidRAW 轻量 RAW 修图",
@@ -57490,6 +57440,7 @@ YouTube 一类站点的高清视频是音视频分离的两条流，下载后需
   },
   {
     slug: "optimizerduck",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "optimizerDuck",
     nameZh: "optimizerDuck 系统优化",
@@ -57585,6 +57536,7 @@ README 把 42 项分成性能、隐私、GPU、电源、臃肿组件与服务、
   },
   {
     slug: "manga-image-translator",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "Manga Image Translator",
     nameZh: "漫画图片翻译",
@@ -57679,6 +57631,7 @@ Python 3.12 起步；Windows 上必须先装 Microsoft C++ Build Tools，某些�
   },
   {
     slug: "openframeworks",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "openFrameworks",
     nameZh: "openFrameworks 创意编程",
@@ -57779,6 +57732,7 @@ examples 目录按主题分（graphics、sound、video、computer vision 等）�
   },
   {
     slug: "omni-tools",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "OmniTools",
     nameZh: "OmniTools 自建工具箱",
@@ -57872,6 +57826,7 @@ README 的国际化覆盖率表里，中文约七成、缺几百个键。表现�
   },
   {
     slug: "react-player",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "ReactPlayer",
     nameZh: "ReactPlayer 播放组件",
@@ -57968,6 +57923,7 @@ README 的国际化覆盖率表里，中文约七成、缺几百个键。表现�
   },
   {
     slug: "tkinter-designer",
+    license: "BSD-3-Clause",
     linksCheckedAt: "2026-10-24",
     name: "Tkinter Designer",
     nameZh: "Tkinter Designer 界面生成",
@@ -58067,6 +58023,7 @@ URL 必须加引号。Figma 的分享链接通常带 \`?node-id=...&t=...\` 这�
   },
   {
     slug: "milligram",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Milligram",
     nameZh: "Milligram 极简 CSS",
@@ -58169,6 +58126,7 @@ Milligram 适合「内容为主、交互为辅」的页面：
   },
   {
     slug: "cemu",
+    license: "MPL-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Cemu",
     nameZh: "Cemu Wii U 模拟器",
@@ -58269,6 +58227,7 @@ Milligram 适合「内容为主、交互为辅」的页面：
   },
   {
     slug: "gamenetworkingsockets",
+    license: "BSD-3-Clause",
     linksCheckedAt: "2026-10-24",
     name: "GameNetworkingSockets",
     nameZh: "GameNetworkingSockets 联机传输",
@@ -58363,6 +58322,7 @@ NAT 穿透走 WebRTC 的 ICE，但「双方怎么交换候选地址」这件事�
   },
   {
     slug: "mobile-mcp",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Mobile MCP",
     nameZh: "Mobile MCP 移动端自动化",
@@ -58472,6 +58432,7 @@ Claude Code 也可以一条命令：
   },
   {
     slug: "dicebear",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "DiceBear",
     nameZh: "DiceBear 头像生成",
@@ -58571,6 +58532,7 @@ README 指向 licenses 页面汇总。上线前把你实际用到的那几套挑
   },
   {
     slug: "cocos-engine",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Cocos Engine",
     nameZh: "Cocos Creator 运行时引擎",
@@ -58649,6 +58611,7 @@ README 给的前置很少，就两个：
   },
   {
     slug: "finetune",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "FineTune",
     nameZh: "FineTune 分应用音量控制",
@@ -58724,6 +58687,7 @@ README 给的前置很少，就两个：
   },
   {
     slug: "o3de",
+    license: "MIT OR Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "O3DE",
     nameZh: "O3DE 开放 3D 引擎",
@@ -58815,6 +58779,7 @@ README 特意用 Note 标注：**不要给这个路径加尾斜杠**。CMake 里
   },
   {
     slug: "autoclip",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "AutoClip",
     nameZh: "AutoClip 长视频切片",
@@ -58911,6 +58876,7 @@ docker compose up -d
   },
   {
     slug: "fyrox",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Fyrox",
     nameZh: "Fyrox Rust 游戏引擎",
@@ -58988,6 +58954,7 @@ Discord 与 GitHub Discussions 是官方指定的两个地方，README 也把「
   },
   {
     slug: "unicorn",
+    license: "GPL-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Unicorn Engine",
     nameZh: "Unicorn CPU 模拟框架",
@@ -59069,6 +59036,7 @@ docs/FAQ.md 覆盖了架构常量怎么写、内存怎么映射、绑定版本�
   },
   {
     slug: "flowbite",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Flowbite",
     nameZh: "Flowbite Tailwind 组件库",
@@ -59154,6 +59122,7 @@ Flowbite 给的是组件与行为，配色、间距、字体仍然由你的 Tail
   },
   {
     slug: "berty",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Berty",
     nameZh: "Berty 点对点加密通讯",
@@ -59231,6 +59200,7 @@ README 的警告要原样理解：项目处于活跃开发、Wesh Protocol 部�
   },
   {
     slug: "bazzite",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Bazzite",
     nameZh: "Bazzite 游戏向 Linux",
@@ -59326,6 +59296,7 @@ NVIDIA 显卡用另一个：
   },
   {
     slug: "titanbot",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "TitanBot",
     nameZh: "TitanBot Discord 机器人",
@@ -59411,6 +59382,7 @@ compose 默认给内置 Postgres 设了 POSTGRES_SSL=false 与 AUTO_MIGRATE=true
   },
   {
     slug: "webstudio",
+    license: "AGPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "Webstudio",
     nameZh: "Webstudio 可视化建站",
@@ -59489,6 +59461,7 @@ Builder 的 issue 在 webstudio-is/webstudio，路线图在 GitHub Projects 上�
   },
   {
     slug: "juce",
+    license: "AGPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "JUCE",
     nameZh: "JUCE 音频应用框架",
@@ -59579,6 +59552,7 @@ AAX 插件要用 PACE 的工具数字签名才能在正式 Pro Tools 里加载�
   },
   {
     slug: "rawgraphs-app",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "RAWGraphs",
     nameZh: "RAWGraphs 图表工具",
@@ -59665,6 +59639,7 @@ SVG 出来后进 Illustrator / Inkscape：文字转曲与否、字体替换、�
   },
   {
     slug: "bottles",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "Bottles",
     nameZh: "Bottles Wine 管理器",
@@ -59748,6 +59723,7 @@ Flatpak 版本跑在沙箱里，默认只能访问有限路径。典型症状：
   },
   {
     slug: "aeron",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Aeron",
     nameZh: "Aeron 低延迟消息传输",
@@ -59836,6 +59812,7 @@ README 推荐配 **Simple Binary Encoding（SBE）**，Agrona 提供底层数据
   },
   {
     slug: "dashboard-icons",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Dashboard Icons",
     nameZh: "Dashboard Icons 图标库",
@@ -59928,6 +59905,7 @@ MCP 端点不需要 API Key：\`https://dashboardicons.com/api/mcp\`。
   },
   {
     slug: "love",
+    license: "Zlib",
     linksCheckedAt: "2026-10-24",
     name: "LÖVE",
     nameZh: "LÖVE 2D 游戏框架",
@@ -60016,6 +59994,7 @@ README 写明：不接受由 LLM / 生成式 AI 产生的 PR、issue 与其他�
   },
   {
     slug: "flecs",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "flecs",
     nameZh: "Flecs ECS 框架",
@@ -60092,6 +60071,7 @@ Flecs 的 README 用同一个例子讲了 C 与 C++：C99 侧用 \`ECS_COMPONENT
   },
   {
     slug: "ffmpegfreeui",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "FFmpegFreeUI",
     nameZh: "3FUI 视频压制工具",
@@ -60174,6 +60154,7 @@ README 反复强调：报错请带完整命令行与源文件参数。ffmpeg 的
   },
   {
     slug: "mumble",
+    license: "BSD-3-Clause",
     linksCheckedAt: "2026-10-24",
     name: "Mumble",
     nameZh: "Mumble 语音聊天",
@@ -60268,6 +60249,7 @@ mumble-overlay gamename
   },
   {
     slug: "librephotos",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "LibrePhotos",
     nameZh: "LibrePhotos 自建相册",
@@ -60353,6 +60335,8 @@ Android / iOS 有 Expo 写的 App，README 强调是 offline-first，适合在�
   },
   {
     slug: "imagesharp",
+    price: "开源项目免费，商用需授权",
+    kind: "app",
     linksCheckedAt: "2026-10-24",
     name: "ImageSharp",
     nameZh: "ImageSharp 图像库",
@@ -60360,7 +60344,7 @@ Android / iOS 有 Expo 写的 App，README 强调是 offline-first，适合在�
     summary: ".NET 的纯托管 2D 图像库，不依赖 GDI+ 所以跨平台行为一致；但 3.x 起改用 Six Labors 分拆许可，商用要买授权，闭源项目先看条款再决定。",
     scenes: ["code"],
     platforms: ["windows", "macos", "linux"],
-    source: "opensource",
+    source: "official",
     tags: [".NET", "图像处理", "C#", "2D 图形", "跨平台"],
     body: "ImageSharp 是 .NET 上全托管的高性能二维图像处理与绘图库，目标场景包括设备端、云端和嵌入式/IoT。它最大的工程价值在「全托管」三个字：不套 System.Drawing，也就不受 GDI+ 在 Linux 上的历史包袱影响，同一份代码在 Windows、Linux、macOS 上行为一致，容器里也不会因为缺字体库直接崩。\n能力覆盖面按 README 的说法是「完整」：常见格式的读写、绘制、EXIF 等元数据处理、以及给专业流程留的底层构建块。它编译目标是 .NET 8，因此不能用在更老的框架上；官方另有 Samples 仓库放可直接构建的示例，文档站有概念说明。\n真正的门槛不在技术，在许可证。项目用的是 Six Labors Split License 1.0，README 首页就把「购买商业授权」摆在赞助入口第一位。这不是可以忽略的细节：如果你在做闭源商业产品，得先确认自己的用法落在哪个档位，否则等到要发布时才发现要付费，返工成本比授权费高得多。\n另一个常见误判是把它当成图像服务：它只是库，没有 HTTP 接口、没有缩略图任务队列，要做图片服务得自己套一层。想直接跑批量压缩的话，命令行工具或 ffmpeg 更省事。",
     officialUrl: "https://sixlabors.com/products/imagesharp",
@@ -60441,6 +60425,7 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
   },
   {
     slug: "ffsubsync",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "ffsubsync",
     nameZh: "ffsubsync 字幕对轴",
@@ -60532,6 +60517,7 @@ ffsubsync reference.srt -i 未同步.srt -o 已同步.srt
   },
   {
     slug: "hacs",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "HACS",
     nameZh: "HACS 扩展商店",
@@ -60610,6 +60596,7 @@ HACS 会提示可更新的组件，但**不要无脑全更**。HA 大版本升�
   },
   {
     slug: "masstransit",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "MassTransit",
     nameZh: "MassTransit 消息总线",
@@ -60699,6 +60686,7 @@ README 有一句加粗提醒：**不要在 GitHub 开 issue 提问**，问题去
   },
   {
     slug: "learning-area",
+    license: "CC0-1.0",
     linksCheckedAt: "2026-10-24",
     name: "MDN learning-area",
     nameZh: "MDN 学习区示例库",
@@ -60792,6 +60780,7 @@ MDN 文章在持续修订，示例偶尔和正文对不上。遇到这种情况�
   },
   {
     slug: "parabolic",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Parabolic",
     nameZh: "Parabolic 视频下载",
@@ -60881,6 +60870,7 @@ README 有醒目提示：YouTube 等平台的视频可能受 DMCA 保护，作�
   },
   {
     slug: "miniaudio",
+    license: "Unlicense",
     linksCheckedAt: "2026-10-24",
     name: "miniaudio",
     nameZh: "miniaudio 音频库",
@@ -60973,6 +60963,7 @@ cc main.c miniaudio.c -lpthread -lm -o player
   },
   {
     slug: "final2x",
+    license: "BSD-3-Clause",
     linksCheckedAt: "2026-10-24",
     name: "Final2x",
     nameZh: "Final2x 图片超分",
@@ -61065,6 +61056,7 @@ xattr -cr /Applications/Final2x.app
   },
   {
     slug: "mediabunny",
+    license: "MPL-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Mediabunny",
     nameZh: "Mediabunny 媒体库",
@@ -61157,6 +61149,7 @@ MPL-2.0 是弱 copyleft：调用它做闭源产品没问题，但**改了源码�
   },
   {
     slug: "wickedengine",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Wicked Engine",
     nameZh: "Wicked Engine 3D 引擎",
@@ -61238,6 +61231,7 @@ README 排错一节专门写了这条：Visual Studio 编出来的 exe 如果直
   },
   {
     slug: "spotify-player",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "spotify-player",
     nameZh: "终端 Spotify 播放器",
@@ -61323,6 +61317,7 @@ sudo apt install libssl-dev libasound2-dev libdbus-1-dev
   },
   {
     slug: "immich-go",
+    license: "AGPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "immich-go",
     nameZh: "immich-go 相册迁移工具",
@@ -61403,6 +61398,7 @@ README 开头写着 early version、not yet extensively tested、keep a backup c
   },
   {
     slug: "sandstorm",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "Sandstorm",
     nameZh: "Sandstorm 自托管办公套件",
@@ -61481,6 +61477,7 @@ README 开头写着 early version、not yet extensively tested、keep a backup c
   },
   {
     slug: "eqmac",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "eqMac",
     nameZh: "eqMac 系统级均衡器",
@@ -61559,6 +61556,7 @@ UI 是 Angular 写的网页，托管在远端并做 OTA 更新，本地有缓存
   },
   {
     slug: "supercollider",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "SuperCollider",
     nameZh: "SuperCollider 声音编程环境",
@@ -61641,6 +61639,7 @@ Linux 没有官方二进制，README 的原话是要自己构建或使用 Flatpa
   },
   {
     slug: "ejabberd",
+    license: "GPL-2.0",
     linksCheckedAt: "2026-10-24",
     name: "ejabberd",
     nameZh: "ejabberd 即时通讯服务器",
@@ -61723,6 +61722,7 @@ GPL v2 是社区版；Business Edition 与云端 Fluux 是 ProcessOne 的商业�
   },
   {
     slug: "namida",
+    kind: "app",
     linksCheckedAt: "2026-10-24",
     name: "Namida",
     nameZh: "Namida 音乐播放器",
@@ -61730,9 +61730,9 @@ GPL v2 是社区版；Business Edition 与云端 Fluux 是 ProcessOne 的商业�
     summary: "本地曲库为主的播放器，同时能接 YouTube、Jellyfin、Subsonic、WebDAV，标签编辑与参数均衡都内置。桌面端 Linux 还是 beta，得先自己装 mpv 才能出声。",
     scenes: ["music"],
     platforms: ["windows", "linux"],
-    source: "opensource",
+    source: "official",
     tags: ["音乐播放器", "本地曲库", "Flutter", "标签编辑", "YouTube"],
-    body: "Namida 是 Flutter 写的音乐与视频播放器，主线是本地曲库：索引器基于 taglib，能改标签、按文件夹建库、排除目录、按任意字段排序，还支持多艺术家与流派分隔符。\n它把其他播放器常丢给外部工具的事做进了应用里：参数均衡器可导入 AutoEQ 曲线、逐曲的音量/音高/均衡设置、歌词抓取与自行对轴、播放统计、智能播放列表、局域网内同步歌单与历史。桌面端另有 bit-perfect 播放、USB DAC 直连、独占模式，以及系统托盘、全局快捷键、桌面歌词窗。\n第二层是「不止本地」：可以同时挂本地库、YouTube、Subsonic、Jellyfin、WebDAV、SMB 多个来源，服务器内容能缓存到本地离线听。YouTube 侧支持多账号、下载、SponsorBlock、Return YouTube Dislike、字幕，下载文件名模板接近 yt-dlp 的写法。\n代价在平台与成熟度。安装表里只有 Android、Windows 和 Linux，**没有 macOS 也没有 iOS**；Linux 至今只有 beta，稳定版标着 Soon，而且必须先装 mpv 才能播放，想登录 YouTube 还要 webkit2gtk-4.1。功能密度高也意味着设置项多，第一次进来容易在权限与索引目录上耗掉耐心。",
+    body: "Namida 是 Flutter 写的音乐与视频播放器，主线是本地曲库：索引器基于 taglib，能改标签、按文件夹建库、排除目录、按任意字段排序，还支持多艺术家与流派分隔符。\n它把其他播放器常丢给外部工具的事做进了应用里：参数均衡器可导入 AutoEQ 曲线、逐曲的音量/音高/均衡设置、歌词抓取与自行对轴、播放统计、智能播放列表、局域网内同步歌单与历史。桌面端另有 bit-perfect 播放、USB DAC 直连、独占模式，以及系统托盘、全局快捷键、桌面歌词窗。\n第二层是「不止本地」：可以同时挂本地库、YouTube、Subsonic、Jellyfin、WebDAV、SMB 多个来源，服务器内容能缓存到本地离线听。YouTube 侧支持多账号、下载、SponsorBlock、Return YouTube Dislike、字幕，下载文件名模板接近 yt-dlp 的写法。\n代价在平台与成熟度。安装表里只有 Android、Windows 和 Linux，**没有 macOS 也没有 iOS**；Linux 至今只有 beta，稳定版标着 Soon，而且必须先装 mpv 才能播放，想登录 YouTube 还要 webkit2gtk-4.1。功能密度高也意味着设置项多，第一次进来容易在权限与索引目录上耗掉耐心。\n仓库里放的是一份 EULA（最终用户许可协议），不是开源许可：可以用官方发布的程序，但不能改名或换许可再分发。",
     officialUrl: "https://github.com/namidaco/namida",
     officialLabel: "github.com",
     links: {
@@ -61811,6 +61811,7 @@ Linux 只有 beta，且依赖自己装：
   },
   {
     slug: "halide",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "Halide",
     nameZh: "Halide 图像处理语言",
@@ -61891,6 +61892,7 @@ Linux 只有 beta，且依赖自己装：
   },
   {
     slug: "scikit-image",
+    license: "BSD-3-Clause",
     linksCheckedAt: "2026-10-24",
     name: "scikit-image",
     nameZh: "scikit-image 图像处理库",
@@ -61977,6 +61979,7 @@ README 全文就这两个命令加一个文档链接，没有更多安装说明�
   },
   {
     slug: "pedalboard",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "Pedalboard",
     nameZh: "Pedalboard 音频效果库",
@@ -62068,6 +62071,7 @@ AudioStream 可以直接接声卡输入输出，把效果链挂上去就是软�
   },
   {
     slug: "pyaudioanalysis",
+    license: "Apache-2.0",
     linksCheckedAt: "2026-10-24",
     name: "pyAudioAnalysis",
     nameZh: "pyAudioAnalysis 音频分析库",
@@ -62158,6 +62162,7 @@ pip install -e .
   },
   {
     slug: "music-tag-web",
+    license: "GPL-3.0",
     linksCheckedAt: "2026-10-24",
     name: "Music Tag Web",
     nameZh: "Music Tag Web 音乐标签编辑器",
@@ -64872,6 +64877,7 @@ make docker:install
   },
   {
     slug: "egos-2000",
+    license: "MIT",
     linksCheckedAt: "2026-10-24",
     name: "egos-2000",
     nameZh: "egos-2000 教学操作系统",
@@ -65730,5 +65736,125 @@ Linux 上不要在 Wayland 会话里试，官方只支持 X11。`,
         },
       ],
     },
+  },
+  {
+    slug: "cura",
+    linksCheckedAt: "2026-10-24",
+    name: "UltiMaker Cura",
+    nameZh: "Cura 切片软件",
+    aliases: ["cura", "ultimaker cura", "UltiMaker Cura", "3d 打印切片", "切片软件", "FDM 切片"],
+    summary: "最常用的开源 FDM 切片软件：把模型切成打印机吃得下的路径，机型预设全、推荐档开箱能打。",
+    scenes: ["engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "AGPL-3.0",
+    tags: ["3D 打印", "切片", "FDM", "工程制图", "开源"],
+    body: "Cura 由 UltiMaker 维护，做的是 3D 打印流程里「切片」这一步：把你画好的模型（STL / 3MF / OBJ，5.x 起也能直接读 STEP）切成打印机逐层执行的路径，输出 G-code。它不建模——零件仍在 CAD 里画，这里只管「怎么把它打出来」。\n它的长处是机型预设和材料库够全：从 Ender 3 这类入门机到社区自组的 Voron，多数能在配置里直接选到；参数分推荐与自定义两档，推荐档针对常见机型实测过，新手第一次打不用先学 400 多个设置项。Marketplace 里还有支撑生成、模型修复、校准一类插件，装一个解决一类具体问题。\n代价提前说清：树状支撑与有机支撑这一块比 PrusaSlicer 系弱，悬垂多的模型要换软件；新版把设置收进推荐层，想改细节得切到自定义模式；UltiMaker 账号、云打印与 Enterprise 版都是可选项，本地切片不需要登录。",
+    officialUrl: "https://ultimaker.com/software/ultimaker-cura",
+    officialLabel: "ultimaker.com",
+    links: {
+      official: "https://ultimaker.com/software/ultimaker-cura",
+      github: "https://github.com/Ultimaker/Cura",
+    },
+    whoFor: "刚买第一台 FDM 打印机、不想从零配参数的人；机器是 Ender、Voron、Anycubic 这类社区热门型号的人。",
+    whoNot: "需要树状 / 有机支撑，或者要把层高、路径逐项调到底的人——PrusaSlicer 与 OrcaSlicer 更顺手；只做光固化树脂打印的人。",
+    installTips: [
+      "从 ultimaker.com 的 Cura 页下载：Windows 有 exe 与 msi、macOS 有 dmg 与 pkg（分 Intel / Apple Silicon）、Linux 给 AppImage。",
+      "首次启动会让你选机型，列表里没有自己的机器就先选同尺寸的预设，再改打印尺寸与起始 G-code。",
+      "先用默认推荐档打一个校准件，确认首层压得实、挤出量正常，再动温度与速度。",
+      "扩展在右上角 Marketplace 里装，装完要重启 Cura 才生效。",
+    ],
+    alternatives: ["prusaslicer", "orcaslicer", "bambu-studio"],
+    icon: { letter: "C", color: "#0F62B8" },
+  },
+  {
+    slug: "prusaslicer",
+    linksCheckedAt: "2026-10-24",
+    name: "PrusaSlicer",
+    nameZh: "PrusaSlicer 切片软件",
+    aliases: ["prusaslicer", "prusa slicer", "Slic3r", "有机支撑", "树状支撑"],
+    summary: "从 Slic3r 演化来的开源切片软件，有机支撑与参数控制是强项，Simple / Advanced / Expert 三档递进。",
+    scenes: ["engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "AGPL-3.0",
+    tags: ["3D 打印", "切片", "FDM", "有机支撑", "开源"],
+    body: "PrusaSlicer 是 Prusa 维护的开源切片软件，源头是 Alessandro Ranellucci 的 Slic3r——现在市面上的 OrcaSlicer、Bambu Studio、SuperSlicer 都是它的分支，所以它算这一系的原点。\n两个能力值得单独说。第一是有机支撑（Organic Support）：支撑只在真正需要的地方接触模型，耗材少、拆起来几乎不留痕，悬垂多的件差别很明显；支撑区域还能直接刷到模型表面上。第二是配置分三层：系统预设、用户预设、项目内覆盖，改一个参数不会被下一次更新冲掉，批量打印不同材料时这套结构省事。Simple / Advanced / Expert 三档把参数逐层展开，新手不会一进来就被淹没。\n代价：200 多个预设全是为自家打印机与耗材实测的，换成第三方机器要自己配起始 G-code、床尺寸与调平方式；Prusa Connect 云功能绑定自家生态；3.0 还在 alpha，界面改动大，生产环境建议留 2.9.x。",
+    officialUrl: "https://www.prusa3d.com/page/prusaslicer_424/",
+    officialLabel: "prusa3d.com",
+    links: {
+      official: "https://www.prusa3d.com/page/prusaslicer_424/",
+      github: "https://github.com/prusa3d/PrusaSlicer",
+    },
+    whoFor: "悬垂多、要精细控制支撑与层高的人；用 Prusa 机器、想用官方实测预设的人；想拿它当 OrcaSlicer / Bambu Studio 上游来理解的人。",
+    whoNot: "想要开箱即用、不想碰参数的新手（先看 Cura）；机器是冷门型号又没有社区预设、自己也不想配的人。",
+    installTips: [
+      "官网 PrusaSlicer 页按系统下载：Windows exe、macOS dmg、Linux AppImage，免账号、可离线。",
+      "第三方机器在「打印机设置」里新建配置，重点填床尺寸、起始 / 结束 G-code、调平方式，别直接用 Prusa 预设改。",
+      "有机支撑在 Support material 的 Style 里选 Organic；刷支撑区域用右键菜单里的 Paint-on supports。",
+      "切片后一定进预览层拖滑块逐层过一遍，支撑落点与首层问题在这一步最容易看出来。",
+    ],
+    alternatives: ["orcaslicer", "cura", "bambu-studio"],
+    icon: { letter: "P", color: "#FA6831" },
+  },
+  {
+    slug: "orcaslicer",
+    linksCheckedAt: "2026-10-24",
+    name: "OrcaSlicer",
+    nameZh: "OrcaSlicer 切片软件",
+    aliases: ["orcaslicer", "orca slicer", "orca 切片", "校准", "Voron 切片"],
+    summary: "PrusaSlicer 分支，补上多厂商机型预设、内置校准向导与更好的悬垂处理，Bambu 与 Voron 用户常选。",
+    scenes: ["engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "AGPL-3.0",
+    tags: ["3D 打印", "切片", "FDM", "校准", "开源"],
+    body: "OrcaSlicer 是 PrusaSlicer 的分支（也吸收了不少 Bambu Studio 的改动），定位很直白：把 PrusaSlicer 的切片质量与 Bambu Studio 的现代交互合到一起，并且不绑定任何一家硬件。\n实际用起来的差异在三个地方。机型与材料预设覆盖多个厂商，Bambu、Prusa、Voron、Creality 这些常见的都能直接选到，不用自己从零写起始 G-code。内置校准向导把流量、压力提前（Pressure Advance）、温度塔这些流程做成了点几步就出结果，Klipper 机器尤其需要。悬垂与桥接的处理比上游更好一些，配合可刷的支撑区域，支撑拆起来更省事。\n代价也要说：更新非常频繁，版本之间偶有回归，生产环境建议留一个能用的旧版；参数比 Cura 多一个量级，第一次打开容易被设置项劝退；社区预设质量参差，别人给的 profile 只当起点，最终还得自己校准。",
+    officialUrl: "https://github.com/SoftFever/OrcaSlicer",
+    officialLabel: "github.com/SoftFever/OrcaSlicer",
+    links: {
+      official: "https://github.com/SoftFever/OrcaSlicer",
+      github: "https://github.com/SoftFever/OrcaSlicer",
+    },
+    whoFor: "用 Bambu、Voron 或 Klipper 机器，想要 PrusaSlicer 能力加现代界面的人；愿意花半小时跑一遍校准、把机器调到稳定的人。",
+    whoNot: "只想打一个零件、不打算调参的人；机器冷门又没现成预设、也不想自己配 G-code 的人。",
+    installTips: [
+      "从 GitHub Releases 下对应平台的包：Windows 有 installer 与 portable、macOS 分 Intel / Apple Silicon、Linux 有 AppImage。",
+      "首次启动走一遍校准向导，先做流量与压力提前两项，这两项对成品表面影响最大。",
+      "预设分「机器 + 耗材 + 工艺」三段，先选机器与耗材，工艺先用 0.20mm 标准档。",
+      "遇到切片结果异常先在 Releases 里看已知问题，再考虑回退到上一个稳定版。",
+    ],
+    alternatives: ["prusaslicer", "bambu-studio", "cura"],
+    icon: { letter: "O", color: "#1F9E8F" },
+  },
+  {
+    slug: "bambu-studio",
+    linksCheckedAt: "2026-10-24",
+    name: "Bambu Studio",
+    nameZh: "Bambu Studio 切片软件",
+    aliases: ["bambu studio", "bambustudio", "拓竹切片", "AMS 多色", "Bambu 切片"],
+    summary: "Bambu Lab 官方切片器，开源但打通自家硬件：AMS 多色映射、远程监控与设备管理做得最完整。",
+    scenes: ["engineering"],
+    platforms: ["windows", "macos", "linux"],
+    source: "opensource",
+    license: "AGPL-3.0",
+    tags: ["3D 打印", "切片", "FDM", "多色打印", "开源"],
+    body: "Bambu Studio 是 Bambu Lab 的官方切片软件，客户端以 AGPL 开源（仓库在 GitHub），但云服务与账号体系是厂商自有的——这决定了它能做什么、以及你被绑在哪。\n对自家机器的打通是它最实在的部分：AMS 多色打印时耗材自动映射到槽位，不用手动对位置；远程发任务、摄像头看打印过程、多台设备切换都在一个界面里；基于 3MF 的项目工作流支持多盘与装配 / 零件视图，给客户发文件时装配关系不丢。它也读 STEP，圆弧路径比 STL 更顺。\n代价：给第三方机器切片是能用的，但预设与体验明显不如自家；部分能力（云打印、部分材料库）要求登录 Bambu 账号，介意的话要开局域网模式（LAN Only）；版本号长得像 02.08.02.61 这种，稳定版与 Beta 版页面分开列，别下错。",
+    officialUrl: "https://bambulab.cn/zh-cn/download/studio",
+    officialLabel: "bambulab.cn",
+    links: {
+      official: "https://bambulab.cn/zh-cn/download/studio",
+      github: "https://github.com/bambulab/BambuStudio",
+    },
+    whoFor: "用 Bambu 机器、要 AMS 多色与远程监控的人；想把切片、发任务、看摄像头放在一个客户端里的人。",
+    whoNot: "用第三方机器又不想登录云端账号的人——OrcaSlicer 更合适；要求全离线、不接受厂商云服务的工作流。",
+    installTips: [
+      "国内从 bambulab.cn 的下载页取安装包：Windows 要 10 64 位以上，macOS 要 10.15 以上，Linux 去 GitHub Releases 下。",
+      "同一页面同时列正式版与 Beta 版，生产环境只用正式版。",
+      "不想要云功能就在设置里开 LAN Only 模式，之后只能同局域网发任务。",
+      "多色打印先在 AMS 槽位里把耗材配好，再回切片界面确认颜色映射，顺序反了会白打一遍。",
+    ],
+    alternatives: ["orcaslicer", "prusaslicer", "cura"],
+    icon: { letter: "B", color: "#00A650" },
   },
 ];

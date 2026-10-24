@@ -9,6 +9,12 @@
  * 为什么必须有数据库那一半：P4 之后运行库的权威位置是 MySQL，**只备文件根本恢复不了站点**。
  * 所以没配 MYSQL_URL 时会明确告警，而不是安静地出一份残缺快照。
  *
+ * 用哪个账号导出：默认 MYSQL_URL（应用账号），但它是最小权限账号，
+ * mysqldump 需要 SHOW VIEW（0005 建的视图）与 PROCESS（表空间统计），
+ * **按 P9 的最小权限部署，这一步必然 Access denied** —— 所以按
+ * MYSQL_DUMP_URL → MYSQL_MIGRATE_URL → MYSQL_URL 的顺序挑第一个能用的。
+ * 加 --no-tablespaces 去掉对 PROCESS 的需求；SHOW VIEW 只能靠换账号。
+ *
  * 不自己实现归档格式：--zip 时调用系统自带的 tar。
  * 环境变量不进备份——ADMIN_PASSWORD_HASH、SESSION_SECRET、MYSQL_URL 需另行保管。
  *
@@ -181,11 +187,11 @@ async function prune(outDir, keep) {
   if (skipped) console.log(`${skipped} 个同名目录不是备份产物，已保留。`);
 }
 
-/** 从 MYSQL_URL 拆出连接信息。口令只进临时 defaults 文件，绝不上命令行。 */
-function mysqlDumpArgs(url) {
+/** 从 URL 拆出连接信息。口令只进临时 defaults 文件，绝不上命令行。 */
+function mysqlDumpArgs(url, sourceName) {
   const parsed = new URL(url);
   const database = decodeURIComponent(parsed.pathname.replace(/^\/+/, ""));
-  if (!database) throw new Error("MYSQL_URL 缺少数据库名");
+  if (!database) throw new Error(`${sourceName} 缺少数据库名`);
   const defaults = [
     "[client]",
     "host=" + parsed.hostname,
@@ -194,20 +200,45 @@ function mysqlDumpArgs(url) {
     "password=" + decodeURIComponent(parsed.password),
     "",
   ].join("\n");
-  return { database, defaults };
+  return { database, defaults, user: decodeURIComponent(parsed.username) };
+}
+
+/**
+ * 挑导出用的连接串。
+ *
+ * 为什么不能只用 MYSQL_URL：那是应用的最小权限账号，mysqldump 需要
+ * SHOW VIEW（0005 的视图）与 PROCESS（表空间统计）。P9 的权限模型**故意**
+ * 不给应用账号这两项，于是「按推荐配置部署」和「备份能跑」直接冲突 ——
+ * 实测报错：Access denied; you need (at least one of) the PROCESS privilege(s)，
+ * 紧接着 show create table v_published_item_links 也被拒。
+ *
+ * 优先级：专用导出账号（MYSQL_DUMP_URL，不存在就算了）→ 迁移账号（有 DDL 权限，
+ * 天然能 SHOW VIEW）→ 应用账号（老部署的兜底，权限不够会如实报错）。
+ */
+function dumpConnection() {
+  const candidates = [
+    ["MYSQL_DUMP_URL", process.env.MYSQL_DUMP_URL?.trim()],
+    ["MYSQL_MIGRATE_URL", process.env.MYSQL_MIGRATE_URL?.trim()],
+    ["MYSQL_URL", process.env.MYSQL_URL?.trim()],
+  ];
+  for (const [name, value] of candidates) {
+    if (value) return { name, url: value };
+  }
+  return null;
 }
 
 /**
  * 导出数据库到快照的 db/ashare.sql。
  *
- * 两个刻意的选择：
+ * 三个刻意的选择：
  *  - 口令走 --defaults-extra-file（0600，用完立即删）而不是命令行 —— 后者会出现在进程列表里；
- *  - 导出失败就抛错，不留一份「看起来成功了」但没有库的快照。
+ *  - 导出失败就抛错，不留一份「看起来成功了」但没有库的快照；
+ *  - --no-tablespaces：备份不需要表空间统计，去掉它就不要求 PROCESS 权限。
  */
 async function dumpDatabase(target, manifest) {
-  const url = process.env.MYSQL_URL?.trim();
-  if (!url) return false;
-  const { database, defaults } = mysqlDumpArgs(url);
+  const conn = dumpConnection();
+  if (!conn) return false;
+  const { database, defaults, user } = mysqlDumpArgs(conn.url, conn.name);
   const dir = path.join(target, "db");
   await fs.mkdir(dir, { recursive: true });
   const file = path.join(dir, "ashare.sql");
@@ -223,6 +254,8 @@ async function dumpDatabase(target, manifest) {
         "--routines",
         "--triggers",
         "--events",
+        // 不导表空间：备份用不到，去掉它就不要求 PROCESS 权限。
+        "--no-tablespaces",
         "--default-character-set=utf8mb4",
         "--databases",
         database,
@@ -234,7 +267,13 @@ async function dumpDatabase(target, manifest) {
       throw new Error("mysqldump 执行失败：" + result.error.message + "（可用 MYSQLDUMP 环境变量指定可执行文件路径）");
     }
     if (result.status !== 0) {
-      throw new Error("mysqldump 退出码 " + result.status + "：" + String(result.stderr || "").trim().slice(0, 300));
+      const stderr = String(result.stderr || "").trim().slice(0, 300);
+      const hint = /SHOW VIEW|PROCESS privilege/i.test(stderr)
+        ? `\n  账号 ${user}（来自 ${conn.name}）权限不足：mysqldump 需要 SHOW VIEW。` +
+          "\n  用有 DDL 权限的账号导出：设置 MYSQL_DUMP_URL 或 MYSQL_MIGRATE_URL 后重跑。" +
+          "\n  不要为了备份给应用账号加权限 —— 它是运行时最小权限账号。"
+        : "";
+      throw new Error("mysqldump 退出码 " + result.status + "：" + stderr + hint);
     }
   } finally {
     // 凭据文件必须立刻删除，哪怕导出失败。
@@ -246,8 +285,14 @@ async function dumpDatabase(target, manifest) {
     bytes: content.length,
     sha256: createHash("sha256").update(content).digest("hex"),
     database,
+    // 记下用哪个变量导的（只是变量名与账号，不含口令）：换环境排查权限问题时有据可查。
+    via: conn.name,
+    user,
   };
-  console.log("已导出数据库 " + database + "：" + (content.length / 1024).toFixed(1) + " KiB");
+  console.log(
+    "已导出数据库 " + database + "（账号 " + user + "，凭据来自 " + conn.name + "）：" +
+      (content.length / 1024).toFixed(1) + " KiB",
+  );
   return true;
 }
 
@@ -266,9 +311,11 @@ async function main() {
   }
 
   const sources = await existingSources(root);
-  const hasDatabase = Boolean(process.env.MYSQL_URL?.trim());
+  // 判断口径与 dumpDatabase 一致：三个变量任一存在就算「有库可备」，
+  // 否则只配了 MYSQL_DUMP_URL 的部署会被误判成「没有可备份的数据」。
+  const hasDatabase = Boolean(dumpConnection());
   if (!sources.length && !hasDatabase) {
-    throw new Error("既没有 data/store / data/media，也没有配置 MYSQL_URL —— 没有可备份的数据。");
+    throw new Error("既没有 data/store / data/media，也没有配置 MYSQL_URL（或 MYSQL_DUMP_URL / MYSQL_MIGRATE_URL）—— 没有可备份的数据。");
   }
 
   const baseName = `ashare-backup-${stamp()}`;
@@ -296,7 +343,7 @@ async function main() {
 
   // 数据库那一半放在写 manifest 之前：导出失败就整个失败，不留残缺快照。
   if (!(await dumpDatabase(target, manifest))) {
-    console.warn("[backup] 未配置 MYSQL_URL：本次**没有备份数据库**。运行库的权威位置已是 MySQL，只有文件快照恢复不了站点。");
+    console.warn("[backup] 未配置 MYSQL_URL / MYSQL_DUMP_URL / MYSQL_MIGRATE_URL：本次**没有备份数据库**。运行库的权威位置已是 MySQL，只有文件快照恢复不了站点。");
   }
 
   await fs.writeFile(path.join(target, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);

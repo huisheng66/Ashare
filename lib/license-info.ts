@@ -15,8 +15,14 @@ export type LicenseInfo = {
   spdx: string;
   /** 一句话说明，只讲「能不能闭源商用」 */
   summary: string;
-  /** 分三档，供 UI 决定强调程度 */
-  tier: "permissive" | "weak-copyleft" | "strong-copyleft";
+  /**
+   * 分四档。
+   *
+   * `source-available` 是 2026-10-24 补的第四档：BSL-1.1 这类许可既不是宽松、也不是
+   * copyleft —— 它限制的是「拿它提供竞争性托管服务」，不限制衍生作品的开闭源。
+   * 硬塞进前三档都会说错话（标成 strong-copyleft 会让人以为衍生作品必须开源）。
+   */
+  tier: "permissive" | "weak-copyleft" | "strong-copyleft" | "source-available";
   /** 是否允许完全闭源分发（不含任何开源义务） */
   allowsClosedSource: boolean;
 };
@@ -91,6 +97,27 @@ const TABLE: Record<string, Omit<LicenseInfo, "spdx">> = {
   "EPL-2.0": { summary: "修改的文件需开源，链接调用不受限", tier: "weak-copyleft", allowsClosedSource: true },
   // MulanPSL-2.0：木兰宽松许可证（国内主导），条款接近 Apache-2.0 但无专利报复条款。
   "MulanPSL-2.0": { summary: "宽松许可（木兰），保留声明即可商用与闭源", tier: "permissive", allowsClosedSource: true },
+  // EUPL-1.2：欧盟公共许可证，**是 copyleft**（衍生作品须沿用 EUPL 或兼容许可），
+  // 但第 5 条列了一份兼容清单（GPL、AGPL、MPL、LGPL 等），可与它们互换成对方许可，
+  // 比 GPL 与闭源生态的关系略宽松。eza 用它。
+  // CC-BY-SA-3.0：内容型强 copyleft（3.0 版，BY-SA 的老版本），Cataclysm-DDA 与 setup-ipsec-vpn 用它。
+  "CC-BY-SA-3.0": { summary: "允许商用，需署名且衍生作品同方式共享（3.0 版）", tier: "strong-copyleft", allowsClosedSource: false },
+  // MIT-CMU：Pillow（原 PIL）用的 MIT 变体，只多了「保留 CMU 与作者署名」这一条。
+  "MIT-CMU": { summary: "MIT 变体，保留 CMU 与作者署名即可商用", tier: "permissive", allowsClosedSource: true },
+  // ImageMagick 许可：条款与 Apache-2.0 近似（允许商用、闭源、链接不同许可的代码），但是自家文本。
+  ImageMagick: { summary: "允许商用与闭源分发，保留声明即可", tier: "permissive", allowsClosedSource: true },
+  // BSL-1.1：**不是开源许可**（OSI 不认），源码可见但限制「拿它提供竞争性托管服务」，
+  // 到期后转成指定的开源许可（SurrealDB / SpacetimeDB 转 AGPL，EMQX 转 Apache-2.0）。
+  "BSL-1.1": {
+    summary: "源码可见，禁止提供竞争性托管服务；非开源许可，到期后转开源",
+    tier: "source-available",
+    allowsClosedSource: true,
+  },
+  "EUPL-1.2": {
+    summary: "衍生作品需沿用 EUPL 或兼容许可（清单含 GPL / MPL），可商用",
+    tier: "strong-copyleft",
+    allowsClosedSource: false,
+  },
   "ELv2": { summary: "源码可见，禁止作为托管服务转售", tier: "strong-copyleft", allowsClosedSource: false },
   // FIT2CLOUD：DataEase 的厂商自定义许可，基于 GPL-3.0 附加品牌限制（不得改 Logo/名称）。
   // 自定义许可无法归入 SPDX，按原文如实描述，不拔高也不贬低。

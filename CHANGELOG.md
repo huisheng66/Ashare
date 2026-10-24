@@ -1,5 +1,337 @@
 # 变更记录
 
+## 2026-10-24 · 十条「源码可见但非开源」统一改判官方；许可行不再按来源隐藏
+
+上一轮把 4 条改判官方时留了一句「同类还有 10 条，要一起改是个产品决定」。这轮统一了口径：
+**整份许可不是开源/CC 许可的，来源就不写「开源」**。
+
+### 改判的十条（开源 662 → 652）
+
+| 条目 | 许可形态 |
+| --- | --- |
+| `n8n` | Sustainable Use License（fair-code） |
+| `tldraw` | tldraw 自有许可 |
+| `devilutionx` | Sustainable Use License |
+| `nocobase` | NocoBase 自家许可 |
+| `rag-techniques` | 自定义非商业许可 |
+| `transitions-dev` | 自定：禁把库当竞品再分发 |
+| `30-days-of-python` | 仓库没有许可证文件 |
+| `surrealdb` / `spacetimedb` / `emqx` | BSL 1.1 |
+
+全部原本就是 `kind: "app"`，所以 `official + app` 组合合法（矩阵里 official 只接受 app / script）。
+
+### 连带修掉一个真 bug：许可行被来源吞掉
+
+`components/LicenseNote.tsx` 原先写着 `if (source !== "opensource") return null` —— 这条规则把两件事混在了一起：
+「没有 SPDX」（不显示，对）与「有 SPDX 但来源不是开源」（被吞掉，错）。实测受害者是 `duckstation`：
+官方来源、许可 CC-BY-NC-ND-4.0（**禁止商用、禁止改作**），这行提示一直在页面上看不到。
+
+改成「有可核验的 SPDX 就显示」。这同时解决了改判带来的副作用 —— 那 3 条 BSL 改判成官方之后，
+许可行不会跟着消失，页面上仍是「BSL-1.1 · 源码可见，禁止提供竞争性托管服务；非开源许可」。
+组件也不再需要 `source` 参数，调用处一并收掉。
+
+### 两条价格
+
+`price` 空值会渲染成「免费」（`SoftwareCard` 里 `item.price ?? "免费"`）：
+`nocobase` 补「社区版免费，商业插件付费」，`rag-techniques` 补「非商业免费」。
+`price` 不在 `SEED_SYNC_FIELDS`（价格由后台按商务维护），这两条单独写了一次运行库。
+
+### 没动的三条，以及为什么
+
+`cs249r-book`、`happy-llm`、`learn-vim` 是 CC BY-NC-SA 4.0 的教材 —— 非商业条款严格说也不属于
+OSI 意义上的开源，但它们是**内容不是软件**，且作者本身就是社区/院校，「官方」这个渠道描述对它们不合适。
+这个口径要不要继续收紧，可以单独定。
+
+`docker-android`（Apache 2.0 + 附加条款）与 `eartrumpet`（MIT + 排除名单）主体仍是 Apache / MIT，
+只是加了附加条件，保留开源徽章 + 正文说明。
+
+### 验证
+
+- `npm run check`：344 项，267 通过、0 失败；`npm run test:db`：82 项 0 失败
+- `npm run seed:sync`：10 处（source）；`seed:drift -- --strict` 0 处差异
+- `npm run license:audit`：缺口 0，仅剩 2 条「许可由正文承担」
+- 前台抽查：`/software/surrealdb` 显示 BSL 限制说明且来源为官方；`/software/duckstation` 现在能看见 CC-BY-NC-ND-4.0；
+  `/software/nocobase`、`/software/rag-techniques` 价格文案正确
+
+## 2026-10-24 · 四条「假开源」改判官方：徽章不该替作者做出他没做的授权
+
+上一轮末尾留了一句「还有 5 条挂着开源徽章、许可其实是商业/自定义的」。这轮处理掉，但结论不是 5 条 ——
+**juce 留在开源**：AGPL-3.0 是 OSI 认可的许可，另有商业授权不改变它开源的事实，把徽章换成「官方」反而丢信息。
+
+### 改判的四条
+
+| 条目 | 实际许可 | 为什么不是开源 |
+| --- | --- | --- |
+| `namida` | EULA | 闭源最终用户协议，禁止改名或换许可再分发 |
+| `imagesharp` | Six Labors Split | 按实体规模分档收费，不是开源许可 |
+| `remotion` | Remotion License | 个人与小团队免费，公司需购买授权 |
+| `et` | ET License | 仅限学习，商业使用需 4999 元授权 |
+
+`source` 从 `opensource` 改成 `official`（徽章「官方」），`kind` 保持 `app`。
+依据是 `PRODUCT.md` 对三类来源的定义：「厂商正式版应用 / 脚本工具 / 开源项目的官方发行渠道」——
+这四条属于第一类，它们确实是厂商亲自发布的，只是不开放。
+
+### 顺带修掉的价格误读
+
+改判之后暴露出一个连带问题：卡片价格位在 `price` 为空时渲染「免费」（`SoftwareCard` 里 `item.price ?? "免费"`）。
+这四条里有三条是「个人免费、公司收费」，挂个「免费」就是把条件抹掉。补了文案：
+
+- `remotion`：个人与小团队免费
+- `imagesharp`：开源项目免费，商用需授权
+- `et`：商业使用 ¥4999
+
+`price` 刻意不在 `SEED_SYNC_FIELDS` 里（价格可能由后台按商务结果维护），所以这三条单独写了一次运行库；
+`seed:drift` 仍为 0（price 本就不参与比对）。
+
+### 新增一条断言：来源与类型的组合矩阵
+
+`lib/semantics.ts` 里那张矩阵本来只管后台保存与 ingest，**种子是人工写的，没人保证它先过一遍校验**。
+现在 `tests/seed-integrity.test.mjs` 会对全部 676 条跑一遍 `isValidSourceKind`——
+`official` 只有 `app` / `script` 两种合法形态，之前要是谁把 AGPL 双轨项目标成 official，
+前台会同时显示「官方」和「开源项目」，现在构建前就会红。
+
+### 仍按原样保留的（同一类，但涉及产品口径）
+
+`n8n`、`tldraw`、`devilutionx`（Sustainable Use / 自定义）、`nocobase`（自家许可）、`rag-techniques`（自定义非商业）、
+`transitions-dev`（自定 + 禁竞品）、`30-days-of-python`（没有许可证文件）、
+`surrealdb` / `spacetimedb` / `emqx`（BSL 1.1）—— 这 10 条同样是「源码可见但非 OSI 开源」，
+现在挂的仍是「开源」徽章，靠 `kind: app` + 正文说明。
+
+要不要按同一口径一起改判，是个产品决定：改成「官方」会让全站「开源」条目少 10 条，
+但那才是徽章的真实含义。我没有替你决定。
+
+### 验证
+
+- `npm run check`：344 项，267 通过、0 失败；`npm run test:db`：82 项 0 失败
+- `npm run seed:sync`：4 处（source）；`seed:drift -- --strict` 0 处差异
+- 前台抽查：`/software/remotion` 显示「官方 · 应用 · 个人与小团队免费」；`/software/et` 显示「商业使用 ¥4999」；
+  `/software/juce` 仍是「开源 · 开源项目 · AGPL-3.0」
+
+## 2026-10-24 · 剩下 38 条许可证收口：24 条填上、11 条改判「非开源」
+
+上一轮留下的 38 条共同点是「机器认不出」，逐个读了 LICENSE 原文之后，发现它们不是同一类问题：
+**有的只是 GitHub 认不出，有的是真不是开源**。混在一起按「缺字段」处理，只会把错误的数据填进去。
+
+### 三类分开处置
+
+| 类别 | 条数 | 处置 |
+| --- | --- | --- |
+| 真实开源 / CC 许可 | 24 | 填 `license`，保持「开源项目」标签 |
+| 源码可见但不是 OSI 开源（BSL 1.1） | 3 | 填 `license: BSL-1.1`，`kind` 改 app |
+| 自定义许可 / 闭源 EULA / 根本没有许可证文件 | 11 | **不填** `license`，`kind` 改 app，许可形态由正文承担 |
+
+第三类不填不是偷懒：`docker-android` 是「Apache 2.0 加附加条款」，`eartrumpet` 是「MIT 加排除名单」，
+`imagesharp` 是 Six Labors Split，`namida` 干脆只有 EULA。给它们挂一个 SPDX 标识就是**把限制抹掉**，
+比空着更糟 —— 空着说明「没核过」，写错说明「核错了」。
+
+`kind: "app"` 用的是 n8n 那条先例（`content-audit.mjs` 的注释里写着）：源码公开但不是 OSI 许可的项目，
+按 app 计、许可状态交给正文。这轮补了 5 条正文（namida / nocobase / docker-android / eartrumpet / rag-techniques），
+`transitions-dev` 正文本来就写了，重复加的一句已撤掉。
+
+### 几个读原文才敢写的判断
+
+- `tiled`：COPYING 只写「Tiled GPL」，版本要看 LICENSE.GPL —— 确认是 v2 才敢写 `GPL-2.0`；
+  libtiled 是 BSD-2，属子模块，不单独记。
+- `photodemon` 两条约束 = BSD-2-Clause；`mumble` 三条（含「Neither the name」）= BSD-3-Clause。
+  差一条就是另一个许可，不能按「都是 BSD」处理。
+- `gun` 的 README 写 Zlib / MIT / Apache 三选一；三选的 OR 表达式在说明文案里只能显示前两个，
+  所以取 LICENSE.md 正文首段的 MIT，而不是写一个显示不全的复合串。
+- `juce` 是 AGPLv3 与商业许可双轨，记 AGPL-3.0（选开源那一支）；`cs249r-book` 等三本是 CC BY-NC-SA 4.0，
+  非商用条款照实记，不因为「教材」就宽容。
+- `miniaudio` 在公有领域（Unlicense）与 MIT-0 之间二选一，记 Unlicense。
+
+### 新增四个许可证映射
+
+`lib/license-info.ts` 补 `CC-BY-SA-3.0`、`MIT-CMU`（Pillow）、`ImageMagick`、`BSL-1.1`。
+
+`tier` 同时加了第四档 `source-available`：BSL 既不是宽松也不是 copyleft，
+它限制的是「拿它提供竞争性托管服务」，不限制衍生作品开闭源 —— 塞进前三档都会说错话。
+
+### 工具同步
+
+- `npm run license:audit` 现在把「kind=app、许可由正文承担」的 13 条**单独列出**，
+  而不是让它们从缺口清单里悄悄消失（换人接手时要能一眼看到是哪些）。
+- `tests/seed-integrity.test.mjs` 新增一条断言：kind=app 且没有 license 的条目，**正文必须提到许可**。
+  这是 `LicenseNote` 的设计推论 —— 许可行不显示时，正文就是唯一出处，正文也没写读者就完全无从判断。
+
+### 验证
+
+- 缺口：38 → 0（判定口径：`source=opensource` 且 `kind ≠ app` 必须写 license）
+- 完全没有 license 的条目 13 条，全部是 `kind: "app"`
+- `npm run check`：343 项，266 通过、0 失败；`npm run test:db`：82 项 0 失败
+- `npm run seed:sync`：38 处；`seed:drift -- --strict` 0 处差异
+- 前台抽查：`/software/surrealdb` 显示 `BSL-1.1 · 源码可见，禁止提供竞争性托管服务；非开源许可`
+  且类型为「应用」；`/software/pillow` 显示 `MIT-CMU`；`/software/namida` 不显示许可行（预期）。
+
+### 仍需人工裁定
+
+还有 5 条挂着「开源」来源徽章、但许可其实是商业/自定义的：`namida`（纯 EULA）、
+`imagesharp`、`remotion`、`et`、`juce`（双轨）。`source` 字段决定徽章文案，改成 `official`
+属于产品口径调整（这批确实是厂商亲自发布的），不是数据修正 —— 留给你定，我没有替你改。
+
+## 2026-10-24 · 补 99 条许可证（GitHub 机器核验）：缺口 137 → 38
+
+`content:audit` 长期报「137 条标了开源却没有许可证字段」。这一项不能靠猜 ——
+`data/types.ts` 里写得很清楚：「SPDX 许可证标识……核验不到时留空，不要猜」。
+但空着也不是办法：前台不显示许可说明，读者无从判断能不能商用、能不能闭源分发。
+所以这一轮先解决**可核验的那一半**，用机器能拿到的证据去填。
+
+### 三轮探针，只认机器可读的证据
+
+| 轮次 | 手段 | 结果 |
+| --- | --- | --- |
+| 1 | `repos/{owner}/{repo}` 的 licensee 检测 | 81 条 |
+| 2 | 根目录许可文件名（`LICENSE-MIT` + `LICENSE-APACHE`）判双许可 | 修正 2 条 |
+| 3 | licensee 认不出的，读 LICENSE 正文，只认 `SPDX-License-Identifier` 行或正式许可名称 | 15 条 |
+
+最终写入 99 条（81 + 15 + 修复事故后补上的 playwright / plasmic 两条）。缺口 137 → 38。
+
+### 双许可：单值会把条件说窄
+
+Rust 生态惯例是 `MIT OR Apache-2.0`，而 GitHub 只报其中一个（通常是 Apache-2.0）。
+按单值记，读者会以为「只能用 Apache-2.0」，比实际更严。根目录同时有
+`LICENSE-MIT` 与 `LICENSE-APACHE` 的判为双许可 —— 实测命中 bevy、egui、ruffle、o3de 四条。
+
+同理 mosquitto 的 LICENSE 里直接写着 `SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause`，
+就按原文记，不简化成 EPL-2.0。
+
+### 故意留空的两条
+
+- `docker-android`：LICENSE 写的是「Apache 2.0 **AND the following amendments**」，
+  是加了附加条款的自定义许可。记成 Apache-2.0 等于把限制抹掉，比留空更糟。
+- `serena` 按组件分许可（SolidLSP 用 MIT、应用本体 GPL-3.0-or-later），只记应用本体，
+  逐组件的细节留给正文。
+
+### 新增 `npm run license:audit`
+
+缺口审计工具（**只报告，不写数据**）：列出缺许可证的条目，附 GitHub 的检测结果，
+`--files` 额外查根目录许可文件识别双许可，`--json` 给机器读。
+
+不做自动写入是有原因的：这一轮先用脚本按行号插字段，判断「是否已有 license」时用了
+行首 4 空格缩进匹配，于是把 guide 代码块里 4 空格缩进的示例代码也当成了字段，
+**往 playwright 与 plasmic 的教程代码里各插了一行 `license: "..."`**。
+两处已按上下文还原，并改用「插入后 item.license 是否真的生效」反查全部目标条目
+（唯一没生效的是故意留空的 docker-android）。
+结论写进脚本注释：结构改动靠行号不可靠，工具止于给候选值。
+
+### 顺带
+
+- `lib/license-info.ts` 补 `EUPL-1.2` 映射（eza 用它）：EUPL 是 copyleft，但第 5 条列了兼容清单，
+  与 GPL 的传染范围不同，文案里写清楚。
+- 前台抽查：`/software/bevy` 显示「或选其一：MIT / Apache-2.0」、`/software/eza` 显示 EUPL 说明、
+  `/software/docker-android` 不显示许可（符合预期）。
+
+### 验证
+
+- `npm run check`：342 项，265 通过、0 失败
+- `npm run seed:sync`：98 处（99 条 license 里有一条运行库本来就是同一个值，无需写），`seed:drift -- --strict` 0 处差异
+- `npm run content:audit`：许可证缺口 137 → 38
+- `npm run build` 通过，六个详情页抽查许可文案正确
+
+### 留待后续
+
+剩下的 38 条共同点是**仓库里没有可被机器识别的许可文件**：自定义许可、多组件分许可、
+或只在 README 里写一句话。要补只能逐条读原文人工判定。
+
+其中要留意的是一类**源码可见但并非 OSI 开源**的项目（BSL / fair-code / 商用限制）——
+若确认如此，按 n8n 的先例应把 `source` 改掉并在正文第 4 段说明许可形态，
+而不是继续挂着 `opensource` 标签。这批需要逐条看，不适合批量处理。
+
+## 2026-10-24 · 制图补上 3D 打印切片（12 → 16）；去重两条；`seed:sync` 补空档让漂移归零
+
+上一轮治理「制图」时留下的尾巴：12 条里有 CAD、EDA、GIS、图表，唯独缺 **3D 打印切片**——
+「做三维」的最后一公里。这一轮补上，同时把审核发现的四处问题一并处理。
+
+### 内容：补 4 条切片软件（制图 12 → 16）
+
+| 条目 | 许可证 | 定位 |
+| --- | --- | --- |
+| UltiMaker Cura | AGPL-3.0 | 机型预设最全，推荐档开箱能打 |
+| PrusaSlicer | AGPL-3.0 | 有机支撑与三层预设体系，Orca/Bambu 的上游 |
+| OrcaSlicer | AGPL-3.0 | PrusaSlicer 分支 + 多厂商预设 + 内置校准 |
+| Bambu Studio | AGPL-3.0 | 自家硬件打通最好（AMS 多色、远程监控） |
+
+链接当日逐条核验（Cura 5.13、PrusaSlicer 2.9.6、Bambu Studio 02.08.02.61 均可在官方页确认），
+`linksCheckedAt` 记 2026-10-24。四家互为「同类替代」，闭环成立。
+
+### 去重：两个产品被收了两遍
+
+| 保留 | 删除 | 判据 |
+| --- | --- | --- |
+| `heroic` | `heroicgameslauncher` | 官网与 GitHub 仓库完全相同；保留旧 slug（已被索引），把新条目的正文 / 详细教程 / 安装渠道合并进来 |
+| `musicfreedesktop` | `musicfree` | 后者是**仅移动端**的安卓应用，上一批自己跳过过「仅移动端 6 条」，这条漏了；且它把 platforms 写成三平台，与正文「桌面版在另一个仓库」直接矛盾 |
+
+`heroic` 的同类替代原先写着 `sunshine` / `moonlight-qt`（串流工具，不是启动器），
+改成 `lutris` / `playnite`。`yt-dlp` 的场景从 `code` + `design` 改回 `tools`
+（同类 GUI 前端 yoinks 也在 tools）。
+
+### 补空档：`SEED_FILL_FIELDS`
+
+`alternatives` 由后台人工维护更准，所以不在「无条件覆盖」的同步清单里；
+但**空着不等于人工判定为空**，那只是还没补。分不清这两者的代价是实测出来的：
+674 条里 27 条种子有值、运行库为空，`seed:sync` 说「已是最新」，`seed:drift` 报 27 处不一致。
+
+新增第三档 `SEED_FILL_FIELDS`（只在运行库为空时写），27 处差异一次补齐；
+两个落点现在**完全一致**（566 处 → 0）。
+
+### 搜索：汉字与拉丁之间的空格会切断 bigram
+
+目录里写「3D 打印」，中文用户更常打「3d打印」。ngram 按字切 bigram，
+带空格入库得到 `3d` + `打印`，而查询「3d打印」切成 `3d` + `d打` + `打印` ——
+布尔模式要求每个 token 都命中，`d打` 在库里不存在，于是 0 结果。
+
+实测：搜「3D 打印」5 条、搜「3d打印」只有 1 条（openscad 正文里恰好连写过）。
+
+修法在**入库侧**（`lib/catalog-rows.ts` 的 `glueScriptBoundaries`）：只合并汉字↔拉丁/数字边界上的空格，
+汉字之间的词边界保留（「视频 下载」不动）。连写之后两种输入都命中，查询侧不用改。
+`db:reindex` 相应改为重算整列 `search_text` —— 规则变了就得重算存量行，否则索引里是旧口径的 token。
+
+修复后「3d打印」与「3D 打印」都返回同样的 5 条。
+
+### 备份：最小权限账号导不出库
+
+按 P9 的权限模型，应用账号 `ashare_app` 没有 `SHOW VIEW` 与 `PROCESS`，
+而 `mysqldump` 两样都要 —— **README 推荐的部署方式下 `npm run backup` 的数据库那一半必然失败**：
+
+```
+mysqldump: Error: 'Access denied; you need (at least one of) the PROCESS privilege(s)'
+mysqldump: Couldn't execute 'show create table `v_published_item_links`': SHOW VIEW command denied
+```
+
+改为按 `MYSQL_DUMP_URL` → `MYSQL_MIGRATE_URL` → `MYSQL_URL` 挑第一个存在的连接串，
+并加 `--no-tablespaces`（去掉对 PROCESS 的需求）。权限仍然不够时，报错直接点明账号与解法，
+而不是让人去猜。manifest 里记下用的是哪个变量与账号（不含口令）。
+
+### 新增回归测试
+
+| 文件 | 断言 |
+| --- | --- |
+| `tests/seed-integrity.test.mjs`（6 项） | alternatives 必须指向存在的 slug；官网 / 仓库 / 同名不得重复；许可证必须能映射；场景平台自洽；外链 https |
+| `tests/search-text.test.mjs`（5 项） | 空格合并的边界：合并 3D 打印、不合并「视频 下载」、NFKC 仍生效 |
+| `tests/seed-contract.test.mjs`（+1 项） | `SEED_FILL_FIELDS ⊆ SEED_DRIFT_FIELDS` 且与 `SEED_SYNC_FIELDS` 互斥 |
+
+第一组专治这轮发现的两类退化：`heroic/heroicgameslauncher` 这类重复收录，
+以及 `voicestudio→audacity` 这类指向当时还没收录的 slug。
+
+### 验证
+
+- `npm run check`：342 项，265 通过、0 失败（77 项因未设 `MYSQL_TEST_URL` 跳过）
+- `npm run test:db`：82 项 0 失败（含新增的「3d打印」查询）
+- `npm run seed:drift -- --strict`：**0 处差异**
+- `npm run content:audit`：制图 16 条；待补 593 条（其中 481 条缺预览图）
+
+### 顺带修掉的本机状态（不进代码）
+
+- `pinyin-pro` 声明在 `package.json` 里但没装（`npm ci` 被 safe-delete 拦下，改为单独装）—— 缺它 `tsc` / 构建直接失败
+- 迁移 `0007_search-pinyin`、`0008_search-initials` 未应用，新搜索代码对着旧库会报 `Unknown column 'search_pinyin'`
+- 本地 MySQL 重启后停用词表配置回退、运行库停在 160 条（种子 674）—— 已按文档两步恢复并补齐
+
+### 留待后续
+
+- 待补条目里 **481 条缺预览图**、**137 条开源条目缺许可证字段**：前者要逐个项目抓真实截图，后者要读 README 核 SPDX，都不是脚本能一把刷完的
+- 217 条正文里混着 markdown 记号（`- ` 列表、`1.` 编号），正文按纯文本段落渲染，这些记号会原样显示
+- `dbeaver` / `gimp` / `blender` / `thunderbird` 标了开源但没给源码链接，「开源」这个断言目前只能从官网自证
+
 ## 2026-10-24 · 治理「制图」场景：43 条误归条目回到真实主场景（55 → 12）
 
 `engineering` 这个 id 的字面意思是「工程」，场景名与描述却是**制图**（画零件、布电路、做三维或地图）。

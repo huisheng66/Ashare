@@ -204,7 +204,8 @@ export default async function SoftwarePage({ params }: Props) {
 
             {/* 许可证与渠道是两种信息，不依附「其他渠道」是否存在 ——
                 VS Code 只有官网一条渠道，挂在 others 里会跟着一起消失。 */}
-            <LicenseNote spdx={item.license} source={item.source} />
+            {/* 有 SPDX 就显示，不看来源：官方来源的 BSL / CC-BY-NC-ND 更需要说清限制。 */}
+            <LicenseNote spdx={item.license} />
 
             <dl className="mt-4 divide-y divide-border border-t border-border">
               <Fact label="平台">{item.platforms.map((p) => platformLabel[p]).join(" · ")}</Fact>

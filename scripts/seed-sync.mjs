@@ -19,7 +19,7 @@ import { readCatalog, withDb } from "./_shared.mjs";
 const { samples } = await import("../data/samples.ts");
 const { software } = await import("../data/software.ts");
 const { normalizeGuide } = await import("../lib/guide.ts");
-const { seedToItem, SEED_SYNC_FIELDS } = await import("../lib/seed.ts");
+const { seedToItem, SEED_FILL_FIELDS, SEED_SYNC_FIELDS } = await import("../lib/seed.ts");
 
 function parseArgs(argv) {
   const args = { dryRun: false, guidesOnly: false, help: false };
@@ -89,6 +89,14 @@ async function main() {
   // 正是本文件开头那段注释描述的甩锅现场。
   // 同步范围同样从登记表取（比漂移比对窄：有些字段后台改得更准）。
   const SYNCED_FIELDS = SEED_SYNC_FIELDS;
+  // 「运行库为空才补」的字段：空 = 还没补，不是人工判定为空。
+  const FILLED_FIELDS = SEED_FILL_FIELDS;
+  /** 后台把字段清成空值（空串 / 空数组）即视为「尚无内容」。 */
+  const isEmpty = (value) =>
+    value === undefined ||
+    value === null ||
+    (typeof value === "string" && value.trim() === "") ||
+    (Array.isArray(value) && value.length === 0);
 
   for (const item of catalog) {
     // 比对必须与对象键顺序无关：DB 往返会重排 links 的键（diskSha256/diskFile 先后不同），
@@ -109,6 +117,16 @@ async function main() {
       if (same(item[field], fresh[field])) continue;
       merged[field] = fresh[field];
       changed.push(field);
+    }
+
+    // 补空档：种子有、运行库空着就填上。运行库已有值（哪怕和种子不同）
+    // 说明后台动过，那是人工判断，不覆盖 —— 这类分歧留在 seed:drift 里由人看。
+    for (const field of FILLED_FIELDS) {
+      if (fresh[field] === undefined) continue;
+      if (!isEmpty(item[field])) continue;
+      if (same(item[field], fresh[field])) continue;
+      merged[field] = fresh[field];
+      changed.push(field + "(补空)");
     }
 
     // guide 走 normalizeGuide：**seedToItem 原样透传，normalizeGuide 会 trim。**

@@ -37,6 +37,7 @@
 | 命令 | 用途 |
 |---|---|
 | `npm run content:audit` | 列出条目缺失字段、场景库存与待补清单（`--scene <id>` 只看一个场景，`--json` 机器可读） |
+| `npm run license:audit` | 许可证缺口审计：给缺失的条目附上 GitHub 的检测结果与双许可判断，**只报告不写数据** |
 | `npm run seed:sync` / `seed:drift` | 种子与运行库的双落点同步与漂移比对（`--strict` 非零退出） |
 | `npm run merge:guides` | 教程行级合并（行级扫描定位） |
 | `npm run add:trending` | 批量收录：从 `trending-incoming/` 导入并校验 schema |

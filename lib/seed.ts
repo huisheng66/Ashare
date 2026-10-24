@@ -75,3 +75,20 @@ export const SEED_SYNC_FIELDS: string[] = [
   "scenes", "platforms", "license", "kind", "version", "linksCheckedAt", "guide",
   "previews",
 ];
+
+/**
+ * 「运行库为空才补」的字段 —— 同步只在运行库该字段为空时写入种子值。
+ *
+ * 为什么要第三档：alternatives（同类替代）由后台人工维护得更准 ——
+ * 替代品要看站内实际收录了谁，种子批量生成的那一版不一定是最好的选择。
+ * 所以它不能像 summary 那样无条件覆盖。但「空」和「人工判定为空」是两种意图：
+ * 空着基本等于「还没补」，是内容债，不是决定。
+ *
+ * 缺少这一档的代价是实测到的：674 条里 27 条的 alternatives 种子里有、运行库为空，
+ * seed:sync 说「已是最新」，seed:drift 却报 27 处不一致 ——
+ * 两个脚本互相甩锅，而这批差异纯靠人一条条补是体力活。
+ *
+ * 契约：FILL ⊆ DRIFT 且 FILL ∩ SYNC = ∅（由 tests/seed-contract.test.mjs 钉住）。
+ * 只在运行库**为空**时补，所以后台已经填过（哪怕填得和种子不同）的条目不会被覆盖。
+ */
+export const SEED_FILL_FIELDS: string[] = ["alternatives"];
